@@ -1,0 +1,37 @@
+{
+  "name": "sarita_abdm_backend",
+  "version": "1.0.0",
+  "description": "ABDM Compliant Backend",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "verify:m2": "node scripts/verify_m2_architecture.js",
+    "verify:prescription-bundle": "node scripts/verify_prescription_bundle.js",
+    "verify:file-bundles": "node scripts/verify_file_bundle_generators.js",
+    "tunnel": "./scripts/start_cloudflared_tunnel.sh",
+    "tunnel:stop": "./scripts/stop_cloudflared_tunnel.sh",
+    "tunnel:localtunnel": "lt --port 3000"
+  },
+  "keywords": [
+    "abdm",
+    "health",
+    "backend"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "asn1.js": "^5.4.1",
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "elliptic": "^6.6.1",
+    "express": "^5.2.1",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "localtunnel": "^2.0.2",
+    "nodemon": "^3.0.0"
+  }
+}

@@ -1,0 +1,525 @@
+const axios = require("axios");
+const { v4: uuidv4 } = require("uuid");
+const { getGatewayToken } = require("../services/gatewayService");
+const { signPayloadAsJws } = require("../services/jwsService");
+const { getHeaders } = require("../utils/headers");
+const { pushEvent, getEventByRequestId, listEvents } = require("../utils/m2EventStore");
+
+const toText = (value) => {
+  if (value === null || value === undefined) return "";
+  const text = String(value).trim();
+  return text.length > 0 ? text : "";
+};
+
+const toObject = (value) =>
+  value && typeof value === "object" && !Array.isArray(value) ? value : {};
+
+const getErrorPayload = (err) => {
+  const status = err.response?.status || 500;
+  const data = err.response?.data;
+
+  if (typeof data === "string") {
+    return { status, body: { error: data } };
+  }
+  if (data && typeof data === "object") {
+    return { status, body: data };
+  }
+
+  return {
+    status,
+    body: { error: err.message || "ABDM API call failed" },
+  };
+};
+
+const withGatewayHeaders = async (extraHeaders = {}) => {
+  const gatewayToken = await getGatewayToken();
+  return {
+    ...getHeaders(gatewayToken),
+    ...extraHeaders,
+  };
+};
+
+const toIsoTimestamp = (value, fallback) => {
+  const text = toText(value);
+  if (!text) return fallback;
+  const parsed = new Date(text);
+  if (Number.isNaN(parsed.getTime())) return fallback;
+  return parsed.toISOString();
+};
+
+const parseHiTypes = (value) => {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => toText(item))
+      .filter(Boolean);
+  }
+
+  const text = toText(value);
+  return text ? [text] : [];
+};
+
+const postToAbdm = async ({ path, body, extraHeaders = {} }) => {
+  const headers = await withGatewayHeaders(extraHeaders);
+  const response = await axios.post(
+    `${process.env.GATEWAY_BASE}${path}`,
+    toObject(body),
+    { headers }
+  );
+  return response.data;
+};
+
+const postToAbdmWithFallback = async ({
+  primaryPath,
+  fallbackPath,
+  body,
+  extraHeaders = {},
+}) => {
+  try {
+    return await postToAbdm({
+      path: primaryPath,
+      body,
+      extraHeaders,
+    });
+  } catch (err) {
+    const status = Number(err.response?.status || 0);
+    if (!fallbackPath || (status !== 404 && status !== 405)) {
+      throw err;
+    }
+
+    return postToAbdm({
+      path: fallbackPath,
+      body,
+      extraHeaders,
+    });
+  }
+};
+
+const shouldRetryDiscoverVariant = (err) => {
+  const status = Number(err.response?.status || 0);
+  const body = err.response?.data;
+  const message =
+    typeof body === "string"
+      ? body
+      : typeof body?.message === "string"
+        ? body.message
+        : typeof body?.error?.message === "string"
+          ? body.error.message
+          : typeof body?.error === "string"
+            ? body.error
+            : "";
+  const normalized = String(message || "").toLowerCase();
+
+  return (
+    status === 404 ||
+    status === 405 ||
+    status === 400 ||
+    status === 401 ||
+    normalized.includes("jwt signature") ||
+    normalized.includes("access denied") ||
+    normalized.includes("missing x-auth-token")
+  );
+};
+
+const tryDiscoverVariants = async ({ body, hiuId, xAuthToken }) => {
+  const rawToken = toText(xAuthToken);
+  const bearerToken = rawToken.toLowerCase().startsWith("bearer ")
+    ? rawToken
+    : `Bearer ${rawToken}`;
+  const variants = [
+    {
+      label: "user-initiated-linking/raw-token",
+      path: "/api/hiecm/user-initiated-linking/v3/patient/care-context/discover",
+      headers: {
+        "X-AUTH-TOKEN": rawToken,
+        "X-HIU-ID": hiuId,
+      },
+    },
+    {
+      label: "user-initiated-linking/bearer-token",
+      path: "/api/hiecm/user-initiated-linking/v3/patient/care-context/discover",
+      headers: {
+        "X-AUTH-TOKEN": bearerToken,
+        "X-HIU-ID": hiuId,
+      },
+    },
+    {
+      label: "hip-v3/raw-token",
+      path: "/api/hiecm/hip/v3/patient/care-context/discover",
+      headers: {
+        "X-AUTH-TOKEN": rawToken,
+        "X-HIU-ID": hiuId,
+      },
+    },
+    {
+      label: "hip-v3/bearer-token",
+      path: "/api/hiecm/hip/v3/patient/care-context/discover",
+      headers: {
+        "X-AUTH-TOKEN": bearerToken,
+        "X-HIU-ID": hiuId,
+      },
+    },
+  ];
+
+  let lastError = null;
+
+  for (const variant of variants) {
+    try {
+      const response = await postToAbdm({
+        path: variant.path,
+        body,
+        extraHeaders: variant.headers,
+      });
+      return {
+        response,
+        variant: variant.label,
+      };
+    } catch (err) {
+      lastError = err;
+      if (!shouldRetryDiscoverVariant(err)) {
+        throw err;
+      }
+    }
+  }
+
+  throw lastError;
+};
+
+exports.generateToken = async (req, res) => {
+  try {
+    const hipId =
+      toText(req.body?.hipId) ||
+      toText(req.header("X-HIP-ID")) ||
+      toText(process.env.HIP_ID);
+    if (!hipId) {
+      return res.status(400).json({ error: "HIP ID is required for generate-token" });
+    }
+
+    const payload = toObject(req.body);
+    if (Object.prototype.hasOwnProperty.call(payload, "hipId")) {
+      delete payload.hipId;
+    }
+
+    const headers = await withGatewayHeaders({
+      "X-HIP-ID": hipId,
+    });
+    const requestId = toText(headers["REQUEST-ID"]);
+
+    const response = await axios.post(
+      `${process.env.GATEWAY_BASE}/api/hiecm/v3/token/generate-token`,
+      payload,
+      { headers }
+    );
+
+    const callback = requestId
+      ? getEventByRequestId("token_on_generate", requestId)
+      : null;
+
+    if (callback?.payload && typeof callback.payload === "object") {
+      return res.json({
+        requestId,
+        callbackReceived: true,
+        ...callback.payload,
+      });
+    }
+
+    return res.json({
+      requestId,
+      callbackReceived: false,
+      callbackPending: true,
+      immediateResponse:
+        response?.data && typeof response.data === "object" ? response.data : {},
+      message:
+        "Link token request accepted. ABDM callback has not reached the app yet.",
+    });
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.generateConsentViewLink = async (req, res) => {
+  try {
+    // Validate gateway auth first so the flow always depends on ABDM session validity.
+    await getGatewayToken();
+
+    const now = new Date().toISOString();
+    const requestId = toText(req.body?.requestId) || uuidv4();
+    const timestamp = toIsoTimestamp(req.body?.timestamp, now);
+
+    const hiuId =
+      toText(req.body?.hiuId) ||
+      toText(req.body?.hiu?.id) ||
+      toText(process.env.HIU_ID) ||
+      toText(process.env.ABDM_CLIENT_ID);
+    const patientId =
+      toText(req.body?.patientId) ||
+      toText(req.body?.patient?.id) ||
+      toText(req.body?.AbhaAddress);
+
+    if (!hiuId) {
+      return res.status(400).json({ error: "HIU ID is required for consent view JWS" });
+    }
+    if (!patientId) {
+      return res.status(400).json({ error: "Patient ID (Abha address/ID) is required" });
+    }
+
+    const defaultFrom = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const dateFrom = toIsoTimestamp(
+      req.body?.dateFrom || req.body?.permission?.dateRange?.from,
+      defaultFrom
+    );
+    const dateTo = toIsoTimestamp(
+      req.body?.dateTo || req.body?.permission?.dateRange?.to,
+      now
+    );
+
+    const purposeText =
+      toText(req.body?.purposeText) ||
+      toText(req.body?.purpose?.text) ||
+      "View medical records";
+    const purposeCode =
+      toText(req.body?.purposeCode) ||
+      toText(req.body?.purpose?.code) ||
+      "CAREMGT";
+    const requesterName =
+      toText(req.body?.requesterName) ||
+      toText(req.body?.requester?.name);
+    const hipId = toText(req.body?.hipId || req.body?.hip?.id);
+    const hiTypes = parseHiTypes(req.body?.hiTypes);
+
+    const consentRequest = {
+      requestId,
+      timestamp,
+      hiu: { id: hiuId },
+      patient: { id: patientId },
+      purpose: {
+        text: purposeText,
+        code: purposeCode,
+      },
+      permission: {
+        accessMode: "VIEW",
+        dateRange: {
+          from: dateFrom,
+          to: dateTo,
+        },
+      },
+      ...(requesterName
+        ? {
+            requester: {
+              name: requesterName,
+            },
+          }
+        : {}),
+      ...(hipId ? { hip: { id: hipId } } : {}),
+      ...(hiTypes.length ? { hiTypes } : {}),
+    };
+
+    const jwsToken = signPayloadAsJws(consentRequest, {
+      keyId: toText(process.env.ABDM_HIU_KEY_ID || process.env.HIU_KEY_ID),
+    });
+
+    const baseConsentViewUrl =
+      toText(process.env.ABDM_CONSENT_VIEW_URL) ||
+      toText(process.env.CONSENT_VIEW_URL) ||
+      "https://consent.abdm.gov.in/view";
+
+    const consentUrl = new URL(baseConsentViewUrl);
+    consentUrl.searchParams.set("request", jwsToken);
+
+    return res.json({
+      requestId,
+      timestamp,
+      consentRequest,
+      jwsToken,
+      consentViewUrl: consentUrl.toString(),
+    });
+  } catch (err) {
+    const isConfigError =
+      toText(err.message).toLowerCase().includes("private key");
+    if (isConfigError) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.discover = async (req, res) => {
+  try {
+    const xAuthToken = toText(req.header("X-Auth-Token"));
+    const hiuId =
+      toText(req.header("X-HIU-ID")) ||
+      toText(process.env.HIU_ID) ||
+      toText(process.env.ABDM_CLIENT_ID);
+
+    if (!xAuthToken) {
+      return res.status(401).json({
+        error: "Missing X-Auth-Token (PHR session token from Abha login)",
+      });
+    }
+    if (!hiuId) {
+      return res.status(400).json({ error: "Missing HIU ID configuration" });
+    }
+
+    const { response, variant } = await tryDiscoverVariants({
+      body: req.body,
+      hiuId,
+      xAuthToken,
+    });
+
+    return res.json({
+      ...response,
+      discoverVariant: variant,
+    });
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.linkCareContexts = async (req, res) => {
+  try {
+    const linkToken =
+      toText(req.header("X-LINK-TOKEN")) ||
+      toText(req.body?.linkingToken);
+    const hipId =
+      toText(req.header("X-HIP-ID")) ||
+      toText(req.body?.hipId) ||
+      toText(process.env.HIP_ID);
+
+    if (!linkToken) {
+      return res.status(400).json({ error: "X-LINK-TOKEN is required for link care context" });
+    }
+    if (!hipId) {
+      return res.status(400).json({ error: "HIP ID is required for link care context" });
+    }
+
+    const payload = toObject(req.body);
+    delete payload.linkingToken;
+    delete payload.hipId;
+
+    const response = await postToAbdmWithFallback({
+      primaryPath: "/api/hiecm/hip/v3/link/carecontext",
+      fallbackPath: "/api/hiecm/hip/v3/link/patient/links",
+      body: payload,
+      extraHeaders: {
+        "X-LINK-TOKEN": linkToken,
+        "X-HIP-ID": hipId,
+      },
+    });
+    return res.json(response);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.patientLinks = async (req, res) => {
+  try {
+    const response = await postToAbdm({
+      path: "/api/hiecm/hip/v3/link/patient/links",
+      body: req.body,
+    });
+    return res.json(response);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.notifyContext = async (req, res) => {
+  try {
+    const response = await postToAbdm({
+      path: "/api/hiecm/hip/v3/link/context/notify",
+      body: req.body,
+    });
+    return res.json(response);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.notifyMobile = async (req, res) => {
+  try {
+    const response = await postToAbdmWithFallback({
+      primaryPath: "/api/hiecm/hip/v3/link/patient/links/sms/notify2",
+      fallbackPath: "/api/hiecm/hip/v3/link/patient/links/notify2",
+      body: req.body,
+    });
+    return res.json(response);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.consentOnNotify = async (req, res) => {
+  try {
+    const response = await postToAbdm({
+      path: "/api/hiecm/consent/v3/request/hip/on-notify",
+      body: req.body,
+    });
+    return res.json(response);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.dataOnRequest = async (req, res) => {
+  try {
+    const response = await postToAbdm({
+      path: "/api/hiecm/data-flow/v3/health-information/hip/on-request",
+      body: req.body,
+    });
+    return res.json(response);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.dataFlowNotify = async (req, res) => {
+  try {
+    const response = await postToAbdm({
+      path: "/api/hiecm/data-flow/v3/health-information/notify",
+      body: req.body,
+    });
+    return res.json(response);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.getTokenCallback = async (req, res) => {
+  const requestId = toText(req.params?.requestId);
+  if (!requestId) {
+    return res.status(400).json({ error: "requestId is required" });
+  }
+
+  const callback = getEventByRequestId("token_on_generate", requestId);
+  if (!callback) {
+    return res
+      .status(404)
+      .json({ error: "Callback not received yet for this requestId" });
+  }
+
+  return res.json(callback);
+};
+
+exports.getRecentTokenCallbacks = async (req, res) => {
+  const limit = Number(req.query?.limit || 20);
+  const callbacks = listEvents("token_on_generate", limit);
+  return res.json({
+    callbacks,
+    total: callbacks.length,
+  });
+};
+
+exports.onGenerateToken = async (req, res) => {
+  pushEvent("token_on_generate", req.body || {});
+  return res.status(202).json({});
+};

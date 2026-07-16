@@ -1,0 +1,2874 @@
+{
+	"info": {
+		"_postman_id": "bdc85f50-0310-4502-abf0-4f432ff770c5",
+		"name": "ConsentM",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11710522"
+	},
+	"item": [
+		{
+			"name": "CM",
+			"item": [
+				{
+					"name": "Subscription",
+					"item": [
+						{
+							"name": "Deny Subscription",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const moment = require('moment');",
+											"pm.globals.set(\"timestamp\", moment.utc().format(\"YYYY-MM-DDTHH:mm:ss.SSSSSS\"));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{AUTHORIZATION}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Auth-Token",
+										"value": "{{AUTHORIZATION}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"sources\": [\n        {\n            \"categories\": [\n                \"LINK\"\n            ],\n            \"hip\": {\n                \"id\": \"IN0410000183\"\n            },\n            \"hiTypes\": [\n                \"DiagnosticReport\",\n                \"Prescription\",\n                \"DischargeSummary\",\n                \"OPConsultation\"\n            ],\n            \"period\": {\n                 \"from\": \"2021-12-01T04:39:04.368Z\",\n                \"to\": \"2021-12-03T04:39:04.368Z\"\n            },\n            \"purpose\": {\n                \"code\": \"PATRQT\",\n                \"text\": \"Self Requested\"\n            }\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{CM_HOST}}/subscription-requests/be8b2623-19f0-4616-87e6-206027377177/deny",
+									"host": [
+										"{{CM_HOST}}"
+									],
+									"path": [
+										"subscription-requests",
+										"be8b2623-19f0-4616-87e6-206027377177",
+										"deny"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Approve Subscription Req",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const moment = require('moment');",
+											"pm.globals.set(\"timestamp\", moment.utc().format(\"YYYY-MM-DDTHH:mm:ss.SSSSSS\"));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{AUTHORIZATION}}",
+										"type": "text"
+									},
+									{
+										"key": "X-Auth-Token",
+										"value": "{{AUTHORIZATION}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"isApplicableForAllHIPs\": false,\n    \"sources\": [\n        {\n            \"categories\": [\n                \"LINK\"\n            ],\n            \"hip\": {\n                \"id\": \"IN0410000183\"\n            },\n            \"hiTypes\": [\n                \"DiagnosticReport\",\n                \"Prescription\",\n                \"DischargeSummary\",\n                \"OPConsultation\"\n            ],\n            \"period\": {\n                 \"from\": \"2021-12-01T04:39:04.368Z\",\n                \"to\": \"2021-12-03T04:39:04.368Z\"\n            },\n            \"purpose\": {\n                \"code\": \"PATRQT\",\n                \"text\": \"Self Requested\"\n            }\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{CM_HOST}}/subscription-requests/545b4bba-c444-4320-9d8f-0ea1c7f7543e/approve",
+									"host": [
+										"{{CM_HOST}}"
+									],
+									"path": [
+										"subscription-requests",
+										"545b4bba-c444-4320-9d8f-0ea1c7f7543e",
+										"approve"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get subscription details of a subscription id",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "accept",
+										"value": "application/json"
+									},
+									{
+										"key": "X-AUTH-TOKEN",
+										"value": "{{AUTHORIZATION}}"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{AUTHORIZATION}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{CM_HOST}}/subscription-requests/?subscription-id=2b12ad3f-7122-4701-8a53-45537b5cbe62",
+									"host": [
+										"{{CM_HOST}}"
+									],
+									"path": [
+										"subscription-requests",
+										""
+									],
+									"query": [
+										{
+											"key": "subscription-id",
+											"value": "2b12ad3f-7122-4701-8a53-45537b5cbe62"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Subscription Request",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const moment = require('moment');",
+											"pm.globals.set(\"timestamp\", moment.utc().format(\"YYYY-MM-DDTHH:mm:ss.SSSSSS\"));"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"type": "text",
+										"value": "{{AUTHORIZATION}}"
+									},
+									{
+										"key": "X-Auth-Token",
+										"type": "text",
+										"value": "{{AUTHORIZATION}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "\n{\n    \"requestId\": \"{{$guid}}\",\n    \"timestamp\": \"{{timestamp}}\",\n    \"subscription\":{\n        \"purpose\": {\n            \"text\": \"Care Management\",\n            \"code\": \"CAREMGT\"\n        },\n        \"patient\":{\n            \"id\":\"test.sb.005@ndhm\"\n        },\n        \"hiu\":{\n            \"id\": \"10000010\",\n            \"name\": \"NDHM Health Locker\"\n        },\n        \"hips\":[\n            {\n                \"id\":\"10000005\",\n                \"name\": \"Max Health Care\"\n            },\n            {\n                \"id\":\"10019843\",\n                \"name\": \"Well Being Hospital\"\n            }\n        ],\n        \"categories\":[\"DATA\", \"LINK\"],\n        \"period\":{\n            \"from\": \"2017-10-08T08:51:11.721Z\",\n            \"to\": \"2021-10-08T08:51:11.721Z\"\n        }\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{CM_HOST}}/subscription-requests?limit=10&offset=0&status=GRANTED",
+									"host": [
+										"{{CM_HOST}}"
+									],
+									"path": [
+										"subscription-requests"
+									],
+									"query": [
+										{
+											"key": "limit",
+											"value": "10"
+										},
+										{
+											"key": "offset",
+											"value": "0"
+										},
+										{
+											"key": "status",
+											"value": "GRANTED"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Patient AUth Init",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update session id\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"PAT_AUTH_TXN_ID\", jsonData.txnId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"authMethod\": \"MOBILE_OTP\",\n\t\"healthid\": \"73-7854-0707-4044\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/auth-init",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"auth-init"
+							]
+						},
+						"description": "\t"
+					},
+					"response": []
+				},
+				{
+					"name": "Patient AUth confirm",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update session id\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"HEALTH_ID_FOR_COMPLETE\", jsonData.profile.healthId);",
+									"    pm.environment.set(\"TOKEN\", jsonData.token);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"transactionId\": \"{{PAT_AUTH_TXN_ID}}\",\n\t\"authCode\": \"440027\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/auth-confirm",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"auth-confirm"
+							]
+						},
+						"description": "\t"
+					},
+					"response": []
+				},
+				{
+					"name": "Patient AUth complete Profile",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{TOKEN}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"cmId\": \"xxx@sbx\",\n\t\"healthId\": \"{{HEALTH_ID_FOR_COMPLETE}}\",\n\t\"password\": \"Testing@1\" \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/complete-profile",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"complete-profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New User Gen Aadhar OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{USER_TEMP_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"aadhaar\": \"472579072033\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/generate-aadhar-otp",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"generate-aadhar-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New User Verify Aadhar OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"USER_TEMP_TOKEN\", jsonData.temporaryToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{USER_TEMP_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"txnId\": \"aa217d2d-c1a7-43f5-8302-46de76220154\",\n    \"otp\": \"\"    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/verify-aadhar-otp",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"verify-aadhar-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patient",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/users/anaro@sbx",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"users",
+								"anaro@sbx"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Providers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/providers?name=cow",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"providers"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "cow"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Discovery Enquiry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update patient reference number\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"PATIENT_REF_NUMBER\", jsonData.patient.referenceNumber);",
+									"    pm.environment.set(\"CARE_CONTEXT1_NUMBER\",",
+									"    jsonData.patient.careContexts[0].referenceNumber)",
+									"    pm.environment.set(\"DISCOVERY_REQUEST_ID\", jsonData.transactionId)",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "patientId",
+								"type": "text",
+								"value": "1",
+								"disabled": true
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/json",
+								"disabled": true
+							},
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{AUTHORIZATION}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"requestId\": \"{{$guid}}\",\n    \"hip\": {\n        \"id\": \"IN0410000183\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/v1/care-contexts/discover",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"v1",
+								"care-contexts",
+								"discover"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Link Enquiry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update link reference number\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"LINK_REF_NUMBER\", jsonData.link.referenceNumber);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"requestId\": \"{{$guid}}\",\n\t\"transactionId\": \"{{DISCOVERY_REQUEST_ID}}\",\n\t\"patient\": {\n\t\t\"referenceNumber\": \"{{PATIENT_REF_NUMBER}}\",\n\t\t\"careContexts\": [\n            {\n                \"referenceNumber\": \"{{CARE_CONTEXT1_NUMBER}}\"\n            }\n        ]\n\t}\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/v1/links/link/init",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"v1",
+								"links",
+								"link",
+								"init"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Link Confirmation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"token\": \"748632\"\n}"
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/v1/links/link/confirm/{{LINK_REF_NUMBER}}",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"v1",
+								"links",
+								"link",
+								"confirm",
+								"{{LINK_REF_NUMBER}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Links",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/patients/links",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"links"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consent Requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/consent-requests?status=GRANTED",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consent-requests"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "GRANTED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create pin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiIzNi0wODg3LTc4NTUtMTU0MiIsIm1vYmlsZSI6Ijg2MTkxMzk0MjUiLCJoZWFsdGhJZCI6InNodWJoLnNodWtsYTFAc2J4IiwiZXhwIjoxNjM3MDUxODY1LCJoZWFsdGhJZE51bWJlciI6IjM2LTA4ODctNzg1NS0xNTQyIiwiaWF0IjoxNjM3MDUwMDY1fQ.WUq3YbEDU8PCGWxlGRjdbIOTyB-YyKtwGLQvKRkRJUNQtiMR8eauP_3INTfL6LVvd5GaG0CjylEoEaNwpG7_IZRrKQx7axEvUuqi9wtqCwNlpQLmrRUCBhq552wkJRw_Lm3Qa36MHNTdKb2_SSa2X4Ml4zmVzTe3YHrX-Xwe1MMfMKeYnNhlG733HC0nrteRYto3X7EWGP2O_t2Otcaw-CaYYzHByyk-4WALM7dRkmW0RbG529J5TeE1RQRGBvt7m334OGXvWk4Jj7ct96hGwGs9dk3XCNUmw0lc9KmqcFnDrwWizpqgXptDGfBp-xXUMD7_kx-1ukDXQjru02tTfnyjpN7njXszmUUURXjpUvs-OKhJm9z33Hn995ncELv1VCkMj3w-Px0X3j4iYM7np_rgvnlyt4nRUY8WUBmSLRVSGair4q7Aicv32HD-ldMQWxVydfaB1JQTNXH0LIATj_XuPsisRt453IlAgwBrjC8RAzkERwErYpbBPsOd7Fpx9KiJvaz3M8PMdjvvHt1BBUO_Z2foSuu3_Wgpg2H9o9QF516zAOAHp6i368Yw7BcagEBMp7ARXxrmcaVDxqf0DD2d63NaGVcB53pi86lfOwXWtv3JaqtprkzNQCjm5FyLfsytsfQzElTI_HC_FoA5A5r3F6A8UGGo_oH9hczsk6A",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"pin\": \"1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/pin",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"pin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify pin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"PIN_AUTHORIZATION\", jsonData.temporaryToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiIzNi0wODg3LTc4NTUtMTU0MiIsIm1vYmlsZSI6Ijg2MTkxMzk0MjUiLCJoZWFsdGhJZCI6InNodWJoLnNodWtsYTFAc2J4IiwiZXhwIjoxNjM3MDUxODY1LCJoZWFsdGhJZE51bWJlciI6IjM2LTA4ODctNzg1NS0xNTQyIiwiaWF0IjoxNjM3MDUwMDY1fQ.WUq3YbEDU8PCGWxlGRjdbIOTyB-YyKtwGLQvKRkRJUNQtiMR8eauP_3INTfL6LVvd5GaG0CjylEoEaNwpG7_IZRrKQx7axEvUuqi9wtqCwNlpQLmrRUCBhq552wkJRw_Lm3Qa36MHNTdKb2_SSa2X4Ml4zmVzTe3YHrX-Xwe1MMfMKeYnNhlG733HC0nrteRYto3X7EWGP2O_t2Otcaw-CaYYzHByyk-4WALM7dRkmW0RbG529J5TeE1RQRGBvt7m334OGXvWk4Jj7ct96hGwGs9dk3XCNUmw0lc9KmqcFnDrwWizpqgXptDGfBp-xXUMD7_kx-1ukDXQjru02tTfnyjpN7njXszmUUURXjpUvs-OKhJm9z33Hn995ncELv1VCkMj3w-Px0X3j4iYM7np_rgvnlyt4nRUY8WUBmSLRVSGair4q7Aicv32HD-ldMQWxVydfaB1JQTNXH0LIATj_XuPsisRt453IlAgwBrjC8RAzkERwErYpbBPsOd7Fpx9KiJvaz3M8PMdjvvHt1BBUO_Z2foSuu3_Wgpg2H9o9QF516zAOAHp6i368Yw7BcagEBMp7ARXxrmcaVDxqf0DD2d63NaGVcB53pi86lfOwXWtv3JaqtprkzNQCjm5FyLfsytsfQzElTI_HC_FoA5A5r3F6A8UGGo_oH9hczsk6A",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"requestId\" : \"{{$guid}}\",\n\t\"pin\": \"1234\",\n\t\"scope\" : \"consent.autoapprove\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/verify-pin",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"verify-pin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auto Approve",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{PIN_AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "x-cm-Id",
+								"value": "sbx",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"isApplicableForAllHIPs\": true,\n    \"hiu\": {\n        \"id\": \"Test-HIU\",\n        \"name\": \"HIU for test\"\n    },\n    \"includedSources\": [\n        {\n            \"hiTypes\": [\n                \"DiagnosticReport\",\n                \"Prescription\",\n                \"DischargeSummary\",\n                \"OPConsultation\",\n                \"ImmunizationRecord\",\n                \"WellnessRecord\",\n                \"HealthDocumentRecord\"\n            ],\n            \"purpose\": {\n                \"code\": \"PATRQT\",\n                \"text\": \"Self Requested\"\n            },\n            \"period\": {\n                \"from\": \"2020-01-01T12:54:21.896Z\",\n                \"to\": \"2121-12-31T12:54:21.896Z\"\n            }\n        }\n    ],\n    \"excludedSources\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/consents/auto-approve",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consents",
+								"auto-approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Enable auto-approval-policy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"url": {
+							"raw": "https://dev.abdm.gov.in/cm/consents/auto-approval-policy/a6acc1d5-b005-416d-a796-b08307b71896/enable",
+							"protocol": "https",
+							"host": [
+								"dev",
+								"abdm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"cm",
+								"consents",
+								"auto-approval-policy",
+								"a6acc1d5-b005-416d-a796-b08307b71896",
+								"enable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Disable auto-approval-policy",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"url": {
+							"raw": "https://dev.abdm.gov.in/cm/consents/auto-approval-policy/a6acc1d5-b005-416d-a796-b08307b71896/disable",
+							"protocol": "https",
+							"host": [
+								"dev",
+								"abdm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"cm",
+								"consents",
+								"auto-approval-policy",
+								"a6acc1d5-b005-416d-a796-b08307b71896",
+								"disable"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Grant Consent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update Consent Artefact ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"CONSENT_ARTEFACT_ID\", jsonData.consents[0].id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{PIN_AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{PIN_AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"consents\": [\n        {\n            \"careContexts\": [\n                {\n                    \"careContextReference\": \"DEMO-26-001\",\n                    \"patientReference\": \"TEST-001\"\n                }\n            ],\n            \"purpose\": {\n                \"code\": \"CAREMGT\"\n            },\n            \"hiTypes\": [\n                \"OPConsultation\",\n                \"DiagnosticReport\",\n                \"DischargeSummary\",\n                \"Prescription\",\n                \"ImmunizationRecord\",\n                \"HealthDocumentRecord\",\n                \"WellnessRecord\"\n            ],\n            \"hip\": {\n                \"id\": \"TEST_HIP\"\n            },\n            \"permission\": {\n                \"accessMode\": \"VIEW\",\n                \"dataEraseAt\": \"2022-10-30T12:30:00.352\",\n                \"dateRange\": {\n                    \"from\": \"1992-04-03T10:05:26.352\",\n                    \"to\": \"2021-06-28T14:05:26.352\"\n                },\n                \"frequency\": {\n                    \"value\": 1,\n                    \"unit\": \"YEAR\",\n                    \"repeats\": 0\n                }\n            }\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/consent-requests/d79409b1-0235-43fd-ac75-ee0cf6be1a44/approve",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consent-requests",
+								"d79409b1-0235-43fd-ac75-ee0cf6be1a44",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Consent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{PIN_AUTHORIZATION}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"consents\": [\n        \"{{CONSENT_ARTEFACT_ID}}\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/consents/revoke",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consents",
+								"revoke"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Session",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"AUTHORIZATION\", jsonData.token);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.refreshToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"XXXX@sbx\",\n\t\"password\": \"password\",\n\t\"grantType\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/sessions",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"sessions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Session (Request OTP)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"OTP_SESSION_ID\", jsonData.sessionId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"jainbrijesh@ndhm\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/otpsession/verify",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"otpsession",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Session (Verify OTP)",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"AUTHORIZATION\", \"bearer \" + jsonData.accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.refreshToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"{{USERNAME}}\",\n\t\"sessionId\": \"{{OTP_SESSION_ID}}\",\n\t\"otp\" : \"666666\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/otpsession/permit",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"otpsession",
+								"permit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consent Artefacts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/consent-requests/{{CONSENT_REQUEST_ID}}/consent-artefacts",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consent-requests",
+								"{{CONSENT_REQUEST_ID}}",
+								"consent-artefacts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consent Request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"CONSENT_REQUEST_ID\", jsonData.id);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{CENTRAL_REGISTRY_AUTH}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"requestId\": \"{{$guid}}\",\n    \"consent\": {\n        \"patient\": {\n            \"id\": \"arvind.tomar@sbx\"\n        },\n        \"purpose\": {\n            \"code\": \"CAREMGT\",\n            \"text\": \"Care Management\"\n        },\n        \"hiTypes\": [\n            \"OPConsultation\",\n            \"DiagnosticReport\",\n            \"DischargeSummary\",\n            \"Prescription\",\n            \"ImmunizationRecord\",\n            \"HealthDocumentRecord\",\n            \"WellnessRecord\"\n        ],\n        \"hiu\": {\n            \"id\": \"TEST_HIU\",\n            \"name\": \"TEST_HIU\"\n        },\n        \"requester\": {\n            \"name\": \"Dr Lakshmi\",\n            \"identifier\": {\n                \"value\": \"1\",\n                \"type\": \"identifier\",\n                \"system\": \"NCG\"\n            }\n        },\n        \"permission\": {\n            \"accessMode\": \"VIEW\",\n            \"frequency\": {\n                \"unit\": \"YEAR\",\n                \"value\": \"1\"\n            },\n            \"dateRange\": {\n                \"from\": \"1999-11-23T11:06:32.760Z\",\n                \"to\": \"2021-11-23T14:06:32.760Z\"\n            },\n            \"dataEraseAt\": \"2022-12-21T11:06:32.760Z\"\n        },\n        \"consentNotificationUrl\": \"https://webhook.site/7e794085-0e91-4909-8615-b9ff647eda4b\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/consent-requests",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consent-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Internal Consent Artefact",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/internal/consents/{{CONSENT_REQUEST_ID}}",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"internal",
+								"consents",
+								"{{CONSENT_REQUEST_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "HIU consent",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{CENTRAL_REGISTRY_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/consents/{{CONSENT_REQUEST_ID}}",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consents",
+								"{{CONSENT_REQUEST_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{CENTRAL_REGISTRY_AUTH_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/health-information/request",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"health-information",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Deny Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/consent-requests/{{CONSENT_REQUEST_ID}}/deny",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consent-requests",
+								"{{CONSENT_REQUEST_ID}}",
+								"deny"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"warning": "This is a duplicate header and will be overridden by the Authorization header generated by Postman.",
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"refreshToken\" : \"{{REFRESH_TOKEN}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/logout",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Consent Artefacts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/consentArtefacts?status=GRANTED&limit=3&offset=1",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"consentArtefacts"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "GRANTED"
+								},
+								{
+									"key": "limit",
+									"value": "3"
+								},
+								{
+									"key": "offset",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update session token for generate otp\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"GENERATE_OTP_SESSION_ID\", jsonData.sessionId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \"username\": \"{{USERNAME}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/generateotp",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"generateotp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Verify OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"VERIFY_OTP_TEMP_TOKEN\", jsonData.temporaryToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"sessionId\": \"{{GENERATE_OTP_SESSION_ID}}\",\n\t\"value\": \"985799\",\n    \"authMode\": \"MOBILE_OTP\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/verifyotp",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"verifyotp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset password",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"AUTHORIZATION\", \"bearer \" + jsonData.accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.refreshToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{VERIFY_OTP_TEMP_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/reset-password",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update password",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"AUTHORIZATION\", \"bearer \" + jsonData.accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.refreshToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"oldPassword\": \"password\",\n\t\"newPassword\":  \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/update-password",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"update-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change pin",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{PIN_AUTHORIZATION}}",
+								"type": "text",
+								"disabled": true
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{PIN_AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"pin\": \"1111\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/change-pin",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"change-pin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recovery init for CM Id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update session token for generate otp\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"RECOVERY_SESSION_ID\", jsonData.sessionId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\n    \"name\": {\n        \"first\": \"Mritunjay\",\n    \"last\": \"Dubey\"\n\n    },\n\"gender\": \"M\",\n\"dateOfBirth\":{\n    \"year\": 1992\n},\n\"verifiedIdentifiers\": [\n{\n\"type\": \"MOBILE\",\n\"value\": \"+91-8904653362\"\n}\n],\n\"unverifiedIdentifiers\": []\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/recovery-init",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"recovery-init"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recovery confirm for CM Id",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"sessionId\": \"{{RECOVERY_SESSION_ID}}\",\n\t\"value\": \"666666\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/recovery-confirm",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"recovery-confirm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/patients/me",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Share Profile",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');",
+									"pm.globals.set(\"timestamp\", moment.utc().format(\"YYYY-MM-DDTHH:mm:ss.SSSSSS\"));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestId\": \"{{$guid}}\",\n  \"hipDetails\": {\n    \"hipId\": \"TEST_HIP_QA\",\n    \"code\": \"12345\"\n  },\n  \"patientDetails\": {\n    \"id\": \"mdubey@ndhm\",\n    \"healthId\": \"46-7824-7547-2246\",\n    \"name\": {\n        \"first\": \"Mritunjay\",        \n        \"last\": \"Dubey\"\n    },\n    \"gender\": \"M\",\n    \"dateOfBirth\": {\n        \"date\": 6,\n        \"month\": 3,\n        \"year\": 1992\n    },    \n    \"stateName\": \"Ladakh\",\n    \"stateCode\": \"37\",\n    \"districtName\": \"Kargil\",\n    \"districtCode\": \"6\",\n    \"aadhaarVerified\": false,    \n    \"hasTransactionPin\": false,\n    \"verifiedIdentifiers\": [\n        {\n            \"type\": \"MOBILE\",\n            \"value\": \"+91-8904653362\"\n        }\n    ],\n    \"unverifiedIdentifiers\": null\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/profile/share",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"profile",
+								"share"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get AUTH Requests",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');",
+									"pm.globals.set(\"timestamp\", moment.utc().format(\"YYYY-MM-DDTHH:mm:ss.SSSSSS\"));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n    \"requestId\": \"{{$guid}}\",\n    \"timestamp\": \"{{timestamp}}\",\n    \"subscription\":{\n        \"purpose\": {\n            \"text\": \"Care Management\",\n            \"code\": \"CAREMGT\"\n        },\n        \"patient\":{\n            \"id\":\"test.sb.005@ndhm\"\n        },\n        \"hiu\":{\n            \"id\": \"10000010\",\n            \"name\": \"NDHM Health Locker\"\n        },\n        \"hips\":[\n            {\n                \"id\":\"10000005\",\n                \"name\": \"Max Health Care\"\n            },\n            {\n                \"id\":\"10019843\",\n                \"name\": \"Well Being Hospital\"\n            }\n        ],\n        \"categories\":[\"DATA\", \"LINK\"],\n        \"period\":{\n            \"from\": \"2017-10-08T08:51:11.721Z\",\n            \"to\": \"2021-10-08T08:51:11.721Z\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/authorization-requests?limit=10&offset=0&status=GRANTED&mode=DIRECT",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"authorization-requests"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "status",
+									"value": "GRANTED"
+								},
+								{
+									"key": "mode",
+									"value": "DIRECT"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get combined requests",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');",
+									"pm.globals.set(\"timestamp\", moment.utc().format(\"YYYY-MM-DDTHH:mm:ss.SSSSSS\"));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{AUTHORIZATION}}"
+							},
+							{
+								"key": "X-Auth-Token",
+								"type": "text",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n    \"requestId\": \"{{$guid}}\",\n    \"timestamp\": \"{{timestamp}}\",\n    \"subscription\":{\n        \"purpose\": {\n            \"text\": \"Care Management\",\n            \"code\": \"CAREMGT\"\n        },\n        \"patient\":{\n            \"id\":\"test.sb.005@ndhm\"\n        },\n        \"hiu\":{\n            \"id\": \"10000010\",\n            \"name\": \"NDHM Health Locker\"\n        },\n        \"hips\":[\n            {\n                \"id\":\"10000005\",\n                \"name\": \"Max Health Care\"\n            },\n            {\n                \"id\":\"10019843\",\n                \"name\": \"Well Being Hospital\"\n            }\n        ],\n        \"categories\":[\"DATA\", \"LINK\"],\n        \"period\":{\n            \"from\": \"2017-10-08T08:51:11.721Z\",\n            \"to\": \"2021-10-08T08:51:11.721Z\"\n        }\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/subscription-requests?limit=10&offset=0&status=REQUESTED",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"subscription-requests"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								},
+								{
+									"key": "status",
+									"value": "REQUESTED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload to locker",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{LOCKER_HOST}}/v0.5/locker/upload",
+							"host": [
+								"{{LOCKER_HOST}}"
+							],
+							"path": [
+								"v0.5",
+								"locker",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "HID Exist",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/healthId/exists?healthId=test.sb.005",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"healthId",
+								"exists"
+							],
+							"query": [
+								{
+									"key": "healthId",
+									"value": "test.sb.005"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Patient Lockers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/patients/lockers",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"lockers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Locker Settings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/patients/lockers/10000010",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"lockers",
+								"10000010"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Pin Generate OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update session id\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"SESSION_ID\", jsonData.sessionId);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/patients/forgot-pin/generate-otp",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"forgot-pin",
+								"generate-otp"
+							]
+						},
+						"description": "\t"
+					},
+					"response": []
+				},
+				{
+					"name": "Forgot Pin Validate OTP",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"USER_TEMP_TOKEN\", jsonData.temporaryToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"sessionId\": \"{{SESSION_ID}}\",\n\t\"value\": \"666666\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/forgot-pin/validate-otp",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"forgot-pin",
+								"validate-otp"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Consent PIN",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"AUTHORIZATION\", \"bearer \" + jsonData.accessToken);",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.refreshToken);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{USER_TEMP_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"pin\": \"5555\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/patients/reset-pin",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"reset-pin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "HIP AUth confirm",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const moment = require('moment');\r",
+									"pm.globals.set(\"timestamp\", moment.utc().format(\"YYYY-MM-DDTHH:mm:ss.SSSSSS\"));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "*/*"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-CM-ID",
+								"value": "sbx",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{GATEWAY_AUTH}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"requestId\": \"{{$guid}}\",\r\n    \"timestamp\": \"{{timestamp}}\",\r\n    \"transactionId\": \"38c406c5-efab-4951-aaa1-eb7263d70039\",\r\n    \"credential\": {\r\n        \"authCode\": \"046700\",\r\n        \"demographic\": {\r\n            \"name\": \"Dheeraj Pundir\",\r\n            \"gender\": \"M\",\r\n            \"dateOfBirth\": \"19070-12-12\",\r\n            \"identifier\": {\r\n                \"type\": \"MOBILE\",\r\n                \"value\": \"+918171951968\"\r\n            }\r\n        }\r\n    }\r\n}"
+						},
+						"url": {
+							"raw": "https://dev.ndhm.gov.in/gateway/v0.5/users/auth/confirm",
+							"protocol": "https",
+							"host": [
+								"dev",
+								"ndhm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"gateway",
+								"v0.5",
+								"users",
+								"auth",
+								"confirm"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facility Info",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}"
+							},
+							{
+								"key": "",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/facility/10000005",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"facility",
+								"10000005"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/ndhm/{healthId}/deactivate",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "/ndhm/{healthId}/deactivate",
+							"path": [
+								"ndhm",
+								"{healthId}",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Heartbeat",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI3My03ODU0LTA3MDctNDA0NCIsIm1vYmlsZSI6Iis5MTkzNTQ2MjkwNjgiLCJoZWFsdGhJZCI6ImFydmluZC50b21hckBzYngiLCJleHAiOjE2MzM1OTQxMDcsImhlYWx0aElkTnVtYmVyIjoiNzMtNzg1NC0wNzA3LTQwNDQiLCJpYXQiOjE2MzM1OTIzMDd9.X_k4tOsduz3zWtngtwiBeClsSgXD_OY9S61nOhCXGvik9h2lvF5-2nQe8jf7Gv6nBNENsSEreRVjrVELY3FBYmjHqj1VoOKmyFACcnqy8YIteWPGVoMoKln_I_BgAG3e7bLhJk40q88OXAzPBxh8XLG3STI0G5AysK9F-iXfl8DLBK8ql9RJM-5xW8P_nMPs8EGQOHcsPbu0byGsEix8pXJemMLvwpCw0pojbCdhNPcOviiDrLk8XOitPii8mxOaWySWXi5X2yUFm1A6A_Fu1dUu8GkutF42SK3Ilt4fS2n7KB4kA1h61JqitRMczkDuVAuB6nYYBNHP11TkMw3Iz7AWmPPah4zcckldKTSCDf_hKNOUDqjiP2WAZZWI5n8661GQTlxzEaAjQCDLpUELAu3iiTS6s3mV3rz20HiCkpZWKsFYVEDwyr_5Frcv1UevXx5buGAhhgYwtswGYrLE5EQ2PMpc0KKwdZcu2RSoW3gmOuZ0pc5rj0rTf4gEUL2t14eKjKOJ0K0tsMRa9zyXeHbeugOEoyLO0V7M4fp-Dp87w75AvDa__sCrTaVgAsrrvD-LK7-QioAQUpVrM1wwZ7dHZyAPGiO--k4_rwQ1WeEKRXFvJyEso5phAQhV7glBClX4UA91pFkEmSS04_JjekMrwhDPp7KsqbQWJdT0GhI"
+							},
+							{
+								"key": "X-Auth-Token",
+								"value": "Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI3My03ODU0LTA3MDctNDA0NCIsIm1vYmlsZSI6Iis5MTkzNTQ2MjkwNjgiLCJoZWFsdGhJZCI6ImFydmluZC50b21hckBzYngiLCJleHAiOjE2MzM1OTQxMDcsImhlYWx0aElkTnVtYmVyIjoiNzMtNzg1NC0wNzA3LTQwNDQiLCJpYXQiOjE2MzM1OTIzMDd9.X_k4tOsduz3zWtngtwiBeClsSgXD_OY9S61nOhCXGvik9h2lvF5-2nQe8jf7Gv6nBNENsSEreRVjrVELY3FBYmjHqj1VoOKmyFACcnqy8YIteWPGVoMoKln_I_BgAG3e7bLhJk40q88OXAzPBxh8XLG3STI0G5AysK9F-iXfl8DLBK8ql9RJM-5xW8P_nMPs8EGQOHcsPbu0byGsEix8pXJemMLvwpCw0pojbCdhNPcOviiDrLk8XOitPii8mxOaWySWXi5X2yUFm1A6A_Fu1dUu8GkutF42SK3Ilt4fS2n7KB4kA1h61JqitRMczkDuVAuB6nYYBNHP11TkMw3Iz7AWmPPah4zcckldKTSCDf_hKNOUDqjiP2WAZZWI5n8661GQTlxzEaAjQCDLpUELAu3iiTS6s3mV3rz20HiCkpZWKsFYVEDwyr_5Frcv1UevXx5buGAhhgYwtswGYrLE5EQ2PMpc0KKwdZcu2RSoW3gmOuZ0pc5rj0rTf4gEUL2t14eKjKOJ0K0tsMRa9zyXeHbeugOEoyLO0V7M4fp-Dp87w75AvDa__sCrTaVgAsrrvD-LK7-QioAQUpVrM1wwZ7dHZyAPGiO--k4_rwQ1WeEKRXFvJyEso5phAQhV7glBClX4UA91pFkEmSS04_JjekMrwhDPp7KsqbQWJdT0GhI"
+							},
+							{
+								"key": "Cookie",
+								"value": "TS01960242=01115a1c908d666e2bf66351af846717f977369d7bc80fe3b93e35dba733efc2921f3effa93d233ad481f17c902d0e2bada19288b1"
+							}
+						],
+						"url": {
+							"raw": "https://dev.ndhm.gov.in/cm/v0.5/heartbeat",
+							"protocol": "https",
+							"host": [
+								"dev",
+								"ndhm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"cm",
+								"v0.5",
+								"heartbeat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "phr-policy version",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-Auth-Token",
+								"value": "Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI3My03ODU0LTA3MDctNDA0NCIsIm1vYmlsZSI6Iis5MTkzNTQ2MjkwNjgiLCJoZWFsdGhJZCI6ImFydmluZC50b21hckBzYngiLCJleHAiOjE2MzM1OTQxMDcsImhlYWx0aElkTnVtYmVyIjoiNzMtNzg1NC0wNzA3LTQwNDQiLCJpYXQiOjE2MzM1OTIzMDd9.X_k4tOsduz3zWtngtwiBeClsSgXD_OY9S61nOhCXGvik9h2lvF5-2nQe8jf7Gv6nBNENsSEreRVjrVELY3FBYmjHqj1VoOKmyFACcnqy8YIteWPGVoMoKln_I_BgAG3e7bLhJk40q88OXAzPBxh8XLG3STI0G5AysK9F-iXfl8DLBK8ql9RJM-5xW8P_nMPs8EGQOHcsPbu0byGsEix8pXJemMLvwpCw0pojbCdhNPcOviiDrLk8XOitPii8mxOaWySWXi5X2yUFm1A6A_Fu1dUu8GkutF42SK3Ilt4fS2n7KB4kA1h61JqitRMczkDuVAuB6nYYBNHP11TkMw3Iz7AWmPPah4zcckldKTSCDf_hKNOUDqjiP2WAZZWI5n8661GQTlxzEaAjQCDLpUELAu3iiTS6s3mV3rz20HiCkpZWKsFYVEDwyr_5Frcv1UevXx5buGAhhgYwtswGYrLE5EQ2PMpc0KKwdZcu2RSoW3gmOuZ0pc5rj0rTf4gEUL2t14eKjKOJ0K0tsMRa9zyXeHbeugOEoyLO0V7M4fp-Dp87w75AvDa__sCrTaVgAsrrvD-LK7-QioAQUpVrM1wwZ7dHZyAPGiO--k4_rwQ1WeEKRXFvJyEso5phAQhV7glBClX4UA91pFkEmSS04_JjekMrwhDPp7KsqbQWJdT0GhI"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiI3My03ODU0LTA3MDctNDA0NCIsIm1vYmlsZSI6Iis5MTkzNTQ2MjkwNjgiLCJoZWFsdGhJZCI6ImFydmluZC50b21hckBzYngiLCJleHAiOjE2MzM1OTQxMDcsImhlYWx0aElkTnVtYmVyIjoiNzMtNzg1NC0wNzA3LTQwNDQiLCJpYXQiOjE2MzM1OTIzMDd9.X_k4tOsduz3zWtngtwiBeClsSgXD_OY9S61nOhCXGvik9h2lvF5-2nQe8jf7Gv6nBNENsSEreRVjrVELY3FBYmjHqj1VoOKmyFACcnqy8YIteWPGVoMoKln_I_BgAG3e7bLhJk40q88OXAzPBxh8XLG3STI0G5AysK9F-iXfl8DLBK8ql9RJM-5xW8P_nMPs8EGQOHcsPbu0byGsEix8pXJemMLvwpCw0pojbCdhNPcOviiDrLk8XOitPii8mxOaWySWXi5X2yUFm1A6A_Fu1dUu8GkutF42SK3Ilt4fS2n7KB4kA1h61JqitRMczkDuVAuB6nYYBNHP11TkMw3Iz7AWmPPah4zcckldKTSCDf_hKNOUDqjiP2WAZZWI5n8661GQTlxzEaAjQCDLpUELAu3iiTS6s3mV3rz20HiCkpZWKsFYVEDwyr_5Frcv1UevXx5buGAhhgYwtswGYrLE5EQ2PMpc0KKwdZcu2RSoW3gmOuZ0pc5rj0rTf4gEUL2t14eKjKOJ0K0tsMRa9zyXeHbeugOEoyLO0V7M4fp-Dp87w75AvDa__sCrTaVgAsrrvD-LK7-QioAQUpVrM1wwZ7dHZyAPGiO--k4_rwQ1WeEKRXFvJyEso5phAQhV7glBClX4UA91pFkEmSS04_JjekMrwhDPp7KsqbQWJdT0GhI"
+							},
+							{
+								"key": "Cookie",
+								"value": "TS01960242=01115a1c908d666e2bf66351af846717f977369d7bc80fe3b93e35dba733efc2921f3effa93d233ad481f17c902d0e2bada19288b1"
+							}
+						],
+						"url": {
+							"raw": "https://dev.ndhm.gov.in/cm/patients/phr-policy/v1.0.0",
+							"protocol": "https",
+							"host": [
+								"dev",
+								"ndhm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"cm",
+								"patients",
+								"phr-policy",
+								"v1.0.0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Safety nonce",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{CM_HOST}}/safety/nonce",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"safety",
+								"nonce"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Safety verify",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"attestationJWS\" : \"gTrreRScA4C5RVWhJE5oWzE2MzI1NTk0OTE=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{CM_HOST}}/safety/verify",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"safety",
+								"verify"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Feedback",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/users/feedback",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"users",
+								"feedback"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "OIDC-covertCodeToToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Update user creation token\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.environment.set(\"AUTHORIZATION\", jsonData.token);\r",
+									"    pm.environment.set(\"REFRESH_TOKEN\", jsonData.refreshToken);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{GATEWAY_AUTH}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accessCode\": \"7dd9275e-2161-49dc-aae7-73a7b28d9507\"\n}"
+						},
+						"url": {
+							"raw": "https://healthidsbx.ndhm.gov.in/api/v2/oidc/covertCodeToToken",
+							"protocol": "https",
+							"host": [
+								"healthidsbx",
+								"ndhm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"api",
+								"v2",
+								"oidc",
+								"covertCodeToToken"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "https://healthidsbx.abdm.gov.in/oidc?response_type=code&client_id=sbx&redirect_uri=https://webhook.site/88ce3dc2-bb03-4395-90ea-043d3411a0d2&action=login&state=13-232424-ads-23d&scope=profile",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "https://healthidsbx.ndhm.gov.in/oidc?response_type=code&client_id=sbx&redirect_uri=https://webhook.site/88ce3dc2-bb03-4395-90ea-043d3411a0d2&action=login&state=13-232424-ads-23d&scope=profile",
+							"protocol": "https",
+							"host": [
+								"healthidsbx",
+								"ndhm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"oidc"
+							],
+							"query": [
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "client_id",
+									"value": "sbx"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "https://webhook.site/88ce3dc2-bb03-4395-90ea-043d3411a0d2"
+								},
+								{
+									"key": "action",
+									"value": "login"
+								},
+								{
+									"key": "state",
+									"value": "13-232424-ads-23d"
+								},
+								{
+									"key": "scope",
+									"value": "profile"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List providers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/providers?name=z",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"providers"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "z"
+								},
+								{
+									"key": "stateCode",
+									"value": "37",
+									"disabled": true
+								},
+								{
+									"key": "districtCode",
+									"value": "6",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Specific provider",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}"
+							}
+						],
+						"url": {
+							"raw": "https://dev.abdm.gov.in/cm/providers?provider-id",
+							"protocol": "https",
+							"host": [
+								"dev",
+								"abdm",
+								"gov",
+								"in"
+							],
+							"path": [
+								"cm",
+								"providers"
+							],
+							"query": [
+								{
+									"key": "provider-id",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "govt-programs",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/govt-programs",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"govt-programs"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patients requests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "X-AUTH-TOKEN",
+								"value": "{{AUTHORIZATION}}"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{AUTHORIZATION}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{CM_HOST}}/patients/requests?consentLimit=105&consentOffset=0&lockerSetupLimit=198&lockerSetupOffset=0&subscriptionLimit=80&subscriptionOffset=0&authorizationLimit=100&authorizationOffset=0&status=ALL",
+							"host": [
+								"{{CM_HOST}}"
+							],
+							"path": [
+								"patients",
+								"requests"
+							],
+							"query": [
+								{
+									"key": "consentLimit",
+									"value": "105"
+								},
+								{
+									"key": "consentOffset",
+									"value": "0"
+								},
+								{
+									"key": "lockerSetupLimit",
+									"value": "198"
+								},
+								{
+									"key": "lockerSetupOffset",
+									"value": "0"
+								},
+								{
+									"key": "subscriptionLimit",
+									"value": "80"
+								},
+								{
+									"key": "subscriptionOffset",
+									"value": "0"
+								},
+								{
+									"key": "authorizationLimit",
+									"value": "100"
+								},
+								{
+									"key": "authorizationOffset",
+									"value": "0"
+								},
+								{
+									"key": "status",
+									"value": "ALL"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,381 @@
+{
+  "resourceType": "Bundle",
+  "id": "prescription record-9f182819-181b-4e94-8eba-41560c10bc35",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2025-12-06T12:39:27.3472771+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "05fa9095-2f32-43c3-8b57-cec63be419fa"
+  },
+  "type": "document",
+  "timestamp": "2025-12-06T12:39:27.3472771+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:b5623840-c653-4e88-970f-0d2f424a9eb9",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "b5623840-c653-4e88-970f-0d2f424a9eb9",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Prescription record"
+        },
+        "subject": {
+          "reference": "urn:uuid:9a64fe3a-166d-45c8-9ec4-46e890b742f4",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:e6758834-1f9b-41a9-b719-c7027143e777",
+          "display": "Ambulatory"
+        },
+        "date": "2025-12-06T12:39:27.347+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:9ef06947-fe56-4055-af07-20d1f6dcc565",
+            "display": "Dr. Somya"
+          }
+        ],
+        "title": "Prescription record",
+        "custodian": {
+          "reference": "urn:uuid:242ca036-73e3-4658-a460-2837240b6bc3",
+          "display": "Purnank Hospital"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:9a64fe3a-166d-45c8-9ec4-46e890b742f4",
+                "display": "SAURAV  KUMAR"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "entry": [
+              {
+                "reference": "urn:uuid:f9d3c396-0051-455f-ac03-ff686e337bda",
+                "display": "Pantoprazole 40 mg Tablet"
+              },
+              {
+                "reference": "urn:uuid:553c5086-218a-4689-978d-899202fc9312",
+                "display": "Amoxicillin 500 mg Capsule"
+              }
+            ]
+          },
+          {
+            "title": "Prescription Record",
+            "entry": [
+              {
+                "reference": "urn:uuid:4398ab5e-f56a-4332-b7f9-162c60f78242",
+                "display": "Binary"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9a64fe3a-166d-45c8-9ec4-46e890b742f4",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "9a64fe3a-166d-45c8-9ec4-46e890b742f4",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2025-12-06T12:39:27.3472771+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "saurav_50505@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "SAURAV  KUMAR"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "8298540343",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2000-11-05"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9ef06947-fe56-4055-af07-20d1f6dcc565",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "9ef06947-fe56-4055-af07-20d1f6dcc565",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2025-12-06T12:39:27.3472771+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Somya"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:242ca036-73e3-4658-a460-2837240b6bc3",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "242ca036-73e3-4658-a460-2837240b6bc3",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN1010001346"
+          }
+        ],
+        "name": "Purnank Hospital"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e6758834-1f9b-41a9-b719-c7027143e777",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "e6758834-1f9b-41a9-b719-c7027143e777",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://uat.v4.api.emedhub.in/abdm/",
+            "value": "4d81a071-f085-4e7d-888c-58671aac2b2d"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:9a64fe3a-166d-45c8-9ec4-46e890b742f4",
+          "display": "SAURAV  KUMAR"
+        },
+        "period": {
+          "start": "2025-12-06T07:09:27.347+00:00"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f9d3c396-0051-455f-ac03-ff686e337bda",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "f9d3c396-0051-455f-ac03-ff686e337bda",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "1086921000168107",
+              "display": "Pantoprazole 40 mg Tablet"
+            }
+          ],
+          "text": "Pantoprazole 40 mg Tablet"
+        },
+        "subject": {
+          "reference": "urn:uuid:9a64fe3a-166d-45c8-9ec4-46e890b742f4",
+          "display": "SAURAV  KUMAR"
+        },
+        "authoredOn": "2025-12-06T07:09:27+00:00",
+        "requester": {
+          "reference": "urn:uuid:9ef06947-fe56-4055-af07-20d1f6dcc565",
+          "display": "Practitioner"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "235595009",
+                "display": "Gas"
+              }
+            ],
+            "text": "Gas"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "Doses: 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Route: Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "415621003",
+                  "display": "Before Food"
+                }
+              ],
+              "text": "Method: Before Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:553c5086-218a-4689-978d-899202fc9312",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "553c5086-218a-4689-978d-899202fc9312",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387544009",
+              "display": "Amoxicillin 500 mg Capsule"
+            }
+          ],
+          "text": "Amoxicillin 500 mg Capsule"
+        },
+        "subject": {
+          "reference": "urn:uuid:9a64fe3a-166d-45c8-9ec4-46e890b742f4",
+          "display": "SAURAV  KUMAR"
+        },
+        "authoredOn": "2025-12-06T07:09:27+00:00",
+        "requester": {
+          "reference": "urn:uuid:9ef06947-fe56-4055-af07-20d1f6dcc565",
+          "display": "Practitioner"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386661006",
+                "display": "Fever"
+              }
+            ],
+            "text": "Fever"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "Doses: 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Route: Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "Method: After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4398ab5e-f56a-4332-b7f9-162c60f78242",
+      "resource": {
+        "resourceType": "Binary",
+        "id": "4398ab5e-f56a-4332-b7f9-162c60f78242",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Binary"
+          ]
+        },
+        "contentType": "application/pdf",
+        "data": "JVBERi0xLjQKJeLjz9MKNCAwIG9iago8PC9MZW5ndGggNzM5L0ZpbHRlci9GbGF0ZURlY29kZT4+c3RyZWFtCnictVXLctowFN37K+4yXZhIsgR2ViWlkLaThADpptPpCCyIWz+IbNIkX19JhgSQcCdtAsNg+5xzde7D0q1362H47SFAgGE08CgCGgWQeYwxc5V6Y+9KfW+904lGOyGBSexh0mlFbfBJR98d9zHgECZz72goRTmTybJKihxGYlbIGMarLOPy4d3kp+evhUjLiFrDJ+byCAyqn5h7BD57ikx05NqiXKypCBbmUc3Vi8dblCGvEpFX0BMVT9LSFpBdvitku7V2QABjkxvozyb0Bc8EwIl6Mu5ej7pfAb5cn3dHdaD9ILvS67NPvVo6HF0ghFjYpBqIPBay5p/zVDRxe7wSUMzhNJHVTS0hagEfYx+xJuF5MU3SdT4hiUJGUUCDJkV3esPhYpVNN94i7DPEqE/CoO0TyvBf1d04VtNS1vKSryS/+6FCIPa+nN7vqv9nGC7lgufJIzcj+QYTAX0+S9KkejiB4UrmPP8FZ0W5TCqevl4SQ8lnVaJTUPV+iySgJ1vmNy6yB+7unREZ7998SiLc+T75/Er5nYs4mZkW/VNa7XAn7rPRDdkQP07MToZaHUYiCvv/Krbe/xgFjALAbZDCmzexMQ1eQie0/RJ6QKOX0CkjFl1nS0D3aKCkTO30VoLjNWDnskFs2xvEdrhBbDPjLQMkNACxDTgRY8CJGANOxBhwI8oAIocMOBFjwIkYA07EGNhDrvQhiqGeZKor1IZJtvXK1K9BkgtzvOjJVSO7pcGUOUS9onRwCQ0d3FGxqhzkgGGnm+qmiG227qwjtOBlkTvYKlGKa/LTpjPkeVUsJX8s1LGjWpIttHBbEiAtOZrwaSqqA6WwwqpzzscHamGRL2W9QztKYXFPxbyQAvrFwXpYkgEv3cXAbI/ZzYp71fY0TXJgyFUMRE0xPvBluUoPDYYVt6kaFrmhGrbheaWOoYZiWIq+uBPymXzcDyDSwJOnELcCWPd8yBcCNsb/AEkHVnsKZW5kc3RyZWFtCmVuZG9iago2IDAgb2JqCjw8L1R5cGUvUGFnZS9NZWRpYUJveFswIDAgNTk1IDg0Ml0vUmVzb3VyY2VzPDwvRm9udDw8L0YxIDEgMCBSL0YyIDIgMCBSL0YzIDMgMCBSPj4+Pi9Db250ZW50cyA0IDAgUi9QYXJlbnQgNSAwIFI+PgplbmRvYmoKMSAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9IZWx2ZXRpY2EtQm9sZC9FbmNvZGluZy9XaW5BbnNpRW5jb2Rpbmc+PgplbmRvYmoKMiAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9IZWx2ZXRpY2EvRW5jb2RpbmcvV2luQW5zaUVuY29kaW5nPj4KZW5kb2JqCjMgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvQ291cmllci9FbmNvZGluZy9XaW5BbnNpRW5jb2Rpbmc+PgplbmRvYmoKNSAwIG9iago8PC9UeXBlL1BhZ2VzL0NvdW50IDEvS2lkc1s2IDAgUl0+PgplbmRvYmoKNyAwIG9iago8PC9UeXBlL0NhdGFsb2cvUGFnZXMgNSAwIFI+PgplbmRvYmoKOCAwIG9iago8PC9Qcm9kdWNlcihpVGV4dFNoYXJwkiA1LjUuNSCpMjAwMC0yMDE0IGlUZXh0IEdyb3VwIE5WIFwoQUdQTC12ZXJzaW9uXCkpL0NyZWF0aW9uRGF0ZShEOjIwMjUxMjA2MTIzOTI3KzA1JzMwJykvTW9kRGF0ZShEOjIwMjUxMjA2MTIzOTI3KzA1JzMwJyk+PgplbmRvYmoKeHJlZgowIDkKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwOTUxIDAwMDAwIG4gCjAwMDAwMDEwNDQgMDAwMDAgbiAKMDAwMDAwMTEzMiAwMDAwMCBuIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDEyMTggMDAwMDAgbiAKMDAwMDAwMDgyMSAwMDAwMCBuIAowMDAwMDAxMjY5IDAwMDAwIG4gCjAwMDAwMDEzMTQgMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDkvUm9vdCA3IDAgUi9JbmZvIDggMCBSL0lEIFs8YzI1OWRjODI0MmY3NjMwMDlhNmVhNzExYWQzMDExMWE+PGMyNTlkYzgyNDJmNzYzMDA5YTZlYTcxMWFkMzAxMTFhPl0+PgolaVRleHQtNS41LjUKc3RhcnR4cmVmCjE0NzYKJSVFT0YK"
+      }
+    }
+  ]
+}

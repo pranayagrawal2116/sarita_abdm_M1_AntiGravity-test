@@ -1,0 +1,109 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../utils/api_config.dart';
+import '../utils/api_debug_http.dart';
+import '../utils/app_runtime_store.dart';
+import '../utils/auth_session.dart';
+import '../utils/consent_mode.dart';
+import '../models/consent_request.dart';
+
+class ConsentApiService {
+  static String _readableError(http.Response response, String fallback) {
+    try {
+      final data = jsonDecode(response.body);
+      if (data is Map<String, dynamic>) {
+        final message = data['message'] ?? data['error'] ?? data['details'];
+        if (message != null && message.toString().trim().isNotEmpty) {
+          return '${message.toString().trim()} (${response.statusCode})';
+        }
+      }
+    } catch (_) {
+      final body = response.body.trim();
+      if (body.isNotEmpty) {
+        return '$body (${response.statusCode})';
+      }
+    }
+
+    return '$fallback (${response.statusCode})';
+  }
+
+  static Future<List<ConsentRequest>> fetchConsentRequests({
+    ConsentMode mode = ConsentMode.currentDefault,
+  }) async {
+    final token = AuthSession.phrAuthToken;
+    final refreshToken = AuthSession.phrRefreshToken;
+    if (token == null || token.trim().isEmpty) {
+      throw Exception("Missing login session. Please log in again.");
+    }
+
+    final url = Uri.parse("${ApiConfig.baseUrl}/consents/requests");
+
+    final response = await ApiDebugHttp.get(
+      url,
+      headers: {
+        "X-Auth-Token": token,
+        if (refreshToken != null && refreshToken.trim().isNotEmpty)
+          "X-Refresh-Token": refreshToken,
+        "X-Consent-Mode": mode.apiValue,
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(_readableError(response, "Failed to fetch consents"));
+    }
+
+    final data = jsonDecode(response.body);
+    AppRuntimeStore.setApiResponse('consent.fetchConsentRequests', data, extraValues: {
+      'consent.requests': data['consents'],
+      'consent.mode': mode.apiValue,
+    });
+    return (data['consents'] as List)
+        .map((e) => ConsentRequest.fromJson(e))
+        .toList();
+  }
+
+  static Future<String> submitConsentDecision(
+    String consentId,
+    String decision, {
+    Map<String, dynamic>? raw,
+    ConsentMode mode = ConsentMode.currentDefault,
+  }) async {
+    final token = AuthSession.phrAuthToken;
+    final refreshToken = AuthSession.phrRefreshToken;
+    if (token == null || token.trim().isEmpty) {
+      throw Exception("Missing login session. Please log in again.");
+    }
+
+    final url = Uri.parse("${ApiConfig.baseUrl}/consents/decision");
+
+    final response = await ApiDebugHttp.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+        "X-Auth-Token": token,
+        if (refreshToken != null && refreshToken.trim().isNotEmpty)
+          "X-Refresh-Token": refreshToken,
+        "X-Consent-Mode": mode.apiValue,
+      },
+      body: jsonEncode({
+        "consentId": consentId,
+        "decision": decision,
+        if (raw != null && raw.isNotEmpty) "raw": raw,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to submit consent decision"),
+      );
+    }
+
+    final data = jsonDecode(response.body);
+    AppRuntimeStore.setApiResponse('consent.submitConsentDecision', data, extraValues: {
+      'consent.lastDecision.consentId': consentId,
+      'consent.lastDecision.decision': decision,
+      'consent.lastDecision.artefactId': data['consentArtefactId']?.toString(),
+    });
+    return data['consentArtefactId']?.toString() ?? '';
+  }
+}

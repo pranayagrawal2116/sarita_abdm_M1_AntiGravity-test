@@ -1,0 +1,34 @@
+import 'frozen_flow_models.dart';
+
+typedef FrozenExistingUserFetcher =
+    Future<Map<String, dynamic>?> Function({required String verifiedMobile});
+typedef FrozenExistingUserFromVerifyResponse =
+    Map<String, dynamic>? Function({required String verifiedMobile});
+
+/// Frozen snapshot of the completed Aadhaar-linked mobile registration path.
+///
+/// This file is reference-only safe-space code. Do not edit it directly when
+/// building a new variation of the flow. Instead, copy the logic into a new
+/// working module outside `lib/m1_safe_space/`.
+class FrozenAadhaarLinkedMobileFlow {
+  const FrozenAadhaarLinkedMobileFlow();
+
+  Future<FrozenExistingAccountResolution> resolve({
+    required String verifiedMobile,
+    required FrozenExistingUserFetcher
+    fetchExistingUserFromEnrollmentProfileDetails,
+    required FrozenExistingUserFromVerifyResponse
+    existingUserFromVerifyResponse,
+  }) async {
+    final existingUserFromVerify = existingUserFromVerifyResponse(
+      verifiedMobile: verifiedMobile,
+    );
+    final existingUserFromApi =
+        await fetchExistingUserFromEnrollmentProfileDetails(
+          verifiedMobile: verifiedMobile,
+        ) ??
+        existingUserFromVerify;
+
+    return FrozenExistingAccountResolution(existingUser: existingUserFromApi);
+  }
+}

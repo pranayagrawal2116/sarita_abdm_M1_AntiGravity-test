@@ -1,0 +1,348 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-c367d02e-482f-48db-9464-46d03ae7fcba",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-16T11:11:44.164+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "beb325e9-8654-4257-9350-2e0a82d7a90e"
+  },
+  "type": "document",
+  "timestamp": "2026-07-16T11:11:44.164+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:c4f77f2c-7428-41d6-b753-56b09f3d3073",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "c4f77f2c-7428-41d6-b753-56b09f3d3073",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Immunization record"
+        },
+        "subject": {
+          "reference": "urn:uuid:ea00bfae-88a6-4dd5-9a91-39c376e65345",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:ead0f805-9cd2-4c61-b1fb-1fb90aa32b31",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-16T11:11:44.164+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:f3597d9d-1ad9-442f-9b91-39d8003665fd",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Immunization record",
+        "custodian": {
+          "reference": "urn:uuid:9982a63d-2fb4-4964-b795-f87b67116be6",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:ea00bfae-88a6-4dd5-9a91-39c376e65345",
+                "display": "Pranay Anup Agrawal"
+              }
+            ]
+          },
+          {
+            "title": "Immunization Details",
+            "entry": [
+              {
+                "reference": "urn:uuid:deb7d618-d8ea-46fd-a4b6-6a6522724b3e",
+                "display": "Immunization"
+              }
+            ]
+          },
+          {
+            "title": "Immunization Recommendation",
+            "entry": [
+              {
+                "reference": "urn:uuid:1e72bb92-291a-4271-a516-58bcf5d4dba9",
+                "display": "ImmunizationRecommendation"
+              }
+            ]
+          },
+          {
+            "title": "Document Reference",
+            "entry": [
+              {
+                "reference": "urn:uuid:8a33a80b-4a4b-4bab-844b-f7f5d84be919",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ea00bfae-88a6-4dd5-9a91-39c376e65345",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "ea00bfae-88a6-4dd5-9a91-39c376e65345",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:11:44.164+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranayagrawal8@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f3597d9d-1ad9-442f-9b91-39d8003665fd",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "f3597d9d-1ad9-442f-9b91-39d8003665fd",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:11:44.164+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9982a63d-2fb4-4964-b795-f87b67116be6",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "9982a63d-2fb4-4964-b795-f87b67116be6",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ead0f805-9cd2-4c61-b1fb-1fb90aa32b31",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ead0f805-9cd2-4c61-b1fb-1fb90aa32b31",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "c3b06db6-a5e9-4079-adfa-624a42866318"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:ea00bfae-88a6-4dd5-9a91-39c376e65345",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-07-16T11:11:44.164+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:deb7d618-d8ea-46fd-a4b6-6a6522724b3e",
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "deb7d618-d8ea-46fd-a4b6-6a6522724b3e",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization"
+          ]
+        },
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "1119305005",
+              "display": "Health Information Record"
+            }
+          ],
+          "text": "Health Information Record"
+        },
+        "patient": {
+          "reference": "urn:uuid:ea00bfae-88a6-4dd5-9a91-39c376e65345",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:ead0f805-9cd2-4c61-b1fb-1fb90aa32b31",
+          "display": "Encounter"
+        },
+        "occurrenceDateTime": "2026-07-16T11:11:44",
+        "primarySource": true,
+        "performer": [
+          {
+            "actor": {
+              "reference": "urn:uuid:f3597d9d-1ad9-442f-9b91-39d8003665fd",
+              "display": "Practitioner"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:1e72bb92-291a-4271-a516-58bcf5d4dba9",
+      "resource": {
+        "resourceType": "ImmunizationRecommendation",
+        "id": "1e72bb92-291a-4271-a516-58bcf5d4dba9",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecommendation"
+          ]
+        },
+        "patient": {
+          "reference": "urn:uuid:ea00bfae-88a6-4dd5-9a91-39c376e65345",
+          "display": "Pranay Anup Agrawal"
+        },
+        "date": "2026-07-16T11:11:44.164+05:30",
+        "recommendation": [
+          {
+            "vaccineCode": [
+              {
+                "coding": [
+                  {
+                    "system": "https://www.snomed.org",
+                    "code": "28531000087107",
+                    "display": ""
+                  }
+                ]
+              }
+            ],
+            "forecastStatus": {
+              "text": "Due"
+            },
+            "dateCriterion": [
+              {
+                "code": {
+                  "text": "Next Dose Due Date"
+                },
+                "value": "2026-07-16T11:11:44.164+05:30"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8a33a80b-4a4b-4bab-844b-f7f5d84be919",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "8a33a80b-4a4b-4bab-844b-f7f5d84be919",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Immunization Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:ea00bfae-88a6-4dd5-9a91-39c376e65345"
+        },
+        "date": "2026-07-16T05:41:44.164Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "SGVhbHRoIEluZm9ybWF0aW9uIFJlY29yZAo9PT09PT09PT09PT09PT09PT09PT09PT09ClR5cGU6IEltbXVuaXphdGlvbiBSZWNvcmQKU2F2ZWQgQXQ6IDIwMjYtMDctMTYgMTE6MTA6NTgKCi0tLSBQYXRpZW50IERldGFpbHMgLS0tCk5hbWU6IFByYW5heSBBbnVwIEFncmF3YWwKQUJIQSBBZGRyZXNzOiBwcmFuYXlhZ3Jhd2FsOEBzYngKQUJIQSBOdW1iZXI6IDkxLTE3MjItMDQwMC0wODI5Ck1vYmlsZTogOTUxMDAyOTU3NQpHZW5kZXI6IE0KRE9CIC8gWU9COiAyMS0xLTIwMDYKVUhJRDogU0hDMTYwNzI2MDEKCi0tLSBSZWNvcmQgRGF0YSAtLS0KCkVudHJpZXM6CiAgLSBJdGVtIDE6CiAgICBWYWNjaW5lIE5hbWU6IENPVklELTE5IFZhY2NpbmUKICAgIEJyYW5kOiBDT1ZJU0hJRUxECiAgICBEYXRlOiAxNi0wNy0yMDIzCiAgICBMb3QgTnVtYmVyOiBDVjc0MjkKICAgIERvc2UgTm86IDFzdCBEb3NlCkRyYWZ0IEVudHJ5OgogIFZhY2NpbmUgTmFtZTogLQogIEJyYW5kOiAtCiAgRGF0ZTogLQogIExvdCBOdW1iZXI6IC0KICBEb3NlIE5vOiAtCg==",
+              "title": "Immunization Record",
+              "creation": "2026-07-16T05:41:44.164Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

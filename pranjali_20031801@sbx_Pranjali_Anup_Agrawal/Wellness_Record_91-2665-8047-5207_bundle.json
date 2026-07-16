@@ -1,0 +1,351 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-20d7e070-c2d9-4215-ac6c-e8fe570e9fdc",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-16T11:07:28.892+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "f1d320f7-2358-43ab-8f7d-1c766b92c2cd"
+  },
+  "type": "document",
+  "timestamp": "2026-07-16T11:07:28.892+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:a8f2b3cb-e058-4e1b-9432-637b0872ec50",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "a8f2b3cb-e058-4e1b-9432-637b0872ec50",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/WellnessRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Wellness Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:959ae798-6649-4416-b1bc-a4956d30b8f7",
+          "display": "Pranjali Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:7e8e97d3-5bc5-4c6a-985f-edaeb3f8dc13",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-16T11:07:28.892+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:ec84ba7b-0965-4318-875c-34afb26335f2",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Wellness Record",
+        "custodian": {
+          "reference": "urn:uuid:35332a11-3e0e-44b4-9ebd-d9ba36f56863",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Physical findings of general status",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "425044008",
+                  "display": "Physical findings of general status"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:8f18f595-c780-40ae-b293-6f18186bb88f",
+                "display": "Sleep Hours"
+              },
+              {
+                "reference": "urn:uuid:1c543981-fbe2-4ea2-bf65-6ff5523bbb45",
+                "display": "Calories Burned"
+              },
+              {
+                "reference": "urn:uuid:0efd1a9c-6bb1-4a01-87c5-5ba0ba8e8b3e",
+                "display": "Step Count"
+              },
+              {
+                "reference": "urn:uuid:ba10d792-d4b6-4b72-8a07-c10b6f7d739f",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:959ae798-6649-4416-b1bc-a4956d30b8f7",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "959ae798-6649-4416-b1bc-a4956d30b8f7",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.892+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranjali_20031801@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranjali Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "2003-01-18"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ec84ba7b-0965-4318-875c-34afb26335f2",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "ec84ba7b-0965-4318-875c-34afb26335f2",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.892+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:35332a11-3e0e-44b4-9ebd-d9ba36f56863",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "35332a11-3e0e-44b4-9ebd-d9ba36f56863",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7e8e97d3-5bc5-4c6a-985f-edaeb3f8dc13",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "7e8e97d3-5bc5-4c6a-985f-edaeb3f8dc13",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "4cb0c350-4f15-4c18-937c-2344951ffb23"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:959ae798-6649-4416-b1bc-a4956d30b8f7",
+          "display": "Pranjali Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-07-16T11:07:28.892+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8f18f595-c780-40ae-b293-6f18186bb88f",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "8f18f595-c780-40ae-b293-6f18186bb88f",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "248263006",
+              "display": "Sleep Hours"
+            }
+          ],
+          "text": "Sleep Hours"
+        },
+        "subject": {
+          "reference": "urn:uuid:959ae798-6649-4416-b1bc-a4956d30b8f7"
+        },
+        "effectiveDateTime": "2026-07-16T05:37:28.892Z",
+        "valueQuantity": {
+          "value": 9,
+          "system": "http://unitsofmeasure.org"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:1c543981-fbe2-4ea2-bf65-6ff5523bbb45",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "1c543981-fbe2-4ea2-bf65-6ff5523bbb45",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "41981-2",
+              "display": "Calories Burned"
+            }
+          ],
+          "text": "Calories Burned"
+        },
+        "subject": {
+          "reference": "urn:uuid:959ae798-6649-4416-b1bc-a4956d30b8f7"
+        },
+        "effectiveDateTime": "2026-07-16T05:37:28.892Z",
+        "valueQuantity": {
+          "value": 1200,
+          "system": "http://unitsofmeasure.org"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0efd1a9c-6bb1-4a01-87c5-5ba0ba8e8b3e",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "0efd1a9c-6bb1-4a01-87c5-5ba0ba8e8b3e",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "55423-8",
+              "display": "Step Count"
+            }
+          ],
+          "text": "Step Count"
+        },
+        "subject": {
+          "reference": "urn:uuid:959ae798-6649-4416-b1bc-a4956d30b8f7"
+        },
+        "effectiveDateTime": "2026-07-16T05:37:28.892Z",
+        "valueQuantity": {
+          "value": 12000,
+          "system": "http://unitsofmeasure.org"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ba10d792-d4b6-4b72-8a07-c10b6f7d739f",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "ba10d792-d4b6-4b72-8a07-c10b6f7d739f",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Wellness Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:959ae798-6649-4416-b1bc-a4956d30b8f7"
+        },
+        "date": "2026-07-16T05:37:28.892Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "SGVhbHRoIEluZm9ybWF0aW9uIFJlY29yZAo9PT09PT09PT09PT09PT09PT09PT09PT09ClR5cGU6IFdlbGxuZXNzIFJlY29yZApTYXZlZCBBdDogMjAyNi0wNy0wOSAxNTozMDoyMwoKLS0tIFBhdGllbnQgRGV0YWlscyAtLS0KTmFtZTogUHJhbmphbGkgQW51cCBBZ3Jhd2FsCkFCSEEgQWRkcmVzczogcHJhbmphbGlfMjAwMzE4MDFAc2J4CkFCSEEgTnVtYmVyOiA5MS0yNjY1LTgwNDctNTIwNwpNb2JpbGU6IDk1MTAwMjk1NzUKR2VuZGVyOiBGCkRPQiAvIFlPQjogMTgtMS0yMDAzClVISUQ6IFNIQzA5MDcyNjAxCgotLS0gUmVjb3JkIERhdGEgLS0tCgpMaWZlc3R5bGU6CiAgU21va2luZzogTmV2ZXIgc21va2VkCiAgRGlldDogVmVnZXRhcmlhbgpQaHlzaWNhbCBBY3Rpdml0eToKICBTbGVlcCBIb3VyczogOQogIENhbG9yaWVzIEJ1cm5lZDogMTIwMAogIFN0ZXAgQ291bnQ6IDEyMDAwCldvbWVuIEhlYWx0aDoKICBBZ2UgQXQgTWVuYXJjaGU6IDEyCiAgTGFzdCBNZW5zdHJ1YWwgRGF0ZTogMDktMDctMjAyNgo=",
+              "title": "Wellness Document",
+              "creation": "2026-07-16T05:37:28.892Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

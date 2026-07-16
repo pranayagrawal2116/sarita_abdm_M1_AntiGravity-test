@@ -1,0 +1,9 @@
+const express = require("express");
+const controller = require("../controllers/m2CallbackController");
+
+const router = express.Router();
+
+router.get("/:type", controller.fetchByType);
+router.get("/:type/:requestId", controller.fetchByTypeAndRequestId);
+
+module.exports = router;

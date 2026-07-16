@@ -1,0 +1,449 @@
+{
+	"info": {
+		"_postman_id": "75fd28f6-6ab2-46ce-8e92-33698cdf5ab8",
+		"name": "Consent Pin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11710522"
+	},
+	"item": [
+		{
+			"name": "consent pin",
+			"item": [
+				{
+					"name": "create",
+					"item": [
+						{
+							"name": "create pin",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Auth-Token",
+										"value": "{{x_auth_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pin\": \"9999\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/pin",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"pin"
+									]
+								},
+								"description": "**Explanation** - Api Accepts **pin** to create.  \n**Request Body** - Required  \n**Response** - It will returns the success"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "reset",
+					"item": [
+						{
+							"name": "1. verify pin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.globals.set(\"temporaryToken\", jsonData.temporaryToken);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Auth-Token",
+										"value": "{{x_auth_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pin\": \"1111\",\n    \"requestId\": \"fa3217f7-78cc-4338-85ad-40705e251467\",\n    \"scope\": \"profile.changepin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/verify-pin",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"verify-pin"
+									]
+								},
+								"description": "**Explanation** - Api Accepts **Pin** to verify and **Request id** to to identify the request and **Scope** to define the action  \n**Request Body** - Required  \n**Response** - It will returns the **Token Id** which needs to be pass in next api.\n\nNOTE : **requestId** - it is a UUID. Change any one or more word to create a new request."
+							},
+							"response": []
+						},
+						{
+							"name": "2. reset pin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "in",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "value",
+											"value": "{{temporaryToken}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-AUTH-TOKEN",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Auth-Token",
+										"value": "Bearer eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJhdHVsNjVAc2J4IiwiZXhwIjoxNjczODY2ODE5LCJpYXQiOjE2NzM4NjY2OTksInNpZCI6ImVkM2JhYTZhLWQ2MWItNDRhYi05NzBkLTNiN2Q4ZGJhMDM1ZiIsInNjb3BlIjoicHJvZmlsZS5jaGFuZ2VwaW4ifQ.ZyzIAArhTDB2yMEdbNsOW3TTReB5uDgyyUnv6L3-7-Ip2qt2lz5GUjzyPuhVj1sTesxN13l45TDQ05lPKwYJtHiZ5bs5KOzpDzQZ8ECmCAYZ5FuMnJPmHAz7MBNAPOGgX7LrT4nL8A5D1zt-O2exd1EwPB7VkpCsP8U0iWDuH04ClEXXl51Dn_3-2ck0_SCgFIFvZrDgL7Jl_Uwp5fuhoYEBKpI2ONKoSYOtcc4lUbUr0zyTZugDmd4Cn07UFShr73Y1UVCc05oaMX7Fxf29z-pLSMSEfm5i_xAVEkcSxBvuIpRjoM-KYNe8il4QtbM20srHbjKxIVrjwnWAH1KwAw",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"pin\": \"2222\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/change-pin",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"change-pin"
+									]
+								},
+								"description": "**Explanation** - Api Accepts **Pin** to be changed  \n**Request Body** - Required  \n**Response** - It will returns the **Success**\n\nNOTE : Inside **Auth**, pass the token which was received in verify pin api and add it in value block of X-AUTH-TOKEN"
+							},
+							"response": []
+						},
+						{
+							"name": "3. verify to confirm the pin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();\r",
+											"pm.globals.set(\"temporaryToken\", jsonData.temporaryToken);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{x_auth_token}}",
+											"type": "string"
+										},
+										{
+											"key": "in",
+											"value": "header",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-AUTH-TOKEN",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJkcmF0aG9yZTgzQHNieCIsImV4cCI6MTY3MjEyMTc0NSwiaWF0IjoxNjcyMTIxNjI1LCJzaWQiOiIxMWE4NjljZS0zODVmLTQ5MjUtOTkyNC05YzZmZGZjMTkwZTkiLCJzY29wZSI6InByb2ZpbGUuY2hhbmdlcGluIn0.CafBiZ6F5IaHc1hlG7JSvXs8g6Vb1M4fXaLwcVrJEVgnGxp_73xNl79s1Z4bfL_63F9zzs1SMqD_UY4puHdV2syTuNvOLK98hMmCFdPmezrNYQwkzcxsVwZJ-SDYvKuhRAW-hckcuTkMKhunRwR_CVp25U6B0kjBeRXH50Ge8L0BRE4C5J9_7e1V5Eft0bezAyBUVm4MR543hZ-Rgl4FsxQjC6xksozGx9vh5FQpD9O58r0geP5tedRKHZoOV19pCzbvJdd4aiGRhJW02Jo9ryxPgUmSnDVKP6Bq1pj-sCZxwzUqzRUBMfDFe_DAiMcrzTiBJ3_DP_a7QLxsEmBa1g",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pin\": \"2222\",\n    \"requestId\": \"fa3217f7-78cc-4338-85ad-40705e251453\",\n    \"scope\": \"consentrequest.approve\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/verify-pin",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"verify-pin"
+									]
+								},
+								"description": "**Explanation** - Api Accepts **Pin** to verify it is changed and **Request id** to to identify the request and **Scope** to define the action  \n**Request Body** - Required  \n**Response** - It will returns the **Success**\n\nNOTE : **requestId** - it is a UUID. Change any one or two word to create a new request."
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "forget",
+					"item": [
+						{
+							"name": "1. generate otp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.globals.set(\"sessionId\", jsonData.sessionId);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "X-Auth-Token",
+										"value": "{{x_auth_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/forgot-pin/generate-otp",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"forgot-pin",
+										"generate-otp"
+									]
+								},
+								"description": "**Explanation** -NA  \n**Request Body** - NA  \n**Response** - It will send the **OTP** on registered mobile number and returns the **Session Id.**"
+							},
+							"response": []
+						},
+						{
+							"name": "2. validate otp",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"var jsonData = pm.response.json();",
+											"pm.globals.set(\"temporaryToken\", jsonData.temporaryToken);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{x_auth_token}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-AUTH-TOKEN",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"warning": "This is a duplicate header and will be overridden by the X-AUTH-TOKEN header generated by Postman.",
+										"key": "X-AUTH-TOKEN",
+										"value": "{{x_auth_token}}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"authMode\": \"NULL\",\n    \"sessionId\": \"{{sessionId}}\",\n    \"value\": \"853308\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/forgot-pin/validate-otp",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"forgot-pin",
+										"validate-otp"
+									]
+								},
+								"description": "**Explanation** - Api Accepts **Session Id** to identify the request session and **Value** which is OTP  \n**Request Body** - Required  \n**Response** - It will returns the **Token Id** which needs to be pass in next api.\n\nNOTE : **sessionId** - add the data here which we will get from generate response sessionId."
+							},
+							"response": []
+						},
+						{
+							"name": "3. reset pin",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "X-AUTH-TOKEN",
+										"value": "{{temporaryToken}}",
+										"type": "default"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"pin\": \"1111\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/reset-pin",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"reset-pin"
+									]
+								},
+								"description": "**Explanation** - Api Accepts **Pin** to be changed  \n**Request Body** - Required  \n**Response** - It will returns the **Success**\n\nNOTE : Inside **Auth**, pass the token which was received in validate pin api and add it in value block of X-AUTH-TOKEN"
+							},
+							"response": []
+						},
+						{
+							"name": "4. verify pin",
+							"request": {
+								"auth": {
+									"type": "apikey",
+									"apikey": [
+										{
+											"key": "value",
+											"value": "{{x_auth_token}}",
+											"type": "string"
+										},
+										{
+											"key": "key",
+											"value": "X-AUTH-TOKEN",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"pin\": \"1111\",\n    \"requestId\": \"{{$guid}}\",\n    \"scope\": \"profile.changepin\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/cm/patients/verify-pin",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"cm",
+										"patients",
+										"verify-pin"
+									]
+								},
+								"description": "**Explanation** - Api Accepts **Pin** to verify it is changed and **Request id** to to identify the request and **Scope** to define the action  \n**Request Body** - Required  \n**Response** - It will returns the **Success**\n\nNOTE : **requestId** - it is a UUID. Change any one or more word to create a new request."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

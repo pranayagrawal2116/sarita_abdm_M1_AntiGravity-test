@@ -1,0 +1,9 @@
+const express = require("express");
+const router = express.Router();
+const controller = require("../controllers/linkingController");
+
+router.post("/on-discover", controller.onDiscover);
+router.post("/on-init", controller.onInit);
+router.post("/on-confirm", controller.onConfirm);
+
+module.exports = router;

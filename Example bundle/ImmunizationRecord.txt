@@ -1,0 +1,358 @@
+{
+  "resourceType": "Bundle",
+  "id": "immunization record-8c6fbdf3-e3d9-4628-871e-eb63a376c448",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2025-12-06T12:42:45.6251141+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecord"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "3832f525-6e85-44da-915b-c7547712e6f6"
+  },
+  "type": "document",
+  "timestamp": "2025-12-06T12:42:45.6251141+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:d78be87d-8539-4fa7-a840-bc44ce252c25",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "d78be87d-8539-4fa7-a840-bc44ce252c25",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Immunization record"
+        },
+        "subject": {
+          "reference": "urn:uuid:29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:ad6b00f1-a5a5-4d64-b8e8-5e90d5bfc112",
+          "display": "Ambulatory"
+        },
+        "date": "2025-12-06T12:42:45.625+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:2b73deba-69b1-4b3f-925a-fa7eeef32b88",
+            "display": "Dr. Somya"
+          }
+        ],
+        "title": "Immunization record",
+        "custodian": {
+          "reference": "urn:uuid:afd00302-cb4e-4ed0-a809-1685d779d52b",
+          "display": "Purnank Hospital"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+                "display": "SAURAV  KUMAR"
+              }
+            ]
+          },
+          {
+            "title": "Immunization Details",
+            "entry": [
+              {
+                "reference": "urn:uuid:667f6234-8b7b-45da-9b4b-f2ce7ff50904",
+                "display": "Immunization"
+              }
+            ]
+          },
+          {
+            "title": "Immunization Recommendation",
+            "entry": [
+              {
+                "reference": "urn:uuid:d02273aa-51e9-4768-adb8-67847918df73",
+                "display": "ImmunizationRecommendation"
+              }
+            ]
+          },
+          {
+            "title": "Document Reference",
+            "entry": [
+              {
+                "reference": "urn:uuid:362709d8-d9a3-4d8d-af0d-10aa11c3bf0b",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2025-12-06T12:42:45.6251141+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "saurav_50505@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "SAURAV  KUMAR"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "8298540343",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2000-11-05"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2b73deba-69b1-4b3f-925a-fa7eeef32b88",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "2b73deba-69b1-4b3f-925a-fa7eeef32b88",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2025-12-06T12:42:45.6251141+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Somya"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:afd00302-cb4e-4ed0-a809-1685d779d52b",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "afd00302-cb4e-4ed0-a809-1685d779d52b",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN1010001346"
+          }
+        ],
+        "name": "Purnank Hospital"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ad6b00f1-a5a5-4d64-b8e8-5e90d5bfc112",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ad6b00f1-a5a5-4d64-b8e8-5e90d5bfc112",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://uat.v4.api.emedhub.in/abdm/",
+            "value": "00f72030-bf3e-4c81-8b93-5e6b7b3d16bf"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+          "display": "SAURAV  KUMAR"
+        },
+        "period": {
+          "start": "2025-12-06T07:12:45.625+00:00"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:667f6234-8b7b-45da-9b4b-f2ce7ff50904",
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "667f6234-8b7b-45da-9b4b-f2ce7ff50904",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization"
+          ]
+        },
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "1119349007",
+              "display": "COVID-19 mRNA Vaccine"
+            }
+          ],
+          "text": "COVID-19 mRNA Vaccine"
+        },
+        "patient": {
+          "reference": "urn:uuid:29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:ad6b00f1-a5a5-4d64-b8e8-5e90d5bfc112",
+          "display": "Encounter"
+        },
+        "occurrenceDateTime": "2025-12-06T12:42:45",
+        "primarySource": true,
+        "manufacturer": {
+          "display": "Cipla"
+        },
+        "lotNumber": "234233",
+        "performer": [
+          {
+            "actor": {
+              "reference": "urn:uuid:2b73deba-69b1-4b3f-925a-fa7eeef32b88",
+              "display": "Practitioner"
+            }
+          }
+        ],
+        "protocolApplied": [
+          {
+            "doseNumberPositiveInt": 2
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d02273aa-51e9-4768-adb8-67847918df73",
+      "resource": {
+        "resourceType": "ImmunizationRecommendation",
+        "id": "d02273aa-51e9-4768-adb8-67847918df73",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecommendation"
+          ]
+        },
+        "patient": {
+          "reference": "urn:uuid:29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+          "display": "SAURAV  KUMAR"
+        },
+        "recommendation": [
+          {
+            "vaccineCode": [
+              {
+                "coding": [
+                  {
+                    "system": "https://www.snomed.org",
+                    "code": "28531000087107",
+                    "display": ""
+                  }
+                ]
+              }
+            ],
+            "forecastStatus": {
+              "text": "Due"
+            },
+            "dateCriterion": [
+              {
+                "code": {
+                  "text": "Next Dose Due Date"
+                },
+                "value": "2025-12-06T12:42:00.000+05:30"
+              }
+            ],
+            "description": "",
+            "series": ""
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:362709d8-d9a3-4d8d-af0d-10aa11c3bf0b",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "362709d8-d9a3-4d8d-af0d-10aa11c3bf0b",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Immunization Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:29cdc2df-1af1-498e-9fce-fb5b4b1c18f8",
+          "display": "SAURAV  KUMAR"
+        },
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "JVBERi0xLjQKJeLjz9MKNCAwIG9iago8PC9MZW5ndGggNjYzL0ZpbHRlci9GbGF0ZURlY29kZT4+c3RyZWFtCnictZbbctowEIbv/RR7mV6Y6Ah2rkpKc2gbIODkptPpCNshbn1IZNM2ffpKsk0gMnTSJjAMRvv9q3/Xi+DeuXcw/HQQIMAwO3UYAuZTyBzOublKnblzqZ73znGgowOPQBA5mJAeG4BLBvrT4QkG7EFw4xycZ9kqT36LKilymMVhISOYr7JMyIc3wTfHbYRIy4jawyXm8gBMVK+Yzwhcvs5MdObaolw2KIKlWapZvXm0gUzV/nFewSiuRJKWtoBs810p+73GAQGMTW2gH23qschigCO1Mh9ezYbXAB+vLoazOtHTJNvSq7PzUS2dzsYIIe7tU53GeRTLmr8QabyPHYkqhuIGjhNZ3dYSojZwMXYR3ye8KBZJ2tTjEd/jDFFG9ymGi1sB41W2aL352OWIM5d4tO8SxvFf1cMoknFZ1vJSrKT48VWlQPxtufi1rf6fYZjIpViP5CtMBJyIMEmT6uEIpiuZi/w7nBXlXVKJ9OWKmEoRVokuQfX7NYqAkeyZ17zIHkT3vTMi4/2zy4iPB1+CDy9U3+a58S91MbKV+NFpCxvwfWCOMtQbcOIzePqucusDkDPAiALug4ydm300ZvQ5OGH95+CU+c/BGScWrqsloG/SqZJyddRbBc6bgF1LG7FttxHbYRuxzcw3DBDPBIhtoDNiDHRGjIHOiDHwJHKpf8Qw1IPEtME+BNnGyB5cizBM8tic7npu1MBsSDDjHZpjKfLIhgnzOuBJGK6kjPOwIz3luEPxaRLYqG6tjY6KUlkveh28KpbhGl9/8d9Nrs9HLvYhm42HWrNJU6TptiE7emGnTO5SsaMXFkwQ4eoPgYv6O3phKygjlO5oh00/gocnFHy9uHbk4R6FpsipWMaAG/oPT9r8cwplbmRzdHJlYW0KZW5kb2JqCjYgMCBvYmoKPDwvVHlwZS9QYWdlL01lZGlhQm94WzAgMCA1OTUgODQyXS9SZXNvdXJjZXM8PC9Gb250PDwvRjEgMSAwIFIvRjIgMiAwIFIvRjMgMyAwIFI+Pj4+L0NvbnRlbnRzIDQgMCBSL1BhcmVudCA1IDAgUj4+CmVuZG9iagoxIDAgb2JqCjw8L1R5cGUvRm9udC9TdWJ0eXBlL1R5cGUxL0Jhc2VGb250L0hlbHZldGljYS1Cb2xkL0VuY29kaW5nL1dpbkFuc2lFbmNvZGluZz4+CmVuZG9iagoyIDAgb2JqCjw8L1R5cGUvRm9udC9TdWJ0eXBlL1R5cGUxL0Jhc2VGb250L0hlbHZldGljYS9FbmNvZGluZy9XaW5BbnNpRW5jb2Rpbmc+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9Db3VyaWVyL0VuY29kaW5nL1dpbkFuc2lFbmNvZGluZz4+CmVuZG9iago1IDAgb2JqCjw8L1R5cGUvUGFnZXMvQ291bnQgMS9LaWRzWzYgMCBSXT4+CmVuZG9iago3IDAgb2JqCjw8L1R5cGUvQ2F0YWxvZy9QYWdlcyA1IDAgUj4+CmVuZG9iago4IDAgb2JqCjw8L1Byb2R1Y2VyKGlUZXh0U2hhcnCSIDUuNS41IKkyMDAwLTIwMTQgaVRleHQgR3JvdXAgTlYgXChBR1BMLXZlcnNpb25cKSkvQ3JlYXRpb25EYXRlKEQ6MjAyNTEyMDYxMjQyNDUrMDUnMzAnKS9Nb2REYXRlKEQ6MjAyNTEyMDYxMjQyNDUrMDUnMzAnKT4+CmVuZG9iagp4cmVmCjAgOQowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDA4NzUgMDAwMDAgbiAKMDAwMDAwMDk2OCAwMDAwMCBuIAowMDAwMDAxMDU2IDAwMDAwIG4gCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMTE0MiAwMDAwMCBuIAowMDAwMDAwNzQ1IDAwMDAwIG4gCjAwMDAwMDExOTMgMDAwMDAgbiAKMDAwMDAwMTIzOCAwMDAwMCBuIAp0cmFpbGVyCjw8L1NpemUgOS9Sb290IDcgMCBSL0luZm8gOCAwIFIvSUQgWzxiZmZmM2IwOGFlMGM0NjU5ZTk3ZGU5MWYyZDYwZGRlOD48YmZmZjNiMDhhZTBjNDY1OWU5N2RlOTFmMmQ2MGRkZTg+XT4+CiVpVGV4dC01LjUuNQpzdGFydHhyZWYKMTQwMAolJUVPRgo=",
+              "title": "Immunization Record",
+              "creation": "2025-12-06T07:12:45.640+00:00"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

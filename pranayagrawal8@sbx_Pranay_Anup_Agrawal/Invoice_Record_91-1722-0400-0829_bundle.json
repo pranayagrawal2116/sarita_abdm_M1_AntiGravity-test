@@ -1,0 +1,298 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-00142019-f89b-4535-9570-687892b7e9f7",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-16T11:11:44.165+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "9f47ea2f-b20a-4700-9944-6cd07b5f0ecb"
+  },
+  "type": "document",
+  "timestamp": "2026-07-16T11:11:44.165+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:e3e4bb79-04e5-4a1d-b301-5f49315ad9b4",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "e3e4bb79-04e5-4a1d-b301-5f49315ad9b4",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InvoiceRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Invoice Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:550018fc-8179-4fc0-ae89-005c1775a7ae",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:435483cd-7d10-47b8-a3d9-8975b7c1a438",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-16T11:11:44.165+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:d67452e1-d6aa-4918-8ece-a3e79ed53b05",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Invoice Record",
+        "custodian": {
+          "reference": "urn:uuid:4f0fafa4-0b9f-4d6c-b9b3-2387f121c7df",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Invoice Details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "419891008",
+                  "display": "Record artifact"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:442b4f39-f254-4a1d-a897-70bf93dbba24",
+                "display": "Invoice"
+              },
+              {
+                "reference": "urn:uuid:5c60f71e-8f2a-469a-a5e1-e8f72e96e25a",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:550018fc-8179-4fc0-ae89-005c1775a7ae",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "550018fc-8179-4fc0-ae89-005c1775a7ae",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:11:44.165+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranayagrawal8@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d67452e1-d6aa-4918-8ece-a3e79ed53b05",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "d67452e1-d6aa-4918-8ece-a3e79ed53b05",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:11:44.165+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4f0fafa4-0b9f-4d6c-b9b3-2387f121c7df",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "4f0fafa4-0b9f-4d6c-b9b3-2387f121c7df",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:435483cd-7d10-47b8-a3d9-8975b7c1a438",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "435483cd-7d10-47b8-a3d9-8975b7c1a438",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "2eab6868-3a4f-4683-bf42-8d290ee40245"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:550018fc-8179-4fc0-ae89-005c1775a7ae",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-07-16T11:11:44.165+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:442b4f39-f254-4a1d-a897-70bf93dbba24",
+      "resource": {
+        "resourceType": "Invoice",
+        "id": "442b4f39-f254-4a1d-a897-70bf93dbba24",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Invoice"
+          ]
+        },
+        "status": "issued",
+        "subject": {
+          "reference": "urn:uuid:550018fc-8179-4fc0-ae89-005c1775a7ae",
+          "display": "Pranay Anup Agrawal"
+        },
+        "date": "2026-07-16T05:41:44.165Z",
+        "identifier": [
+          {
+            "value": "urn:uuid:435483cd-7d10-47b8-a3d9-8975b7c1a438"
+          }
+        ],
+        "totalNet": {
+          "value": 577.02,
+          "currency": "INR"
+        },
+        "totalGross": {
+          "value": 577.02,
+          "currency": "INR"
+        },
+        "lineItem": [
+          {
+            "sequence": 1,
+            "chargeItemCodeableConcept": {
+              "text": "Consultation Charges"
+            },
+            "priceComponent": [
+              {
+                "type": "base",
+                "amount": {
+                  "value": 577.02,
+                  "currency": "INR"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5c60f71e-8f2a-469a-a5e1-e8f72e96e25a",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "5c60f71e-8f2a-469a-a5e1-e8f72e96e25a",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Invoice Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:550018fc-8179-4fc0-ae89-005c1775a7ae"
+        },
+        "date": "2026-07-16T05:41:44.165Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "SGVhbHRoIEluZm9ybWF0aW9uIFJlY29yZAo9PT09PT09PT09PT09PT09PT09PT09PT09ClR5cGU6IEludm9pY2UgUmVjb3JkClNhdmVkIEF0OiAyMDI2LTA3LTE2IDExOjExOjQzCgotLS0gUGF0aWVudCBEZXRhaWxzIC0tLQpOYW1lOiBQcmFuYXkgQW51cCBBZ3Jhd2FsCkFCSEEgQWRkcmVzczogcHJhbmF5YWdyYXdhbDhAc2J4CkFCSEEgTnVtYmVyOiA5MS0xNzIyLTA0MDAtMDgyOQpNb2JpbGU6IDk1MTAwMjk1NzUKR2VuZGVyOiBNCkRPQiAvIFlPQjogMjEtMS0yMDA2ClVISUQ6IFNIQzE2MDcyNjAxCgotLS0gUmVjb3JkIERhdGEgLS0tCgpIZWFkZXI6CiAgRGF0ZTogMTYtMDctMjAyNgogIEludm9pY2UgTm86IElOVjk0ODI1CiAgUGF5bWVudCBUeXBlOiBDYXNoCkl0ZW1zOgogIC0gSXRlbSAxOgogICAgTmFtZTogQ29uc3VsdGF0aW9uIENoYXJnZXMKICAgIFR5cGU6IENvbnN1bHRhdGlvbgogICAgTXJwOiA1MDAuMAogICAgRGlzY291bnQ6IDExLjAKICAgIFJhdGU6IDQ4OS4wCiAgICBRdHk6IDEKICAgIEdzdCBQY3Q6IDE4LjAKICAgIEdzdCBBbXQ6IDg4LjAyCiAgICBUb3RhbDogNTc3LjAyCkRyYWZ0IEl0ZW06CiAgTmFtZTogLQogIFR5cGU6IENvbnN1bHRhdGlvbgogIE1ycDogLQogIERpc2NvdW50OiAtCiAgUmF0ZTogLQogIFF1YW50aXR5OiAtCiAgR3N0IFBlcmNlbnQ6IC0KU3VtbWFyeToKICBUb3RhbCBRdHk6IDEKICBUb3RhbCBHc3Q6IDg4LjAyCiAgR3JhbmQgVG90YWw6IDU3Ny4wMgo=",
+              "title": "Invoice_Record_91-1722-0400-0829",
+              "creation": "2026-07-16T05:41:44.165Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

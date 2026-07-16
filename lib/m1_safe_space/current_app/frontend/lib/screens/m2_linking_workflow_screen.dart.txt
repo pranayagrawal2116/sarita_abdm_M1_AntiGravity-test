@@ -1,0 +1,1904 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+
+import '../services/abha_api_service.dart';
+import '../services/hip_linking_api_service.dart';
+import '../utils/auth_session.dart';
+
+class M2LinkingWorkflowScreen extends StatefulWidget {
+  const M2LinkingWorkflowScreen({super.key});
+
+  @override
+  State<M2LinkingWorkflowScreen> createState() =>
+      _M2LinkingWorkflowScreenState();
+}
+
+class _M2LinkingWorkflowScreenState extends State<M2LinkingWorkflowScreen> {
+  static const _apiTimeout = Duration(seconds: 75);
+  static const _callbackPollInterval = Duration(seconds: 2);
+
+  final _bridgeIdController = TextEditingController();
+  final _facilityIdController = TextEditingController();
+  final _facilityNameController = TextEditingController();
+  final _serviceIdController = TextEditingController();
+  final _serviceNameController = TextEditingController();
+  final _hipIdController = TextEditingController();
+  final _hiuIdController = TextEditingController();
+  final _AbhaNumberController = TextEditingController();
+  final _AbhaAddressController = TextEditingController();
+  final _patientNameController = TextEditingController();
+  final _patientGenderController = TextEditingController();
+  final _patientYearOfBirthController = TextEditingController();
+  final _linkingTokenController = TextEditingController();
+  final _patientReferenceController = TextEditingController();
+  final _patientDisplayController = TextEditingController();
+  final _careContextReferenceController = TextEditingController();
+  final _careContextDisplayController = TextEditingController();
+  final _consentIdController = TextEditingController();
+  final _transactionIdController = TextEditingController();
+  final _requestIdController = TextEditingController();
+  final _consentPatientIdController = TextEditingController();
+  final _consentPurposeController = TextEditingController();
+  final _consentRequesterController = TextEditingController();
+  final _consentFromController = TextEditingController();
+  final _consentToController = TextEditingController();
+  final _consentViewUrlController = TextEditingController();
+
+  bool _callingApi = false;
+  String _activeButtonLabel = '';
+  int _completedSetupIndex = 0;
+  int _completedStep2Index = 0;
+  String _callbackType = 'token_on_generate';
+  String _consentAckStatus = 'OK';
+  String _dataRequestSessionStatus = 'ACKNOWLEDGED';
+  String _dataNotifySessionStatus = 'TRANSFERRED';
+  String _selectedHiType = 'Prescription';
+  bool _registerAsHip = true;
+  bool _registerAsHiu = false;
+  String _lastAction = 'No API call yet';
+  String _lastResponse = '{}';
+  String _callbackPublicBaseUrl = '';
+  String _tokenCallbackUrl = '';
+  bool _callbackPublicReachable = false;
+  String _callbackConfigError = '';
+
+  static const _docApis = [
+    'POST /api/hip/setup/session/check',
+    'PATCH /api/hip/setup/bridge/url',
+    'POST /api/hip/setup/bridge/services/register',
+    'GET /api/hip/setup/bridge-service/:serviceId',
+    'GET /api/hip/setup/bridge-services/:bridgeId',
+    'https://dev.abdm.gov.in/api/hiecm/v3/token/generate-token',
+    'https://dev.abdm.gov.in/api/hiecm/hip/v3/link/carecontext',
+    'https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links',
+    'https://dev.abdm.gov.in/api/hiecm/hip/v3/link/context/notify',
+    'https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links/sms/notify2',
+    'https://dev.abdm.gov.in/api/hiecm/user-initiated-linking/v3/patient/care-context/on-discover',
+    'https://dev.abdm.gov.in/api/hiecm/user-initiated-linking/v3/link/care-context/on-init',
+    'https://dev.abdm.gov.in/api/hiecm/user-initiated-linking/v3/link/care-context/on-confirm',
+    'https://dev.abdm.gov.in/api/hiecm/consent/v3/request/hip/on-notify',
+    'https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/hip/on-request',
+    'https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify',
+    'POST /api/hip/link/consent/view-link (JWS + consent-view URL generation)',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    final now = DateTime.now().toUtc();
+    final from = now.subtract(const Duration(days: 30));
+    _consentFromController.text = from.toIso8601String();
+    _consentToController.text = now.toIso8601String();
+    _consentPurposeController.text = 'View medical records';
+    _prefillLoggedInProfile();
+    _loadCallbackConfig();
+  }
+
+  @override
+  void dispose() {
+    _bridgeIdController.dispose();
+    _facilityIdController.dispose();
+    _facilityNameController.dispose();
+    _serviceIdController.dispose();
+    _serviceNameController.dispose();
+    _hipIdController.dispose();
+    _hiuIdController.dispose();
+    _AbhaNumberController.dispose();
+    _AbhaAddressController.dispose();
+    _patientNameController.dispose();
+    _patientGenderController.dispose();
+    _patientYearOfBirthController.dispose();
+    _linkingTokenController.dispose();
+    _patientReferenceController.dispose();
+    _patientDisplayController.dispose();
+    _careContextReferenceController.dispose();
+    _careContextDisplayController.dispose();
+    _consentIdController.dispose();
+    _transactionIdController.dispose();
+    _requestIdController.dispose();
+    _consentPatientIdController.dispose();
+    _consentPurposeController.dispose();
+    _consentRequesterController.dispose();
+    _consentFromController.dispose();
+    _consentToController.dispose();
+    _consentViewUrlController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('M2 HIP Workflow (ABDM Live)')),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final introCard = _sectionCard(
+            title: 'Execution Order (Follow Sequence)',
+            child: const Text(
+              'Step 0A) Gateway & bridge setup -> Step 0B) Session readiness -> Step 1) Core IDs -> Step 2) HIP-initiated linking APIs (1 to 5) -> Step 3) Consent/Data APIs (7 to 9) -> Step 4) Consent View JWS (10) -> Step 5) Callback monitor.',
+            ),
+          );
+
+          final setupCard = _sectionCard(
+            title: 'Step 0A: Gateway & Bridge Setup',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Run this once when starting M2 integration, and run bridge URL update again whenever the public tunnel/domain changes.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _bridgeIdController,
+                  label: 'Bridge ID',
+                  hint: 'Usually your ABDM client/bridge ID',
+                  sourceHint:
+                      'From ABDM onboarding. Often same as the bridge/client ID used in the Postman docs.',
+                  onChanged: (_) => _handleSetupSourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _facilityIdController,
+                  label: 'Facility ID',
+                  hint: 'INxxxxxxxxxx',
+                  sourceHint:
+                      'From your ABDM/HPR/HFR facility onboarding details. Needed for bridge service registration.',
+                  onChanged: (_) => _handleSetupSourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _facilityNameController,
+                  label: 'Facility Name',
+                  hint: 'Hospital / Clinic Name',
+                  sourceHint:
+                      'Your ABDM-registered facility name for service registration.',
+                  onChanged: (_) => _handleSetupSourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _serviceNameController,
+                  label: 'Service Name',
+                  hint: 'Hospital / HIP Name',
+                  sourceHint:
+                      'Visible service name sent in bridge registration. Usually your HIP/HIU facility name.',
+                  onChanged: (_) => _handleSetupSourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _serviceIdController,
+                  label: 'Service ID (for lookup)',
+                  hint: 'Your HIP or HIU service ID',
+                  sourceHint:
+                      'Use the registered ABDM service ID when checking bridge-service lookup. Often this is your HIP ID or HIU ID.',
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  _callbackPublicBaseUrl.isNotEmpty
+                      ? 'Current public callback base: $_callbackPublicBaseUrl'
+                      : 'Current public callback base: Not loaded',
+                  style: const TextStyle(fontSize: 12, color: Colors.black87),
+                ),
+                const SizedBox(height: 10),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Register as HIP'),
+                  value: _registerAsHip,
+                  onChanged: (value) {
+                    setState(() {
+                      _registerAsHip = value ?? false;
+                      _completedSetupIndex = 0;
+                    });
+                  },
+                ),
+                CheckboxListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Register as HIU'),
+                  value: _registerAsHiu,
+                  onChanged: (value) {
+                    setState(() {
+                      _registerAsHiu = value ?? false;
+                      _completedSetupIndex = 0;
+                    });
+                  },
+                ),
+                const SizedBox(height: 6),
+                _actionButton(
+                  label: '0.1) Check Gateway Session',
+                  enabled: _canCheckSetupSession,
+                  onTap: _callCheckSetupSession,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '0.2) Update Bridge URL',
+                  enabled: _canUpdateBridgeUrl,
+                  onTap: _callUpdateBridgeUrl,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '0.3) Register Bridge Services',
+                  enabled: _canRegisterBridgeServices,
+                  onTap: _callRegisterBridgeServices,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '0.4) Find Bridge Service By Service ID',
+                  enabled: _canFindBridgeServiceByServiceId,
+                  onTap: _callFindBridgeServiceByServiceId,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '0.5) Find Services By Bridge ID',
+                  enabled: _canFindServicesByBridgeId,
+                  onTap: _callFindServicesByBridgeId,
+                  outlined: true,
+                ),
+              ],
+            ),
+          );
+
+          final readinessCard = _sectionCard(
+            title: 'Step 0B: Session Readiness',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _hasPhrToken
+                      ? 'PHR token from ABHA login: Available'
+                      : 'PHR token from ABHA login: Missing',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: _hasPhrToken
+                        ? Colors.green.shade700
+                        : Colors.red.shade700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Data source: This token is auto-populated only after ABHA login in this app. It is required for ABDM user-initiated discovery flows and useful for end-to-end M2 testing.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  _callbackPublicReachable
+                      ? 'Callback URL status: Public URL detected'
+                      : 'Callback URL status: Callback host may not be reachable from ABDM',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: _callbackPublicReachable
+                        ? Colors.green.shade700
+                        : Colors.red.shade700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                SelectableText(
+                  _callbackPublicBaseUrl.isNotEmpty
+                      ? 'Public callback base: $_callbackPublicBaseUrl'
+                      : 'Public callback base: Not loaded',
+                  style: const TextStyle(fontSize: 12, color: Colors.black87),
+                ),
+                const SizedBox(height: 4),
+                SelectableText(
+                  _tokenCallbackUrl.isNotEmpty
+                      ? 'Token callback URL: $_tokenCallbackUrl'
+                      : 'Token callback URL: Not loaded',
+                  style: const TextStyle(fontSize: 12, color: Colors.black87),
+                ),
+                if (_callbackConfigError.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    _callbackConfigError,
+                    style: TextStyle(fontSize: 12, color: Colors.red.shade700),
+                  ),
+                ],
+                if (_callbackPublicBaseUrl.contains('loca.lt')) ...[
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Heads up: `loca.lt` links often expire. If this tunnel is not live right now, ABDM cannot deliver the link token callback.',
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  ),
+                ],
+              ],
+            ),
+          );
+
+          final patientInputsCard = _sectionCard(
+            title: 'Step 1: Core IDs & Input Data',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _labeledField(
+                  controller: _hipIdController,
+                  label: 'HIP ID',
+                  hint: 'IN3410000260',
+                  sourceHint:
+                      'From ABDM onboarding/credentials for your HIP facility.',
+                  onChanged: (_) => _handleStep2SourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _hiuIdController,
+                  label: 'HIU ID (for Consent View)',
+                  hint: 'SBX_HIU_V3',
+                  sourceHint:
+                      'From ABDM onboarding for your HIU. If blank, HIP ID is used.',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _AbhaNumberController,
+                  label: 'ABHA Number',
+                  hint: '91XXXXXXXXXXXX',
+                  sourceHint:
+                      'From logged-in ABHA profile. Used by ABDM generate-token API.',
+                  onChanged: (_) => _handleStep2SourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _AbhaAddressController,
+                  label: 'ABHA Address',
+                  hint: 'name@sbx',
+                  sourceHint:
+                      'From user ABHA profile/login output (ABHA Address of patient).',
+                  onChanged: (_) => _handleStep2SourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _patientNameController,
+                  label: 'Patient Name',
+                  sourceHint:
+                      'From logged-in ABHA profile. Must match ABDM-verified profile for generate-token.',
+                  onChanged: (_) => _handleStep2SourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _patientGenderController,
+                  label: 'Patient Gender',
+                  hint: 'M / F / O',
+                  sourceHint:
+                      'From logged-in ABHA profile. ABDM generate-token expects the verified gender.',
+                  onChanged: (_) => _handleStep2SourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _patientYearOfBirthController,
+                  label: 'Year Of Birth',
+                  hint: '1989',
+                  sourceHint:
+                      'From logged-in ABHA profile. ABDM generate-token expects yearOfBirth.',
+                  onChanged: (_) => _handleStep2SourceChanged(),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _patientReferenceController,
+                  label: 'Patient Reference Number',
+                  sourceHint:
+                      'From your HIP/HMIS system. Use a unique patient reference or internal patient ID for this linking request.',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _patientDisplayController,
+                  label: 'Patient Display',
+                  sourceHint:
+                      'From your HIP/HMIS system. Visible label/description for this patient record set.',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _careContextReferenceController,
+                  label: 'Care Context Reference Number',
+                  sourceHint:
+                      'From your HIP/HMIS system. Use a unique care-context/visit/encounter record ID.',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _careContextDisplayController,
+                  label: 'Care Context Display',
+                  sourceHint:
+                      'From your HIP/HMIS system. Display text for the visit/record, for example consultation or test name.',
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Data source: Select the HI Type matching the record being linked, as shown in the M2 walkthrough.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 4),
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedHiType,
+                  decoration: const InputDecoration(
+                    labelText: 'HI Type',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'Prescription',
+                      child: Text('Prescription'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'DiagnosticReport',
+                      child: Text('Diagnostic Report'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'OPConsultation',
+                      child: Text('OP Consultation'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'DischargeSummary',
+                      child: Text('Discharge Summary'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'ImmunizationRecord',
+                      child: Text('Immunization Record'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HealthDocumentRecord',
+                      child: Text('Health Document Record'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'WellnessRecord',
+                      child: Text('Wellness Record'),
+                    ),
+                    DropdownMenuItem(value: 'Invoice', child: Text('Invoice')),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _selectedHiType = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Data source: Count is the number of records represented by this patient object for the selected HI Type.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 4),
+                TextFormField(
+                  initialValue: '1',
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: 'Count',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _linkingTokenController,
+                  label: 'Linking Token',
+                  sourceHint:
+                      'From Step 2 button 1 (Generate Linking Token) response: linkToken.',
+                  apiFilled: true,
+                ),
+              ],
+            ),
+          );
+
+          final linkingApisCard = _sectionCard(
+            title: 'Step 2: HIP-Initiated Linking APIs (Run 1 -> 5)',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'HIP-initiated linking flow from the M2 walkthrough. Run in order. Each next button unlocks only after the previous step succeeds.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 10),
+                _actionButton(
+                  label: '1) Generate Linking Token',
+                  enabled: _canGenerateToken,
+                  onTap: _callGenerateToken,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '2) Link Care Contexts',
+                  enabled: _canLinkCareContexts,
+                  onTap: _callLinkCareContexts,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '3) Fetch Patient Links',
+                  enabled: _canPatientLinks,
+                  onTap: _callPatientLinks,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '4) Notify Context Update',
+                  enabled: _canContextNotify,
+                  onTap: _callContextNotify,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '5) Send SMS Notify2',
+                  enabled: _canNotify2,
+                  onTap: _callNotify2,
+                ),
+              ],
+            ),
+          );
+
+          final consentDataCard = _sectionCard(
+            title: 'Step 3: Consent & Data APIs (Run 7 -> 9)',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _labeledField(
+                  controller: _consentIdController,
+                  label: 'Consent ID',
+                  sourceHint:
+                      'From ABDM consent callback (consent_on_notify) or consent manager response.',
+                  apiFilled: true,
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _transactionIdController,
+                  label: 'Transaction ID',
+                  sourceHint:
+                      'From ABDM health-information request callback (data_on_request).',
+                  apiFilled: true,
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _requestIdController,
+                  label: 'Request ID (for callbacks/acks)',
+                  sourceHint:
+                      'From request/response payloads of previous steps. Often auto-filled by this screen.',
+                  apiFilled: true,
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Data source: Select status values based on ABDM callback state you received.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 4),
+                DropdownButtonFormField<String>(
+                  initialValue: _consentAckStatus,
+                  decoration: const InputDecoration(
+                    labelText: 'Consent Ack Status',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'OK', child: Text('OK')),
+                    DropdownMenuItem(value: 'NOK', child: Text('NOK')),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _consentAckStatus = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  initialValue: _dataRequestSessionStatus,
+                  decoration: const InputDecoration(
+                    labelText: 'Data On-Request Session Status',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'ACKNOWLEDGED',
+                      child: Text('ACKNOWLEDGED'),
+                    ),
+                    DropdownMenuItem(value: 'FAILED', child: Text('FAILED')),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _dataRequestSessionStatus = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  initialValue: _dataNotifySessionStatus,
+                  decoration: const InputDecoration(
+                    labelText: 'Data Notify Session Status',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'TRANSFERRED',
+                      child: Text('TRANSFERRED'),
+                    ),
+                    DropdownMenuItem(value: 'FAILED', child: Text('FAILED')),
+                    DropdownMenuItem(
+                      value: 'RECEIVED',
+                      child: Text('RECEIVED'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _dataNotifySessionStatus = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _actionButton(
+                  label: '7) Consent On-Notify Ack',
+                  enabled: _canConsentOnNotify,
+                  onTap: _callConsentOnNotify,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '8) Data On-Request Ack',
+                  enabled: _canDataOnRequest,
+                  onTap: _callDataOnRequest,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: '9) Data Flow Notify',
+                  enabled: _canDataFlowNotify,
+                  onTap: _callDataFlowNotify,
+                ),
+              ],
+            ),
+          );
+
+          final callbackCard = _sectionCard(
+            title: 'Step 5: Callback Monitor',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Use this after each API call to fetch callback payloads and auto-fill missing IDs.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  initialValue: _callbackType,
+                  decoration: const InputDecoration(
+                    labelText: 'Callback Type',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'token_on_generate',
+                      child: Text('token_on_generate'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'link_on_discover',
+                      child: Text('link_on_discover'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'link_on_carecontext',
+                      child: Text('link_on_carecontext'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'link_on_init',
+                      child: Text('link_on_init'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'link_on_confirm',
+                      child: Text('link_on_confirm'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'context_on_notify',
+                      child: Text('context_on_notify'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'sms_on_notify',
+                      child: Text('sms_on_notify'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'consent_on_notify',
+                      child: Text('consent_on_notify'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'data_on_request',
+                      child: Text('data_on_request'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'data_notify',
+                      child: Text('data_notify'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _callbackType = value);
+                  },
+                ),
+                const SizedBox(height: 10),
+                _actionButton(
+                  label: 'Get Latest Callback Events',
+                  enabled: _canCallbacksByType,
+                  onTap: _callCallbacksByType,
+                  outlined: true,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: 'Get Callback By Request ID',
+                  enabled: _canCallbackByTypeAndRequestId,
+                  onTap: _callCallbackByTypeAndRequestId,
+                ),
+              ],
+            ),
+          );
+
+          final consentViewCard = _sectionCard(
+            title: 'Step 4: Consent View (JWS) - Run 10',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _labeledField(
+                  controller: _consentPatientIdController,
+                  label: 'Patient ID for Consent View',
+                  hint: 'ABHA Address / ABHA ID',
+                  sourceHint:
+                      'From patient ABHA Address or ABHA number. If blank, ABHA Address from Step 1 is used.',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _consentPurposeController,
+                  label: 'Purpose Text',
+                  hint: 'View medical records',
+                  sourceHint:
+                      'Business purpose to display on consent page and include in JWS payload.',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _consentRequesterController,
+                  label: 'Requester Name (optional)',
+                  sourceHint:
+                      'Display name of HIU requester (shown to user on consent UI if provided).',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _consentFromController,
+                  label: 'Date From (ISO)',
+                  hint: '2026-03-25T00:00:00.000Z',
+                  sourceHint:
+                      'Start of health-record range required for consent request.',
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _consentToController,
+                  label: 'Date To (ISO)',
+                  hint: '2026-03-31T23:59:59.000Z',
+                  sourceHint:
+                      'End of health-record range required for consent request.',
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'If HIU ID or Patient ID is left blank here, HIP ID and ABHA Address from the top section are used.',
+                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                ),
+                const SizedBox(height: 10),
+                _actionButton(
+                  label: '10) Generate Consent View Link (JWS)',
+                  enabled: _canGenerateConsentView,
+                  onTap: _callGenerateConsentViewLink,
+                ),
+                const SizedBox(height: 8),
+                _actionButton(
+                  label: 'Open Consent View Page',
+                  enabled: _canOpenConsentView,
+                  onTap: _callOpenConsentView,
+                  outlined: true,
+                ),
+                const SizedBox(height: 10),
+                _labeledField(
+                  controller: _consentViewUrlController,
+                  label: 'Generated Consent View URL',
+                  sourceHint:
+                      'Auto-generated from Step 10 response after JWS signing on backend.',
+                  apiFilled: true,
+                ),
+              ],
+            ),
+          );
+
+          final docsTile = ExpansionTile(
+            title: const Text('M2 APIs from Readme Docs'),
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: SelectableText(
+                  _docApis.join('\n'),
+                  style: const TextStyle(fontFamily: 'monospace'),
+                ),
+              ),
+            ],
+          );
+
+          final responseCard = _sectionCard(
+            title: 'Last Response',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _lastAction,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFDDDDDD)),
+                  ),
+                  child: SelectableText(
+                    _lastResponse,
+                    style: const TextStyle(fontFamily: 'monospace'),
+                  ),
+                ),
+              ],
+            ),
+          );
+
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1320),
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  introCard,
+                  const SizedBox(height: 12),
+                  setupCard,
+                  const SizedBox(height: 12),
+                  readinessCard,
+                  const SizedBox(height: 12),
+                  patientInputsCard,
+                  const SizedBox(height: 12),
+                  linkingApisCard,
+                  const SizedBox(height: 12),
+                  consentDataCard,
+                  const SizedBox(height: 12),
+                  consentViewCard,
+                  const SizedBox(height: 12),
+                  callbackCard,
+                  const SizedBox(height: 12),
+                  docsTile,
+                  const SizedBox(height: 12),
+                  responseCard,
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _labeledField({
+    required TextEditingController controller,
+    required String label,
+    String? hint,
+    String? sourceHint,
+    bool apiFilled = false,
+    bool readOnly = false,
+    ValueChanged<String>? onChanged,
+  }) {
+    final hintText = sourceHint?.trim() ?? '';
+    final locked = readOnly || apiFilled;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (apiFilled) ...[
+          Text(
+            'Auto-filled from API',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Colors.blue.shade700,
+            ),
+          ),
+          const SizedBox(height: 4),
+        ],
+        if (hintText.isNotEmpty) ...[
+          Text(
+            'Data source: $hintText',
+            style: const TextStyle(fontSize: 12, color: Colors.black54),
+          ),
+          const SizedBox(height: 4),
+        ],
+        TextField(
+          controller: controller,
+          readOnly: locked,
+          onChanged: onChanged ?? (_) => setState(() {}),
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hint,
+            border: const OutlineInputBorder(),
+            filled: locked,
+            fillColor: locked ? const Color(0xFFF3F6FA) : null,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _actionButton({
+    required String label,
+    required bool enabled,
+    required Future<void> Function() onTap,
+    bool outlined = false,
+  }) {
+    final isActive = _callingApi && _activeButtonLabel == label;
+    final child = Text(isActive ? 'Calling...' : label);
+    final canTap = enabled && !_callingApi;
+    Future<void> handleTap() async {
+      setState(() => _activeButtonLabel = label);
+      try {
+        await onTap();
+      } finally {
+        if (mounted) {
+          setState(() => _activeButtonLabel = '');
+        }
+      }
+    }
+
+    if (outlined) {
+      return SizedBox(
+        height: 46,
+        child: OutlinedButton(
+          onPressed: canTap ? handleTap : null,
+          child: child,
+        ),
+      );
+    }
+
+    return SizedBox(
+      height: 46,
+      child: ElevatedButton(onPressed: canTap ? handleTap : null, child: child),
+    );
+  }
+
+  Widget _sectionCard({required String title, required Widget child}) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _required(TextEditingController controller, String label) {
+    final value = controller.text.trim();
+    if (value.isEmpty) {
+      throw Exception('$label is required');
+    }
+    return value;
+  }
+
+  bool _hasText(TextEditingController controller) {
+    return controller.text.trim().isNotEmpty;
+  }
+
+  bool get _hasPhrToken {
+    final token = AuthSession.phrAuthToken?.trim() ?? '';
+    return token.isNotEmpty;
+  }
+
+  Future<void> _prefillLoggedInProfile() async {
+    if (!_hasPhrToken) {
+      return;
+    }
+
+    try {
+      final profile = await AbhaApiService.fetchLoggedInProfile();
+      if (!mounted) return;
+
+      final AbhaNumber =
+          profile['AbhaNumber']?.toString() ??
+          profile['healthIdNumber']?.toString() ??
+          profile['AbhaNumber']?.toString() ??
+          '';
+      final AbhaAddress =
+          profile['preferredAbhaAddress']?.toString() ??
+          profile['AbhaAddress']?.toString() ??
+          AuthSession.AbhaAddress ??
+          '';
+      final patientName =
+          profile['name']?.toString() ?? profile['fullName']?.toString() ?? '';
+      final gender = profile['gender']?.toString() ?? '';
+      final yearOfBirth = profile['yearOfBirth']?.toString() ?? '';
+
+      setState(() {
+        if (_AbhaNumberController.text.trim().isEmpty &&
+            AbhaNumber.trim().isNotEmpty) {
+          _AbhaNumberController.text = AbhaNumber.trim();
+        }
+        if (_AbhaAddressController.text.trim().isEmpty &&
+            AbhaAddress.trim().isNotEmpty) {
+          _AbhaAddressController.text = AbhaAddress.trim();
+        }
+        if (_patientNameController.text.trim().isEmpty &&
+            patientName.trim().isNotEmpty) {
+          _patientNameController.text = patientName.trim();
+        }
+        if (_patientGenderController.text.trim().isEmpty &&
+            gender.trim().isNotEmpty) {
+          _patientGenderController.text = gender.trim();
+        }
+        if (_patientYearOfBirthController.text.trim().isEmpty &&
+            yearOfBirth.trim().isNotEmpty) {
+          _patientYearOfBirthController.text = yearOfBirth.trim();
+        }
+      });
+    } catch (_) {
+      // Keep the screen usable even if profile prefill fails.
+    }
+  }
+
+  void _handleStep2SourceChanged() {
+    setState(() {
+      _completedStep2Index = 0;
+      _linkingTokenController.clear();
+      _requestIdController.clear();
+    });
+  }
+
+  void _handleSetupSourceChanged() {
+    setState(() {
+      _completedSetupIndex = 0;
+    });
+  }
+
+  bool get _canCheckSetupSession => true;
+
+  bool get _canUpdateBridgeUrl {
+    return _completedSetupIndex >= 1 &&
+        _hasText(_bridgeIdController) &&
+        _callbackPublicBaseUrl.trim().isNotEmpty;
+  }
+
+  bool get _canRegisterBridgeServices {
+    return _completedSetupIndex >= 2 &&
+        _hasText(_bridgeIdController) &&
+        _hasText(_facilityIdController) &&
+        _hasText(_facilityNameController) &&
+        _hasText(_serviceNameController) &&
+        (_registerAsHip || _registerAsHiu);
+  }
+
+  bool get _canFindBridgeServiceByServiceId {
+    return _completedSetupIndex >= 3 && _hasText(_serviceIdController);
+  }
+
+  bool get _canFindServicesByBridgeId {
+    return _completedSetupIndex >= 2 && _hasText(_bridgeIdController);
+  }
+
+  bool get _canGenerateToken {
+    return _hasText(_hipIdController) &&
+        _hasText(_AbhaNumberController) &&
+        _hasText(_AbhaAddressController) &&
+        _hasText(_patientNameController) &&
+        _hasText(_patientGenderController) &&
+        _hasText(_patientYearOfBirthController);
+  }
+
+  bool get _canLinkCareContexts {
+    return _completedStep2Index >= 1 &&
+        _hasText(_hipIdController) &&
+        _hasText(_AbhaNumberController) &&
+        _hasText(_AbhaAddressController) &&
+        _hasText(_linkingTokenController) &&
+        _hasText(_patientReferenceController) &&
+        _hasText(_patientDisplayController) &&
+        _hasText(_careContextReferenceController) &&
+        _hasText(_careContextDisplayController);
+  }
+
+  bool get _canPatientLinks {
+    return _completedStep2Index >= 2 &&
+        _hasText(_hipIdController) &&
+        _hasText(_AbhaAddressController);
+  }
+
+  bool get _canContextNotify {
+    return _completedStep2Index >= 3 &&
+        _hasText(_hipIdController) &&
+        _hasText(_AbhaAddressController) &&
+        _hasText(_careContextReferenceController);
+  }
+
+  bool get _canNotify2 {
+    return _completedStep2Index >= 4 &&
+        _hasText(_hipIdController) &&
+        _hasText(_AbhaAddressController) &&
+        _hasText(_linkingTokenController);
+  }
+
+  bool get _canConsentOnNotify {
+    return _hasText(_consentIdController) && _hasText(_requestIdController);
+  }
+
+  bool get _canDataOnRequest {
+    return _hasText(_transactionIdController) && _hasText(_requestIdController);
+  }
+
+  bool get _canDataFlowNotify {
+    return _hasText(_consentIdController) &&
+        _hasText(_transactionIdController) &&
+        _hasText(_hipIdController);
+  }
+
+  bool get _canGenerateConsentView {
+    final hiuId = _hiuIdController.text.trim().isNotEmpty
+        ? _hiuIdController.text.trim()
+        : _hipIdController.text.trim();
+    final patientId = _consentPatientIdController.text.trim().isNotEmpty
+        ? _consentPatientIdController.text.trim()
+        : _AbhaAddressController.text.trim();
+    final purpose = _consentPurposeController.text.trim();
+    return hiuId.isNotEmpty && patientId.isNotEmpty && purpose.isNotEmpty;
+  }
+
+  bool get _canOpenConsentView {
+    return _consentViewUrlController.text.trim().isNotEmpty;
+  }
+
+  bool get _canCallbacksByType {
+    return _callbackType.trim().isNotEmpty;
+  }
+
+  bool get _canCallbackByTypeAndRequestId {
+    return _canCallbacksByType && _hasText(_requestIdController);
+  }
+
+  String _pretty(Object value) {
+    const encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(value);
+  }
+
+  String _errorMessage(Object error) {
+    final raw = error.toString().trim();
+    if (raw.startsWith('Exception: ')) {
+      return raw.substring('Exception: '.length).trim();
+    }
+    if (raw.startsWith('TimeoutException: ')) {
+      return raw.substring('TimeoutException: '.length).trim();
+    }
+    return raw;
+  }
+
+  Future<void> _showErrorDialog({
+    required String title,
+    required Object error,
+  }) async {
+    if (!mounted) return;
+    final message = _errorMessage(error);
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content: SelectableText(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  dynamic _byPath(dynamic source, List<dynamic> path) {
+    dynamic current = source;
+    for (final segment in path) {
+      if (current is Map<String, dynamic> && segment is String) {
+        current = current[segment];
+        continue;
+      }
+      if (current is List && segment is int) {
+        if (segment < 0 || segment >= current.length) {
+          return null;
+        }
+        current = current[segment];
+        continue;
+      }
+      return null;
+    }
+    return current;
+  }
+
+  String _firstNonEmpty(dynamic source, List<List<dynamic>> paths) {
+    for (final path in paths) {
+      final value = _byPath(source, path);
+      final text = value?.toString().trim() ?? '';
+      if (text.isNotEmpty) return text;
+    }
+    return '';
+  }
+
+  String _extractRequestId(dynamic source) {
+    if (source is! Map<String, dynamic>) return '';
+    return _firstNonEmpty(source, const [
+      ['requestId'],
+      ['response', 'requestId'],
+      ['payload', 'requestId'],
+      ['payload', 'response', 'requestId'],
+      ['items', 0, 'requestId'],
+      ['items', 0, 'payload', 'requestId'],
+      ['items', 0, 'payload', 'response', 'requestId'],
+      ['callbacks', 0, 'requestId'],
+      ['callbacks', 0, 'payload', 'requestId'],
+      ['callbacks', 0, 'payload', 'response', 'requestId'],
+    ]);
+  }
+
+  String _extractLinkingToken(dynamic source) {
+    if (source is! Map<String, dynamic>) return '';
+    return _firstNonEmpty(source, const [
+      ['linkToken'],
+      ['linkingToken'],
+      ['payload', 'linkToken'],
+      ['payload', 'linkingToken'],
+      ['response', 'linkToken'],
+      ['response', 'linkingToken'],
+      ['immediateResponse', 'linkToken'],
+      ['immediateResponse', 'linkingToken'],
+      ['items', 0, 'payload', 'linkToken'],
+      ['items', 0, 'payload', 'linkingToken'],
+      ['callbacks', 0, 'payload', 'linkToken'],
+      ['callbacks', 0, 'payload', 'linkingToken'],
+    ]);
+  }
+
+  Future<Map<String, dynamic>> _waitForGenerateTokenCallback(
+    String requestId,
+  ) async {
+    final deadline = DateTime.now().add(_apiTimeout);
+    Object? lastError;
+    bool callbackNeverReachedBackend = false;
+
+    while (DateTime.now().isBefore(deadline)) {
+      try {
+        final callback = await HipLinkingApiService.fetchTokenCallback(
+          requestId,
+        );
+        if (_extractLinkingToken(callback).isNotEmpty) {
+          return callback;
+        }
+        lastError = Exception(
+          'Token callback reached the app but did not contain linkToken.',
+        );
+      } catch (error) {
+        final message = error.toString().toLowerCase();
+        if (message.contains('callback not received yet') ||
+            message.contains('(404)')) {
+          callbackNeverReachedBackend = true;
+        } else {
+          lastError = error;
+        }
+      }
+
+      await Future.delayed(_callbackPollInterval);
+    }
+
+    throw TimeoutException(
+      callbackNeverReachedBackend
+          ? 'ABDM did not send the token callback to this app within ${_apiTimeout.inSeconds} seconds for requestId $requestId. Check the public callback URL/tunnel: ${_tokenCallbackUrl.isNotEmpty
+                ? _tokenCallbackUrl
+                : _callbackPublicBaseUrl.isNotEmpty
+                ? _callbackPublicBaseUrl
+                : 'not configured'}.'
+          : lastError?.toString() ??
+                'ABDM callback did not return a link token within ${_apiTimeout.inSeconds} seconds',
+    );
+  }
+
+  Future<void> _loadCallbackConfig() async {
+    try {
+      final config = await HipLinkingApiService.fetchCallbackConfig();
+      if (!mounted) return;
+      setState(() {
+        _callbackPublicBaseUrl =
+            config['publicBaseUrl']?.toString().trim() ?? '';
+        _callbackPublicReachable = config['isPublicReachable'] == true;
+        final callbacks = config['callbacks'] is Map<String, dynamic>
+            ? config['callbacks'] as Map<String, dynamic>
+            : <String, dynamic>{};
+        final setupDefaults = config['setupDefaults'] is Map<String, dynamic>
+            ? config['setupDefaults'] as Map<String, dynamic>
+            : <String, dynamic>{};
+        _tokenCallbackUrl =
+            callbacks['hipOnGenerateToken']?.toString().trim() ?? '';
+        if (_bridgeIdController.text.trim().isEmpty) {
+          _bridgeIdController.text =
+              setupDefaults['bridgeId']?.toString().trim() ?? '';
+        }
+        if (_facilityIdController.text.trim().isEmpty) {
+          _facilityIdController.text =
+              setupDefaults['facilityId']?.toString().trim() ?? '';
+        }
+        if (_facilityNameController.text.trim().isEmpty) {
+          _facilityNameController.text =
+              setupDefaults['facilityName']?.toString().trim() ?? '';
+        }
+        if (_serviceIdController.text.trim().isEmpty) {
+          _serviceIdController.text =
+              setupDefaults['serviceId']?.toString().trim() ?? '';
+        }
+        if (_serviceNameController.text.trim().isEmpty) {
+          _serviceNameController.text =
+              setupDefaults['serviceName']?.toString().trim() ?? '';
+        }
+        if (_hipIdController.text.trim().isEmpty) {
+          _hipIdController.text =
+              setupDefaults['hipId']?.toString().trim() ?? '';
+        }
+        if (_hiuIdController.text.trim().isEmpty) {
+          _hiuIdController.text =
+              setupDefaults['hiuId']?.toString().trim() ?? '';
+        }
+        _callbackConfigError = '';
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _callbackConfigError =
+            'Could not load callback config: ${error.toString()}';
+      });
+    }
+  }
+
+  void _applyAutoFillFromResponse(Map<String, dynamic> response) {
+    final requestId = _extractRequestId(response);
+    if (requestId.isNotEmpty) {
+      _requestIdController.text = requestId;
+    }
+
+    final linkingToken = _extractLinkingToken(response);
+    if (linkingToken.isNotEmpty) {
+      _linkingTokenController.text = linkingToken;
+    }
+
+    final patientRef = _firstNonEmpty(response, const [
+      ['patient', 0, 'referenceNumber'],
+      ['patients', 0, 'referenceNumber'],
+      ['payload', 'patient', 0, 'referenceNumber'],
+      ['payload', 'patients', 0, 'referenceNumber'],
+      ['items', 0, 'payload', 'patient', 0, 'referenceNumber'],
+      ['items', 0, 'payload', 'patients', 0, 'referenceNumber'],
+      ['callbacks', 0, 'payload', 'patient', 0, 'referenceNumber'],
+      ['callbacks', 0, 'payload', 'patients', 0, 'referenceNumber'],
+    ]);
+    if (patientRef.isNotEmpty) {
+      _patientReferenceController.text = patientRef;
+    }
+
+    final careContextRef = _firstNonEmpty(response, const [
+      ['patient', 0, 'careContexts', 0, 'referenceNumber'],
+      ['patients', 0, 'careContexts', 0, 'referenceNumber'],
+      ['payload', 'patient', 0, 'careContexts', 0, 'referenceNumber'],
+      ['payload', 'patients', 0, 'careContexts', 0, 'referenceNumber'],
+      [
+        'items',
+        0,
+        'payload',
+        'patient',
+        0,
+        'careContexts',
+        0,
+        'referenceNumber',
+      ],
+      [
+        'items',
+        0,
+        'payload',
+        'patients',
+        0,
+        'careContexts',
+        0,
+        'referenceNumber',
+      ],
+      [
+        'callbacks',
+        0,
+        'payload',
+        'patient',
+        0,
+        'careContexts',
+        0,
+        'referenceNumber',
+      ],
+      [
+        'callbacks',
+        0,
+        'payload',
+        'patients',
+        0,
+        'careContexts',
+        0,
+        'referenceNumber',
+      ],
+      ['notification', 'careContexts', 0, 'referenceNumber'],
+      ['payload', 'notification', 'careContexts', 0, 'referenceNumber'],
+    ]);
+    if (careContextRef.isNotEmpty) {
+      _careContextReferenceController.text = careContextRef;
+    }
+
+    final consentId = _firstNonEmpty(response, const [
+      ['consentId'],
+      ['acknowledgement', 'consentId'],
+      ['notification', 'consentId'],
+      ['payload', 'consentId'],
+      ['payload', 'acknowledgement', 'consentId'],
+      ['payload', 'notification', 'consentId'],
+      ['items', 0, 'payload', 'consentId'],
+      ['items', 0, 'payload', 'acknowledgement', 'consentId'],
+      ['items', 0, 'payload', 'notification', 'consentId'],
+      ['callbacks', 0, 'payload', 'consentId'],
+      ['callbacks', 0, 'payload', 'acknowledgement', 'consentId'],
+      ['callbacks', 0, 'payload', 'notification', 'consentId'],
+    ]);
+    if (consentId.isNotEmpty) {
+      _consentIdController.text = consentId;
+    }
+
+    final transactionId = _firstNonEmpty(response, const [
+      ['transactionId'],
+      ['notification', 'transactionId'],
+      ['payload', 'transactionId'],
+      ['payload', 'notification', 'transactionId'],
+      ['items', 0, 'payload', 'transactionId'],
+      ['items', 0, 'payload', 'notification', 'transactionId'],
+      ['callbacks', 0, 'payload', 'transactionId'],
+      ['callbacks', 0, 'payload', 'notification', 'transactionId'],
+    ]);
+    if (transactionId.isNotEmpty) {
+      _transactionIdController.text = transactionId;
+    }
+
+    final consentViewUrl = _firstNonEmpty(response, const [
+      ['consentViewUrl'],
+      ['payload', 'consentViewUrl'],
+      ['items', 0, 'payload', 'consentViewUrl'],
+    ]);
+    if (consentViewUrl.isNotEmpty) {
+      _consentViewUrlController.text = consentViewUrl;
+    }
+
+    final consentPatientId = _firstNonEmpty(response, const [
+      ['consentRequest', 'patient', 'id'],
+      ['patient', 'id'],
+      ['payload', 'consentRequest', 'patient', 'id'],
+    ]);
+    if (consentPatientId.isNotEmpty) {
+      _consentPatientIdController.text = consentPatientId;
+    }
+
+    final consentHiuId = _firstNonEmpty(response, const [
+      ['consentRequest', 'hiu', 'id'],
+      ['hiu', 'id'],
+      ['payload', 'consentRequest', 'hiu', 'id'],
+    ]);
+    if (consentHiuId.isNotEmpty) {
+      _hiuIdController.text = consentHiuId;
+    }
+  }
+
+  Future<bool> _execute({
+    required String action,
+    required Future<Map<String, dynamic>> Function() call,
+    Duration? timeout,
+  }) async {
+    setState(() => _callingApi = true);
+    try {
+      final response = await call().timeout(
+        timeout ?? _apiTimeout,
+        onTimeout: () => throw TimeoutException(
+          "ABDM API timed out after ${(timeout ?? _apiTimeout).inSeconds} seconds",
+        ),
+      );
+      if (!mounted) return false;
+      _applyAutoFillFromResponse(response);
+      setState(() {
+        _lastAction = action;
+        _lastResponse = _pretty(response);
+      });
+      return true;
+    } catch (e) {
+      if (!mounted) return false;
+      final message = _errorMessage(e);
+      setState(() {
+        _lastAction = '$action (error)';
+        _lastResponse = message;
+      });
+      await _showErrorDialog(title: 'API Request Failed', error: e);
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() => _callingApi = false);
+      }
+    }
+  }
+
+  Future<void> _callCheckSetupSession() async {
+    final success = await _execute(
+      action: 'POST /hip/setup/session/check',
+      call: HipLinkingApiService.checkSetupSession,
+    );
+    if (success && mounted) {
+      setState(() => _completedSetupIndex = 1);
+    }
+  }
+
+  Future<void> _callUpdateBridgeUrl() async {
+    final bridgeId = _required(_bridgeIdController, 'Bridge ID');
+    if (_callbackPublicBaseUrl.trim().isEmpty) {
+      throw Exception('Public callback base URL is not loaded yet');
+    }
+
+    final success = await _execute(
+      action: 'PATCH /hip/setup/bridge/url',
+      call: () => HipLinkingApiService.updateBridgeUrl({
+        'bridgeId': bridgeId,
+        'url': _callbackPublicBaseUrl.trim(),
+      }),
+    );
+    if (success && mounted) {
+      setState(() => _completedSetupIndex = 2);
+    }
+  }
+
+  Future<void> _callRegisterBridgeServices() async {
+    final bridgeId = _required(_bridgeIdController, 'Bridge ID');
+    final facilityId = _required(_facilityIdController, 'Facility ID');
+    final facilityName = _required(_facilityNameController, 'Facility Name');
+    final serviceName = _required(_serviceNameController, 'Service Name');
+    if (!_registerAsHip && !_registerAsHiu) {
+      throw Exception('Select at least one registration type: HIP or HIU');
+    }
+
+    final success = await _execute(
+      action: 'POST /hip/setup/bridge/services/register',
+      call: () => HipLinkingApiService.registerBridgeServices({
+        'bridgeId': bridgeId,
+        'facilityId': facilityId,
+        'facilityName': facilityName,
+        'serviceName': serviceName,
+        'registerHip': _registerAsHip,
+        'registerHiu': _registerAsHiu,
+      }),
+    );
+    if (success && mounted) {
+      setState(() => _completedSetupIndex = 3);
+    }
+  }
+
+  Future<void> _callFindBridgeServiceByServiceId() async {
+    final serviceId = _required(_serviceIdController, 'Service ID');
+
+    await _execute(
+      action: 'GET /hip/setup/bridge-service/:serviceId',
+      call: () => HipLinkingApiService.fetchBridgeServiceByServiceId(serviceId),
+    );
+  }
+
+  Future<void> _callFindServicesByBridgeId() async {
+    final bridgeId = _required(_bridgeIdController, 'Bridge ID');
+
+    await _execute(
+      action: 'GET /hip/setup/bridge-services/:bridgeId',
+      call: () => HipLinkingApiService.fetchServicesByBridgeId(bridgeId),
+    );
+  }
+
+  Future<void> _callGenerateToken() async {
+    final hipId = _required(_hipIdController, 'HIP ID');
+    final AbhaNumber = _required(_AbhaNumberController, 'ABHA Number');
+    final AbhaAddress = _required(_AbhaAddressController, 'ABHA Address');
+    final patientName = _required(_patientNameController, 'Patient Name');
+    final patientGender = _required(_patientGenderController, 'Patient Gender');
+    final patientYearOfBirth = _required(
+      _patientYearOfBirthController,
+      'Year Of Birth',
+    );
+
+    final success = await _execute(
+      action: 'POST /hip/link/token/generate',
+      timeout: const Duration(seconds: 90),
+      call: () async {
+        final response = await HipLinkingApiService.generateToken({
+          'hipId': hipId,
+          'AbhaNumber': AbhaNumber,
+          'AbhaAddress': AbhaAddress,
+          'name': patientName,
+          'gender': patientGender,
+          'yearOfBirth': patientYearOfBirth,
+        });
+
+        if (_extractLinkingToken(response).isNotEmpty) {
+          return response;
+        }
+
+        final requestId = _extractRequestId(response);
+        if (requestId.isEmpty) {
+          return response;
+        }
+
+        final callback = await _waitForGenerateTokenCallback(requestId);
+        return {
+          ...response,
+          'callbackReceived': true,
+          'callback': callback,
+          'linkToken': _extractLinkingToken(callback).isNotEmpty
+              ? _extractLinkingToken(callback)
+              : _extractLinkingToken(response),
+          'response': {
+            ...((response['response'] is Map<String, dynamic>)
+                ? response['response'] as Map<String, dynamic>
+                : <String, dynamic>{}),
+            'requestId': requestId,
+          },
+          'payload': callback['payload'] is Map<String, dynamic>
+              ? callback['payload'] as Map<String, dynamic>
+              : <String, dynamic>{},
+        };
+      },
+    );
+    if (success && mounted && _linkingTokenController.text.trim().isNotEmpty) {
+      setState(() => _completedStep2Index = 1);
+    }
+  }
+
+  Future<void> _callLinkCareContexts() async {
+    final hipId = _required(_hipIdController, 'HIP ID');
+    final AbhaNumber = _required(_AbhaNumberController, 'ABHA Number');
+    final AbhaAddress = _required(_AbhaAddressController, 'ABHA Address');
+    final linkingToken = _required(_linkingTokenController, 'Linking Token');
+    final patientRef = _required(
+      _patientReferenceController,
+      'Patient Reference Number',
+    );
+    final patientDisplay = _required(
+      _patientDisplayController,
+      'Patient Display',
+    );
+    final careContextRef = _required(
+      _careContextReferenceController,
+      'Care Context Reference Number',
+    );
+    final careContextDisplay = _required(
+      _careContextDisplayController,
+      'Care Context Display',
+    );
+
+    final success = await _execute(
+      action: 'POST /hip/link/carecontext',
+      call: () => HipLinkingApiService.linkCareContext({
+        'hipId': hipId,
+        'linkingToken': linkingToken,
+        'AbhaNumber': AbhaNumber,
+        'AbhaAddress': AbhaAddress,
+        'patient': [
+          {
+            'referenceNumber': patientRef,
+            'display': patientDisplay,
+            'careContexts': [
+              {
+                'referenceNumber': careContextRef,
+                'display': careContextDisplay,
+              },
+            ],
+            'hiType': _selectedHiType,
+            'count': 1,
+          },
+        ],
+      }),
+    );
+    if (success && mounted) {
+      setState(() => _completedStep2Index = 2);
+    }
+  }
+
+  Future<void> _callPatientLinks() async {
+    final hipId = _required(_hipIdController, 'HIP ID');
+    final AbhaAddress = _required(_AbhaAddressController, 'ABHA Address');
+
+    final success = await _execute(
+      action: 'POST /hip/link/patient/links',
+      call: () => HipLinkingApiService.patientLinks({
+        'hipId': hipId,
+        'AbhaAddress': AbhaAddress,
+      }),
+    );
+    if (success && mounted) {
+      setState(() => _completedStep2Index = 3);
+    }
+  }
+
+  Future<void> _callContextNotify() async {
+    final hipId = _required(_hipIdController, 'HIP ID');
+    final AbhaAddress = _required(_AbhaAddressController, 'ABHA Address');
+    final careContextRef = _required(
+      _careContextReferenceController,
+      'Care Context Reference Number',
+    );
+
+    final success = await _execute(
+      action: 'POST /hip/link/context/notify',
+      call: () => HipLinkingApiService.notifyContext({
+        'notification': {
+          'AbhaAddress': AbhaAddress,
+          'hipId': hipId,
+          'careContexts': [
+            {'referenceNumber': careContextRef},
+          ],
+        },
+      }),
+    );
+    if (success && mounted) {
+      setState(() => _completedStep2Index = 4);
+    }
+  }
+
+  Future<void> _callNotify2() async {
+    final hipId = _required(_hipIdController, 'HIP ID');
+    final AbhaAddress = _required(_AbhaAddressController, 'ABHA Address');
+    final linkToken = _required(_linkingTokenController, 'Linking Token');
+
+    final success = await _execute(
+      action: 'POST /hip/link/patient/links/sms/notify2',
+      call: () => HipLinkingApiService.notifyMobile({
+        'AbhaAddress': AbhaAddress,
+        'hipId': hipId,
+        'linkToken': linkToken,
+      }),
+    );
+    if (success && mounted) {
+      setState(() => _completedStep2Index = 5);
+    }
+  }
+
+  Future<void> _callConsentOnNotify() async {
+    final consentId = _required(_consentIdController, 'Consent ID');
+    final requestId = _required(_requestIdController, 'Request ID');
+
+    await _execute(
+      action: 'POST /hip/link/consent/request/hip/on-notify',
+      call: () => HipLinkingApiService.consentOnNotify({
+        'acknowledgement': {
+          'status': _consentAckStatus,
+          'consentId': consentId,
+        },
+        'response': {'requestId': requestId},
+      }),
+    );
+  }
+
+  Future<void> _callDataOnRequest() async {
+    final transactionId = _required(_transactionIdController, 'Transaction ID');
+    final requestId = _required(_requestIdController, 'Request ID');
+
+    await _execute(
+      action: 'POST /hip/link/data-flow/health-information/hip/on-request',
+      call: () => HipLinkingApiService.dataOnRequest({
+        'transactionId': transactionId,
+        'sessionStatus': _dataRequestSessionStatus,
+        'response': {'requestId': requestId},
+      }),
+    );
+  }
+
+  Future<void> _callDataFlowNotify() async {
+    final consentId = _required(_consentIdController, 'Consent ID');
+    final transactionId = _required(_transactionIdController, 'Transaction ID');
+    final hipId = _required(_hipIdController, 'HIP ID');
+
+    await _execute(
+      action: 'POST /hip/link/data-flow/health-information/notify',
+      call: () => HipLinkingApiService.dataFlowNotify({
+        'notification': {
+          'consentId': consentId,
+          'transactionId': transactionId,
+          'doneAt': DateTime.now().toUtc().toIso8601String(),
+          'notifier': {'type': 'HIP', 'id': hipId},
+          'statusNotification': {'sessionStatus': _dataNotifySessionStatus},
+        },
+      }),
+    );
+  }
+
+  Future<void> _callGenerateConsentViewLink() async {
+    final hiuId = _hiuIdController.text.trim().isNotEmpty
+        ? _hiuIdController.text.trim()
+        : _required(_hipIdController, 'HIP ID');
+    final patientId = _consentPatientIdController.text.trim().isNotEmpty
+        ? _consentPatientIdController.text.trim()
+        : _required(_AbhaAddressController, 'ABHA Address');
+    final purposeText = _required(_consentPurposeController, 'Purpose Text');
+
+    await _execute(
+      action: 'POST /hip/link/consent/view-link',
+      call: () => HipLinkingApiService.generateConsentViewLink({
+        'hiuId': hiuId,
+        'patientId': patientId,
+        'purposeText': purposeText,
+        if (_consentRequesterController.text.trim().isNotEmpty)
+          'requesterName': _consentRequesterController.text.trim(),
+        if (_consentFromController.text.trim().isNotEmpty)
+          'dateFrom': _consentFromController.text.trim(),
+        if (_consentToController.text.trim().isNotEmpty)
+          'dateTo': _consentToController.text.trim(),
+        if (_hipIdController.text.trim().isNotEmpty)
+          'hipId': _hipIdController.text.trim(),
+      }),
+    );
+  }
+
+  Future<void> _callOpenConsentView() async {
+    try {
+      final url = _required(
+        _consentViewUrlController,
+        'Generated Consent View URL',
+      );
+      await _openExternalUrl(url);
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Consent page opened')));
+    } catch (e) {
+      if (!mounted) return;
+      await _showErrorDialog(title: 'Operation Failed', error: e);
+    }
+  }
+
+  Future<void> _openExternalUrl(String url) async {
+    ProcessResult result;
+    if (Platform.isMacOS) {
+      result = await Process.run('open', [url]);
+    } else if (Platform.isLinux) {
+      result = await Process.run('xdg-open', [url]);
+    } else if (Platform.isWindows) {
+      result = await Process.run('cmd', ['/c', 'start', '', url]);
+    } else {
+      throw Exception('Unsupported desktop platform for opening external URLs');
+    }
+
+    if (result.exitCode != 0) {
+      throw Exception('Failed to open consent page URL');
+    }
+  }
+
+  Future<void> _callCallbackByTypeAndRequestId() async {
+    final requestId = _required(_requestIdController, 'Request ID');
+
+    await _execute(
+      action: 'GET /m2/callbacks/:type/:requestId',
+      call: () => HipLinkingApiService.fetchCallbackByTypeAndRequestId(
+        _callbackType,
+        requestId,
+      ),
+    );
+  }
+
+  Future<void> _callCallbacksByType() async {
+    await _execute(
+      action: 'GET /m2/callbacks/:type',
+      call: () => HipLinkingApiService.fetchCallbackByType(_callbackType),
+    );
+  }
+}

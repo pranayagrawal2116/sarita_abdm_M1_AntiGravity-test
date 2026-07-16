@@ -1,0 +1,270 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+import '../utils/api_config.dart';
+import '../utils/api_debug_http.dart';
+import '../utils/app_runtime_store.dart';
+
+class HipLinkingApiService {
+  static String _storeKey(String method, String path) {
+    final normalizedPath = path
+        .replaceAll(RegExp(r'^/+'), '')
+        .replaceAll('/', '.')
+        .replaceAll('-', '_')
+        .replaceAll('?', '.');
+    return 'hipLinking.${method.toLowerCase()}.$normalizedPath';
+  }
+
+  static void _storeResponse(String method, String path, dynamic data) {
+    AppRuntimeStore.setApiResponse(_storeKey(method, path), data, extraValues: {
+      'hipLinking.lastMethod': method.toUpperCase(),
+      'hipLinking.lastPath': path,
+      'hipLinking.lastResponse': data,
+    });
+  }
+
+  static String _readableError(http.Response response, String fallback) {
+    try {
+      final decoded = jsonDecode(response.body);
+      if (decoded is Map<String, dynamic>) {
+        final message =
+            decoded['message'] ?? decoded['error'] ?? decoded['details'];
+        if (message is String && message.trim().isNotEmpty) {
+          return '$message (${response.statusCode})';
+        }
+        return '${decoded.toString()} (${response.statusCode})';
+      }
+      if (decoded is List && decoded.isNotEmpty) {
+        return '${decoded.toString()} (${response.statusCode})';
+      }
+    } catch (_) {}
+    return '$fallback (${response.statusCode})';
+  }
+
+  static Future<Map<String, dynamic>> _post(
+    String path,
+    Map<String, dynamic> payload, {
+    Map<String, String>? headers,
+  }) async {
+    final response = await ApiDebugHttp.post(
+      Uri.parse('${ApiConfig.baseUrl}$path'),
+      headers: {'Content-Type': 'application/json', ...?headers},
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(_readableError(response, 'ABDM API call failed'));
+    }
+
+    if (response.body.trim().isEmpty) {
+      return {'statusCode': response.statusCode, 'message': 'Empty response'};
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic>) {
+      _storeResponse('post', path, decoded);
+      return decoded;
+    }
+
+    final data = {'statusCode': response.statusCode, 'data': decoded};
+    _storeResponse('post', path, data);
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> _get(
+    String path, {
+    Map<String, String>? headers,
+  }) async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse('${ApiConfig.baseUrl}$path'),
+      headers: {...?headers},
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(_readableError(response, 'ABDM API call failed'));
+    }
+
+    if (response.body.trim().isEmpty) {
+      return {'statusCode': response.statusCode, 'message': 'Empty response'};
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic>) {
+      _storeResponse('get', path, decoded);
+      return decoded;
+    }
+
+    final data = {'statusCode': response.statusCode, 'data': decoded};
+    _storeResponse('get', path, data);
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> generateToken(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/token/generate', payload);
+  }
+
+  static Future<Map<String, dynamic>> generateConsentViewLink(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/consent/view-link', payload);
+  }
+
+  static Future<Map<String, dynamic>> discover(
+    Map<String, dynamic> payload, {
+    String? xAuthToken,
+    String? xHiuId,
+  }) {
+    final headers = <String, String>{
+      if (xAuthToken != null && xAuthToken.trim().isNotEmpty)
+        'X-Auth-Token': xAuthToken.trim(),
+      if (xHiuId != null && xHiuId.trim().isNotEmpty) 'X-HIU-ID': xHiuId.trim(),
+    };
+
+    return _post(
+      '/hip/link/patient/care-context/discover',
+      payload,
+      headers: headers.isEmpty ? null : headers,
+    );
+  }
+
+  static Future<Map<String, dynamic>> linkCareContext(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/carecontext', payload);
+  }
+
+  static Future<Map<String, dynamic>> patientLinks(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/patient/links', payload);
+  }
+
+  static Future<Map<String, dynamic>> notifyContext(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/context/notify', payload);
+  }
+
+  static Future<Map<String, dynamic>> notifyMobile(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/patient/links/sms/notify2', payload);
+  }
+
+  static Future<Map<String, dynamic>> consentOnNotify(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/consent/request/hip/on-notify', payload);
+  }
+
+  static Future<Map<String, dynamic>> dataOnRequest(
+    Map<String, dynamic> payload,
+  ) {
+    return _post(
+      '/hip/link/data-flow/health-information/hip/on-request',
+      payload,
+    );
+  }
+
+  static Future<Map<String, dynamic>> dataFlowNotify(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/data-flow/health-information/notify', payload);
+  }
+
+  static Future<Map<String, dynamic>> fetchCallbackByType(
+    String type, {
+    int limit = 20,
+  }) {
+    return _get('/m2/callbacks/$type?limit=$limit');
+  }
+
+  static Future<Map<String, dynamic>> fetchCallbackByTypeAndRequestId(
+    String type,
+    String requestId,
+  ) {
+    return _get('/m2/callbacks/$type/$requestId');
+  }
+
+  // Backward compatibility for old callers.
+  static Future<Map<String, dynamic>> linkPatientLinks(
+    Map<String, dynamic> payload,
+  ) {
+    return linkCareContext(payload);
+  }
+
+  static Future<Map<String, dynamic>> fetchTokenCallback(String requestId) {
+    return _get('/hip/link/token/callback/$requestId');
+  }
+
+  static Future<Map<String, dynamic>> fetchRecentTokenCallbacks({
+    int limit = 20,
+  }) {
+    return _get('/hip/link/token/callbacks?limit=$limit');
+  }
+
+  static Future<Map<String, dynamic>> fetchCallbackConfig() {
+    return _get('/config/callbacks');
+  }
+
+  static Future<Map<String, dynamic>> checkSetupSession() {
+    return _post('/hip/setup/session/check', const {});
+  }
+
+  static Future<Map<String, dynamic>> updateBridgeUrl(
+    Map<String, dynamic> payload,
+  ) {
+    return _patch('/hip/setup/bridge/url', payload);
+  }
+
+  static Future<Map<String, dynamic>> registerBridgeServices(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/setup/bridge/services/register', payload);
+  }
+
+  static Future<Map<String, dynamic>> fetchBridgeServiceByServiceId(
+    String serviceId,
+  ) {
+    return _get('/hip/setup/bridge-service/$serviceId');
+  }
+
+  static Future<Map<String, dynamic>> fetchServicesByBridgeId(
+    String bridgeId,
+  ) {
+    return _get('/hip/setup/bridge-services/$bridgeId');
+  }
+
+  static Future<Map<String, dynamic>> _patch(
+    String path,
+    Map<String, dynamic> payload, {
+    Map<String, String>? headers,
+  }) async {
+    final response = await ApiDebugHttp.patch(
+      Uri.parse('${ApiConfig.baseUrl}$path'),
+      headers: {'Content-Type': 'application/json', ...?headers},
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(_readableError(response, 'ABDM API call failed'));
+    }
+
+    if (response.body.trim().isEmpty) {
+      return {'statusCode': response.statusCode, 'message': 'Empty response'};
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is Map<String, dynamic>) {
+      _storeResponse('patch', path, decoded);
+      return decoded;
+    }
+
+    final data = {'statusCode': response.statusCode, 'data': decoded};
+    _storeResponse('patch', path, data);
+    return data;
+  }
+}

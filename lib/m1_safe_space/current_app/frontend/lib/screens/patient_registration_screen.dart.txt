@@ -1,0 +1,662 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../services/abha_api_service.dart';
+import '../services/linking_api_service.dart';
+import '../utils/aadhaar_text.dart';
+import '../utils/api_config.dart';
+import '../widgets/desktop_workspace.dart';
+import '../widgets/otp_digit_row.dart';
+import 'create_Abha_screen.dart';
+import 'health_facility_qr_screen.dart';
+
+class PatientRegistrationScreen extends StatefulWidget {
+  const PatientRegistrationScreen({super.key});
+
+  @override
+  State<PatientRegistrationScreen> createState() =>
+      _PatientRegistrationScreenState();
+}
+
+class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
+  final TextEditingController _hipIdController = TextEditingController();
+  final TextEditingController _facilitySearchController =
+      TextEditingController();
+  final TextEditingController _identifierController = TextEditingController();
+  late final List<TextEditingController> _otpDigitCtrls;
+  late final List<FocusNode> _otpFocusNodes;
+
+  String _identifierType = 'Abha_ADDRESS';
+  bool _showAadhaarIdentifier = false;
+  bool _updatingAadhaarIdentifierText = false;
+  String _aadhaarIdentifierRaw = '';
+  bool _isReturningPatient = true;
+  bool _searchingFacilities = false;
+  bool _requestingOtp = false;
+  bool _confirming = false;
+  String? _verificationTxnId;
+  String _statusMessage =
+      'Returning patients can verify their ABHA identity with OTP during patient registration.';
+  List<Map<String, dynamic>> _providers = const [];
+
+  String get _otpValue =>
+      _otpDigitCtrls.map((controller) => controller.text.trim()).join();
+
+  bool get _isOtpComplete => RegExp(r'^\d{6}$').hasMatch(_otpValue);
+
+  @override
+  void initState() {
+    super.initState();
+    _otpDigitCtrls = List.generate(6, (_) => TextEditingController());
+    _otpFocusNodes = List.generate(6, (_) => FocusNode());
+  }
+
+  @override
+  void dispose() {
+    _hipIdController.dispose();
+    _facilitySearchController.dispose();
+    _identifierController.dispose();
+    for (final ctrl in _otpDigitCtrls) {
+      ctrl.dispose();
+    }
+    for (final node in _otpFocusNodes) {
+      node.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Patient Registration")),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1240),
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  const DesktopPageIntro(
+                    eyebrow: "Facility Verification",
+                    title:
+                        "Handle patient verification in a desktop-friendly registration flow.",
+                    description:
+                        "Choose the patient path, resolve a facility, request an ABDM verification OTP, and complete registration without switching between cramped panels.",
+                    pills: [
+                      "Facility lookup",
+                      "QR scan",
+                      "ABHA verification",
+                      "Registration status",
+                    ],
+                  ),
+                  SegmentedButton<bool>(
+                    segments: const [
+                      ButtonSegment<bool>(
+                        value: true,
+                        label: Text("Returning Patient"),
+                      ),
+                      ButtonSegment<bool>(
+                        value: false,
+                        label: Text("New Patient"),
+                      ),
+                    ],
+                    selected: {_isReturningPatient},
+                    onSelectionChanged: (selection) {
+                      setState(() {
+                        _isReturningPatient = selection.first;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  if (!_isReturningPatient) ...[
+                    _infoCard(
+                      title: "New Patient",
+                      children: [
+                        const Text(
+                          "For private M1, new patients should first create an ABHA using Aadhaar OTP and then create an ABHA Address.",
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const CreateAbhaScreen(),
+                                ),
+                              );
+                            },
+                            child: const Text("Create New ABHA"),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    _infoCard(
+                      title: "Health Facility Verification",
+                      children: [
+                        TextField(
+                          controller: _hipIdController,
+                          decoration: const InputDecoration(
+                            labelText: "Health Facility HIP ID",
+                            hintText: "Scan facility QR or enter HIP ID",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: _openQrScanner,
+                            child: const Text("Paste Health Facility QR"),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _facilitySearchController,
+                                decoration: const InputDecoration(
+                                  labelText: "Search Facility By Name",
+                                  hintText: "Hospital or clinic name",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            SizedBox(
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: _searchingFacilities
+                                    ? null
+                                    : _searchFacilities,
+                                child: Text(
+                                  _searchingFacilities
+                                      ? "Searching..."
+                                      : "Search",
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_providers.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          const Text(
+                            "Select a health facility",
+                            style: TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 8),
+                          ..._providers.map((provider) {
+                            final name =
+                                provider['name']
+                                        ?.toString()
+                                        .trim()
+                                        .isNotEmpty ==
+                                    true
+                                ? provider['name'].toString().trim()
+                                : (provider['hipId']?.toString() ??
+                                      'Unknown Facility');
+                            final hipId = provider['hipId']?.toString() ?? '';
+                            final facilityType =
+                                provider['facilityType']?.toString() ?? '';
+                            final city = provider['city']?.toString() ?? '';
+
+                            return Card(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              child: ListTile(
+                                title: Text(name),
+                                subtitle: Text(
+                                  [
+                                    if (hipId.isNotEmpty) "HIP ID: $hipId",
+                                    if (facilityType.isNotEmpty)
+                                      "Type: $facilityType",
+                                    if (city.isNotEmpty) "City: $city",
+                                  ].join('\n'),
+                                ),
+                                trailing: const Icon(Icons.chevron_right),
+                                onTap: () {
+                                  setState(() {
+                                    _hipIdController.text = hipId;
+                                    _statusMessage =
+                                        "Selected health facility $name. HIP ID populated for verification.";
+                                  });
+                                },
+                              ),
+                            );
+                          }),
+                        ],
+                        const SizedBox(height: 16),
+                        DropdownButtonFormField<String>(
+                          initialValue: _identifierType,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'Abha_ADDRESS',
+                              child: Text('Verify by ABHA Address'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Abha_NUMBER',
+                              child: Text('Verify by ABHA Number'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'MOBILE',
+                              child: Text('Verify by Mobile'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'AADHAAR_NUMBER',
+                              child: Text('Verify by Aadhaar Number'),
+                            ),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) return;
+                            setState(() {
+                              _identifierType = value;
+                              _showAadhaarIdentifier = false;
+                              _aadhaarIdentifierRaw = '';
+                              _identifierController.clear();
+                              if (_identifierType == 'AADHAAR_NUMBER') {
+                                _syncAadhaarIdentifierText();
+                              }
+                            });
+                          },
+                          decoration: const InputDecoration(
+                            labelText: "Verification Method",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _identifierController,
+                          keyboardType: _identifierType == 'AADHAAR_NUMBER'
+                              ? TextInputType.number
+                              : TextInputType.text,
+                          inputFormatters: _identifierType == 'AADHAAR_NUMBER'
+                              ? [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'[0-9 ]'),
+                                  ),
+                                ]
+                              : null,
+                          onChanged: _handleIdentifierChanged,
+                          onTap: _identifierType == 'AADHAAR_NUMBER'
+                              ? _handleAadhaarIdentifierTap
+                              : null,
+                          decoration: InputDecoration(
+                            labelText: _labelForIdentifierType(_identifierType),
+                            hintText: _identifierType == 'AADHAAR_NUMBER'
+                                ? (_showAadhaarIdentifier
+                                      ? '1234 5678 9012'
+                                      : 'XXXX XXXX 9012')
+                                : null,
+                            suffixIcon: _identifierType == 'AADHAAR_NUMBER'
+                                ? IconButton(
+                                    tooltip: _showAadhaarIdentifier
+                                        ? 'Hide Aadhaar'
+                                        : 'Show Aadhaar',
+                                    icon: Icon(
+                                      _showAadhaarIdentifier
+                                          ? Icons.visibility_off
+                                          : Icons.visibility,
+                                    ),
+                                    onPressed: _toggleAadhaarIdentifierVisibility,
+                                  )
+                                : null,
+                            border: const OutlineInputBorder(),
+                          ),
+                        ),
+                        if (_identifierType == 'AADHAAR_NUMBER') ...[
+                          const SizedBox(height: 8),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Only last 4 digits will be visible for security.',
+                              style: TextStyle(
+                                color: Color(0xFF617283),
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 48,
+                          child: ElevatedButton(
+                            onPressed: _requestingOtp ? null : _discoverRecords,
+                            child: Text(
+                              _requestingOtp
+                                  ? "Requesting OTP..."
+                                  : "Request Verification OTP",
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Health facility HIP ID is captured for facility workflow and QR-based registration. The M1 verification OTP request itself is sent using the selected ABHA identifier.",
+                        ),
+                      ],
+                    ),
+                    if (_verificationTxnId != null) ...[
+                      const SizedBox(height: 16),
+                      _infoCard(
+                        title: "Confirm OTP",
+                        children: [
+                          const Text(
+                            "ABDM has sent a verification OTP. Enter it to complete patient registration verification.",
+                          ),
+                          const SizedBox(height: 12),
+                          OtpDigitRow(
+                            controllers: _otpDigitCtrls,
+                            focusNodes: _otpFocusNodes,
+                            enabled: !_confirming,
+                            onChanged: () {
+                              setState(() {});
+                            },
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: (_confirming || !_isOtpComplete)
+                                  ? null
+                                  : _confirmOtp,
+                              child: Text(
+                                _confirming
+                                    ? "Confirming..."
+                                    : "Confirm Verification OTP",
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ],
+                  const SizedBox(height: 16),
+                  _infoCard(
+                    title: "Verification Status",
+                    children: [Text(_statusMessage)],
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Future<void> _openQrScanner() async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(builder: (_) => const HealthFacilityQrScreen()),
+    );
+
+    if (!mounted || result == null) return;
+
+    final hipId = (result['hipId']?.toString() ?? '').trim();
+    setState(() {
+      if (hipId.isNotEmpty) {
+        _hipIdController.text = hipId;
+      }
+      _statusMessage = hipId.isNotEmpty
+          ? "Health facility QR scanned. HIP ID resolved as $hipId."
+          : "QR scanned, but HIP ID could not be derived automatically. Please paste the facility HIP ID manually.";
+    });
+  }
+
+  Future<void> _discoverRecords() async {
+    final identifierValue = _normalizedIdentifierValue();
+
+    if (identifierValue.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "${_labelForIdentifierType(_identifierType)} is required.",
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _requestingOtp = true;
+      _verificationTxnId = null;
+      _clearOtpInputs();
+      _statusMessage = "Requesting ABDM verification OTP...";
+    });
+
+    try {
+      final txnId = await AbhaApiService.requestVerificationOtp(
+        identifierType: _identifierType,
+        identifierValue: identifierValue,
+      );
+
+      if (txnId.trim().isEmpty) {
+        throw Exception("Verification transaction ID was not returned");
+      }
+
+      setState(() {
+        _verificationTxnId = txnId;
+        _statusMessage =
+            "OTP requested successfully. Enter the OTP to complete patient registration verification.";
+      });
+      if (!mounted) return;
+      _otpFocusNodes.first.requestFocus();
+    } catch (e) {
+      final errorMessage = AbhaApiService.userFacingError(e);
+      setState(() {
+        _statusMessage = errorMessage;
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+    } finally {
+      if (mounted) {
+        setState(() => _requestingOtp = false);
+      }
+    }
+  }
+
+  Future<void> _searchFacilities() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final query = _facilitySearchController.text.trim();
+
+    if (query.isEmpty) {
+      messenger.showSnackBar(
+        const SnackBar(content: Text("Enter a facility name to search.")),
+      );
+      return;
+    }
+
+    setState(() {
+      _searchingFacilities = true;
+      _providers = const [];
+      _statusMessage = "Searching ABDM health facilities...";
+    });
+
+    try {
+      final providers = await LinkingApiService.searchProviders(query);
+      setState(() {
+        _providers = providers;
+        _statusMessage = providers.isEmpty
+            ? "No health facilities matched that search. Try a broader hospital or clinic name."
+            : "Select a health facility to continue verification.";
+      });
+    } catch (e) {
+      final errorMessage = AbhaApiService.userFacingError(e);
+      setState(() {
+        _statusMessage = errorMessage;
+      });
+      messenger.showSnackBar(SnackBar(content: Text(errorMessage)));
+    } finally {
+      if (mounted) {
+        setState(() => _searchingFacilities = false);
+      }
+    }
+  }
+
+  Future<void> _confirmOtp() async {
+    final txnId = _verificationTxnId;
+    if (txnId == null || txnId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please request OTP first.")),
+      );
+      return;
+    }
+
+    setState(() {
+      _confirming = true;
+      _statusMessage = "Confirming patient verification OTP...";
+    });
+
+    try {
+      final result = await AbhaApiService.verifyRegistrationOtp(
+        identifierType: _identifierType,
+        identifierValue: _normalizedIdentifierValue(),
+        txnId: txnId,
+        otp: _otpValue,
+      );
+
+      final verified =
+          result['verified'] == true ||
+          (result['authResult']?.toString().toLowerCase() == 'success');
+      if (!verified) {
+        throw Exception(
+          result['message']?.toString() ??
+              'Verification failed. Please try again.',
+        );
+      }
+
+      setState(() {
+        _statusMessage =
+            "Returning patient verification completed successfully for ${_labelForIdentifierType(_identifierType)}.";
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Patient verification completed")),
+      );
+    } catch (e) {
+      final errorMessage = AbhaApiService.userFacingError(e);
+      setState(() {
+        _statusMessage = errorMessage;
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(errorMessage)));
+    } finally {
+      if (mounted) {
+        setState(() => _confirming = false);
+      }
+    }
+  }
+
+  String _labelForIdentifierType(String type) {
+    switch (type) {
+      case 'Abha_NUMBER':
+        return 'ABHA Number';
+      case 'MOBILE':
+        return 'Mobile Number';
+      case 'AADHAAR_NUMBER':
+        return 'Aadhaar Number';
+      case 'Abha_ADDRESS':
+      default:
+        return 'ABHA Address';
+    }
+  }
+
+  String _normalizedIdentifierValue() {
+    final raw = _identifierType == 'AADHAAR_NUMBER'
+        ? _aadhaarIdentifierRaw
+        : _identifierController.text.trim();
+    switch (_identifierType) {
+      case 'Abha_ADDRESS':
+        if (raw.contains('@')) {
+          return raw.toLowerCase();
+        }
+        return ApiConfig.fullAbhaAddress(raw).toLowerCase();
+      case 'Abha_NUMBER':
+        return raw.replaceAll(RegExp(r'[^0-9]'), '');
+      case 'MOBILE':
+      case 'AADHAAR_NUMBER':
+        return raw.replaceAll(RegExp(r'\s+'), '');
+      default:
+        return raw;
+    }
+  }
+
+  void _handleIdentifierChanged(String value) {
+    if (_identifierType != 'AADHAAR_NUMBER') {
+      return;
+    }
+    if (_updatingAadhaarIdentifierText) {
+      return;
+    }
+    final digits = normalizeAadhaarDigits(value);
+    setState(() {
+      _aadhaarIdentifierRaw = digits;
+      _syncAadhaarIdentifierText();
+    });
+  }
+
+  void _toggleAadhaarIdentifierVisibility() {
+    setState(() {
+      _showAadhaarIdentifier = !_showAadhaarIdentifier;
+      _syncAadhaarIdentifierText();
+    });
+  }
+
+  void _handleAadhaarIdentifierTap() {
+    if (_showAadhaarIdentifier) {
+      return;
+    }
+
+    final currentText = _identifierController.text;
+    if (currentText.isEmpty) {
+      return;
+    }
+
+    _identifierController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: currentText.length,
+    );
+  }
+
+  void _syncAadhaarIdentifierText() {
+    _updatingAadhaarIdentifierText = true;
+    _identifierController.value = buildAadhaarEditingValue(
+      digits: _aadhaarIdentifierRaw,
+      showFullValue: _showAadhaarIdentifier,
+    );
+    _updatingAadhaarIdentifierText = false;
+  }
+
+  void _clearOtpInputs() {
+    for (final controller in _otpDigitCtrls) {
+      controller.clear();
+    }
+  }
+
+  Widget _infoCard({required String title, required List<Widget> children}) {
+    return DesktopSurface(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}

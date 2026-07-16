@@ -1,0 +1,311 @@
+{"timestamp":"2026-07-13T03:37:45.734Z","level":"INFO","module":"M2FHIRBuilder","message":"Generating FHIR R4 bundle.","meta":{"recordType":"Diagnostic Report"}}
+{"timestamp":"2026-07-13T03:37:45.738Z","level":"INFO","module":"M2FHIRBuilder","message":"FHIR R4 Bundle constructed successfully.","meta":{"recordType":"Diagnostic Report","durationMs":4}}
+{
+  "resourceType": "Bundle",
+  "id": "bundle-3004dfd2-e8ea-474b-90da-ce46afcb7ac5",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-13T09:07:45.737+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "fa4f545f-8562-48a0-8ee7-3acc9ebbcc4f"
+  },
+  "type": "document",
+  "timestamp": "2026-07-13T09:07:45.737+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:52ffc73f-c676-42d6-84b9-14722b56fefb",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "52ffc73f-c676-42d6-84b9-14722b56fefb",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "721981007",
+              "display": "Diagnostic studies report"
+            }
+          ],
+          "text": "Diagnostic Report- Lab"
+        },
+        "subject": {
+          "reference": "urn:uuid:a04a6951-5256-458f-8753-497a2bce76c5",
+          "display": "Pranay"
+        },
+        "encounter": {
+          "reference": "urn:uuid:34836833-2842-43e5-bac2-2e927f4b9a76",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-13T09:07:45.737+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:dd92b36a-8fe4-4dc4-be02-d1cb2cd916b6",
+            "display": "Dr"
+          }
+        ],
+        "title": "Diagnostic report",
+        "custodian": {
+          "reference": "urn:uuid:244db8a5-684a-4003-a1f8-ab43797664f8",
+          "display": "Fac"
+        },
+        "section": [
+          {
+            "title": "Laboratory report",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "4321000179101",
+                  "display": "Hematology report"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:c9307959-7859-464f-8c8c-f5659b25b946",
+                "display": "Laboratory report"
+              },
+              {
+                "reference": "urn:uuid:db36aa7f-8553-4144-975f-30b47d05285c",
+                "display": "Hemoglobin"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a04a6951-5256-458f-8753-497a2bce76c5",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "a04a6951-5256-458f-8753-497a2bce76c5",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-13T09:07:45.737+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranay211_2006@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "",
+            "use": "home"
+          }
+        ],
+        "gender": "male"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:dd92b36a-8fe4-4dc4-be02-d1cb2cd916b6",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "dd92b36a-8fe4-4dc4-be02-d1cb2cd916b6",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-13T09:07:45.737+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:244db8a5-684a-4003-a1f8-ab43797664f8",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "244db8a5-684a-4003-a1f8-ab43797664f8",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "123"
+          }
+        ],
+        "name": "Fac"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:34836833-2842-43e5-bac2-2e927f4b9a76",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "34836833-2842-43e5-bac2-2e927f4b9a76",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "14afc6ac-6716-444e-af7b-c2bf4e968a03"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:a04a6951-5256-458f-8753-497a2bce76c5",
+          "display": "Pranay"
+        },
+        "period": {
+          "start": "2026-07-13T09:07:45.737+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:db36aa7f-8553-4144-975f-30b47d05285c",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "db36aa7f-8553-4144-975f-30b47d05285c",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "718-7",
+              "display": "Hemoglobin"
+            }
+          ],
+          "text": "Hemoglobin"
+        },
+        "subject": {
+          "reference": "urn:uuid:a04a6951-5256-458f-8753-497a2bce76c5"
+        },
+        "effectiveDateTime": "2026-07-13T09:07:45.738+05:30",
+        "valueString": "Recorded"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c9307959-7859-464f-8c8c-f5659b25b946",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "c9307959-7859-464f-8c8c-f5659b25b946",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "708196005",
+                "display": "Hematology service"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11502-2",
+              "display": "Laboratory report"
+            }
+          ],
+          "text": "Laboratory report"
+        },
+        "subject": {
+          "reference": "urn:uuid:a04a6951-5256-458f-8753-497a2bce76c5",
+          "display": "Pranay"
+        },
+        "performer": [
+          {
+            "reference": "urn:uuid:244db8a5-684a-4003-a1f8-ab43797664f8",
+            "display": "Fac"
+          }
+        ],
+        "resultsInterpreter": [
+          {
+            "reference": "urn:uuid:dd92b36a-8fe4-4dc4-be02-d1cb2cd916b6",
+            "display": "Dr"
+          }
+        ],
+        "result": [
+          {
+            "reference": "urn:uuid:db36aa7f-8553-4144-975f-30b47d05285c",
+            "display": "Hemoglobin"
+          }
+        ],
+        "conclusion": "Diagnostic report generated for ABDM transfer"
+      }
+    }
+  ]
+}

@@ -1,0 +1,243 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
+class ApiDebugHttp {
+  static const int _maxLogLength = 4000;
+
+  static Future<http.Response> get(
+    Uri url, {
+    Map<String, String>? headers,
+  }) async {
+    _logRequest('GET', url, headers: headers);
+    try {
+      final response = await http.get(url, headers: headers);
+      _logResponse('GET', url, response);
+      return response;
+    } catch (error, stackTrace) {
+      _logError('GET', url, error, stackTrace);
+      rethrow;
+    }
+  }
+
+  static Future<http.Response> post(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
+    _logRequest('POST', url, headers: headers, body: body);
+    try {
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: body,
+        encoding: encoding,
+      );
+      _logResponse('POST', url, response);
+      return response;
+    } catch (error, stackTrace) {
+      _logError('POST', url, error, stackTrace);
+      rethrow;
+    }
+  }
+
+  static Future<http.Response> patch(
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+    Encoding? encoding,
+  }) async {
+    _logRequest('PATCH', url, headers: headers, body: body);
+    try {
+      final response = await http.patch(
+        url,
+        headers: headers,
+        body: body,
+        encoding: encoding,
+      );
+      _logResponse('PATCH', url, response);
+      return response;
+    } catch (error, stackTrace) {
+      _logError('PATCH', url, error, stackTrace);
+      rethrow;
+    }
+  }
+
+  static void _logRequest(
+    String method,
+    Uri url, {
+    Map<String, String>? headers,
+    Object? body,
+  }) {
+    if (!kDebugMode) {
+      return;
+    }
+
+    final buffer = StringBuffer()
+      ..writeln('[API REQUEST] $method $url');
+
+    if (headers != null && headers.isNotEmpty) {
+      buffer.writeln('headers: ${_prettyJson(_sanitizeHeaders(headers))}');
+    }
+
+    if (body != null) {
+      buffer.writeln('body: ${_formatBody(body)}');
+    }
+
+    debugPrint(_truncate(buffer.toString().trimRight()));
+  }
+
+  static void _logResponse(String method, Uri url, http.Response response) {
+    if (!kDebugMode) {
+      return;
+    }
+
+    final buffer = StringBuffer()
+      ..writeln('[API RESPONSE] $method $url')
+      ..writeln('status: ${response.statusCode}');
+
+    if (response.headers.isNotEmpty) {
+      buffer.writeln(
+        'headers: ${_prettyJson(_sanitizeHeaders(response.headers))}',
+      );
+    }
+
+    final responseBody = response.body.trim();
+    if (responseBody.isNotEmpty) {
+      buffer.writeln('body: ${_formatBody(responseBody)}');
+    }
+
+    debugPrint(_truncate(buffer.toString().trimRight()));
+  }
+
+  static void _logError(
+    String method,
+    Uri url,
+    Object error,
+    StackTrace stackTrace,
+  ) {
+    if (!kDebugMode) {
+      return;
+    }
+
+    final buffer = StringBuffer()
+      ..writeln('[API ERROR] $method $url')
+      ..writeln('error: $error')
+      ..writeln('stackTrace: $stackTrace');
+
+    debugPrint(_truncate(buffer.toString().trimRight()));
+  }
+
+  static Map<String, String> _sanitizeHeaders(Map<String, String> headers) {
+    const sensitiveHeaders = {
+      'authorization',
+      'x-auth-token',
+      'x-refresh-token',
+      'x-token',
+      'cookie',
+      'set-cookie',
+    };
+
+    return headers.map((key, value) {
+      if (sensitiveHeaders.contains(key.toLowerCase())) {
+        return MapEntry(key, _maskValue(value));
+      }
+      return MapEntry(key, value);
+    });
+  }
+
+  static String _formatBody(Object body) {
+    if (body is String) {
+      return _prettyJson(body);
+    }
+
+    try {
+      return const JsonEncoder.withIndent('  ').convert(_summarizeForLog(body));
+    } catch (_) {
+      return body.toString();
+    }
+  }
+
+  static String _prettyJson(Object value) {
+    try {
+      final decoded = value is String ? jsonDecode(value) : value;
+      final summarized = _summarizeForLog(decoded);
+      return const JsonEncoder.withIndent('  ').convert(summarized);
+    } catch (_) {
+      return _truncate(value.toString());
+    }
+  }
+
+  static Object? _summarizeForLog(Object? value) {
+    if (value == null) {
+      return value;
+    }
+
+    if (value is String) {
+      if (value.length > 1200) {
+        return '<string ${value.length} chars>';
+      }
+      return value;
+    }
+
+    if (value is List) {
+      final isNumericList = value.every((item) => item is num);
+      if (isNumericList && value.length > 100) {
+        return '<binary-like list ${value.length} items>';
+      }
+      if (value.length > 100) {
+        return '<list ${value.length} items>';
+      }
+      return value.map(_summarizeForLog).toList(growable: false);
+    }
+
+    if (value is Map) {
+      final mapped = <String, Object?>{};
+      for (final entry in value.entries) {
+        final key = entry.key.toString();
+        final nestedValue = entry.value;
+
+        if (key == 'data') {
+          if (nestedValue is String && nestedValue.length > 1200) {
+            mapped[key] = '<base64 ${nestedValue.length} chars>';
+            continue;
+          }
+          if (nestedValue is List && nestedValue.length > 100) {
+            mapped[key] = '<binary-like list ${nestedValue.length} items>';
+            continue;
+          }
+        }
+
+        if (key == 'type' &&
+            nestedValue?.toString() == 'Buffer' &&
+            value['data'] is List) {
+          final dataLength = (value['data'] as List).length;
+          mapped[key] = 'Buffer';
+          mapped['data'] = '<binary $dataLength bytes>';
+          continue;
+        }
+
+        mapped[key] = _summarizeForLog(nestedValue);
+      }
+      return mapped;
+    }
+
+    return value;
+  }
+
+  static String _maskValue(String value) {
+    if (value.length <= 8) {
+      return '***';
+    }
+    return '${value.substring(0, 4)}***${value.substring(value.length - 4)}';
+  }
+
+  static String _truncate(String value) {
+    if (value.length <= _maxLogLength) {
+      return value;
+    }
+    return '${value.substring(0, _maxLogLength)}\n...[truncated]';
+  }
+}

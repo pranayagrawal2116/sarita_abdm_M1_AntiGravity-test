@@ -1,0 +1,38 @@
+import 'app_runtime_store.dart';
+
+class AuthSession {
+  static String? phrAuthToken;
+  static String? phrRefreshToken;
+  static String? AbhaAddress;
+
+  static bool get isLoggedIn =>
+      phrAuthToken != null && phrAuthToken!.trim().isNotEmpty;
+
+  static void setLogin({
+    required String token,
+    required String address,
+    String? refreshToken,
+  }) {
+    phrAuthToken = token;
+    phrRefreshToken = refreshToken;
+    AbhaAddress = address;
+    AppRuntimeStore.setValues({
+      'session.isLoggedIn': true,
+      'session.phrAuthToken': token,
+      'session.phrRefreshToken': refreshToken,
+      'session.AbhaAddress': address,
+    });
+  }
+
+  static void clear() {
+    phrAuthToken = null;
+    phrRefreshToken = null;
+    AbhaAddress = null;
+    AppRuntimeStore.setValues({
+      'session.isLoggedIn': false,
+      'session.phrAuthToken': null,
+      'session.phrRefreshToken': null,
+      'session.AbhaAddress': null,
+    });
+  }
+}

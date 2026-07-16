@@ -1,0 +1,189 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+import '../utils/api_config.dart';
+import '../utils/api_debug_http.dart';
+import '../utils/app_runtime_store.dart';
+
+class ConsentManagerApiService {
+  static void _storeResponse(
+    String key,
+    Map<String, dynamic> data, {
+    Map<String, dynamic>? extraValues,
+  }) {
+    AppRuntimeStore.setApiResponse(key, data, extraValues: extraValues);
+  }
+
+  static String _readableError(http.Response response, String fallback) {
+    try {
+      final data = jsonDecode(response.body);
+      if (data is Map<String, dynamic>) {
+        final message = data['message'] ?? data['error'] ?? data['details'];
+        if (message != null && message.toString().trim().isNotEmpty) {
+          return '${message.toString().trim()} (${response.statusCode})';
+        }
+      }
+    } catch (_) {
+      final body = response.body.trim();
+      if (body.isNotEmpty) {
+        return '$body (${response.statusCode})';
+      }
+    }
+
+    return '$fallback (${response.statusCode})';
+  }
+
+  static Future<Map<String, dynamic>> fetchCallbackConfig() async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse("${ApiConfig.baseUrl}/config/callbacks"),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(_readableError(response, "Failed to load callback config"));
+    }
+
+    final data = Map<String, dynamic>.from(jsonDecode(response.body));
+    _storeResponse('consentManager.fetchCallbackConfig', data, extraValues: {
+      'consentManager.callbackConfig': data,
+    });
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> initConsentRequest(
+    Map<String, dynamic> payload,
+  ) async {
+    final response = await ApiDebugHttp.post(
+      Uri.parse("${ApiConfig.baseUrl}/consents/manager/init"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to create consent request"),
+      );
+    }
+
+    final data = Map<String, dynamic>.from(jsonDecode(response.body));
+    _storeResponse('consentManager.initConsentRequest', data, extraValues: {
+      'consentManager.requestId': data['requestId'],
+      'consentManager.initResponse': data,
+    });
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> fetchOnInitCallback(String requestId) async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse(
+        "${ApiConfig.baseUrl}/consents/manager/callbacks/on-init/$requestId",
+      ),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(_readableError(response, "Failed to fetch on-init callback"));
+    }
+
+    final data = Map<String, dynamic>.from(jsonDecode(response.body));
+    _storeResponse('consentManager.fetchOnInitCallback', data, extraValues: {
+      'consentManager.onInit': data,
+      'consentManager.consentRequestId':
+          data['consentRequest'] is Map ? data['consentRequest']['id'] : null,
+    });
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> fetchOnStatusCallback(
+    String consentId,
+  ) async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse(
+        "${ApiConfig.baseUrl}/consents/manager/callbacks/on-status/$consentId",
+      ),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to fetch on-status callback"),
+      );
+    }
+
+    final data = Map<String, dynamic>.from(jsonDecode(response.body));
+    _storeResponse('consentManager.fetchOnStatusCallback', data, extraValues: {
+      'consentManager.onStatus': data,
+      'consentManager.status': data['status'],
+      'consentManager.consentId': consentId,
+    });
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> requestHealthInformation(
+    Map<String, dynamic> payload,
+  ) async {
+    final response = await ApiDebugHttp.post(
+      Uri.parse("${ApiConfig.baseUrl}/consents/manager/health-information/request"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to request health information"),
+      );
+    }
+
+    final data = Map<String, dynamic>.from(jsonDecode(response.body));
+    _storeResponse('consentManager.requestHealthInformation', data, extraValues: {
+      'consentManager.healthInfoRequest': data,
+      'consentManager.requestId': data['requestId'],
+    });
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> fetchOnRequestCallback(
+    String requestId,
+  ) async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse(
+        "${ApiConfig.baseUrl}/consents/manager/callbacks/health-information/on-request/$requestId",
+      ),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to fetch health-information on-request callback"),
+      );
+    }
+
+    final data = Map<String, dynamic>.from(jsonDecode(response.body));
+    _storeResponse('consentManager.fetchOnRequestCallback', data, extraValues: {
+      'consentManager.onRequest': data,
+      'consentManager.transactionId': data['transactionId'],
+    });
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> fetchNotifyCallback(
+    String transactionId,
+  ) async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse(
+        "${ApiConfig.baseUrl}/consents/manager/callbacks/health-information/notify/$transactionId",
+      ),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to fetch health-information notify callback"),
+      );
+    }
+
+    final data = Map<String, dynamic>.from(jsonDecode(response.body));
+    _storeResponse('consentManager.fetchNotifyCallback', data, extraValues: {
+      'consentManager.notify': data,
+      'consentManager.entries': data['entries'],
+      'consentManager.transactionId': transactionId,
+    });
+    return data;
+  }
+}

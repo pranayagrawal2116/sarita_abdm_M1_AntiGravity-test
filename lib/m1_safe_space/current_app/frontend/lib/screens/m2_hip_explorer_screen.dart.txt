@@ -1,0 +1,191 @@
+import 'package:flutter/material.dart';
+
+import '../widgets/desktop_workspace.dart';
+import 'consent_manager_screen.dart';
+import 'm2_linking_workflow_screen.dart';
+
+class M2HipExplorerScreen extends StatelessWidget {
+  const M2HipExplorerScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Step 3: M2 HIP Integration')),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final desktop = constraints.maxWidth >= 980;
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1240),
+              child: ListView(
+                padding: const EdgeInsets.all(20),
+                children: [
+                  const DesktopPageIntro(
+                    eyebrow: "M2 HIP Layer",
+                    title:
+                        "Run live HIP and consent workflows with clearer desktop context.",
+                    description:
+                        "This screen is shaped for larger displays so setup notes, prerequisites, and launch actions stay readable before you enter the detailed workflow.",
+                    pills: [
+                      "Gateway setup",
+                      "Callbacks",
+                      "HIP linking",
+                      "Consent",
+                    ],
+                  ),
+                  if (desktop)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _card(
+                            title: 'ABDM Live Mode',
+                            icon: Icons.cloud_done_outlined,
+                            children: const [
+                              Text(
+                                'M2 is the health-data layer. This flow is connected to ABDM APIs through backend proxy routes only.',
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Users enter real business values (HIP ID, ABHA address, consent IDs, transaction IDs).',
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _card(
+                            title: 'Before You Start',
+                            icon: Icons.playlist_add_check_circle_outlined,
+                            children: const [
+                              Text(
+                                '1. Finish M1 identity setup and PHR login first.',
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '2. Keep backend running with valid ABDM credentials.',
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '3. Configure callback URLs from /api/config/callbacks.',
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '4. Configure HIU private key in backend env for JWS consent-view generation.',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  else ...[
+                    _card(
+                      title: 'ABDM Live Mode',
+                      icon: Icons.cloud_done_outlined,
+                      children: const [
+                        Text(
+                          'M2 flow is connected to ABDM APIs through backend proxy routes only.',
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Users enter real business values (HIP ID, ABHA address, consent IDs, transaction IDs).',
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _card(
+                      title: 'Before You Start',
+                      icon: Icons.playlist_add_check_circle_outlined,
+                      children: const [
+                        Text(
+                          '1. Login to ABHA in the app so PHR token is available.',
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          '2. Keep backend running with valid ABDM credentials.',
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          '3. Configure callback URLs from /api/config/callbacks.',
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          '4. Configure HIU private key in backend env for JWS consent-view generation.',
+                        ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 52,
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ConsentManagerScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.fact_check_outlined),
+                      label: const Text('Open Consent Manager'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 52,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const M2LinkingWorkflowScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.settings_input_component_outlined),
+                      label: const Text('Open M2 Workflow'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _card({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
+    return DesktopSurface(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+}

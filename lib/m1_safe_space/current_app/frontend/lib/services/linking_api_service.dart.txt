@@ -1,0 +1,183 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+import '../utils/api_config.dart';
+import '../utils/api_debug_http.dart';
+import '../utils/app_runtime_store.dart';
+import '../utils/auth_session.dart';
+
+class LinkingApiService {
+  static String _readableError(http.Response response, String fallback) {
+    try {
+      final data = jsonDecode(response.body);
+      if (data is Map<String, dynamic>) {
+        final message = data['message'] ?? data['error'] ?? data['details'];
+        if (message is String && message.trim().isNotEmpty) {
+          return message;
+        }
+
+        final fieldMessages = data.values
+            .whereType<String>()
+            .map((value) => value.trim())
+            .where((value) => value.isNotEmpty)
+            .toList();
+        if (fieldMessages.isNotEmpty) {
+          return fieldMessages.join(", ");
+        }
+
+        return data.toString();
+      }
+
+      if (data is List && data.isNotEmpty) {
+        return data.toString();
+      }
+    } catch (_) {}
+    return '$fallback (${response.statusCode})';
+  }
+
+  static Map<String, String> _headers({bool json = false}) {
+    final token = AuthSession.phrAuthToken;
+    if (token == null || token.trim().isEmpty) {
+      throw Exception("Missing login session. Please log in again.");
+    }
+
+    return {
+      if (json) "Content-Type": "application/json",
+      "X-Auth-Token": token,
+    };
+  }
+
+  static Future<Map<String, dynamic>> discoverCareContexts({
+    required String hipId,
+    required String identifierType,
+    required String identifierValue,
+  }) async {
+    final response = await ApiDebugHttp.post(
+      Uri.parse("${ApiConfig.baseUrl}/linking/discover"),
+      headers: _headers(json: true),
+      body: jsonEncode({
+        "hipId": hipId,
+        "identifierType": identifierType,
+        "identifierValue": identifierValue,
+        if (AuthSession.AbhaAddress != null)
+          "phrAddress": AuthSession.AbhaAddress,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(_readableError(response, "Failed to discover records"));
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    AppRuntimeStore.setApiResponse(
+      'linking.discoverCareContexts',
+      data,
+      extraValues: {'linking.flow.discover': data, 'linking.hipId': hipId},
+    );
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> getStatus(String flowId) async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse("${ApiConfig.baseUrl}/linking/status/$flowId"),
+      headers: _headers(),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to fetch verification status"),
+      );
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    AppRuntimeStore.setApiResponse(
+      'linking.getStatus',
+      data,
+      extraValues: {'linking.status': data, 'linking.flowId': flowId},
+    );
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> initLink({
+    required String flowId,
+    required List<String> selectedReferenceNumbers,
+  }) async {
+    final response = await ApiDebugHttp.post(
+      Uri.parse("${ApiConfig.baseUrl}/linking/init"),
+      headers: _headers(json: true),
+      body: jsonEncode({
+        "flowId": flowId,
+        "selectedReferenceNumbers": selectedReferenceNumbers,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to start OTP verification"),
+      );
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    AppRuntimeStore.setApiResponse(
+      'linking.initLink',
+      data,
+      extraValues: {'linking.init': data, 'linking.flowId': flowId},
+    );
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> confirmLink({
+    required String flowId,
+    required String otp,
+  }) async {
+    final response = await ApiDebugHttp.post(
+      Uri.parse("${ApiConfig.baseUrl}/linking/confirm"),
+      headers: _headers(json: true),
+      body: jsonEncode({"flowId": flowId, "otp": otp}),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to confirm verification OTP"),
+      );
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    AppRuntimeStore.setApiResponse(
+      'linking.confirmLink',
+      data,
+      extraValues: {'linking.confirm': data, 'linking.flowId': flowId},
+    );
+    return data;
+  }
+
+  static Future<List<Map<String, dynamic>>> searchProviders(String name) async {
+    final response = await ApiDebugHttp.get(
+      Uri.parse(
+        "${ApiConfig.baseUrl}/linking/providers?name=${Uri.encodeQueryComponent(name)}",
+      ),
+      headers: _headers(),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        _readableError(response, "Failed to search health facilities"),
+      );
+    }
+
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+    AppRuntimeStore.setApiResponse(
+      'linking.searchProviders',
+      data,
+      extraValues: {
+        'linking.providers': data['providers'],
+        'linking.searchQuery': name,
+      },
+    );
+    return (data['providers'] as List? ?? const [])
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
+}

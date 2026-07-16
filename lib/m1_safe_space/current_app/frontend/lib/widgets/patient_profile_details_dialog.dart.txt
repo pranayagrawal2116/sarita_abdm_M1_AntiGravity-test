@@ -1,0 +1,750 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+
+import '../utils/registered_users_store.dart';
+
+class PatientProfileDetailsDialog extends StatefulWidget {
+  const PatientProfileDetailsDialog({super.key, required this.user});
+
+  final Map<String, dynamic> user;
+
+  @override
+  State<PatientProfileDetailsDialog> createState() =>
+      _PatientProfileDetailsDialogState();
+}
+
+class _PatientProfileDetailsDialogState
+    extends State<PatientProfileDetailsDialog> {
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _mobileCtrl;
+  late final TextEditingController _genderCtrl;
+  late final TextEditingController _dobCtrl;
+  late final TextEditingController _abhaAddressCtrl;
+  late final TextEditingController _abhaNumberCtrl;
+  late final TextEditingController _uhidCtrl;
+  late final TextEditingController _addressCtrl;
+  late final TextEditingController _pincodeCtrl;
+  late final TextEditingController _districtCtrl;
+  late final TextEditingController _stateCtrl;
+
+  late final String _initialMobile;
+  late final String _initialAddress;
+  late final String _initialPincode;
+  late final String _initialDistrict;
+  late final String _initialState;
+  late final Map<String, dynamic> _rawProfile;
+
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _rawProfile = _rawProfileMap(widget.user);
+    _nameCtrl = TextEditingController(text: _value(widget.user['name']));
+    _mobileCtrl = TextEditingController(text: _digits(widget.user['mobile']));
+    _genderCtrl = TextEditingController(text: _value(widget.user['gender']));
+    _dobCtrl = TextEditingController(text: _value(widget.user['dob']));
+    _abhaAddressCtrl = TextEditingController(
+      text: _value(widget.user['AbhaAddress']),
+    );
+    _abhaNumberCtrl = TextEditingController(
+      text: _value(widget.user['AbhaNumber']),
+    );
+    _uhidCtrl = TextEditingController(text: _value(widget.user['uhid']));
+    _addressCtrl = TextEditingController(text: _value(widget.user['address']));
+    _pincodeCtrl = TextEditingController(text: _value(widget.user['pincode']));
+    _districtCtrl = TextEditingController(
+      text: _firstNonEmpty([
+        widget.user['district'],
+        widget.user['districtName'],
+        _rawProfile['district'],
+        _rawProfile['districtName'],
+      ]),
+    );
+    _stateCtrl = TextEditingController(
+      text: _firstNonEmpty([
+        widget.user['state'],
+        widget.user['stateName'],
+        _rawProfile['state'],
+        _rawProfile['stateName'],
+      ]),
+    );
+    _initialMobile = _digits(widget.user['mobile']);
+    _initialAddress = _value(widget.user['address']);
+    _initialPincode = _value(widget.user['pincode']);
+    _initialDistrict = _firstNonEmpty([
+      widget.user['district'],
+      widget.user['districtName'],
+      _rawProfile['district'],
+      _rawProfile['districtName'],
+    ]);
+    _initialState = _firstNonEmpty([
+      widget.user['state'],
+      widget.user['stateName'],
+      _rawProfile['state'],
+      _rawProfile['stateName'],
+    ]);
+    _mobileCtrl.addListener(_refresh);
+    _addressCtrl.addListener(_refresh);
+    _pincodeCtrl.addListener(_refresh);
+    _districtCtrl.addListener(_refresh);
+    _stateCtrl.addListener(_refresh);
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _mobileCtrl.dispose();
+    _genderCtrl.dispose();
+    _dobCtrl.dispose();
+    _abhaAddressCtrl.dispose();
+    _abhaNumberCtrl.dispose();
+    _uhidCtrl.dispose();
+    _addressCtrl.dispose();
+    _pincodeCtrl.dispose();
+    _districtCtrl.dispose();
+    _stateCtrl.dispose();
+    super.dispose();
+  }
+
+  bool get _mobileChanged => _digits(_mobileCtrl.text) != _initialMobile;
+  bool get _addressChanged => _addressCtrl.text.trim() != _initialAddress;
+  bool get _pincodeChanged => _pincodeCtrl.text.trim() != _initialPincode;
+  bool get _districtChanged => _districtCtrl.text.trim() != _initialDistrict;
+  bool get _stateChanged => _stateCtrl.text.trim() != _initialState;
+  bool get _hasChanges =>
+      _mobileChanged ||
+      _addressChanged ||
+      _pincodeChanged ||
+      _districtChanged ||
+      _stateChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final image = _decodedImage();
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 36, vertical: 28),
+      clipBehavior: Clip.antiAlias,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1120, maxHeight: 840),
+        child: Column(
+          children: [
+            _buildHeader(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildHero(image),
+                    const SizedBox(height: 24),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final stacked = constraints.maxWidth < 920;
+                        final personal = _buildSection(
+                          title: 'Personal Information',
+                          children: [
+                            _fieldRow(
+                              _buildTextField(
+                                label: 'Patient Name',
+                                controller: _nameCtrl,
+                                enabled: false,
+                              ),
+                              _buildTextField(
+                                label: 'Mobile Number',
+                                controller: _mobileCtrl,
+                                keyboardType: TextInputType.phone,
+                                helper:
+                                    'Editable. This change is saved only inside the Sarita workspace.',
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _fieldRow(
+                              _buildTextField(
+                                label: 'Gender',
+                                controller: _genderCtrl,
+                                enabled: false,
+                              ),
+                              _buildTextField(
+                                label: 'Date of Birth',
+                                controller: _dobCtrl,
+                                enabled: false,
+                              ),
+                            ),
+                          ],
+                        );
+                        final account = _buildSection(
+                          title: 'ABDM Information',
+                          children: [
+                            _fieldRow(
+                              _buildTextField(
+                                label: 'ABHA Address',
+                                controller: _abhaAddressCtrl,
+                                enabled: false,
+                              ),
+                              _buildTextField(
+                                label: 'ABHA Number',
+                                controller: _abhaNumberCtrl,
+                                enabled: false,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _fieldRow(
+                              _buildTextField(
+                                label: 'UHID',
+                                controller: _uhidCtrl,
+                                enabled: false,
+                              ),
+                              const SizedBox.shrink(),
+                            ),
+                          ],
+                        );
+                        final address = _buildSection(
+                          title: 'Address Information',
+                          children: [
+                            _buildTextField(
+                              label: 'Address',
+                              controller: _addressCtrl,
+                              maxLines: 3,
+                              helper:
+                                  'Editable. This change is saved only inside the Sarita workspace.',
+                            ),
+                            const SizedBox(height: 16),
+                            _fieldRow(
+                              _buildTextField(
+                                label: 'Pincode',
+                                controller: _pincodeCtrl,
+                                keyboardType: TextInputType.number,
+                                helper:
+                                    'Editable. This change is saved only inside the Sarita workspace.',
+                              ),
+                              _buildTextField(
+                                label: 'District',
+                                controller: _districtCtrl,
+                                helper:
+                                    'Editable. This change is saved only inside the Sarita workspace.',
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            _fieldRow(
+                              _buildTextField(
+                                label: 'State',
+                                controller: _stateCtrl,
+                                helper:
+                                    'Editable. This change is saved only inside the Sarita workspace.',
+                              ),
+                              const SizedBox.shrink(),
+                            ),
+                          ],
+                        );
+
+                        if (stacked) {
+                          return Column(
+                            children: [
+                              personal,
+                              const SizedBox(height: 18),
+                              account,
+                              const SizedBox(height: 18),
+                              address,
+                            ],
+                          );
+                        }
+
+                        return Column(
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: personal),
+                                const SizedBox(width: 18),
+                                Expanded(child: account),
+                              ],
+                            ),
+                            const SizedBox(height: 18),
+                            address,
+                          ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            _buildFooter(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(28, 24, 18, 24),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFF1F9FF), Color(0xFFF3FBF6), Color(0xFFFFFFFF)],
+        ),
+        border: Border(bottom: BorderSide(color: Color(0xFFE0EAF2))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  'Patient Profile Details',
+                  style: TextStyle(
+                    color: Color(0xFF17324A),
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.6,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Review the ABHA-linked details, then update the local patient information from one calm Sarita workspace.',
+                  style: TextStyle(
+                    color: Color(0xFF5F7280),
+                    height: 1.45,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: _saving ? null : () => Navigator.of(context).pop(),
+            icon: const Icon(Icons.close_rounded, size: 28),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHero(Uint8List? image) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFEAF6FF), Color(0xFFEFFAF3)],
+        ),
+        border: Border.all(color: const Color(0xFFD7E4F0)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              border: Border.all(color: const Color(0xFFD8E6F1)),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x16000000),
+                  blurRadius: 16,
+                  offset: Offset(0, 8),
+                ),
+              ],
+              image: image != null
+                  ? DecorationImage(
+                      image: MemoryImage(image),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+            child: image == null
+                ? const Icon(
+                    Icons.person_outline_rounded,
+                    color: Color(0xFF5E7388),
+                    size: 36,
+                  )
+                : null,
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.86),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: const Color(0xFFD5E4EE)),
+                  ),
+                  child: const Text(
+                    'ABHA-linked patient',
+                    style: TextStyle(
+                      color: Color(0xFF1B5E8C),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  _nameCtrl.text.trim().isEmpty
+                      ? 'Patient record'
+                      : _nameCtrl.text,
+                  style: const TextStyle(
+                    color: Color(0xFF17324A),
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  _abhaNumberCtrl.text.trim().isEmpty
+                      ? _abhaAddressCtrl.text
+                      : _abhaNumberCtrl.text,
+                  style: const TextStyle(
+                    color: Color(0xFF2F8F5B),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection({
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFDCE7F0)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0F10263B),
+            blurRadius: 16,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF17324A),
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 14),
+          ...children,
+        ],
+      ),
+    );
+  }
+
+  Widget _fieldRow(Widget left, Widget right) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 660) {
+          return Column(children: [left, const SizedBox(height: 16), right]);
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(child: left),
+            const SizedBox(width: 16),
+            Expanded(child: right),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required TextEditingController controller,
+    bool enabled = true,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+    String? helper,
+  }) {
+    final readOnly = !enabled;
+    return TextField(
+      controller: controller,
+      enabled: enabled,
+      readOnly: readOnly,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        helperText: helper,
+        alignLabelWithHint: maxLines > 1,
+        filled: true,
+        fillColor: readOnly ? const Color(0xFFF7FBFF) : Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Color(0xFFD4E2EC)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Color(0xFFD4E2EC)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(18),
+          borderSide: const BorderSide(color: Color(0xFF2F8F5B), width: 1.4),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFooter(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(28, 18, 28, 22),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFDFEFF),
+        border: Border(top: BorderSide(color: Color(0xFFE2EAF2))),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              _hasChanges
+                  ? 'Changes detected. These profile updates will be saved locally in the Sarita workspace.'
+                  : 'No changes yet. You can review the profile or edit the local patient details.',
+              style: const TextStyle(
+                color: Color(0xFF607285),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          TextButton(
+            onPressed: _saving ? null : () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+          const SizedBox(width: 12),
+          ElevatedButton(
+            onPressed: (!_hasChanges || _saving) ? null : _saveChanges,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2F8F5B),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+            ),
+            child: _saving
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Text('Save Changes'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _saveChanges() async {
+    final updatedMobile = _digits(_mobileCtrl.text);
+    final updatedAddress = _addressCtrl.text.trim();
+    final updatedPincode = _pincodeCtrl.text.trim();
+    final updatedDistrict = _districtCtrl.text.trim();
+    final updatedState = _stateCtrl.text.trim();
+
+    if (_mobileChanged && !RegExp(r'^\d{10}$').hasMatch(updatedMobile)) {
+      _showError('Mobile number must be 10 digits.');
+      return;
+    }
+
+    if (updatedAddress.isEmpty) {
+      _showError('Address cannot be empty.');
+      return;
+    }
+
+    if (updatedPincode.isNotEmpty &&
+        !RegExp(r'^\d{6}$').hasMatch(updatedPincode)) {
+      _showError('Pincode must be 6 digits.');
+      return;
+    }
+
+    setState(() => _saving = true);
+
+    try {
+      final updatedRawProfile = Map<String, dynamic>.from(_rawProfile);
+      updatedRawProfile['mobile'] = updatedMobile;
+      updatedRawProfile['address'] = updatedAddress;
+      updatedRawProfile['pincode'] = updatedPincode;
+      updatedRawProfile['pinCode'] = updatedPincode;
+      updatedRawProfile['district'] = updatedDistrict;
+      updatedRawProfile['districtName'] = updatedDistrict;
+      updatedRawProfile['state'] = updatedState;
+      updatedRawProfile['stateName'] = updatedState;
+
+      final updatedProfile = Map<String, dynamic>.from(widget.user);
+      updatedProfile['mobile'] = updatedMobile;
+      updatedProfile['address'] = updatedAddress;
+      updatedProfile['pincode'] = updatedPincode;
+      updatedProfile['pinCode'] = updatedPincode;
+      updatedProfile['district'] = updatedDistrict;
+      updatedProfile['districtName'] = updatedDistrict;
+      updatedProfile['state'] = updatedState;
+      updatedProfile['stateName'] = updatedState;
+      updatedProfile['rawProfile'] = updatedRawProfile;
+
+      final existingLinkedProfiles = widget.user['linkedProfiles'];
+      final updatedLinkedProfiles = <Map<String, dynamic>>[];
+      if (existingLinkedProfiles is List && existingLinkedProfiles.isNotEmpty) {
+        final currentAbhaAddress = _value(widget.user['AbhaAddress'])
+            .toLowerCase();
+        final currentAbhaNumber = _value(widget.user['AbhaNumber']);
+        var replacedCurrentProfile = false;
+
+        for (final rawProfileItem in existingLinkedProfiles.whereType<Map>()) {
+          final linkedProfile = Map<String, dynamic>.from(rawProfileItem);
+          final linkedAbhaAddress = _value(linkedProfile['AbhaAddress'])
+              .toLowerCase();
+          final linkedAbhaNumber = _value(linkedProfile['AbhaNumber']);
+          final matchesCurrentProfile =
+              (currentAbhaAddress.isNotEmpty &&
+                  linkedAbhaAddress == currentAbhaAddress) ||
+              (currentAbhaNumber.isNotEmpty &&
+                  linkedAbhaNumber == currentAbhaNumber);
+
+          if (matchesCurrentProfile && !replacedCurrentProfile) {
+            updatedLinkedProfiles.add(updatedProfile);
+            replacedCurrentProfile = true;
+          } else {
+            updatedLinkedProfiles.add(linkedProfile);
+          }
+        }
+
+        if (!replacedCurrentProfile) {
+          updatedLinkedProfiles.insert(0, updatedProfile);
+        }
+      } else {
+        updatedLinkedProfiles.add(updatedProfile);
+      }
+
+      RegisteredUsersStore.upsert({
+        ...widget.user,
+        'mobile': updatedMobile,
+        'address': updatedAddress,
+        'pincode': updatedPincode,
+        'pinCode': updatedPincode,
+        'district': updatedDistrict,
+        'districtName': updatedDistrict,
+        'state': updatedState,
+        'stateName': updatedState,
+        'rawProfile': updatedRawProfile,
+        'linkedProfiles': updatedLinkedProfiles,
+      });
+
+      if (!mounted) return;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      if (!mounted) return;
+      _showError(_cleanError(e.toString()));
+    } finally {
+      if (mounted) {
+        setState(() => _saving = false);
+      }
+    }
+  }
+
+  void _showError(String message) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _refresh() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Map<String, dynamic> _rawProfileMap(Map<String, dynamic> user) {
+    final raw = user['rawProfile'];
+    if (raw is Map<String, dynamic>) {
+      return raw;
+    }
+    if (raw is Map) {
+      return Map<String, dynamic>.from(raw);
+    }
+    return <String, dynamic>{};
+  }
+
+  Uint8List? _decodedImage() {
+    final candidates = [
+      widget.user['imageBase64'],
+      _rawProfile['photo'],
+      (widget.user['cardPayload'] is Map<String, dynamic>)
+          ? (widget.user['cardPayload'] as Map<String, dynamic>)['data']
+          : null,
+    ];
+    for (final candidate in candidates) {
+      final text = candidate?.toString().trim() ?? '';
+      if (text.isEmpty) {
+        continue;
+      }
+      try {
+        return base64Decode(text);
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  String _cleanError(String value) {
+    return value
+        .replaceFirst(RegExp(r'^Exception:\s*'), '')
+        .replaceFirst(RegExp(r'^Error:\s*'), '')
+        .trim();
+  }
+
+  String _value(Object? value) => value?.toString().trim() ?? '';
+
+  String _digits(Object? value) =>
+      value?.toString().replaceAll(RegExp(r'[^0-9]'), '') ?? '';
+
+  String _firstNonEmpty(List<dynamic> values) {
+    for (final value in values) {
+      final text = value?.toString().trim() ?? '';
+      if (text.isNotEmpty && text.toLowerCase() != 'null') {
+        return text;
+      }
+    }
+    return '';
+  }
+}

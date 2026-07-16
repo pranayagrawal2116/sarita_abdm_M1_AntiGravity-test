@@ -1,0 +1,12 @@
+const express = require("express");
+const router = express.Router();
+const controller = require("../controllers/linkingController");
+
+router.post("/discover", controller.discoverCareContexts);
+router.get("/status/:flowId", controller.getLinkingStatus);
+router.post("/init", controller.initLinking);
+router.post("/confirm", controller.confirmLinking);
+router.get("/providers", controller.searchProviders);
+router.get("/providers/:providerId", controller.getProviderById);
+
+module.exports = router;

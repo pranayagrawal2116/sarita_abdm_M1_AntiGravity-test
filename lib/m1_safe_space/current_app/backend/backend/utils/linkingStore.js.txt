@@ -1,0 +1,62 @@
+const flows = new Map();
+const requestToFlow = new Map();
+
+const now = () => new Date().toISOString();
+
+const ensureFlow = (flowId) => {
+    if (!flows.has(flowId)) {
+        flows.set(flowId, {
+            flowId,
+            createdAt: now(),
+            updatedAt: now(),
+        });
+    }
+    return flows.get(flowId);
+};
+
+const trackRequest = (flowId, requestId) => {
+    if (!requestId) return;
+    requestToFlow.set(String(requestId), flowId);
+};
+
+const updateFlow = (flowId, patch) => {
+    const current = ensureFlow(flowId);
+    const next = {
+        ...current,
+        ...patch,
+        updatedAt: now(),
+    };
+    flows.set(flowId, next);
+
+    trackRequest(flowId, next.discoveryRequestId);
+    trackRequest(flowId, next.initRequestId);
+    trackRequest(flowId, next.confirmRequestId);
+
+    return next;
+};
+
+const getFlow = (flowId) => flows.get(flowId) || null;
+
+const findFlowByRequestId = (requestId) => {
+    const flowId = requestToFlow.get(String(requestId || ""));
+    return flowId ? getFlow(flowId) : null;
+};
+
+const findFlowByTransactionId = (transactionId) => {
+    const text = String(transactionId || "").trim();
+    if (!text) return null;
+    for (const flow of flows.values()) {
+        if (String(flow.transactionId || "").trim() === text) {
+            return flow;
+        }
+    }
+    return null;
+};
+
+module.exports = {
+    ensureFlow,
+    updateFlow,
+    getFlow,
+    findFlowByRequestId,
+    findFlowByTransactionId,
+};

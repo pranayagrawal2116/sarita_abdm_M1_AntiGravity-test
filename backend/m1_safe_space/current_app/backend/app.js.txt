@@ -1,0 +1,313 @@
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
+
+const app = express();
+
+const API_DEBUG_ENABLED = process.env.API_DEBUG !== "false";
+const MAX_LOG_LENGTH = 4000;
+
+const maskValue = (value) => {
+  const text = String(value ?? "");
+  if (text.length <= 8) return "***";
+  return `${text.slice(0, 4)}***${text.slice(-4)}`;
+};
+
+const sanitizeHeaders = (headers = {}) => {
+  const sensitiveHeaders = new Set([
+    "authorization",
+    "x-auth-token",
+    "x-refresh-token",
+    "x-token",
+    "cookie",
+    "set-cookie",
+  ]);
+
+  return Object.fromEntries(
+    Object.entries(headers).map(([key, value]) => [
+      key,
+      sensitiveHeaders.has(String(key).toLowerCase()) ? maskValue(value) : value,
+    ])
+  );
+};
+
+const summarizeBinaryPayload = (value) => {
+  if (Buffer.isBuffer(value)) {
+    return {
+      type: "Buffer",
+      byteLength: value.length,
+      preview: `<binary ${value.length} bytes>`,
+    };
+  }
+
+  if (
+    value &&
+    typeof value === "object" &&
+    value.type === "Buffer" &&
+    Array.isArray(value.data)
+  ) {
+    return {
+      type: "Buffer",
+      byteLength: value.data.length,
+      preview: `<binary ${value.data.length} bytes>`,
+    };
+  }
+
+  return null;
+};
+
+const summarizeLargePayload = (value) => {
+  const binarySummary = summarizeBinaryPayload(value);
+  if (binarySummary) {
+    return binarySummary;
+  }
+
+  if (value == null || value === "") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    if (value.length > 1200) {
+      return `<string ${value.length} chars>`;
+    }
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length > 100) {
+      return `<array ${value.length} items>`;
+    }
+    return value.map((item) => summarizeLargePayload(item));
+  }
+
+  if (typeof value === "object") {
+    const summarized = {};
+    for (const [key, nestedValue] of Object.entries(value)) {
+      if (key === "data") {
+        const nestedBinarySummary = summarizeBinaryPayload(nestedValue);
+        if (nestedBinarySummary) {
+          summarized[key] = nestedBinarySummary;
+          continue;
+        }
+        if (typeof nestedValue === "string" && nestedValue.length > 1200) {
+          summarized[key] = `<base64 ${nestedValue.length} chars>`;
+          continue;
+        }
+      }
+
+      summarized[key] = summarizeLargePayload(nestedValue);
+    }
+    return summarized;
+  }
+
+  return value;
+};
+
+const stringifyForLog = (value) => {
+  if (value == null || value === "") return "";
+  const summarizedValue = summarizeLargePayload(value);
+  if (typeof value === "string") {
+    try {
+      return JSON.stringify(summarizeLargePayload(JSON.parse(value)), null, 2);
+    } catch (_) {
+      return String(summarizedValue);
+    }
+  }
+
+  try {
+    return JSON.stringify(summarizedValue, null, 2);
+  } catch (_) {
+    return String(summarizedValue);
+  }
+};
+
+const truncateLog = (value) =>
+  value.length <= MAX_LOG_LENGTH ? value : `${value.slice(0, MAX_LOG_LENGTH)}\n...[truncated]`;
+
+const logApiDebug = (label, details) => {
+  if (!API_DEBUG_ENABLED) return;
+
+  const lines = [label];
+  for (const [key, value] of Object.entries(details)) {
+    if (value == null || value === "") continue;
+    lines.push(`${key}: ${typeof value === "string" ? value : stringifyForLog(value)}`);
+  }
+
+  console.log(truncateLog(lines.join("\n")));
+};
+
+axios.interceptors.request.use((config) => {
+  logApiDebug(`[API OUTBOUND] ${String(config.method || "GET").toUpperCase()} ${config.url || ""}`, {
+    headers: sanitizeHeaders(config.headers || {}),
+    params: config.params,
+    data: config.data,
+  });
+  return config;
+});
+
+axios.interceptors.response.use(
+  (response) => {
+    logApiDebug(
+      `[API OUTBOUND RESPONSE] ${String(response.config?.method || "GET").toUpperCase()} ${response.config?.url || ""}`,
+      {
+        status: response.status,
+        headers: sanitizeHeaders(response.headers || {}),
+        data: response.data,
+      }
+    );
+    return response;
+  },
+  (error) => {
+    logApiDebug(
+      `[API OUTBOUND ERROR] ${String(error.config?.method || "GET").toUpperCase()} ${error.config?.url || ""}`,
+      {
+        status: error.response?.status,
+        headers: sanitizeHeaders(error.response?.headers || {}),
+        data: error.response?.data || error.message,
+      }
+    );
+    return Promise.reject(error);
+  }
+);
+
+app.use(cors());
+app.use(express.json());
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    logApiDebug(`[API INBOUND] ${req.method} ${req.originalUrl}`, {
+      headers: sanitizeHeaders(req.headers),
+      query: req.query,
+      body: req.body,
+    });
+  }
+
+  res.on("finish", () => {
+    if (req.path.startsWith("/api")) {
+      logApiDebug(`[API INBOUND RESPONSE] ${req.method} ${req.originalUrl}`, {
+        status: res.statusCode,
+      });
+    }
+  });
+
+  next();
+});
+
+// Health check
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+const buildPublicBaseUrl = (req) => {
+  const configured = String(process.env.PUBLIC_BASE_URL || "").trim().replace(/\/$/, "");
+  if (configured) return configured;
+
+  const forwardedProto = String(req.headers["x-forwarded-proto"] || "").trim();
+  const proto = forwardedProto || req.protocol || "http";
+  const host = String(req.headers.host || `localhost:${process.env.PORT || 3000}`).trim();
+  return `${proto}://${host}`;
+};
+
+const isPublicHttpUrl = (value) => {
+  const text = String(value || "").trim();
+  if (!/^https?:\/\//i.test(text)) return false;
+  return !/localhost|127\.0\.0\.1|0\.0\.0\.0/i.test(text);
+};
+
+app.get("/api/config/callbacks", (req, res) => {
+  const publicBaseUrl = buildPublicBaseUrl(req);
+  const setupDefaults = {
+    bridgeId: String(
+      process.env.BRIDGE_ID ||
+        process.env.ABDM_CLIENT_ID ||
+        process.env.CLIENT_ID ||
+        ""
+    ).trim(),
+    facilityId: String(process.env.FACILITY_ID || "").trim(),
+    facilityName: String(process.env.FACILITY_NAME || "").trim(),
+    serviceId: String(
+      process.env.HIP_ID ||
+        process.env.HIU_ID ||
+        process.env.BRIDGE_SERVICE_ID ||
+        ""
+    ).trim(),
+    serviceName: String(
+      process.env.SERVICE_NAME ||
+        process.env.FACILITY_NAME ||
+        ""
+    ).trim(),
+    hipId: String(process.env.HIP_ID || "").trim(),
+    hiuId: String(process.env.HIU_ID || "").trim(),
+  };
+
+  res.json({
+    publicBaseUrl,
+    isPublicReachable: isPublicHttpUrl(publicBaseUrl),
+    setupDefaults,
+    callbacks: {
+      consentRequestOnInit: `${publicBaseUrl}/api/consents/callbacks/on-init`,
+      consentRequestOnStatus: `${publicBaseUrl}/api/consents/callbacks/on-status`,
+      healthInformationOnRequest: `${publicBaseUrl}/api/consents/callbacks/health-information/on-request`,
+      healthInformationNotifyManager: `${publicBaseUrl}/api/consents/callbacks/health-information/notify`,
+      hipDiscover: `${publicBaseUrl}/api/v3/hip/patient/care-context/discover`,
+      hipInit: `${publicBaseUrl}/api/v3/hip/link/care-context/init`,
+      hipConfirm: `${publicBaseUrl}/api/v3/hip/link/care-context/confirm`,
+      discover: `${publicBaseUrl}/api/v3/patient/care-context/on-discover`,
+      init: `${publicBaseUrl}/api/v3/link/care-context/on-init`,
+      confirm: `${publicBaseUrl}/api/v3/link/care-context/on-confirm`,
+      careContextLinked: `${publicBaseUrl}/api/v3/link/on_carecontext`,
+      contextOnNotify: `${publicBaseUrl}/api/v3/links/context/on-notify`,
+      smsOnNotify: `${publicBaseUrl}/api/v3/patients/sms/on-notify`,
+      hipOnGenerateToken: `${publicBaseUrl}/api/v3/hip/token/on-generate-token`,
+      consentOnNotify: `${publicBaseUrl}/api/v3/consent/request/hip/on-notify`,
+      healthInformationRequest: `${publicBaseUrl}/api/v3/hip/health-information/request`,
+      dataOnRequest: `${publicBaseUrl}/api/v3/data-flow/health-information/hip/on-request`,
+      dataNotify: `${publicBaseUrl}/api/v3/data-flow/health-information/notify`,
+    },
+  });
+});
+
+// Routes
+app.use("/api/Abha", require("./routes/AbhaRoutes"));
+app.use("/api/linking", require("./routes/linkingRoutes"));
+app.use("/api/hip/link", require("./routes/hipLinkingRoutes"));
+app.use("/api/hip/setup", require("./routes/hipSetupRoutes"));
+app.use("/api/consents", require("./routes/consentRoutes"));
+app.use("/api/v3/hiu/patient/care-context", require("./routes/patientLinkCallbackRoutes"));
+app.use("/api/v3/hip", require("./routes/hipM2CallbackRoutes"));
+app.use("/api/v3", require("./routes/m2DocCallbackRoutes"));
+app.use("/api/m2/callbacks", require("./routes/m2EventsRoutes"));
+
+const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "0.0.0.0";
+
+app.listen(PORT, HOST, () => {
+  const localBaseUrl = `http://localhost:${PORT}`;
+  const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || "").trim();
+  console.log(`✅ Server running on ${localBaseUrl}`);
+  if (publicBaseUrl) {
+    const trimmed = publicBaseUrl.replace(/\/$/, "");
+    console.log("🔗 Public callback base:", trimmed);
+    console.log("🔁 Consent manager on-init:", `${trimmed}/api/consents/callbacks/on-init`);
+    console.log("🔁 Consent manager on-status:", `${trimmed}/api/consents/callbacks/on-status`);
+    console.log("🔁 Consent manager health-information on-request:", `${trimmed}/api/consents/callbacks/health-information/on-request`);
+    console.log("🔁 Consent manager health-information notify:", `${trimmed}/api/consents/callbacks/health-information/notify`);
+    console.log("🔁 ABDM hip discover:", `${trimmed}/api/v3/hip/patient/care-context/discover`);
+    console.log("🔁 ABDM hip init:", `${trimmed}/api/v3/hip/link/care-context/init`);
+    console.log("🔁 ABDM hip confirm:", `${trimmed}/api/v3/hip/link/care-context/confirm`);
+    console.log("🔁 ABDM on-discover:", `${trimmed}/api/v3/patient/care-context/on-discover`);
+    console.log("🔁 ABDM on-init:", `${trimmed}/api/v3/link/care-context/on-init`);
+    console.log("🔁 ABDM on-confirm:", `${trimmed}/api/v3/link/care-context/on-confirm`);
+    console.log("🔁 ABDM on-carecontext:", `${trimmed}/api/v3/link/on_carecontext`);
+    console.log("🔁 ABDM context on-notify:", `${trimmed}/api/v3/links/context/on-notify`);
+    console.log("🔁 ABDM sms on-notify:", `${trimmed}/api/v3/patients/sms/on-notify`);
+    console.log("🔁 ABDM hip on-generate-token:", `${trimmed}/api/v3/hip/token/on-generate-token`);
+    console.log("🔁 ABDM consent on-notify:", `${trimmed}/api/v3/consent/request/hip/on-notify`);
+    console.log("🔁 ABDM health-information request:", `${trimmed}/api/v3/hip/health-information/request`);
+    console.log("🔁 ABDM data on-request:", `${trimmed}/api/v3/data-flow/health-information/hip/on-request`);
+  } else {
+    console.log("⚠️ PUBLIC_BASE_URL is not set. ABDM callbacks will not reach this server unless you expose it publicly.");
+  }
+  console.log("🛠 Callback config:", `${localBaseUrl}/api/config/callbacks`);
+});

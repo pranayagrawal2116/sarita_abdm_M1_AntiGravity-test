@@ -1,0 +1,22 @@
+SAFE SPACE: Current App
+
+Purpose:
+- preserve the full current M1 app state after the user confirmed everything is working perfectly
+
+Protected snapshot groups:
+- Flutter source snapshot under `lib/m1_safe_space/current_app/frontend/`
+- Backend source snapshot under `lib/m1_safe_space/current_app/backend/`
+- Desktop/project config snapshot under `lib/m1_safe_space/current_app/project/`
+- Backend mirror snapshot under `backend/m1_safe_space/current_app/`
+
+Protected snapshot coverage:
+- current `lib/` application source
+- current `backend/` source excluding generated dependencies and local secret folders
+- current `macos/` desktop project files excluding generated Pods/build outputs
+- current `documentation/` and `test/` folders
+- current root project config files such as `pubspec.yaml`, `pubspec.lock`, and `analysis_options.yaml`
+
+Protection rule:
+- do not modify the protected live app flows directly based on this snapshot
+- use this snapshot as the frozen reference baseline
+- create a new working copy before making future behavior changes

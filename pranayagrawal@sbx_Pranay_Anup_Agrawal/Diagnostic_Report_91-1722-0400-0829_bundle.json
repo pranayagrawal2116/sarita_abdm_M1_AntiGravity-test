@@ -1,0 +1,356 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-cb1b4c4f-c93b-46a5-a581-3b83382255b8",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-16T11:07:28.895+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "fa286e63-150e-420c-8027-0340e94f26ac"
+  },
+  "type": "document",
+  "timestamp": "2026-07-16T11:07:28.895+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:12e8a548-bfbb-4993-8587-888abba433aa",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "12e8a548-bfbb-4993-8587-888abba433aa",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "721981007",
+              "display": "Diagnostic studies report"
+            }
+          ],
+          "text": "Diagnostic Report- Lab"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1d5386f-7a73-48cd-a1b9-95845c206d57",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:6c6ceb44-eda7-4646-b7b9-36c4e2094897",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-16T11:07:28.895+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:ac497fa2-4254-4f15-89d1-aa39442e74b1",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Diagnostic report",
+        "custodian": {
+          "reference": "urn:uuid:ea7a3d79-6dfb-489a-ad01-10ffb3b08cbe",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Complete blood count",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "4321000179101",
+                  "display": "Hematology report"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:dde38ebc-c871-4bd3-9e00-ffc7bedf3036",
+                "display": "Complete blood count"
+              },
+              {
+                "reference": "urn:uuid:a84de7af-e272-4614-a928-bac07c5a150f",
+                "display": "WBC"
+              },
+              {
+                "reference": "urn:uuid:b82e4c3e-800f-4caa-be07-fbd9a301a621",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e1d5386f-7a73-48cd-a1b9-95845c206d57",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "e1d5386f-7a73-48cd-a1b9-95845c206d57",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.895+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranayagrawal@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ac497fa2-4254-4f15-89d1-aa39442e74b1",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "ac497fa2-4254-4f15-89d1-aa39442e74b1",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.895+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ea7a3d79-6dfb-489a-ad01-10ffb3b08cbe",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "ea7a3d79-6dfb-489a-ad01-10ffb3b08cbe",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6c6ceb44-eda7-4646-b7b9-36c4e2094897",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "6c6ceb44-eda7-4646-b7b9-36c4e2094897",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "0e57f8e0-d38f-45d1-806f-67454b1b8a9b"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1d5386f-7a73-48cd-a1b9-95845c206d57",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-07-16T11:07:28.895+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a84de7af-e272-4614-a928-bac07c5a150f",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "a84de7af-e272-4614-a928-bac07c5a150f",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "718-7",
+              "display": "WBC"
+            }
+          ],
+          "text": "WBC"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1d5386f-7a73-48cd-a1b9-95845c206d57"
+        },
+        "effectiveDateTime": "2026-07-16T05:37:28.895Z",
+        "valueQuantity": {
+          "value": 6000,
+          "unit": "10^3u/ml",
+          "system": "http://unitsofmeasure.org",
+          "code": "10^3u/ml"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:dde38ebc-c871-4bd3-9e00-ffc7bedf3036",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "dde38ebc-c871-4bd3-9e00-ffc7bedf3036",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "708196005",
+                "display": "Hematology service"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11502-2",
+              "display": "Complete blood count"
+            }
+          ],
+          "text": "Complete blood count"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1d5386f-7a73-48cd-a1b9-95845c206d57",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:6c6ceb44-eda7-4646-b7b9-36c4e2094897"
+        },
+        "performer": [
+          {
+            "reference": "urn:uuid:ea7a3d79-6dfb-489a-ad01-10ffb3b08cbe",
+            "display": "Sarita Health Care"
+          }
+        ],
+        "resultsInterpreter": [
+          {
+            "reference": "urn:uuid:ac497fa2-4254-4f15-89d1-aa39442e74b1",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "effectiveDateTime": "2026-07-16T05:37:28.895Z",
+        "issued": "2026-07-16T05:37:28.895Z",
+        "result": [
+          {
+            "reference": "urn:uuid:a84de7af-e272-4614-a928-bac07c5a150f",
+            "display": "WBC"
+          }
+        ],
+        "conclusion": "Clinical diagnostic report generated successfully."
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:b82e4c3e-800f-4caa-be07-fbd9a301a621",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "b82e4c3e-800f-4caa-be07-fbd9a301a621",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Diagnostic Report Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1d5386f-7a73-48cd-a1b9-95845c206d57"
+        },
+        "date": "2026-07-16T05:37:28.895Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "SGVhbHRoIEluZm9ybWF0aW9uIFJlY29yZAo9PT09PT09PT09PT09PT09PT09PT09PT09ClR5cGU6IERpYWdub3N0aWMgUmVwb3J0ClNhdmVkIEF0OiAyMDI2LTA3LTExIDE0OjI2OjE2CgotLS0gUGF0aWVudCBEZXRhaWxzIC0tLQpOYW1lOiBQcmFuYXkgQW51cCBBZ3Jhd2FsCkFCSEEgQWRkcmVzczogcHJhbmF5YWdyYXdhbEBzYngKQUJIQSBOdW1iZXI6IDkxLTE3MjItMDQwMC0wODI5Ck1vYmlsZTogOTUxMDAyOTU3NQpHZW5kZXI6IE0KRE9CIC8gWU9COiAyMS0xLTIwMDYKVUhJRDogU0hDMTEwNzI2MDEKCi0tLSBSZWNvcmQgRGF0YSAtLS0KCkxhYiBSZXBvcnRzOgogIC0gSXRlbSAxOgogICAgUmVwb3J0IE5hbWU6IENvbXBsZXRlIGJsb29kIGNvdW50CiAgICBPYnNlcnZhdGlvbnM6CiAgICAgIC0gSXRlbSAxOgogICAgICAgIFRlc3QgTmFtZTogV0JDCiAgICAgICAgVmFsdWU6IDYwMDAKICAgICAgICBVbml0OiAxMF4zdS9tbAo=",
+              "title": "Diagnostic Report Record",
+              "creation": "2026-07-16T05:37:28.895Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

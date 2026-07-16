@@ -1,0 +1,27 @@
+const express = require("express");
+const controller = require("../controllers/hipLinkingController");
+
+const router = express.Router();
+
+router.post("/token/generate", controller.generateToken);
+router.post("/consent/view-link", controller.generateConsentViewLink);
+
+// M2 documented patterns
+router.post("/patient/care-context/discover", controller.discover);
+router.post("/carecontext", controller.linkCareContexts);
+router.post("/patient/links", controller.patientLinks);
+router.post("/context/notify", controller.notifyContext);
+router.post("/patient/links/sms/notify2", controller.notifyMobile);
+router.post("/consent/request/hip/on-notify", controller.consentOnNotify);
+router.post("/data-flow/health-information/hip/on-request", controller.dataOnRequest);
+router.post("/data-flow/health-information/notify", controller.dataFlowNotify);
+
+// Backward-compatible aliases
+router.post("/discover", controller.discover);
+router.post("/patient/links/link", controller.linkCareContexts);
+router.post("/patient/links/notify2", controller.notifyMobile);
+
+router.get("/token/callback/:requestId", controller.getTokenCallback);
+router.get("/token/callbacks", controller.getRecentTokenCallbacks);
+
+module.exports = router;

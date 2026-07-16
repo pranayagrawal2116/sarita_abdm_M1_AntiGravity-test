@@ -1,0 +1,1718 @@
+{
+  "resourceType": "Bundle",
+  "id": "dischare summary record-e25dc425-cdc1-470b-8a02-fc756f3c5999",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2025-12-06T12:47:22.4264776+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "f32cc4eb-0dd9-4ae5-a0ba-7537104871ff"
+  },
+  "type": "document",
+  "timestamp": "2025-12-06T12:47:22.4264776+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:6fce0ee3-24eb-413c-b51d-feb4bb4d79b4",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "6fce0ee3-24eb-413c-b51d-feb4bb4d79b4",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DischargeSummaryRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "373942005",
+              "display": "Discharge summary"
+            }
+          ],
+          "text": "Discharge summary"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Ambulatory"
+        },
+        "date": "2025-12-06T12:47:22.426+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Dr. Somya"
+          }
+        ],
+        "title": "Dischare summary record",
+        "custodian": {
+          "reference": "urn:uuid:37e45f1c-f80a-4e96-b08e-06dd2d4b990e",
+          "display": "Purnank Hospital"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+                "display": "SAURAV  KUMAR"
+              }
+            ]
+          },
+          {
+            "title": "Chief Complaints",
+            "entry": [
+              {
+                "reference": "urn:uuid:2c827ab4-0a44-4f4f-aa34-b8d3b839f181",
+                "display": "Fever"
+              }
+            ]
+          },
+          {
+            "title": "Physical Examination",
+            "entry": [
+              {
+                "reference": "urn:uuid:287c2867-48c9-4891-a327-cd84d8b43d45",
+                "display": "Respiratory rate"
+              },
+              {
+                "reference": "urn:uuid:54ecf01b-87b3-47ff-96fb-afa6085d970e",
+                "display": "Heart rate"
+              },
+              {
+                "reference": "urn:uuid:2ae017a6-a21f-44a9-95c6-ecaadc18940c",
+                "display": "Oxygen saturation in Arterial blood"
+              },
+              {
+                "reference": "urn:uuid:ec901064-6f02-4882-beb8-c04c79c3255b",
+                "display": "Body surface temperature"
+              },
+              {
+                "reference": "urn:uuid:4b3e9e3c-2f90-4e4f-bee8-2131748c295f",
+                "display": "Blood pressure panel with all children optional"
+              },
+              {
+                "reference": "urn:uuid:313440cb-23a3-41de-8295-601bf5c14571",
+                "display": "Body height"
+              },
+              {
+                "reference": "urn:uuid:96baaff3-965b-4cb9-a750-0fce319e5864",
+                "display": "Body weight"
+              },
+              {
+                "reference": "urn:uuid:3e36e90c-2e33-4b1f-9514-064ced10fa95",
+                "display": "Body mass index (BMI) [Ratio]"
+              }
+            ]
+          },
+          {
+            "title": "Allergies",
+            "entry": [
+              {
+                "reference": "urn:uuid:22cbbed5-093a-4046-84cb-fa069f3aa908",
+                "display": "Peanut allergy"
+              }
+            ]
+          },
+          {
+            "title": "Medical History",
+            "entry": [
+              {
+                "reference": "urn:uuid:4cceedda-1d99-484d-8bf2-ea31258891a2",
+                "display": "Diabetes Mellitus"
+              }
+            ]
+          },
+          {
+            "title": "Complete Blood Count",
+            "entry": [
+              {
+                "reference": "urn:uuid:f7eb2c98-0e71-4ce2-b1a9-1a0bd3fc907a",
+                "display": "DiagnosticReport"
+              }
+            ]
+          },
+          {
+            "title": "Procedures",
+            "entry": [
+              {
+                "reference": "urn:uuid:ed6f0e4e-a201-40a4-a354-88e45e60a40f",
+                "display": "Dressing of wound"
+              },
+              {
+                "reference": "urn:uuid:5c5ec0a7-db43-4a48-94ef-dab525b440e0",
+                "display": "Colonoscopy"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "721912009",
+                  "display": "Medication summary document"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:5fb0278e-e37f-49c1-816c-1c2471802cfe",
+                "display": "Paracetamol 500 mg Tablet"
+              },
+              {
+                "reference": "urn:uuid:b054f3e1-80cc-40dc-bab3-394614a2d950",
+                "display": "Amoxicillin 500 mg Capsule"
+              },
+              {
+                "reference": "urn:uuid:9a4b6556-fec6-450f-9ffd-f537f961c2fb",
+                "display": "Pantoprazole 40 mg Tablet"
+              }
+            ]
+          },
+          {
+            "title": "Family History",
+            "entry": [
+              {
+                "reference": "urn:uuid:313f7439-ee8e-4b2c-b437-fe200766eb0d",
+                "display": "Type 2 Diabetes Mellitus - Father"
+              }
+            ]
+          },
+          {
+            "title": "Care Plan",
+            "entry": [
+              {
+                "reference": "urn:uuid:c26d435b-c874-4499-b26b-6b9b22a12564",
+                "display": "Discharge care plan"
+              }
+            ]
+          },
+          {
+            "title": "Document Reference",
+            "entry": [
+              {
+                "reference": "urn:uuid:e753d47b-b8ee-47e2-a3f9-81d324eb3df9",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "f392fe90-05ad-4836-ba56-a37736e63ee6",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2025-12-06T12:47:22.4264776+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "saurav_50505@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "SAURAV  KUMAR"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "8298540343",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2000-11-05"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2025-12-06T12:47:22.4264776+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Somya"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:37e45f1c-f80a-4e96-b08e-06dd2d4b990e",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "37e45f1c-f80a-4e96-b08e-06dd2d4b990e",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN1010001346"
+          }
+        ],
+        "name": "Purnank Hospital"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://uat.v4.api.emedhub.in/abdm/",
+            "value": "4017e8ee-2909-41af-8a86-947614a33776"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP",
+          "display": "inpatient encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "period": {
+          "start": "2025-12-06T07:17:22.426+00:00"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2c827ab4-0a44-4f4f-aa34-b8d3b839f181",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "2c827ab4-0a44-4f4f-aa34-b8d3b839f181",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "text": "Chief Complaint"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "386661006",
+              "display": "Fever"
+            }
+          ],
+          "text": "Fever"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "recordedDate": "2025-12-06T07:17:22+00:00"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:287c2867-48c9-4891-a327-cd84d8b43d45",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "287c2867-48c9-4891-a327-cd84d8b43d45",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationVitalSigns"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "display": "Respiratory rate"
+            }
+          ],
+          "text": "Respiratory rate"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "valueQuantity": {
+          "value": 16,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:54ecf01b-87b3-47ff-96fb-afa6085d970e",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "54ecf01b-87b3-47ff-96fb-afa6085d970e",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationVitalSigns"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "display": "Heart rate"
+            }
+          ],
+          "text": "Heart rate"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "valueQuantity": {
+          "value": 98,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2ae017a6-a21f-44a9-95c6-ecaadc18940c",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "2ae017a6-a21f-44a9-95c6-ecaadc18940c",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationVitalSigns"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2708-6",
+              "display": "Oxygen saturation in Arterial blood"
+            }
+          ],
+          "text": "Oxygen saturation in Arterial blood"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "valueQuantity": {
+          "value": 98,
+          "unit": "%",
+          "system": "http://unitsofmeasure.org",
+          "code": "%"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ec901064-6f02-4882-beb8-c04c79c3255b",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "ec901064-6f02-4882-beb8-c04c79c3255b",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationVitalSigns"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "61008-9",
+              "display": "Body surface temperature"
+            }
+          ],
+          "text": "Body surface temperature"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "valueQuantity": {
+          "value": 98,
+          "unit": "F",
+          "system": "http://unitsofmeasure.org",
+          "code": "F"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4b3e9e3c-2f90-4e4f-bee8-2131748c295f",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "4b3e9e3c-2f90-4e4f-bee8-2131748c295f",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationVitalSigns"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "85354-9",
+              "display": "Blood pressure panel with all children optional"
+            }
+          ],
+          "text": "Blood pressure panel with all children optional"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "component": [
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8480-6",
+                  "display": "Systolic blood pressure"
+                }
+              ],
+              "text": "Systolic blood pressure"
+            },
+            "valueQuantity": {
+              "value": 120,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "interpretation": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                    "code": "H",
+                    "display": "High"
+                  }
+                ],
+                "text": "High"
+              }
+            ]
+          },
+          {
+            "code": {
+              "coding": [
+                {
+                  "system": "http://loinc.org",
+                  "code": "8462-4",
+                  "display": "Diastolic blood pressure"
+                }
+              ],
+              "text": "Diastolic blood pressure"
+            },
+            "valueQuantity": {
+              "value": 80,
+              "unit": "mm[Hg]",
+              "system": "http://unitsofmeasure.org",
+              "code": "mm[Hg]"
+            },
+            "interpretation": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+                    "code": "H",
+                    "display": "High"
+                  }
+                ],
+                "text": "High"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:313440cb-23a3-41de-8295-601bf5c14571",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "313440cb-23a3-41de-8295-601bf5c14571",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationBodyMeasurement"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "display": "Body height"
+            }
+          ],
+          "text": "Body height"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "valueQuantity": {
+          "value": 170,
+          "unit": "in",
+          "system": "http://unitsofmeasure.org",
+          "code": "[in_i]"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:96baaff3-965b-4cb9-a750-0fce319e5864",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "96baaff3-965b-4cb9-a750-0fce319e5864",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationBodyMeasurement"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7",
+              "display": "Body weight"
+            }
+          ],
+          "text": "Body weight"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "valueQuantity": {
+          "value": 70,
+          "unit": "lbs",
+          "system": "http://unitsofmeasure.org",
+          "code": "[lb_av]"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:3e36e90c-2e33-4b1f-9514-064ced10fa95",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "3e36e90c-2e33-4b1f-9514-064ced10fa95",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation",
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ObservationBodyMeasurement"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ],
+            "text": "Vital Signs"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "39156-5",
+              "display": "Body mass index (BMI) [Ratio]"
+            }
+          ],
+          "text": "Body mass index (BMI) [Ratio]"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.4264776+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          }
+        ],
+        "valueQuantity": {
+          "value": 24.22,
+          "unit": "kg/m2",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg/m2"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:22cbbed5-093a-4046-84cb-fa069f3aa908",
+      "resource": {
+        "resourceType": "AllergyIntolerance",
+        "id": "22cbbed5-093a-4046-84cb-fa069f3aa908",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/AllergyIntolerance"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "91935005",
+              "display": "Peanut allergy"
+            }
+          ],
+          "text": "Peanut allergy"
+        },
+        "patient": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "recordedDate": "2025-12-06T07:17:22+00:00"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4cceedda-1d99-484d-8bf2-ea31258891a2",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "4cceedda-1d99-484d-8bf2-ea31258891a2",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition- clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-   status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "text": "Medical History"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "73211009",
+              "display": "Diabetes Mellitus"
+            }
+          ],
+          "text": "Diabetes Mellitus"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "recordedDate": "2025-12-06T07:17:22+00:00"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f7eb2c98-0e71-4ce2-b1a9-1a0bd3fc907a",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "f7eb2c98-0e71-4ce2-b1a9-1a0bd3fc907a",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "4537-7"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "effectiveDateTime": "2025-12-06T07:17:22.442+00:00",
+        "issued": "2025-12-06T07:17:22.442099+00:00",
+        "performer": [
+          {
+            "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+            "display": "Practitioner"
+          },
+          {
+            "reference": "urn:uuid:37e45f1c-f80a-4e96-b08e-06dd2d4b990e",
+            "display": "Organization"
+          }
+        ],
+        "result": [
+          {
+            "reference": "urn:uuid:cdc5b514-bccb-4e5d-be4d-835c4af9490e",
+            "display": "WBC"
+          },
+          {
+            "reference": "urn:uuid:7a8823e3-c6d3-4172-a840-efd1fad49d51",
+            "display": "Platelet Count"
+          },
+          {
+            "reference": "urn:uuid:45dff7a8-b753-4a3b-a4d3-3c27b6400cec",
+            "display": "MCV"
+          },
+          {
+            "reference": "urn:uuid:6ff06223-1c61-4b07-8832-18110162fa9e",
+            "display": "MCH"
+          },
+          {
+            "reference": "urn:uuid:2f117c6d-b641-4a75-b89b-35983b5d6c4f",
+            "display": "MCHC"
+          },
+          {
+            "reference": "urn:uuid:d5d15b16-4983-4282-95b3-2f24c794487f",
+            "display": "RDW"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cdc5b514-bccb-4e5d-be4d-835c4af9490e",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "cdc5b514-bccb-4e5d-be4d-835c4af9490e",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "6690-2"
+            }
+          ],
+          "text": "WBC"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "effectiveDateTime": "2025-12-06T12:47:22.442099+05:30",
+        "valueQuantity": {
+          "value": 6000,
+          "unit": "10^3/µL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7a8823e3-c6d3-4172-a840-efd1fad49d51",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "7a8823e3-c6d3-4172-a840-efd1fad49d51",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "777-3"
+            }
+          ],
+          "text": "Platelet Count"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "effectiveDateTime": "2025-12-06T12:47:22.442099+05:30",
+        "valueQuantity": {
+          "value": 200000,
+          "unit": "10^3/µL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:45dff7a8-b753-4a3b-a4d3-3c27b6400cec",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "45dff7a8-b753-4a3b-a4d3-3c27b6400cec",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "787-2"
+            }
+          ],
+          "text": "MCV"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "effectiveDateTime": "2025-12-06T12:47:22.442099+05:30",
+        "valueQuantity": {
+          "value": 60,
+          "unit": "fL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6ff06223-1c61-4b07-8832-18110162fa9e",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "6ff06223-1c61-4b07-8832-18110162fa9e",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "785-6"
+            }
+          ],
+          "text": "MCH"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "effectiveDateTime": "2025-12-06T12:47:22.442099+05:30",
+        "valueQuantity": {
+          "value": 30,
+          "unit": "pg"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2f117c6d-b641-4a75-b89b-35983b5d6c4f",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "2f117c6d-b641-4a75-b89b-35983b5d6c4f",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "786-4"
+            }
+          ],
+          "text": "MCHC"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "effectiveDateTime": "2025-12-06T12:47:22.442099+05:30",
+        "valueQuantity": {
+          "value": 6,
+          "unit": "g/dL"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d5d15b16-4983-4282-95b3-2f24c794487f",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "d5d15b16-4983-4282-95b3-2f24c794487f",
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "788-0"
+            }
+          ],
+          "text": "RDW"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "effectiveDateTime": "2025-12-06T12:47:22.442099+05:30",
+        "valueQuantity": {
+          "value": 3,
+          "unit": "%"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ed6f0e4e-a201-40a4-a354-88e45e60a40f",
+      "resource": {
+        "resourceType": "Procedure",
+        "id": "ed6f0e4e-a201-40a4-a354-88e45e60a40f",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ProcedureRecord"
+          ]
+        },
+        "status": "completed",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "182531007",
+              "display": "Dressing of wound"
+            }
+          ],
+          "text": "Dressing of wound"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "performedDateTime": "2025-12-06T07:17:22+00:00",
+        "performer": [
+          {
+            "actor": {
+              "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+              "display": "Practitioner"
+            },
+            "onBehalfOf": {
+              "reference": "urn:uuid:37e45f1c-f80a-4e96-b08e-06dd2d4b990e",
+              "display": "Organization"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5c5ec0a7-db43-4a48-94ef-dab525b440e0",
+      "resource": {
+        "resourceType": "Procedure",
+        "id": "5c5ec0a7-db43-4a48-94ef-dab525b440e0",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ProcedureRecord"
+          ]
+        },
+        "status": "completed",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "73797002",
+              "display": "Colonoscopy"
+            }
+          ],
+          "text": "Colonoscopy"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "performedDateTime": "2025-12-06T07:17:22+00:00",
+        "performer": [
+          {
+            "actor": {
+              "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+              "display": "Practitioner"
+            },
+            "onBehalfOf": {
+              "reference": "urn:uuid:37e45f1c-f80a-4e96-b08e-06dd2d4b990e",
+              "display": "Organization"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5fb0278e-e37f-49c1-816c-1c2471802cfe",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "5fb0278e-e37f-49c1-816c-1c2471802cfe",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "322236009",
+              "display": "Paracetamol 500 mg Tablet"
+            }
+          ],
+          "text": "Paracetamol 500 mg Tablet"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "authoredOn": "2025-12-06T07:17:22+00:00",
+        "requester": {
+          "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+          "display": "Practitioner"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386661006",
+                "display": "Fever"
+              }
+            ],
+            "text": "Fever"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "Doses: 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:b054f3e1-80cc-40dc-bab3-394614a2d950",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "b054f3e1-80cc-40dc-bab3-394614a2d950",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387544009",
+              "display": "Amoxicillin 500 mg Capsule"
+            }
+          ],
+          "text": "Amoxicillin 500 mg Capsule"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "authoredOn": "2025-12-06T07:17:22+00:00",
+        "requester": {
+          "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+          "display": "Practitioner"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "49727002",
+                "display": "Cough"
+              }
+            ],
+            "text": "Cough"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "Doses: 1-0-0",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9a4b6556-fec6-450f-9ffd-f537f961c2fb",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "9a4b6556-fec6-450f-9ffd-f537f961c2fb",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "1086921000168107",
+              "display": "Pantoprazole 40 mg Tablet"
+            }
+          ],
+          "text": "Pantoprazole 40 mg Tablet"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "authoredOn": "2025-12-06T07:17:22+00:00",
+        "requester": {
+          "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+          "display": "Practitioner"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "235595009",
+                "display": "Gas"
+              }
+            ],
+            "text": "Gas"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "Doses: 1-0-0",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "415621003",
+                  "display": "Before Food"
+                }
+              ],
+              "text": "Before Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:313f7439-ee8e-4b2c-b437-fe200766eb0d",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "313f7439-ee8e-4b2c-b437-fe200766eb0d",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-   clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-ver-    status",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "category": [
+          {
+            "text": "Family History"
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "44054006",
+              "display": "Type 2 Diabetes Mellitus"
+            }
+          ],
+          "text": "Type 2 Diabetes Mellitus"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "encounter": {
+          "reference": "urn:uuid:14e28cff-183f-4cf8-b262-b7b8d5b2edf9",
+          "display": "Encounter"
+        },
+        "recordedDate": "2025-12-06T07:17:22+00:00",
+        "note": [
+          {
+            "text": "Relationship: Father; Note: 3"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:123868e8-939e-4a3b-b109-942d6121e7f9",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "123868e8-939e-4a3b-b109-942d6121e7f9",
+        "status": "proposed",
+        "serviceCategory": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/service-category",
+                "code": "408443003",
+                "display": "General medical practice"
+              }
+            ],
+            "text": "General medical practice"
+          }
+        ],
+        "serviceType": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/service-category",
+                "code": "11429006",
+                "display": "Consultation"
+              }
+            ],
+            "text": "Consultation"
+          }
+        ],
+        "appointmentType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v2-0276",
+              "code": "FOLLOWUP",
+              "display": "Follow-up visit"
+            }
+          ],
+          "text": "Follow-up visit"
+        },
+        "description": "Re Visit",
+        "start": "2025-12-20T09:00:00+05:30",
+        "end": "2025-12-20T12:00:00+05:30",
+        "participant": [
+          {
+            "actor": {
+              "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+              "display": "SAURAV  KUMAR"
+            },
+            "status": "accepted"
+          },
+          {
+            "actor": {
+              "reference": "urn:uuid:8262b366-ebc6-4e0d-bb37-01ce50b8d13c",
+              "display": "Dr. Somya"
+            },
+            "status": "accepted"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c26d435b-c874-4499-b26b-6b9b22a12564",
+      "resource": {
+        "resourceType": "CarePlan",
+        "id": "c26d435b-c874-4499-b26b-6b9b22a12564",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/CarePlan"
+          ]
+        },
+        "status": "active",
+        "intent": "plan",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "734163000",
+                "display": "Discharge care plan"
+              }
+            ],
+            "text": "Discharge care plan"
+          }
+        ],
+        "title": "Discharge care plan",
+        "description": "Discharge on request",
+        "activity": [
+          {
+            "outcomeReference": [
+              {
+                "reference": "urn:uuid:123868e8-939e-4a3b-b109-942d6121e7f9",
+                "display": "Appointment"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e753d47b-b8ee-47e2-a3f9-81d324eb3df9",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "e753d47b-b8ee-47e2-a3f9-81d324eb3df9",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Discharge Summary Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:f392fe90-05ad-4836-ba56-a37736e63ee6",
+          "display": "SAURAV  KUMAR"
+        },
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "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OTUgODQyXS9SZXNvdXJjZXM8PC9Gb250PDwvRjEgMSAwIFIvRjIgMiAwIFIvRjMgMyAwIFI+Pj4+L0NvbnRlbnRzIDcgMCBSL1BhcmVudCA1IDAgUj4+CmVuZG9iagoxIDAgb2JqCjw8L1R5cGUvRm9udC9TdWJ0eXBlL1R5cGUxL0Jhc2VGb250L0hlbHZldGljYS1Cb2xkL0VuY29kaW5nL1dpbkFuc2lFbmNvZGluZz4+CmVuZG9iagoyIDAgb2JqCjw8L1R5cGUvRm9udC9TdWJ0eXBlL1R5cGUxL0Jhc2VGb250L0hlbHZldGljYS9FbmNvZGluZy9XaW5BbnNpRW5jb2Rpbmc+PgplbmRvYmoKMyAwIG9iago8PC9UeXBlL0ZvbnQvU3VidHlwZS9UeXBlMS9CYXNlRm9udC9Db3VyaWVyL0VuY29kaW5nL1dpbkFuc2lFbmNvZGluZz4+CmVuZG9iago1IDAgb2JqCjw8L1R5cGUvUGFnZXMvQ291bnQgMi9LaWRzWzYgMCBSIDggMCBSXT4+CmVuZG9iago5IDAgb2JqCjw8L1R5cGUvQ2F0YWxvZy9QYWdlcyA1IDAgUj4+CmVuZG9iagoxMCAwIG9iago8PC9Qcm9kdWNlcihpVGV4dFNoYXJwkiA1LjUuNSCpMjAwMC0yMDE0IGlUZXh0IEdyb3VwIE5WIFwoQUdQTC12ZXJzaW9uXCkpL0NyZWF0aW9uRGF0ZShEOjIwMjUxMjA2MTI0NzIyKzA1JzMwJykvTW9kRGF0ZShEOjIwMjUxMjA2MTI0NzIyKzA1JzMwJyk+PgplbmRvYmoKeHJlZgowIDExCjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMjc5NSAwMDAwMCBuIAowMDAwMDAyODg4IDAwMDAwIG4gCjAwMDAwMDI5NzYgMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAzMDYyIDAwMDAwIG4gCjAwMDAwMDEyMTggMDAwMDAgbiAKMDAwMDAwMTM0OCAwMDAwMCBuIAowMDAwMDAyNjY1IDAwMDAwIG4gCjAwMDAwMDMxMTkgMDAwMDAgbiAKMDAwMDAwMzE2NCAwMDAwMCBuIAp0cmFpbGVyCjw8L1NpemUgMTEvUm9vdCA5IDAgUi9JbmZvIDEwIDAgUi9JRCBbPGY4OGMyMWVmM2NkZTA1YTdlYWEzMmZkZTY3Y2M1YzliPjxmODhjMjFlZjNjZGUwNWE3ZWFhMzJmZGU2N2NjNWM5Yj5dPj4KJWlUZXh0LTUuNS41CnN0YXJ0eHJlZgozMzI3CiUlRU9GCg==",
+              "title": "Discharge Summary Record",
+              "creation": "2025-12-06T07:17:22.473+00:00"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

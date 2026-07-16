@@ -1,0 +1,171 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class HealthFacilityQrScreen extends StatefulWidget {
+  const HealthFacilityQrScreen({super.key});
+
+  @override
+  State<HealthFacilityQrScreen> createState() => _HealthFacilityQrScreenState();
+}
+
+class _HealthFacilityQrScreenState extends State<HealthFacilityQrScreen> {
+  final TextEditingController _qrValueController = TextEditingController();
+
+  @override
+  void dispose() {
+    _qrValueController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Health Facility QR Input")),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 760),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Paste Health Facility QR Data",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "This desktop build uses a paste-based workflow instead of a live camera scanner. Paste the QR text or the decoded JSON payload and we will extract the HIP ID.",
+                  style: TextStyle(
+                    color: Color(0xFF5C6C7A),
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: _qrValueController,
+                  minLines: 8,
+                  maxLines: 12,
+                  decoration: const InputDecoration(
+                    labelText: "QR Content",
+                    hintText: "Paste the scanned QR text, URL, or JSON payload here",
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final data = await Clipboard.getData(
+                          Clipboard.kTextPlain,
+                        );
+                        final text = data?.text?.trim() ?? '';
+                        if (text.isEmpty || !mounted) return;
+                        setState(() {
+                          _qrValueController.text = text;
+                          _qrValueController.selection = TextSelection.collapsed(
+                            offset: _qrValueController.text.length,
+                          );
+                        });
+                      },
+                      icon: const Icon(Icons.content_paste_rounded),
+                      label: const Text("Paste From Clipboard"),
+                    ),
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text("Cancel"),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        final raw = _qrValueController.text.trim();
+                        if (raw.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Paste QR content before continuing."),
+                            ),
+                          );
+                          return;
+                        }
+                        final parsed = _extractHipId(raw);
+                        Navigator.pop(context, {
+                          "raw": raw,
+                          "hipId": parsed,
+                        });
+                      },
+                      icon: const Icon(Icons.qr_code_2_rounded),
+                      label: const Text("Use QR Data"),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _extractHipId(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map<String, dynamic>) {
+        return _extractHipIdFromMap(decoded);
+      }
+    } catch (_) {}
+
+    final uri = Uri.tryParse(raw);
+    if (uri != null) {
+      final queryValue = uri.queryParameters['hipId'] ??
+          uri.queryParameters['hip_id'] ??
+          uri.queryParameters['providerId'] ??
+          uri.queryParameters['facilityId'];
+      if (queryValue != null && queryValue.trim().isNotEmpty) {
+        return queryValue.trim();
+      }
+    }
+
+    return raw;
+  }
+
+  String _extractHipIdFromMap(Map<String, dynamic> json) {
+    const candidates = [
+      ['hipId'],
+      ['hip_id'],
+      ['providerId'],
+      ['facilityId'],
+      ['id'],
+      ['hip', 'id'],
+      ['facility', 'id'],
+      ['provider', 'id'],
+      ['identifier'],
+    ];
+
+    for (final path in candidates) {
+      dynamic current = json;
+      for (final key in path) {
+        if (current is Map<String, dynamic>) {
+          current = current[key];
+        } else {
+          current = null;
+          break;
+        }
+      }
+
+      final text = current?.toString().trim() ?? '';
+      if (text.isNotEmpty) {
+        return text;
+      }
+    }
+
+    return json.toString();
+  }
+}

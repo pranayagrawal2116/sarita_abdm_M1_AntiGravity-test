@@ -1,0 +1,316 @@
+{
+  "resourceType": "Bundle",
+  "id": "prescription record-e9efcce3-4798-4d28-b250-2941cdf05001",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-16T11:07:28.891+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "3e141752-8972-4cad-aa08-64a65f9c5077"
+  },
+  "type": "document",
+  "timestamp": "2026-07-16T11:07:28.891+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:2b747d31-2ce0-413f-a7ab-c0432d6968cf",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "2b747d31-2ce0-413f-a7ab-c0432d6968cf",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Prescription record"
+        },
+        "subject": {
+          "reference": "urn:uuid:80ebd451-a2e4-41b8-8a66-5753f804dcff",
+          "display": "Pranjali Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:acf98699-6c4d-45cf-8150-e5172444b3e2",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-16T11:07:28.891+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:564f1abc-fac9-4c3a-99ed-7454987f04cd",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Prescription record",
+        "custodian": {
+          "reference": "urn:uuid:f37432ae-f244-4b4c-8cea-8edd89ba5235",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:80ebd451-a2e4-41b8-8a66-5753f804dcff",
+                "display": "Pranjali Anup Agrawal"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "721912009",
+                  "display": "Medication summary document"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:8c5bd8bc-8fcc-4276-9aaa-aacf2f414e25",
+                "display": "Paracetamol 500mg"
+              }
+            ]
+          },
+          {
+            "title": "Prescription Record",
+            "entry": [
+              {
+                "reference": "urn:uuid:c208a05c-85bc-491a-b151-d36b8c363309",
+                "display": "Binary"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:80ebd451-a2e4-41b8-8a66-5753f804dcff",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "80ebd451-a2e4-41b8-8a66-5753f804dcff",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.891+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranjali_20031801@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranjali Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "2003-01-18"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:564f1abc-fac9-4c3a-99ed-7454987f04cd",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "564f1abc-fac9-4c3a-99ed-7454987f04cd",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.891+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f37432ae-f244-4b4c-8cea-8edd89ba5235",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "f37432ae-f244-4b4c-8cea-8edd89ba5235",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:acf98699-6c4d-45cf-8150-e5172444b3e2",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "acf98699-6c4d-45cf-8150-e5172444b3e2",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "81eb0882-6a94-49c1-9c37-ac0024661ca1"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:80ebd451-a2e4-41b8-8a66-5753f804dcff",
+          "display": "Pranjali Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-07-16T05:37:28.891Z"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8c5bd8bc-8fcc-4276-9aaa-aacf2f414e25",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "8c5bd8bc-8fcc-4276-9aaa-aacf2f414e25",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387517004",
+              "display": "Paracetamol 500mg"
+            }
+          ],
+          "text": "Paracetamol 500mg"
+        },
+        "subject": {
+          "reference": "urn:uuid:80ebd451-a2e4-41b8-8a66-5753f804dcff",
+          "display": "Pranjali Anup Agrawal"
+        },
+        "authoredOn": "2026-07-16T05:37:28.891Z",
+        "requester": {
+          "reference": "urn:uuid:564f1abc-fac9-4c3a-99ed-7454987f04cd",
+          "display": "Dr. Sarita"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386661006",
+                "display": "Fever"
+              }
+            ],
+            "text": "Fever"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "Doses: 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Route: Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "Method: After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c208a05c-85bc-491a-b151-d36b8c363309",
+      "resource": {
+        "resourceType": "Binary",
+        "id": "c208a05c-85bc-491a-b151-d36b8c363309",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Binary"
+          ]
+        },
+        "contentType": "application/pdf",
+        "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+IGVuZG9iago1IDAgb2JqIDw8IC9MZW5ndGggMjYyID4+IHN0cmVhbQpCVAovRjEgMTQgVGYKNzIgNzYwIFRkCihQcmVzY3JpcHRpb24pIFRqCjAgLTI0IFRkCi9GMSAxMCBUZgooUGF0aWVudDogUHJhbmphbGkgQW51cCBBZ3Jhd2FsIHwgQUJIQTogcHJhbmphbGlfMjAwMzE4MDFAc2J4IHwgRE9CL0dlbmRlcjogMjAwMy0wMS0xOCAvIGZlbWFsZSB8IEZhY2lsaXR5OiBTYXJpdGEgSGVhbHRoIENhcmUgfCAxLiBQYXJhY2V0YW1vbCA1MDBtZzsgRG9zZXMgMS0wLTE7IE9yYWw7IEFmdGVyIEZvb2Q7IFJlYXNvbjogRmV2ZXIpIFRqCkVUCmVuZHN0cmVhbSBlbmRvYmoKdHJhaWxlciA8PCAvUm9vdCAxIDAgUiA+PgolJUVPRg=="
+      }
+    }
+  ]
+}

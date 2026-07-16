@@ -1,0 +1,52 @@
+const { pushEvent, listEvents, getEventByRequestId } = require("../utils/m2EventStore");
+
+const toText = (value) => {
+  if (value === null || value === undefined) return "";
+  const text = String(value).trim();
+  return text.length > 0 ? text : "";
+};
+
+const createReceiver = (type) => async (req, res) => {
+  pushEvent(type, req.body || {});
+  return res.status(202).json({});
+};
+
+exports.onConsentNotify = createReceiver("consent_on_notify");
+exports.onDataOnRequest = createReceiver("data_on_request");
+exports.onDataNotify = createReceiver("data_notify");
+exports.onCareContext = createReceiver("link_on_carecontext");
+exports.onContextNotify = createReceiver("context_on_notify");
+exports.onSmsNotify = createReceiver("sms_on_notify");
+exports.onDiscover = createReceiver("link_on_discover");
+exports.onInit = createReceiver("link_on_init");
+exports.onConfirm = createReceiver("link_on_confirm");
+
+exports.fetchByType = async (req, res) => {
+  const type = toText(req.params?.type);
+  if (!type) {
+    return res.status(400).json({ error: "type is required" });
+  }
+
+  const limit = Number(req.query?.limit || 20);
+  const items = listEvents(type, limit);
+  return res.json({
+    type,
+    items,
+    total: items.length,
+  });
+};
+
+exports.fetchByTypeAndRequestId = async (req, res) => {
+  const type = toText(req.params?.type);
+  const requestId = toText(req.params?.requestId);
+  if (!type || !requestId) {
+    return res.status(400).json({ error: "type and requestId are required" });
+  }
+
+  const item = getEventByRequestId(type, requestId);
+  if (!item) {
+    return res.status(404).json({ error: "Callback not found" });
+  }
+
+  return res.json(item);
+};

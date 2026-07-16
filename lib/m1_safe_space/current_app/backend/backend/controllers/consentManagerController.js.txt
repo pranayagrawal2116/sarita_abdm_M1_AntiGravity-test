@@ -1,0 +1,320 @@
+const axios = require("axios");
+const { v4: uuidv4 } = require("uuid");
+
+const { getGatewayToken } = require("../services/gatewayService");
+const { getHeaders } = require("../utils/headers");
+const { pushEvent, listEvents } = require("../utils/m2EventStore");
+
+const toText = (value) => {
+  if (value === null || value === undefined) return "";
+  const text = String(value).trim();
+  return text.length > 0 ? text : "";
+};
+
+const toObject = (value) =>
+  value && typeof value === "object" && !Array.isArray(value) ? value : {};
+
+const toIsoTimestamp = (value, fallback = new Date().toISOString()) => {
+  const text = toText(value);
+  if (!text) return fallback;
+  const parsed = new Date(text);
+  return Number.isNaN(parsed.getTime()) ? fallback : parsed.toISOString();
+};
+
+const getByPath = (source, path) => {
+  let current = source;
+  for (const key of path) {
+    if (Array.isArray(current) && typeof key === "number") {
+      current = current[key];
+      continue;
+    }
+
+    if (current && typeof current === "object" && key in current) {
+      current = current[key];
+      continue;
+    }
+
+    return undefined;
+  }
+
+  return current;
+};
+
+const findFirstString = (source, paths) => {
+  for (const path of paths) {
+    const value = toText(getByPath(source, path));
+    if (value) return value;
+  }
+  return "";
+};
+
+const findEventByValue = (type, value, paths) => {
+  const target = toText(value);
+  if (!target) return null;
+
+  const items = listEvents(type, 200);
+  return (
+    items.find((item) => {
+      for (const path of paths) {
+        if (toText(getByPath(item.payload, path)) === target) {
+          return true;
+        }
+      }
+      return false;
+    }) || null
+  );
+};
+
+const buildPublicBaseUrl = (req) => {
+  const configured = toText(process.env.PUBLIC_BASE_URL).replace(/\/$/, "");
+  if (configured) return configured;
+
+  const forwardedProto = toText(req.headers["x-forwarded-proto"]);
+  const proto = forwardedProto || req.protocol || "http";
+  const host = toText(req.headers.host) || `localhost:${process.env.PORT || 3000}`;
+  return `${proto}://${host}`;
+};
+
+const getErrorPayload = (err) => {
+  const status = err.response?.status || 500;
+  const data = err.response?.data;
+
+  if (typeof data === "string") {
+    return { status, body: { error: data } };
+  }
+
+  if (data && typeof data === "object") {
+    return { status, body: data };
+  }
+
+  return {
+    status,
+    body: { error: err.message || "Consent manager API failed" },
+  };
+};
+
+const postToAbdm = async ({ path, body }) => {
+  const gatewayToken = await getGatewayToken();
+  const response = await axios.post(
+    `${process.env.GATEWAY_BASE}${path}`,
+    body,
+    {
+      headers: getHeaders(gatewayToken),
+    },
+  );
+  return response.data;
+};
+
+exports.initConsentRequest = async (req, res) => {
+  try {
+    const requestId = toText(req.body?.requestId) || uuidv4();
+    const timestamp = toIsoTimestamp(req.body?.timestamp);
+    const consent = toObject(req.body?.consent);
+    const patientId = toText(consent?.patient?.id);
+    const hiuId = toText(consent?.hiu?.id);
+
+    if (!patientId) {
+      return res.status(400).json({ error: "consent.patient.id is required" });
+    }
+
+    if (!hiuId) {
+      return res.status(400).json({ error: "consent.hiu.id is required" });
+    }
+
+    const response = await postToAbdm({
+      path:
+        process.env.ABDM_CONSENT_REQUEST_INIT_PATH ||
+        "/api/hiecm/consent-requests/v3/init",
+      body: {
+        requestId,
+        timestamp,
+        consent,
+      },
+    });
+
+    return res.json({
+      requestId,
+      timestamp,
+      response,
+    });
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.requestHealthInformation = async (req, res) => {
+  try {
+    const requestId = toText(req.body?.requestId) || uuidv4();
+    const timestamp = toIsoTimestamp(req.body?.timestamp);
+    const hiRequest = toObject(req.body?.hiRequest);
+    const consentId = toText(hiRequest?.consent?.id);
+
+    if (!consentId) {
+      return res.status(400).json({ error: "hiRequest.consent.id is required" });
+    }
+
+    const dataPushUrl =
+      toText(hiRequest?.dataPushUrl) ||
+      `${buildPublicBaseUrl(req)}/api/consents/callbacks/health-information/notify`;
+
+    const response = await postToAbdm({
+      path:
+        process.env.ABDM_HEALTH_INFORMATION_REQUEST_PATH ||
+        "/api/hiecm/health-information/request",
+      body: {
+        requestId,
+        timestamp,
+        hiRequest: {
+          ...hiRequest,
+          dataPushUrl,
+        },
+      },
+    });
+
+    return res.json({
+      requestId,
+      timestamp,
+      dataPushUrl,
+      response,
+    });
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    return res.status(status).json(body);
+  }
+};
+
+exports.getConsentInitCallback = async (req, res) => {
+  const requestId = toText(req.params?.requestId);
+  if (!requestId) {
+    return res.status(400).json({ error: "requestId is required" });
+  }
+
+  const event = findEventByValue("consent_request_on_init", requestId, [
+    ["requestId"],
+    ["response", "requestId"],
+    ["acknowledgement", "requestId"],
+  ]);
+
+  if (!event) {
+    return res.status(404).json({ error: "Callback not received yet for this requestId" });
+  }
+
+  const consentId = findFirstString(event.payload, [
+    ["consentRequest", "id"],
+    ["notification", "consentRequest", "id"],
+    ["response", "consentRequest", "id"],
+    ["payload", "consentRequest", "id"],
+  ]);
+
+  return res.json({
+    ...event,
+    consentId,
+  });
+};
+
+exports.getConsentStatusCallback = async (req, res) => {
+  const consentId = toText(req.params?.consentId);
+  if (!consentId) {
+    return res.status(400).json({ error: "consentId is required" });
+  }
+
+  const event = findEventByValue("consent_request_on_status", consentId, [
+    ["consentId"],
+    ["notification", "consentId"],
+    ["response", "consentId"],
+    ["payload", "consentId"],
+    ["consent", "id"],
+  ]);
+
+  if (!event) {
+    return res.status(404).json({ error: "Status callback not received yet for this consentId" });
+  }
+
+  const status = findFirstString(event.payload, [
+    ["status"],
+    ["notification", "status"],
+    ["response", "status"],
+    ["payload", "status"],
+  ]);
+
+  return res.json({
+    ...event,
+    consentId,
+    status,
+  });
+};
+
+exports.getHealthInformationOnRequest = async (req, res) => {
+  const requestId = toText(req.params?.requestId);
+  if (!requestId) {
+    return res.status(400).json({ error: "requestId is required" });
+  }
+
+  const event = findEventByValue("health_information_on_request", requestId, [
+    ["requestId"],
+    ["response", "requestId"],
+    ["acknowledgement", "requestId"],
+    ["transaction", "requestId"],
+  ]);
+
+  if (!event) {
+    return res.status(404).json({ error: "on-request callback not received yet for this requestId" });
+  }
+
+  const transactionId = findFirstString(event.payload, [
+    ["transactionId"],
+    ["response", "transactionId"],
+    ["acknowledgement", "transactionId"],
+    ["payload", "transactionId"],
+  ]);
+
+  return res.json({
+    ...event,
+    transactionId,
+  });
+};
+
+exports.getHealthInformationNotify = async (req, res) => {
+  const transactionId = toText(req.params?.transactionId);
+  if (!transactionId) {
+    return res.status(400).json({ error: "transactionId is required" });
+  }
+
+  const event = findEventByValue("health_information_notify", transactionId, [
+    ["transactionId"],
+    ["notification", "transactionId"],
+    ["response", "transactionId"],
+    ["payload", "transactionId"],
+  ]);
+
+  if (!event) {
+    return res.status(404).json({ error: "notify callback not received yet for this transactionId" });
+  }
+
+  const entries = getByPath(event.payload, ["entries"]);
+  return res.json({
+    ...event,
+    entriesCount: Array.isArray(entries) ? entries.length : 0,
+  });
+};
+
+exports.onConsentRequestInit = async (req, res) => {
+  pushEvent("consent_request_on_init", req.body || {});
+  return res.status(202).json({});
+};
+
+exports.onConsentRequestStatus = async (req, res) => {
+  pushEvent("consent_request_on_status", req.body || {});
+  return res.status(202).json({});
+};
+
+exports.onHealthInformationOnRequest = async (req, res) => {
+  pushEvent("health_information_on_request", req.body || {});
+  return res.status(202).json({});
+};
+
+exports.onHealthInformationNotify = async (req, res) => {
+  pushEvent("health_information_notify", req.body || {});
+  return res.status(202).json({});
+};

@@ -1,0 +1,31 @@
+const express = require("express");
+const router = express.Router();
+const controller = require("../controllers/consentController");
+const manager = require("../controllers/consentManagerController");
+
+router.get("/requests", controller.listConsentRequests);
+router.post("/decision", controller.submitConsentDecision);
+router.post("/manager/init", manager.initConsentRequest);
+router.get("/manager/callbacks/on-init/:requestId", manager.getConsentInitCallback);
+router.get("/manager/callbacks/on-status/:consentId", manager.getConsentStatusCallback);
+router.post("/manager/health-information/request", manager.requestHealthInformation);
+router.get(
+  "/manager/callbacks/health-information/on-request/:requestId",
+  manager.getHealthInformationOnRequest,
+);
+router.get(
+  "/manager/callbacks/health-information/notify/:transactionId",
+  manager.getHealthInformationNotify,
+);
+router.post("/callbacks/on-init", manager.onConsentRequestInit);
+router.post("/callbacks/on-status", manager.onConsentRequestStatus);
+router.post(
+  "/callbacks/health-information/on-request",
+  manager.onHealthInformationOnRequest,
+);
+router.post(
+  "/callbacks/health-information/notify",
+  manager.onHealthInformationNotify,
+);
+
+module.exports = router;

@@ -1,0 +1,28 @@
+const express = require("express");
+const controller = require("../controllers/m2CallbackController");
+
+const router = express.Router();
+
+router.post("/patient/care-context/on-discover", controller.onDiscover);
+router.post("/link/care-context/on-init", controller.onInit);
+router.post("/link/care-context/on-confirm", controller.onConfirm);
+router.post("/link/on_carecontext", controller.onCareContext);
+router.post("/links/context/on-notify", controller.onContextNotify);
+router.post("/links/context/onnotify", controller.onContextNotify);
+router.post("/patients/sms/on-notify", controller.onSmsNotify);
+router.post("/patients/sms/onnotify", controller.onSmsNotify);
+
+// M2 document callback variants with HIP prefix.
+router.post("/hip/patient/care-context/discover", controller.onDiscover);
+router.post("/hip/patient/care-context/on-discover", controller.onDiscover);
+router.post("/hip/link/care-context/init", controller.onInit);
+router.post("/hip/link/care-context/on-init", controller.onInit);
+router.post("/hip/link/care-context/confirm", controller.onConfirm);
+router.post("/hip/link/care-context/on-confirm", controller.onConfirm);
+
+router.post("/consent/request/hip/on-notify", controller.onConsentNotify);
+router.post("/data-flow/health-information/hip/on-request", controller.onDataOnRequest);
+router.post("/data-flow/health-information/notify", controller.onDataNotify);
+router.post("/hip/health-information/request", controller.onDataOnRequest);
+
+module.exports = router;

@@ -1,0 +1,1285 @@
+// @ts-nocheck
+
+const axios = require("axios");
+const { v4: uuidv4 } = require("uuid");
+const { getGatewayToken } = require("../services/gatewayService");
+const { encrypt } = require("../services/encryptionService");
+const { getHeaders } = require("../utils/headers");
+
+const ABHA_BASE = process.env.ABHA_BASE || process.env.Abha_BASE;
+
+const decodeBinaryErrorPayload = (data) => {
+    if (!data) {
+        return null;
+    }
+
+    const bufferValue = Buffer.isBuffer(data)
+        ? data
+        : data?.type === "Buffer" && Array.isArray(data?.data)
+        ? Buffer.from(data.data)
+        : null;
+
+    if (!bufferValue) {
+        return null;
+    }
+
+    const text = bufferValue.toString("utf8").trim();
+    if (!text) {
+        return { error: "Unknown ABDM API error" };
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch (_) {
+        return { error: text };
+    }
+};
+
+const getErrorPayload = (err) => {
+    const status = err.response?.status || 500;
+    const data = err.response?.data;
+
+    const decodedBinaryPayload = decodeBinaryErrorPayload(data);
+    if (decodedBinaryPayload) {
+        return { status, body: decodedBinaryPayload };
+    }
+
+    if (typeof data === "string") {
+        return { status, body: { error: data } };
+    }
+
+    if (data && typeof data === "object") {
+        return { status, body: data };
+    }
+
+    return {
+        status,
+        body: { error: err.message || "Unknown ABDM API error" },
+    };
+};
+
+const postWithFallbacks = async (candidates) => {
+    let lastError;
+
+    for (const candidate of candidates) {
+        try {
+            return await axios.post(candidate.url, candidate.payload, {
+                headers: candidate.headers,
+            });
+        } catch (err) {
+            lastError = err;
+        }
+    }
+
+    throw lastError;
+};
+
+const getCertificate = async (token) => {
+    const res = await axios.get(
+        `${ABHA_BASE}/abha/api/v3/profile/public/certificate`,
+        { headers: getHeaders(token) }
+    );
+    return res.data.publicKey;
+};
+
+const getLoginCertificate = async (token) => {
+    const res = await axios.get(
+        `${ABHA_BASE}/abha/api/v3/phr/app/login/public/certificate`,
+        { headers: getHeaders(token) }
+    );
+    return res.data.publicKey;
+};
+
+const getPhrSessionHeaders = (gatewayToken, xToken) => ({
+    "Content-Type": "application/json",
+    "REQUEST-ID": uuidv4(),
+    "TIMESTAMP": new Date().toISOString(),
+    Authorization: `Bearer ${gatewayToken}`,
+    "X-token": `Bearer ${xToken}`,
+});
+
+const getProfileAccountHeaders = (gatewayToken, accessToken) => ({
+    ...getHeaders(gatewayToken),
+    "X-token": `Bearer ${accessToken}`,
+});
+
+const normalizeXToken = (value) => {
+    const token = String(value || "").trim();
+    if (!token) {
+        return "";
+    }
+    return token.replace(/^Bearer\s+/i, "").trim();
+};
+
+const normalizeRefreshToken = (value) => {
+    const token = String(value || "").trim();
+    if (!token) {
+        return "";
+    }
+    return token.replace(/^Bearer\s+/i, "").trim();
+};
+
+const requestProfileSessionToken = async (refreshToken) => {
+    const normalizedRefreshToken = normalizeRefreshToken(refreshToken);
+    if (!normalizedRefreshToken) {
+        return "";
+    }
+
+    const gatewayToken = await getGatewayToken();
+
+    const candidates = [
+        `${ABHA_BASE}/abha/api/v3/profile/account/request/token`,
+        `${ABHA_BASE}/abha/api/v3/phr/app/login/profile/request/token`,
+    ];
+
+    for (const url of candidates) {
+        try {
+            const response = await axios.get(url, {
+                headers: {
+                    ...getHeaders(gatewayToken),
+                    "R-token": `Bearer ${normalizedRefreshToken}`,
+                },
+            });
+
+            const nextToken = normalizeXToken(
+                response.data?.tokens?.token ||
+                    response.data?.token ||
+                    response.data?.accessToken
+            );
+
+            if (nextToken) {
+                return nextToken;
+            }
+        } catch (_) {}
+    }
+
+    return "";
+};
+
+const shouldRefreshProfileToken = (err) => {
+    const message = String(
+        err.response?.data?.message ||
+            err.response?.data?.error ||
+            err.message ||
+            ""
+    )
+        .trim()
+        .toLowerCase();
+
+    return (
+        message.includes("x-token expired") ||
+        message.includes("invalid x-token") ||
+        message.includes("provided token is invalid") ||
+        err.response?.status === 401
+    );
+};
+
+const normalizeVerificationType = (value) => {
+    const text = String(value || "").trim().toUpperCase();
+    switch (text) {
+        case "ABHA_NUMBER":
+        case "ABHANUMBER":
+            return "ABHA_NUMBER";
+        case "ABHA_ADDRESS":
+        case "ABHAADDRESS":
+            return "ABHA_ADDRESS";
+        case "MOBILE":
+        case "MOBILE_NUMBER":
+            return "MOBILE";
+        case "AADHAAR":
+        case "AADHAAR_NUMBER":
+            return "AADHAAR_NUMBER";
+        default:
+            return text;
+    }
+};
+
+const isValidPhrAddress = (value) =>
+    /^[a-z0-9]+(?:[._][a-z0-9]+)?@[a-z0-9.-]+$/i.test(String(value || "").trim());
+
+const isValidPhrLocalPart = (value) =>
+    /^(?=.{8,18}$)[A-Za-z0-9]+(?:[._][A-Za-z0-9]+)?$/.test(
+        String(value || "").trim()
+    );
+
+const getVerificationConfig = (identifierType) => {
+    switch (identifierType) {
+        case "ABHA_NUMBER":
+            return {
+                scope: ["abha-login", "mobile-verify"],
+                loginHint: "abha-number",
+                otpSystem: "abdm",
+                certificateType: "profile",
+                verifyType: "profile",
+            };
+        case "MOBILE":
+            return {
+                scope: ["abha-login", "mobile-verify"],
+                loginHint: "mobile",
+                otpSystem: "abdm",
+                certificateType: "profile",
+                verifyType: "profile",
+            };
+        case "AADHAAR_NUMBER":
+            return {
+                scope: ["abha-login", "aadhaar-verify"],
+                loginHint: "aadhaar",
+                otpSystem: "aadhaar",
+                certificateType: "profile",
+                verifyType: "profile",
+            };
+        case "ABHA_ADDRESS":
+            return {
+                scope: ["abha-address-login", "mobile-verify"],
+                loginHint: "abha-address",
+                otpSystem: "abdm",
+                certificateType: "profile",
+                verifyType: "phr-web",
+            };
+        default:
+            return null;
+    }
+};
+
+const normalizeAbhaNumberOtpMethod = (otpMethod) => {
+    const text = String(otpMethod || "").trim().toUpperCase().replace(/\s+/g, "_").replace(/-/g, "_");
+    switch (text) {
+        case "AADHAAR_LINKED_MOBILE":
+        case "AADHAAR_LINKED_MOBILE_NUMBER":
+        case "AADHAAR_OTP":
+            return "AADHAAR_LINKED_MOBILE";
+        case "ABHA_LINKED_MOBILE":
+        case "ABHA_LINKED_MOBILE_NUMBER":
+        case "ABHA_OTP":
+            return "ABHA_LINKED_MOBILE";
+        default:
+            return "";
+    }
+};
+
+const getVerificationConfigForRequest = (identifierType, otpMethod) => {
+    const normalizedIdentifierType = identifierType;
+    const normalizedOtpMethod = normalizeAbhaNumberOtpMethod(otpMethod);
+
+    if (normalizedIdentifierType === "ABHA_NUMBER") {
+        if (normalizedOtpMethod === "AADHAAR_LINKED_MOBILE") {
+            return {
+                scope: ["abha-login", "aadhaar-verify"],
+                loginHint: "abha-number",
+                otpSystem: "aadhaar",
+                certificateType: "profile",
+                verifyType: "profile",
+            };
+        }
+
+        if (normalizedOtpMethod === "ABHA_LINKED_MOBILE") {
+            return {
+                scope: ["abha-login", "mobile-verify"],
+                loginHint: "abha-number",
+                otpSystem: "abdm",
+                certificateType: "profile",
+                verifyType: "profile",
+            };
+        }
+
+        return null;
+    }
+
+    return getVerificationConfig(normalizedIdentifierType);
+};
+
+const validateVerificationIdentifier = (identifierType, identifierValue) => {
+    switch (identifierType) {
+        case "ABHA_NUMBER":
+            return (
+                /^\d{14}$/.test(identifierValue) ||
+                /^\d{2}-\d{4}-\d{4}-\d{4}$/.test(identifierValue)
+            );
+        case "ABHA_ADDRESS":
+            return /^[a-z0-9]+(?:[._][a-z0-9]+)?@[a-z0-9.-]+$/i.test(identifierValue);
+        case "MOBILE":
+            return /^\d{10}$/.test(identifierValue);
+        case "AADHAAR_NUMBER":
+            return /^\d{12}$/.test(identifierValue);
+        default:
+            return false;
+    }
+};
+
+const getVerificationRequestOtpEndpoint = (verifyType) => {
+    switch (verifyType) {
+        case "phr-web":
+            return `${ABHA_BASE}/abha/api/v3/phr/web/login/abha/request/otp`;
+        case "phr-app":
+            return `${ABHA_BASE}/abha/api/v3/phr/app/login/request/otp`;
+        case "profile":
+        default:
+            return `${ABHA_BASE}/abha/api/v3/profile/login/request/otp`;
+    }
+};
+
+const verifyAbhaAddressOtp = async ({ txnId, otp, phrAddress }) => {
+    const token = await getGatewayToken();
+    const publicKey = await getCertificate(token);
+    const encryptedOtp = encrypt(otp, publicKey);
+
+    const response = await postWithFallbacks([
+        {
+            url: `${ABHA_BASE}/abha/api/v3/phr/web/login/abha/verify`,
+            payload: {
+                scope: ["abha-address-login", "mobile-verify"],
+                authData: {
+                    authMethods: ["otp"],
+                    otp: {
+                        txnId,
+                        otpValue: encryptedOtp,
+                    },
+                },
+            },
+            headers: getHeaders(token),
+        },
+        {
+            url: `${ABHA_BASE}/abha/api/v3/phr/web/login/abha/verify`,
+            payload: {
+                scope: ["abha-address-login", "mobile-verify"],
+                authData: {
+                    authMethods: ["otp"],
+                    otp: {
+                        txnId,
+                        otpValue: encryptedOtp,
+                    },
+                },
+            },
+            headers: getHeaders(token),
+        },
+    ]);
+
+    return {
+        ...response.data,
+        token:
+            response.data?.tokens?.token ||
+            response.data?.token ||
+            response.data?.accessToken ||
+            "",
+        accessToken:
+            response.data?.tokens?.token ||
+            response.data?.accessToken ||
+            response.data?.token ||
+            "",
+        tokens: {
+            token:
+                response.data?.tokens?.token ||
+                response.data?.token ||
+                response.data?.accessToken ||
+                "",
+            expiresIn: response.data?.tokens?.expiresIn,
+            refreshToken:
+                response.data?.tokens?.refreshToken ||
+                response.data?.refreshToken ||
+                "",
+            refreshExpiresIn: response.data?.tokens?.refreshExpiresIn,
+        },
+        verified: response.data?.authResult !== "failed",
+        message: response.data?.message || "Abha address verified successfully",
+    };
+};
+
+// 🔹 REQUEST OTP
+exports.requestOtp = async (req, res) => {
+    try {
+        const aadhaar = String(req.body?.aadhaar || "").replace(/\s+/g, "");
+
+        if (!/^\d{12}$/.test(aadhaar)) {
+            return res.status(400).json({
+                error: "Aadhaar number must be 12 digits",
+            });
+        }
+
+        const token = await getGatewayToken();
+        const publicKey = await getCertificate(token);
+
+        const encryptedAadhaar = encrypt(aadhaar, publicKey);
+
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/enrollment/request/otp`,
+            {
+                scope: ["abha-enrol"],
+                loginHint: "aadhaar",
+                loginId: encryptedAadhaar,
+                otpSystem: "aadhaar",
+            },
+            { headers: getHeaders(token) }
+        );
+
+        res.json(response.data);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 VERIFY OTP
+exports.verifyOtp = async (req, res) => {
+    try {
+        const txnId = String(req.body?.txnId || "").trim();
+        const otp = String(req.body?.otp || "").replace(/\s+/g, "");
+        const mobile = String(req.body?.mobile || "").replace(/\s+/g, "");
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+            return res.status(400).json({ error: "OTP must be 6 digits" });
+        }
+
+        if (mobile && !/^\d{10}$/.test(mobile)) {
+            return res.status(400).json({
+                error: "Communication mobile number must be 10 digits",
+            });
+        }
+
+        const token = await getGatewayToken();
+        const publicKey = await getCertificate(token);
+
+        const encryptedOtp = encrypt(otp, publicKey);
+
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/enrollment/enrol/byAadhaar`,
+            {
+                authData: {
+                    authMethods: ["otp"],
+                    otp: {
+                        txnId,
+                        otpValue: encryptedOtp,
+                        ...(mobile && { mobile }),
+                    },
+                },
+                consent: {
+                    code: "abha-enrollment",
+                    version: "1.4",
+                },
+            },
+            { headers: getHeaders(token) }
+        );
+
+        res.json(response.data);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 CHECK Abha ADDRESS AVAILABILITY
+exports.checkPhrAvailability = async (req, res) => {
+    try {
+        const phrAddress = String(req.body?.phrAddress || "").trim().toLowerCase();
+
+        if (!phrAddress) {
+            return res.status(400).json({ error: "Abha address is required" });
+        }
+
+        if (!isValidPhrAddress(phrAddress)) {
+            return res.status(400).json({ error: "Invalid Abha address format" });
+        }
+
+        const token = await getGatewayToken();
+        const response = await axios.get(
+            `${ABHA_BASE}/abha/api/v3/phr/app/enrollment/isExists`,
+            {
+                headers: getHeaders(token),
+                params: { abhaAddress: phrAddress },
+            }
+        );
+
+        res.json({ available: response.data == false });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 FETCH Abha ADDRESS SUGGESTIONS
+exports.getPhrSuggestions = async (req, res) => {
+    try {
+        const txnId = String(req.body?.txnId || req.query?.txnId || "").trim();
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        const token = await getGatewayToken();
+        const response = await axios.get(
+            `${ABHA_BASE}/abha/api/v3/enrollment/enrol/suggestion`,
+            {
+                headers: {
+                    ...getHeaders(token),
+                    "Transaction_Id": txnId,
+                },
+            }
+        );
+
+        res.json(response.data);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 LINK / CREATE Abha ADDRESS
+exports.linkPhrAddress = async (req, res) => {
+    try {
+        const phrAddress = String(req.body?.phrAddress || "").trim().toLowerCase();
+        const txnId = String(req.body?.txnId || "").trim();
+        const abhaAddressLocalPart = phrAddress.includes("@")
+            ? phrAddress.split("@")[0]
+            : phrAddress;
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        if (!phrAddress) {
+            return res.status(400).json({ error: "Abha address is required" });
+        }
+
+        if (!isValidPhrAddress(phrAddress)) {
+            return res.status(400).json({ error: "Invalid Abha address format" });
+        }
+
+        if (!isValidPhrLocalPart(abhaAddressLocalPart)) {
+            return res.status(400).json({
+                error: "ABHA address local part must be 8-18 characters and follow ABDM rules",
+            });
+        }
+
+        const token = await getGatewayToken();
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/enrollment/enrol/abha-address`,
+            {
+                txnId,
+                abhaAddress: abhaAddressLocalPart,
+                preferred: 1,
+            },
+            { headers: getHeaders(token) }
+        );
+
+        res.json(response.data);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 REQUEST OTP FOR M1 PATIENT REGISTRATION VERIFICATION
+exports.requestVerificationOtp = async (req, res) => {
+    try {
+        const requestBody = req.body || {};
+        const identifierType = normalizeVerificationType(requestBody.identifierType);
+        const rawIdentifierValue = String(requestBody.identifierValue || "").trim();
+        const rawOtpMethod = String(requestBody.otpMethod || "").trim();
+        const normalizedOtpMethod = normalizeAbhaNumberOtpMethod(rawOtpMethod);
+        const abhaAddressIdentifierValue = rawIdentifierValue.toLowerCase();
+        const abhaNumberIdentifierValue = rawIdentifierValue;
+        const defaultIdentifierValue = rawIdentifierValue;
+        const identifierValue =
+            identifierType === "ABHA_ADDRESS"
+                ? abhaAddressIdentifierValue
+                : identifierType === "ABHA_NUMBER"
+                    ? abhaNumberIdentifierValue
+                    : defaultIdentifierValue;
+        const config = getVerificationConfigForRequest(identifierType, normalizedOtpMethod);
+
+        if (!config) {
+            if (identifierType === "ABHA_NUMBER") {
+                return res.status(400).json({ error: "Select a valid OTP method for Abha Number verification" });
+            }
+            return res.status(400).json({ error: "Unsupported verification type" });
+        }
+
+        if (!validateVerificationIdentifier(identifierType, identifierValue)) {
+            return res.status(400).json({ error: "Invalid verification identifier" });
+        }
+
+        const token = await getGatewayToken();
+        const publicKey = config.certificateType === "login"
+            ? await getLoginCertificate(token)
+            : await getCertificate(token);
+        const encryptedIdentifier = encrypt(identifierValue, publicKey);
+
+        const response = await axios.post(
+            getVerificationRequestOtpEndpoint(config.verifyType),
+            {
+                scope: config.scope,
+                loginHint: config.loginHint,
+                loginId: encryptedIdentifier,
+                otpSystem: config.otpSystem,
+            },
+            { headers: getHeaders(token) }
+        );
+
+        const responseData = response.data || {};
+        const responseTxnId = responseData.txnId;
+        const responseMessage = responseData.message;
+
+        return res.json({
+            ...responseData,
+            txnId: responseTxnId,
+            message: responseMessage,
+            identifierType,
+            identifierValue,
+            otpMethod: normalizedOtpMethod,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 FIND ABHA ACCOUNTS BY MOBILE NUMBER
+exports.searchAbhaByMobile = async (req, res) => {
+    try {
+        const mobile = String(req.body?.mobile || "").replace(/\D/g, "");
+
+        if (!/^\d{10}$/.test(mobile)) {
+            return res.status(400).json({ error: "Mobile number must be 10 digits" });
+        }
+
+        const token = await getGatewayToken();
+        const publicKey = await getCertificate(token);
+        const encryptedMobile = encrypt(mobile, publicKey);
+
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/profile/account/abha/search`,
+            {
+                scope: ["search-abha"],
+                mobile: encryptedMobile,
+            },
+            { headers: getHeaders(token) }
+        );
+
+        return res.json({
+            results: Array.isArray(response.data) ? response.data : [],
+            mobile,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 VERIFY OTP FOR M1 PATIENT REGISTRATION VERIFICATION
+exports.verifyVerificationOtp = async (req, res) => {
+    try {
+        const requestBody = req.body || {};
+        const identifierType = normalizeVerificationType(requestBody.identifierType);
+        const rawIdentifierValue = String(requestBody.identifierValue || "").trim();
+        const rawOtpMethod = String(requestBody.otpMethod || "").trim();
+        const normalizedOtpMethod = normalizeAbhaNumberOtpMethod(rawOtpMethod);
+        const abhaAddressIdentifierValue = rawIdentifierValue.toLowerCase();
+        const abhaNumberIdentifierValue = rawIdentifierValue;
+        const defaultIdentifierValue = rawIdentifierValue;
+        const identifierValue =
+            identifierType === "ABHA_ADDRESS"
+                ? abhaAddressIdentifierValue
+                : identifierType === "ABHA_NUMBER"
+                    ? abhaNumberIdentifierValue
+                    : defaultIdentifierValue;
+        const txnId = String(requestBody.txnId || "").trim();
+        const otp = String(requestBody.otp || "").replace(/\s+/g, "");
+        const config = getVerificationConfigForRequest(identifierType, normalizedOtpMethod);
+
+        if (!config) {
+            if (identifierType === "ABHA_NUMBER") {
+                return res.status(400).json({ error: "Select a valid OTP method for Abha Number verification" });
+            }
+            return res.status(400).json({ error: "Unsupported verification type" });
+        }
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+            return res.status(400).json({ error: "OTP must be 6 digits" });
+        }
+
+        if (!validateVerificationIdentifier(identifierType, identifierValue)) {
+            return res.status(400).json({ error: "Invalid verification identifier" });
+        }
+
+        if (identifierType === "ABHA_ADDRESS") {
+            const result = await verifyAbhaAddressOtp({
+                txnId,
+                otp,
+                phrAddress: identifierValue,
+            });
+            return res.json(result);
+        }
+
+        const token = await getGatewayToken();
+        const publicKey = await getCertificate(token);
+        const encryptedOtp = encrypt(otp, publicKey);
+
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/profile/login/verify`,
+            {
+                scope: config.scope,
+                authData: {
+                    authMethods: ["otp"],
+                    otp: {
+                        txnId,
+                        otpValue: encryptedOtp,
+                    },
+                },
+            },
+            { headers: getHeaders(token) }
+        );
+
+        const responseData = response.data || {};
+        const responseAuthResult = responseData.authResult;
+        const verified = responseAuthResult !== "failed";
+
+        return res.json({
+            ...responseData,
+            verified,
+            identifierType,
+            identifierValue,
+            otpMethod: normalizedOtpMethod,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+exports.verifyVerificationMobileUser = async (req, res) => {
+    try {
+        const txnId = String(req.body?.txnId || "").trim();
+        const rawAbhaNumber = String(req.body?.AbhaNumber || "").trim();
+        const transferToken = normalizeXToken(req.body?.transferToken);
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        if (!rawAbhaNumber) {
+            return res.status(400).json({ error: "Abha number is required" });
+        }
+
+        if (!transferToken) {
+            return res.status(400).json({ error: "Transfer token is required" });
+        }
+
+        const gatewayToken = await getGatewayToken();
+        const formattedAbhaNumber = rawAbhaNumber;
+        const digitsOnlyAbhaNumber = rawAbhaNumber.replace(/\D/g, "");
+        const candidates = [
+            formattedAbhaNumber,
+            digitsOnlyAbhaNumber,
+        ].filter((value, index, array) => value && array.indexOf(value) === index);
+
+        let response;
+        let resolvedAbhaNumber = formattedAbhaNumber;
+
+        for (const candidate of candidates) {
+            try {
+                response = await axios.post(
+                    `${ABHA_BASE}/abha/api/v3/profile/login/verify/user`,
+                    {
+                        AbhaNumber: candidate,
+                        txnId,
+                    },
+                    {
+                        headers: {
+                            ...getHeaders(gatewayToken),
+                            "T-token": `Bearer ${transferToken}`,
+                        },
+                    }
+                );
+                resolvedAbhaNumber = candidate;
+                break;
+            } catch (err) {
+                if (candidate === candidates[candidates.length - 1]) {
+                    throw err;
+                }
+            }
+        }
+
+        return res.json({
+            ...response.data,
+            txnId,
+            AbhaNumber: resolvedAbhaNumber,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 REQUEST LOGIN OTP FOR Abha ADDRESS
+exports.requestLoginOtp = async (req, res) => {
+    try {
+        const phrAddress = String(req.body?.phrAddress || "").trim().toLowerCase();
+
+        if (!phrAddress) {
+            return res.status(400).json({ error: "Abha address is required" });
+        }
+
+        if (!isValidPhrAddress(phrAddress)) {
+            return res.status(400).json({ error: "Invalid Abha address format" });
+        }
+
+        const token = await getGatewayToken();
+        const publicKey = await getCertificate(token);
+        const encryptedPhrAddress = encrypt(phrAddress, publicKey);
+
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/phr/web/login/abha/request/otp`,
+            {
+                scope: ["abha-address-login", "mobile-verify"],
+                loginHint: "abha-address",
+                loginId: encryptedPhrAddress,
+                otpSystem: "abdm",
+            },
+            { headers: getHeaders(token) }
+        );
+
+        res.json(response.data);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 SEARCH AUTH METHODS FOR Abha ADDRESS LOGIN
+exports.searchLoginAuthMethods = async (req, res) => {
+    try {
+        const phrAddress = String(req.body?.phrAddress || "").trim().toLowerCase();
+
+        if (!phrAddress) {
+            return res.status(400).json({ error: "Abha address is required" });
+        }
+
+        if (!isValidPhrAddress(phrAddress)) {
+            return res.status(400).json({ error: "Invalid Abha address format" });
+        }
+
+        const token = await getGatewayToken();
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/phr/web/login/abha/search`,
+            { abhaAddress: phrAddress },
+            { headers: getHeaders(token) }
+        );
+
+        res.json(response.data);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 VERIFY LOGIN OTP FOR Abha ADDRESS
+exports.verifyLoginOtp = async (req, res) => {
+    try {
+        const txnId = String(req.body?.txnId || "").trim();
+        const otp = String(req.body?.otp || "").replace(/\s+/g, "");
+        const phrAddress = String(req.body?.phrAddress || "").trim().toLowerCase();
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+            return res.status(400).json({ error: "OTP must be 6 digits" });
+        }
+
+        if (!isValidPhrAddress(phrAddress)) {
+            return res.status(400).json({ error: "Invalid Abha address format" });
+        }
+
+        const result = await verifyAbhaAddressOtp({
+            txnId,
+            otp,
+            phrAddress,
+        });
+
+        return res.json(result);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 FETCH LOGGED-IN Abha PROFILE
+exports.getLoggedInProfile = async (req, res) => {
+    try {
+        const xToken = String(req.header("X-Token") || "").trim();
+
+        if (!xToken) {
+            return res.status(401).json({ error: "Missing login token" });
+        }
+
+        const gatewayToken = await getGatewayToken();
+
+        const response = await axios.get(
+            `${ABHA_BASE}/abha/api/v3/phr/web/login/profile/abha-profile`,
+            {
+                headers: getPhrSessionHeaders(gatewayToken, xToken),
+            }
+        );
+
+        res.json(response.data);
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 FETCH ENROLLMENT PROFILE DETAILS FOR EXISTING ABHA FOUND DURING AADHAAR ENROLMENT
+exports.getEnrollmentProfileDetails = async (req, res) => {
+    try {
+        const gatewayToken = await getGatewayToken();
+        const xToken = normalizeXToken(
+            req.header("X-Token") ||
+                req.header("Authorization") ||
+                req.query?.xToken ||
+                req.body?.xToken
+        );
+        const refreshToken = normalizeRefreshToken(
+            req.header("Refresh-Token") ||
+                req.query?.refreshToken ||
+                req.body?.refreshToken
+        );
+
+        let profileSessionToken =
+            (await requestProfileSessionToken(refreshToken)) || xToken;
+
+        if (!profileSessionToken) {
+            return res.status(401).json({ error: "Missing Abha session token" });
+        }
+
+        let response;
+
+        try {
+            response = await axios.get(
+                `${ABHA_BASE}/abha/api/v3/profile/account`,
+                {
+                    headers: getProfileAccountHeaders(
+                        gatewayToken,
+                        profileSessionToken
+                    ),
+                }
+            );
+        } catch (err) {
+            if (refreshToken && shouldRefreshProfileToken(err)) {
+                const refreshedToken = await requestProfileSessionToken(refreshToken);
+                if (!refreshedToken) {
+                    throw err;
+                }
+                profileSessionToken = refreshedToken;
+                response = await axios.get(
+                    `${ABHA_BASE}/abha/api/v3/profile/account`,
+                    {
+                        headers: getProfileAccountHeaders(
+                            gatewayToken,
+                            profileSessionToken
+                        ),
+                    }
+                );
+            } else {
+                throw err;
+            }
+        }
+
+        res.json({
+            ...response.data,
+            sessionToken: profileSessionToken,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 DOWNLOAD LOGGED-IN USER PHR CARD
+exports.downloadPhrCard = async (req, res) => {
+    try {
+        const xToken = String(req.header("X-Token") || "").trim();
+
+        if (!xToken) {
+            return res.status(401).json({ error: "Missing login token" });
+        }
+
+        const gatewayToken = await getGatewayToken();
+        const response = await axios.get(
+            `${ABHA_BASE}/abha/api/v3/phr/web/login/profile/abha/phr-card`,
+            {
+                headers: getPhrSessionHeaders(gatewayToken, xToken),
+                responseType: "arraybuffer",
+            }
+        );
+
+        const contentType = String(
+            response.headers["content-type"] || "application/octet-stream"
+        ).split(";")[0].trim();
+        const contentDisposition = String(
+            response.headers["content-disposition"] || ""
+        );
+        const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
+        const fileName = fileNameMatch?.[1] || "abha_card";
+
+        res.json({
+            fileName,
+            contentType,
+            data: Buffer.from(response.data).toString("base64"),
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 DOWNLOAD PROFILE ACCOUNT ABHA CARD
+exports.downloadProfileAccountCard = async (req, res) => {
+    try {
+        const xToken = normalizeXToken(
+            req.header("X-Token") || req.query?.xToken || req.body?.xToken
+        );
+        const refreshToken = normalizeRefreshToken(
+            req.header("Refresh-Token") ||
+                req.query?.refreshToken ||
+                req.body?.refreshToken
+        );
+
+        let profileSessionToken =
+            (await requestProfileSessionToken(refreshToken)) || xToken;
+
+        if (!profileSessionToken) {
+            return res.status(401).json({ error: "Missing Abha session token" });
+        }
+
+        const gatewayToken = await getGatewayToken();
+        let response;
+
+        try {
+            response = await axios.get(
+                `${ABHA_BASE}/abha/api/v3/profile/account/abha-card`,
+                {
+                    headers: getPhrSessionHeaders(
+                        gatewayToken,
+                        profileSessionToken
+                    ),
+                    responseType: "arraybuffer",
+                }
+            );
+        } catch (err) {
+            if (refreshToken && shouldRefreshProfileToken(err)) {
+                const refreshedToken = await requestProfileSessionToken(refreshToken);
+                if (!refreshedToken) {
+                    throw err;
+                }
+                profileSessionToken = refreshedToken;
+                response = await axios.get(
+                    `${ABHA_BASE}/abha/api/v3/profile/account/abha-card`,
+                    {
+                        headers: getPhrSessionHeaders(
+                            gatewayToken,
+                            profileSessionToken
+                        ),
+                        responseType: "arraybuffer",
+                    }
+                );
+            } else {
+                throw err;
+            }
+        }
+
+        const contentType = String(
+            response.headers["content-type"] || "application/octet-stream"
+        ).split(";")[0].trim();
+        const contentDisposition = String(
+            response.headers["content-disposition"] || ""
+        );
+        const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
+        const fileName = fileNameMatch?.[1] || "abha_card";
+
+        res.json({
+            fileName,
+            contentType,
+            data: Buffer.from(response.data).toString("base64"),
+            sessionToken: profileSessionToken,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 REQUEST OTP FOR PROFILE MOBILE UPDATE
+exports.requestProfileMobileUpdateOtp = async (req, res) => {
+    try {
+        const txnId = String(req.body?.txnId || "").trim();
+        const mobile = String(req.body?.mobile || "").replace(/\s+/g, "");
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        if (!/^\d{10}$/.test(mobile)) {
+            return res.status(400).json({ error: "Mobile number must be 10 digits" });
+        }
+
+        const gatewayToken = await getGatewayToken();
+        const publicKey = await getCertificate(gatewayToken);
+        const encryptedMobile = encrypt(mobile, publicKey);
+
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/enrollment/request/otp`,
+            {
+                txnId,
+                scope: ["abha-enrol", "mobile-verify"],
+                loginHint: "mobile",
+                loginId: encryptedMobile,
+                otpSystem: "abdm",
+            },
+            { headers: getHeaders(gatewayToken) }
+        );
+
+        res.json({
+            ...response.data,
+            mobile,
+            enrollmentTxnId: txnId,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 VERIFY OTP FOR PROFILE MOBILE UPDATE
+exports.verifyProfileMobileUpdateOtp = async (req, res) => {
+    try {
+        const txnId = String(req.body?.txnId || "").trim();
+        const otp = String(req.body?.otp || "").replace(/\s+/g, "");
+
+        if (!txnId) {
+            return res.status(400).json({ error: "Transaction ID is required" });
+        }
+
+        if (!/^\d{6}$/.test(otp)) {
+            return res.status(400).json({ error: "OTP must be 6 digits" });
+        }
+
+        const gatewayToken = await getGatewayToken();
+        const publicKey = await getCertificate(gatewayToken);
+        const encryptedOtp = encrypt(otp, publicKey);
+
+        const response = await axios.post(
+            `${ABHA_BASE}/abha/api/v3/enrollment/auth/byAbdm`,
+            {
+                scope: ["abha-enrol", "mobile-verify"],
+                authData: {
+                    authMethods: ["otp"],
+                    otp: {
+                        timeStamp: new Date().toISOString(),
+                        txnId,
+                        otpValue: encryptedOtp,
+                    },
+                },
+            },
+            { headers: getHeaders(gatewayToken) }
+        );
+
+        res.json({
+            ...response.data,
+            verified: response.data?.authResult !== "failed",
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};
+
+// 🔹 UPDATE Abha ACCOUNT PROFILE
+exports.updateProfileAccount = async (req, res) => {
+    try {
+        const AbhaNumber = String(req.body?.AbhaNumber || "").replace(/\D/g, "");
+        const mobile = String(req.body?.mobile || "").replace(/\s+/g, "");
+        const address = String(req.body?.address || "").trim();
+        const xToken = normalizeXToken(req.body?.xToken);
+        const refreshToken = normalizeRefreshToken(req.body?.refreshToken);
+        const stateCode = String(req.body?.stateCode || "").trim();
+        const districtCode = String(req.body?.districtCode || "").trim();
+        const pinCode = String(
+            req.body?.pinCode || req.body?.pincode || ""
+        ).trim();
+
+        if (!AbhaNumber) {
+            return res.status(400).json({ error: "Abha number is required" });
+        }
+
+        if (mobile && !/^\d{10}$/.test(mobile)) {
+            return res.status(400).json({ error: "Mobile number must be 10 digits" });
+        }
+
+        const payload = {
+            AbhaNumber,
+            ...(mobile ? { mobile } : {}),
+            ...(address ? { address } : {}),
+            ...(stateCode ? { stateCode } : {}),
+            ...(districtCode ? { districtCode } : {}),
+            ...(pinCode ? { pinCode } : {}),
+            ...(req.body?.accountStatus ? { accountStatus: req.body.accountStatus } : {}),
+            ...(req.body?.profilePhoto ? { profilePhoto: req.body.profilePhoto } : {}),
+        };
+
+        const gatewayToken = await getGatewayToken();
+        let profileSessionToken =
+            (await requestProfileSessionToken(refreshToken)) || xToken;
+
+        const buildHeaders = (token) =>
+            token
+                ? {
+                    ...getPhrSessionHeaders(gatewayToken, token),
+                    BENEFIT_NAME: process.env.BENEFIT_NAME || "SaritaInfotech",
+                }
+                : {
+                    ...getHeaders(gatewayToken),
+                    BENEFIT_NAME: process.env.BENEFIT_NAME || "SaritaInfotech",
+                };
+
+        let response;
+        try {
+            response = await axios.patch(
+                `${ABHA_BASE}/abha/api/v3/profile/account`,
+                payload,
+                { headers: buildHeaders(profileSessionToken) }
+            );
+        } catch (err) {
+            if (refreshToken && shouldRefreshProfileToken(err)) {
+                const refreshedToken = await requestProfileSessionToken(refreshToken);
+                if (refreshedToken) {
+                    profileSessionToken = refreshedToken;
+                    response = await axios.patch(
+                        `${ABHA_BASE}/abha/api/v3/profile/account`,
+                        payload,
+                        { headers: buildHeaders(profileSessionToken) }
+                    );
+                } else {
+                    throw err;
+                }
+            } else {
+                throw err;
+            }
+        }
+
+        res.json({
+            ...response.data,
+            sessionToken: profileSessionToken,
+        });
+    } catch (err) {
+        const { status, body } = getErrorPayload(err);
+        res.status(status).json(body);
+    }
+};

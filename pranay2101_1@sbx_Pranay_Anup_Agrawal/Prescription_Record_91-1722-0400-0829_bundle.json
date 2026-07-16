@@ -1,0 +1,316 @@
+{
+  "resourceType": "Bundle",
+  "id": "prescription record-a01cf19b-080e-4093-b81e-379d4986a9f1",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-16T11:07:28.863+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "2c12dfef-cf87-4392-9bcf-5b1af7874be8"
+  },
+  "type": "document",
+  "timestamp": "2026-07-16T11:07:28.863+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:3cb26c74-0167-4c53-b34c-78ca5a508802",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "3cb26c74-0167-4c53-b34c-78ca5a508802",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Prescription record"
+        },
+        "subject": {
+          "reference": "urn:uuid:dac1f666-eeb6-4ba1-8dee-5fe62b36f241",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:1086a400-dc91-43da-85aa-0089af8c6c90",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-16T11:07:28.863+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:df12fbd0-d049-43ad-ad6b-3c9a1cd013a1",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Prescription record",
+        "custodian": {
+          "reference": "urn:uuid:2619becd-145c-44d9-8821-9f58b0aa1fd1",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:dac1f666-eeb6-4ba1-8dee-5fe62b36f241",
+                "display": "Pranay Anup Agrawal"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "721912009",
+                  "display": "Medication summary document"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:a1135cc5-a87c-42cc-a37c-749984e2ca8e",
+                "display": "a"
+              }
+            ]
+          },
+          {
+            "title": "Prescription Record",
+            "entry": [
+              {
+                "reference": "urn:uuid:5ed89c1d-9dae-45bc-945c-0ad4dba8707b",
+                "display": "Binary"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:dac1f666-eeb6-4ba1-8dee-5fe62b36f241",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "dac1f666-eeb6-4ba1-8dee-5fe62b36f241",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.863+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranay2101_1@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:df12fbd0-d049-43ad-ad6b-3c9a1cd013a1",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "df12fbd0-d049-43ad-ad6b-3c9a1cd013a1",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-16T11:07:28.863+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2619becd-145c-44d9-8821-9f58b0aa1fd1",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "2619becd-145c-44d9-8821-9f58b0aa1fd1",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:1086a400-dc91-43da-85aa-0089af8c6c90",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "1086a400-dc91-43da-85aa-0089af8c6c90",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "487c9bd7-7365-4115-835f-8dc5d5b0d42f"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:dac1f666-eeb6-4ba1-8dee-5fe62b36f241",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-07-16T05:37:28.863Z"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a1135cc5-a87c-42cc-a37c-749984e2ca8e",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "a1135cc5-a87c-42cc-a37c-749984e2ca8e",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387517004",
+              "display": "a"
+            }
+          ],
+          "text": "a"
+        },
+        "subject": {
+          "reference": "urn:uuid:dac1f666-eeb6-4ba1-8dee-5fe62b36f241",
+          "display": "Pranay Anup Agrawal"
+        },
+        "authoredOn": "2026-07-16T05:37:28.863Z",
+        "requester": {
+          "reference": "urn:uuid:df12fbd0-d049-43ad-ad6b-3c9a1cd013a1",
+          "display": "Dr. Sarita"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "404684003",
+                "display": "a"
+              }
+            ],
+            "text": "a"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "Doses: 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Route: Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "Method: After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5ed89c1d-9dae-45bc-945c-0ad4dba8707b",
+      "resource": {
+        "resourceType": "Binary",
+        "id": "5ed89c1d-9dae-45bc-945c-0ad4dba8707b",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Binary"
+          ]
+        },
+        "contentType": "application/pdf",
+        "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+IGVuZG9iago1IDAgb2JqIDw8IC9MZW5ndGggMjMzID4+IHN0cmVhbQpCVAovRjEgMTQgVGYKNzIgNzYwIFRkCihQcmVzY3JpcHRpb24pIFRqCjAgLTI0IFRkCi9GMSAxMCBUZgooUGF0aWVudDogUHJhbmF5IEFudXAgQWdyYXdhbCB8IEFCSEE6IHByYW5heTIxMDFfMUBzYnggfCBET0IvR2VuZGVyOiAyMDA2LTAxLTIxIC8gbWFsZSB8IEZhY2lsaXR5OiBTYXJpdGEgSGVhbHRoIENhcmUgfCAxLiBhOyBEb3NlcyAxLTAtMTsgT3JhbDsgQWZ0ZXIgRm9vZDsgUmVhc29uOiBhKSBUagpFVAplbmRzdHJlYW0gZW5kb2JqCnRyYWlsZXIgPDwgL1Jvb3QgMSAwIFIgPj4KJSVFT0Y="
+      }
+    }
+  ]
+}

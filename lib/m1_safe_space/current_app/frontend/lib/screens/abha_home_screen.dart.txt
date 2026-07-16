@@ -1,0 +1,635 @@
+import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import '../services/abha_api_service.dart';
+import '../utils/auth_session.dart';
+import '../widgets/desktop_workspace.dart';
+import 'consent_manager_screen.dart';
+import 'consent_list_screen.dart';
+import 'm2_hip_explorer_screen.dart';
+import 'patient_registration_screen.dart';
+
+class AbhaHomeScreen extends StatefulWidget {
+  const AbhaHomeScreen({super.key, this.selectedUser});
+
+  final Map<String, dynamic>? selectedUser;
+
+  @override
+  State<AbhaHomeScreen> createState() => _AbhaHomeScreenState();
+}
+
+class _AbhaHomeScreenState extends State<AbhaHomeScreen> {
+  late Future<Map<String, dynamic>> _profileFuture;
+  late Future<Map<String, dynamic>> _phrCardFuture;
+  bool _downloadingCard = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _profileFuture = widget.selectedUser != null
+        ? Future.value(Map<String, dynamic>.from(widget.selectedUser!))
+        : _loadProfile();
+    _phrCardFuture = widget.selectedUser != null
+        ? Future.value(
+            widget.selectedUser!['cardPayload'] is Map<String, dynamic>
+                ? Map<String, dynamic>.from(widget.selectedUser!['cardPayload'])
+                : const <String, dynamic>{},
+          )
+        : _loadPhrCard();
+  }
+
+  Future<Map<String, dynamic>> _loadProfile() {
+    return AbhaApiService.fetchLoggedInProfile();
+  }
+
+  Future<Map<String, dynamic>> _loadPhrCard() {
+    if (widget.selectedUser != null) {
+      final payload = widget.selectedUser!['cardPayload'];
+      if (payload is Map<String, dynamic> &&
+          (payload['data']?.toString().trim().isNotEmpty ?? false)) {
+        return Future.value(Map<String, dynamic>.from(payload));
+      }
+
+      final source = widget.selectedUser!['source']?.toString().trim() ?? '';
+      final shouldPreferAccountCard =
+          source == 'abdm-enrollment-profile-details' ||
+          source == 'abdm-existing-account';
+      final sessionToken = [
+        widget.selectedUser!['sessionToken'],
+        widget.selectedUser!['token'],
+      ].map((value) => value?.toString().trim() ?? '').firstWhere(
+        (value) => value.isNotEmpty,
+        orElse: () => '',
+      );
+      final refreshToken = [
+        widget.selectedUser!['refreshToken'],
+      ].map((value) => value?.toString().trim() ?? '').firstWhere(
+        (value) => value.isNotEmpty,
+        orElse: () => '',
+      );
+      if (shouldPreferAccountCard && sessionToken.isNotEmpty) {
+        return AbhaApiService.downloadProfileAccountCard(
+          xToken: sessionToken,
+          refreshToken: refreshToken.isEmpty ? null : refreshToken,
+        );
+      }
+
+      if (sessionToken.isNotEmpty) {
+        return AbhaApiService.downloadPhrCardWithToken(
+          xToken: sessionToken,
+        ).catchError((error) {
+          if (sessionToken.isEmpty) {
+            throw error;
+          }
+          return AbhaApiService.downloadProfileAccountCard(
+            xToken: sessionToken,
+            refreshToken: refreshToken.isEmpty ? null : refreshToken,
+          );
+        });
+      }
+    }
+    return AbhaApiService.downloadPhrCard();
+  }
+
+  void _reloadProfile() {
+    setState(() {
+      _profileFuture = widget.selectedUser != null
+          ? Future.value(Map<String, dynamic>.from(widget.selectedUser!))
+          : _loadProfile();
+    });
+  }
+
+  void _reloadPhrCard() {
+    setState(() {
+      _phrCardFuture = widget.selectedUser != null
+          ? Future.value(
+              widget.selectedUser!['cardPayload'] is Map<String, dynamic>
+                  ? Map<String, dynamic>.from(
+                      widget.selectedUser!['cardPayload'],
+                    )
+                  : const <String, dynamic>{},
+            )
+          : _loadPhrCard();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.selectedUser != null ? "Patient Workspace" : "PHR Home",
+        ),
+      ),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _profileFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      snapshot.error.toString().replaceFirst(
+                        RegExp(r'^Exception:\s*'),
+                        '',
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton(
+                      onPressed: _reloadProfile,
+                      child: const Text("Retry Profile Fetch"),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          final profile = snapshot.data ?? const <String, dynamic>{};
+          final fullName =
+              profile['name']?.toString() ??
+              profile['fullName']?.toString() ??
+              [profile['firstName'], profile['middleName'], profile['lastName']]
+                  .whereType<String>()
+                  .where((part) => part.trim().isNotEmpty)
+                  .join(' ');
+          final abhaAddress =
+              profile['preferredAbhaAddress']?.toString() ??
+              profile['AbhaAddress']?.toString() ??
+              AuthSession.AbhaAddress ??
+              "-";
+          final abhaNumber =
+              profile['AbhaNumber']?.toString() ??
+              profile['healthIdNumber']?.toString() ??
+              profile['AbhaNumber']?.toString() ??
+              "-";
+          final maskedAbhaNumber = _maskAbhaNumber(abhaNumber);
+          final maskedMobile = _maskMobile(
+            profile['mobile']?.toString() ?? "-",
+          );
+
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final desktop = constraints.maxWidth >= 1000;
+
+              final profileCard = _infoCard(
+                title: "Profile",
+                children: [
+                  _infoRow("Full Name", fullName.isEmpty ? "-" : fullName),
+                  _infoRow("ABHA Address", abhaAddress),
+                  _infoRow("ABHA Number", maskedAbhaNumber),
+                  _infoRow("Mobile", maskedMobile),
+                  _infoRow("Gender", profile['gender']?.toString() ?? "-"),
+                  _infoRow(
+                    "Year of Birth",
+                    profile['yearOfBirth']?.toString() ?? "-",
+                  ),
+                ],
+              );
+
+              final cardPreview = _cardPreviewCard();
+
+              final actionsCard = _infoCard(
+                title: "PHR Actions",
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF4F8FC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFD5E3F3)),
+                    ),
+                    child: const Text(
+                      "You are now in the PHR layer. From here you can fetch the user profile, card, and then move to M2 HIP workflows.",
+                      style: TextStyle(color: Colors.black87, height: 1.35),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: _downloadingCard
+                          ? null
+                          : () => _downloadAbhaCard(context),
+                      child: Text(
+                        _downloadingCard
+                            ? "Downloading PHR Card..."
+                            : "Download ABHA / PHR Card",
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 48,
+                    child: OutlinedButton(
+                      onPressed: _reloadPhrCard,
+                      child: const Text("Refresh ABHA Card"),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 48,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const PatientRegistrationScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text("Verify At Health Facility"),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 48,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ConsentManagerScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text("Consent Manager"),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 48,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ConsentListScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text("Consent Requests"),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 48,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const M2HipExplorerScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text("M2 HIP Explorer"),
+                    ),
+                  ),
+                ],
+              );
+
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1240),
+                  child: ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      DesktopPageIntro(
+                        eyebrow: widget.selectedUser != null
+                            ? "Selected Patient"
+                            : "PHR Workspace",
+                        title: widget.selectedUser != null
+                            ? "Work on the selected patient in the current desktop workspace."
+                            : "See profile, card, and next actions in one desktop view.",
+                        description: widget.selectedUser != null
+                            ? "This is the current work page for the patient you selected from the homepage. Their details stay visible here while you move through card, consent, and M2 actions."
+                            : "The PHR home screen is now laid out like a working desktop surface so profile details, the ABHA card, and downstream actions stay visible together.",
+                        pills: const [
+                          "Profile",
+                          "ABHA card",
+                          "Consent",
+                          "M2 handoff",
+                        ],
+                      ),
+                      if (desktop)
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Column(
+                                children: [
+                                  profileCard,
+                                  const SizedBox(height: 16),
+                                  cardPreview,
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(flex: 2, child: actionsCard),
+                          ],
+                        )
+                      else ...[
+                        profileCard,
+                        const SizedBox(height: 16),
+                        cardPreview,
+                        const SizedBox(height: 16),
+                        actionsCard,
+                      ],
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _infoCard({required String title, required List<Widget> children}) {
+    return DesktopSurface(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cardPreviewCard() {
+    return _infoCard(
+      title: "ABHA Card",
+      children: [
+        FutureBuilder<Map<String, dynamic>>(
+          future: _phrCardFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 24),
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+
+            if (snapshot.hasError) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    snapshot.error.toString().replaceFirst(
+                      RegExp(r'^Exception:\s*'),
+                      '',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton(
+                    onPressed: _reloadPhrCard,
+                    child: const Text("Retry Card Fetch"),
+                  ),
+                ],
+              );
+            }
+
+            final payload = snapshot.data ?? const <String, dynamic>{};
+            final contentType = (payload['contentType']?.toString() ?? '')
+                .toLowerCase();
+            final encoded = payload['data']?.toString() ?? '';
+
+            if (encoded.isEmpty) {
+              return const Text("ABHA card data was empty.");
+            }
+
+            final bytes = base64Decode(encoded);
+            if (_isImageContentType(contentType)) {
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  width: double.infinity,
+                  color: const Color(0xFFF6F8FB),
+                  child: Image.memory(
+                    bytes,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text("Unable to render the ABHA card image."),
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "The ABHA card was fetched successfully, but ABDM returned it in a non-image format.",
+                ),
+                const SizedBox(height: 10),
+                _binaryCardSummary(
+                  contentType: contentType.isEmpty ? "-" : contentType,
+                  bytes: bytes,
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Use the download button to open the full card file.",
+                  style: TextStyle(color: Colors.black54),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _binaryCardSummary({
+    required String contentType,
+    required Uint8List bytes,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFDCE4ED)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _infoRow("Format", contentType),
+          _infoRow("Size", "${bytes.lengthInBytes} bytes"),
+          _infoRow(
+            "Preview",
+            "Full in-app preview is available when ABDM returns PNG or JPG.",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          Expanded(child: Text(value)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _downloadAbhaCard(BuildContext context) async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => _downloadingCard = true);
+
+    try {
+      Map<String, dynamic> payload;
+      final source =
+          widget.selectedUser?['source']?.toString().trim() ?? '';
+      final shouldPreferAccountCard =
+          source == 'abdm-enrollment-profile-details' ||
+          source == 'abdm-existing-account';
+      final sessionToken = [
+        widget.selectedUser?['sessionToken'],
+        widget.selectedUser?['token'],
+      ].map((value) => value?.toString().trim() ?? '').firstWhere(
+        (value) => value.isNotEmpty,
+        orElse: () => '',
+      );
+      final refreshToken = [
+        widget.selectedUser?['refreshToken'],
+      ].map((value) => value?.toString().trim() ?? '').firstWhere(
+        (value) => value.isNotEmpty,
+        orElse: () => '',
+      );
+
+      if (shouldPreferAccountCard && sessionToken.isNotEmpty) {
+        payload = await AbhaApiService.downloadProfileAccountCard(
+          xToken: sessionToken,
+          refreshToken: refreshToken.isEmpty ? null : refreshToken,
+        );
+      } else {
+        try {
+          payload = sessionToken.isNotEmpty
+              ? await AbhaApiService.downloadPhrCardWithToken(
+                  xToken: sessionToken,
+                )
+              : await AbhaApiService.downloadPhrCard();
+        } catch (_) {
+          if (sessionToken.isEmpty) rethrow;
+          payload = await AbhaApiService.downloadProfileAccountCard(
+            xToken: sessionToken,
+            refreshToken: refreshToken.isEmpty ? null : refreshToken,
+          );
+        }
+      }
+      final contentType =
+          (payload['contentType']?.toString() ?? 'application/octet-stream')
+              .trim()
+              .toLowerCase();
+      final fileName = (payload['fileName']?.toString() ?? 'Abha_card').trim();
+      final encoded = payload['data']?.toString() ?? '';
+
+      if (encoded.isEmpty) {
+        throw Exception("ABHA card response was empty");
+      }
+
+      final bytes = base64Decode(encoded);
+      final extension = _fileExtensionForContentType(contentType);
+      final safeName = fileName.contains('.')
+          ? fileName
+          : '$fileName.$extension';
+      final file = File('${Directory.systemTemp.path}/$safeName');
+
+      await file.writeAsBytes(bytes, flush: true);
+
+      if (Platform.isMacOS) {
+        await Process.run('open', [file.path]);
+      }
+
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('ABHA card saved to ${file.path}')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      final errorMessage = AbhaApiService.userFacingError(e);
+      messenger.showSnackBar(SnackBar(content: Text(errorMessage)));
+    } finally {
+      if (mounted) {
+        setState(() => _downloadingCard = false);
+      }
+    }
+  }
+
+  String _fileExtensionForContentType(String contentType) {
+    if (contentType.contains('pdf')) return 'pdf';
+    if (contentType.contains('png')) return 'png';
+    if (contentType.contains('jpeg') || contentType.contains('jpg')) {
+      return 'jpg';
+    }
+    if (contentType.contains('json')) return 'json';
+    return 'bin';
+  }
+
+  bool _isImageContentType(String contentType) {
+    return contentType.contains('png') ||
+        contentType.contains('jpeg') ||
+        contentType.contains('jpg');
+  }
+
+  String _maskMobile(String value) {
+    if (value.contains('*')) {
+      return value;
+    }
+
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 4) {
+      return value;
+    }
+    return '******${digits.substring(digits.length - 4)}';
+  }
+
+  String _maskAbhaNumber(String value) {
+    if (value.contains('*') || value.toUpperCase().contains('X')) {
+      return value;
+    }
+
+    final digits = value.replaceAll(RegExp(r'\D'), '');
+    if (digits.length < 4) {
+      return value;
+    }
+    return 'XXXX-XXXX-${digits.substring(digits.length - 4)}';
+  }
+}

@@ -43,7 +43,7 @@ const startWatcher = () => {
     ignoreInitial: false, 
   });
 
-  const processFolder = (folderPath) => {
+  const processFolder = async (folderPath) => {
     try {
       const folderName = path.basename(folderPath);
       // AbhaId is typically the part before the first underscore in the folder name, or up to the @sbx
@@ -86,8 +86,8 @@ const startWatcher = () => {
         return;
       }
 
-      fileData.forEach((file) => {
-        const bundle = buildBundleFromFiles({ abhaId, folderName, files: [file] });
+      for (const file of fileData) {
+        const bundle = await buildBundleFromFiles({ abhaId, folderName, files: [file] });
         const baseName = path.basename(file.fileName, ".txt");
         const bundleFileName = `${baseName}_bundle.json`;
         const bundlePath = path.join(folderPath, bundleFileName);
@@ -105,7 +105,7 @@ const startWatcher = () => {
         });
         
         log("Successfully generated and saved FHIR bundle", { bundlePath, hiType: file.hiType });
-      });
+      }
 
     } catch (error) {
       log("Failed to process folder for FHIR bundle", { folderPath, error: error.message });

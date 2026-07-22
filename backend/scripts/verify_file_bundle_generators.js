@@ -27,7 +27,8 @@ const failures = [];
 let checked = 0;
 const checkedTypes = new Set();
 
-for (const folderName of fs.readdirSync(root)) {
+async function run() {
+  for (const folderName of fs.readdirSync(root)) {
   const folderPath = path.join(root, folderName);
   if (!fs.existsSync(folderPath) || !fs.statSync(folderPath).isDirectory() || !/@sbx_/.test(folderName)) {
     continue;
@@ -40,7 +41,7 @@ for (const folderName of fs.readdirSync(root)) {
     const filePath = path.join(folderPath, fileName);
     const hiType = guessHiType(fileName);
     try {
-      const bundle = buildBundleFromFiles({
+      const bundle = await buildBundleFromFiles({
         abhaId,
         folderName,
         files: [
@@ -78,11 +79,16 @@ for (const folderName of fs.readdirSync(root)) {
 
 if (failures.length > 0) {
   console.error(JSON.stringify({ checked, failures }, null, 2));
-  process.exit(1);
+  process.exit(1);  }
+  
+  console.log(JSON.stringify({
+    status: "ok",
+    checked: checked,
+    checkedTypes: Array.from(checkedTypes).sort()
+  }, null, 2));
 }
 
-console.log(JSON.stringify({
-  status: "ok",
-  checked,
-  checkedTypes: Array.from(checkedTypes).sort()
-}, null, 2));
+run().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

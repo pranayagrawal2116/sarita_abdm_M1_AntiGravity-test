@@ -169,6 +169,8 @@ const createMedicationRequest = ({
   reasonCode,
   reasonDisplay,
   instructionText = "As directed",
+  routeText,
+  timingText,
   timestamp = formatTimestamp()
 }) => {
   const resource = {
@@ -196,26 +198,24 @@ const createMedicationRequest = ({
     requester: {
       reference: practitionerId
     },
-    dosageInstruction: [
-      {
-        text: instructionText
-      }
-    ]
+    dosageInstruction: []
   };
 
-  if (reasonCode) {
-    resource.reasonCode = [
-      {
-        coding: [
-          {
-            system: "http://snomed.info/sct",
-            code: reasonCode,
-            display: reasonDisplay
-          }
-        ],
-        text: reasonDisplay
-      }
-    ];
+  const dosage = { text: instructionText };
+  if (routeText) {
+    dosage.route = { text: routeText };
+  }
+  if (timingText) {
+    dosage.method = { text: timingText };
+  }
+  resource.dosageInstruction.push(dosage);
+
+  if (reasonCode || reasonDisplay) {
+    const rc = { text: reasonDisplay || reasonCode || "Condition" };
+    if (reasonCode) {
+      rc.coding = [{ system: "http://snomed.info/sct", code: reasonCode, display: reasonDisplay || reasonCode }];
+    }
+    resource.reasonCode = [rc];
   }
 
   return {
@@ -243,11 +243,93 @@ const createBinary = ({
   };
 };
 
+const createProcedure = ({
+  id = uuidv4(),
+  patientId,
+  display,
+  status = "completed",
+  timestamp = formatTimestamp()
+}) => {
+  return {
+    fullUrl: `urn:uuid:${id}`,
+    resource: {
+      resourceType: "Procedure",
+      id,
+      meta: {
+        profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/Procedure"]
+      },
+      status,
+      code: {
+        text: display
+      },
+      subject: { reference: patientId },
+      performedDateTime: timestamp
+    }
+  };
+};
+
+const createFamilyMemberHistory = ({
+  id = uuidv4(),
+  patientId,
+  display,
+  status = "completed"
+}) => {
+  return {
+    fullUrl: `urn:uuid:${id}`,
+    resource: {
+      resourceType: "FamilyMemberHistory",
+      id,
+      meta: {
+        profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/FamilyMemberHistory"]
+      },
+      status,
+      patient: { reference: patientId },
+      relationship: { text: "Family member" },
+      condition: [
+        {
+          code: { text: display }
+        }
+      ]
+    }
+  };
+};
+
+const createAppointment = ({
+  id = uuidv4(),
+  patientId,
+  practitionerId,
+  reason,
+  status = "booked",
+  timestamp = formatTimestamp()
+}) => {
+  return {
+    fullUrl: `urn:uuid:${id}`,
+    resource: {
+      resourceType: "Appointment",
+      id,
+      meta: {
+        profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/Appointment"]
+      },
+      status,
+      description: reason,
+      participant: [
+        { actor: { reference: patientId }, status: "accepted" },
+        { actor: { reference: practitionerId }, status: "accepted" }
+      ],
+      start: timestamp,
+      end: timestamp
+    }
+  };
+};
+
 module.exports = {
   formatTimestamp,
   createObservation,
   createCondition,
   createDocumentReference,
   createMedicationRequest,
-  createBinary
+  createBinary,
+  createProcedure,
+  createFamilyMemberHistory,
+  createAppointment
 };

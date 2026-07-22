@@ -676,22 +676,66 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
   final _respRateController = TextEditingController();
   final _heartRateController = TextEditingController();
   final _spo2Controller = TextEditingController();
+  final _bpSysController = TextEditingController();
+  final _bpDiaController = TextEditingController();
 
   final List<String> _complaints = [];
   final List<String> _allergies = [];
   final List<String> _medicalHistory = [];
   final List<String> _investigations = [];
+  final List<String> _procedures = [];
+  final List<String> _familyHistory = [];
+  final List<Map<String, String>> _medications = [];
 
   final _complaintInput = TextEditingController();
   final _allergyInput = TextEditingController();
   final _historyInput = TextEditingController();
   final _investigationInput = TextEditingController();
+  final _procedureInput = TextEditingController();
+  final _familyHistoryInput = TextEditingController();
+  
+  // Follow Up
+  final _followUpReasonController = TextEditingController();
+  final _followUpDateController = TextEditingController();
+  final _followUpTimeController = TextEditingController();
+
+  // Medication Form
+  final _medNameController = TextEditingController();
+  final _dosePatternController = TextEditingController();
+  String _selectedRoute = 'Oral';
+  String _selectedTiming = 'After Food';
+  final _instructionsController = TextEditingController();
+
+  final List<String> _routes = ['Oral', 'Intravenous', 'Intramuscular', 'Subcutaneous', 'Topical', 'Inhalation', 'Ophthalmic', 'Nasal'];
+  final List<String> _timings = ['Before Food', 'After Food', 'With Food', 'Empty Stomach', 'As Needed', 'At Bedtime'];
+
+  void _addMedication() {
+    final name = _medNameController.text.trim();
+    final dose = _dosePatternController.text.trim();
+    if (name.isEmpty || dose.isEmpty) return;
+    setState(() {
+      _medications.add({
+        'name': name,
+        'dose': dose,
+        'route': _selectedRoute,
+        'timing': _selectedTiming,
+        'instructions': _instructionsController.text.trim(),
+      });
+      _medNameController.clear();
+      _dosePatternController.clear();
+      _instructionsController.clear();
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     _heightController.addListener(_calculateBmi);
     _weightController.addListener(_calculateBmi);
+    
+    final now = DateTime.now();
+    _followUpDateController.text = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    _followUpTimeController.text = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
   }
 
   @override
@@ -703,11 +747,23 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
     _respRateController.dispose();
     _heartRateController.dispose();
     _spo2Controller.dispose();
+    _bpSysController.dispose();
+    _bpDiaController.dispose();
     
     _complaintInput.dispose();
     _allergyInput.dispose();
     _historyInput.dispose();
     _investigationInput.dispose();
+    _procedureInput.dispose();
+    _familyHistoryInput.dispose();
+    
+    _followUpReasonController.dispose();
+    _followUpDateController.dispose();
+    _followUpTimeController.dispose();
+    
+    _medNameController.dispose();
+    _dosePatternController.dispose();
+    _instructionsController.dispose();
     super.dispose();
   }
 
@@ -722,11 +778,68 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
     }
   }
 
+  void _autoFill() {
+    setState(() {
+      _complaints.clear();
+      _complaints.add('Cold');
+
+      _bpSysController.text = '110';
+      _bpDiaController.text = '80';
+      _heartRateController.text = '110';
+      _respRateController.text = '38';
+      _spo2Controller.text = '99';
+      _tempController.text = '99';
+
+      _heightController.text = '170';
+      _weightController.text = '90';
+      _calculateBmi();
+
+      _allergies.clear();
+      _allergies.add('Dust');
+
+      _medicalHistory.clear();
+      _medicalHistory.add('Diabetes');
+
+      _investigations.clear();
+      _investigations.add('CBC');
+
+      _procedures.clear();
+      _procedures.add('Test');
+
+      _medications.clear();
+      _medications.add({
+        'name': 'Dolo',
+        'dose': '1-0-1',
+        'route': 'Oral',
+        'timing': 'After Food',
+        'instructions': 'Fever',
+      });
+
+      _familyHistory.clear();
+      _familyHistory.add('Diabetes');
+
+      final now = DateTime.now();
+      _followUpReasonController.text = 'Review';
+      _followUpDateController.text = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      _followUpTimeController.text = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: ElevatedButton.icon(
+            onPressed: _autoFill,
+            icon: const Icon(Icons.flash_on),
+            label: const Text('Auto Fill'),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFDE047), foregroundColor: const Color(0xFF1E293B)),
+          ),
+        ),
+        const SizedBox(height: 12),
         _buildSectionTitle('Physical Examination (Vitals)'),
         Card(
           child: Padding(
@@ -775,6 +888,22 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
 
                 final row2 = [
                   _buildFormTextColumn(
+                    'BP Systolic',
+                    TextFormField(
+                      controller: _bpSysController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(hintText: 'e.g. 120'),
+                    ),
+                  ),
+                  _buildFormTextColumn(
+                    'BP Diastolic',
+                    TextFormField(
+                      controller: _bpDiaController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(hintText: 'e.g. 80'),
+                    ),
+                  ),
+                  _buildFormTextColumn(
                     'Resp Rate (/min)',
                     TextFormField(
                       controller: _respRateController,
@@ -790,6 +919,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                       decoration: const InputDecoration(hintText: 'e.g. 72'),
                     ),
                   ),
+                ];
+                
+                final row3 = [
                   _buildFormTextColumn(
                     'SpO2 (%)',
                     TextFormField(
@@ -798,7 +930,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                       decoration: const InputDecoration(hintText: 'e.g. 98'),
                     ),
                   ),
-                  _buildFormTextColumn('', const SizedBox.shrink()), // Empty column for alignment
+                  _buildFormTextColumn('', const SizedBox.shrink()),
+                  _buildFormTextColumn('', const SizedBox.shrink()),
+                  _buildFormTextColumn('', const SizedBox.shrink()),
                 ];
 
                 if (isWide) {
@@ -811,10 +945,14 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                       Row(
                         children: row2.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList(),
                       ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: row3.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList(),
+                      ),
                     ],
                   );
                 } else {
-                  return Column(children: [...row1, ...row2]);
+                  return Column(children: [...row1, ...row2, ...row3]);
                 }
               },
             ),
@@ -848,6 +986,141 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
           _investigationInput,
           'Enter investigation...',
         ),
+        const SizedBox(height: 20),
+        _buildListManagerCard(
+          'Procedures',
+          _procedures,
+          _procedureInput,
+          'Enter procedure...',
+        ),
+        const SizedBox(height: 20),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text('Medications', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 16),
+                if (_medications.isNotEmpty)
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _medications.length,
+                    separatorBuilder: (_, __) => const Divider(),
+                    itemBuilder: (context, index) {
+                      final m = _medications[index];
+                      return ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('${m['name']} (${m['dose']})', style: const TextStyle(fontWeight: FontWeight.w600)),
+                        subtitle: Text('${m['route']} | ${m['timing']}\n${m['instructions']}'),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => setState(() => _medications.removeAt(index)),
+                        ),
+                      );
+                    },
+                  ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    SizedBox(
+                      width: 200,
+                      child: TextFormField(
+                        controller: _medNameController,
+                        decoration: const InputDecoration(labelText: 'Drug Name', hintText: 'e.g. Paracetamol'),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 120,
+                      child: TextFormField(
+                        controller: _dosePatternController,
+                        decoration: const InputDecoration(labelText: 'Dose', hintText: 'e.g. 1-0-1'),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 150,
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedRoute,
+                        isExpanded: true,
+                        decoration: const InputDecoration(labelText: 'Route'),
+                        items: _routes.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+                        onChanged: (v) => setState(() => _selectedRoute = v!),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 150,
+                      child: DropdownButtonFormField<String>(
+                        value: _selectedTiming,
+                        isExpanded: true,
+                        decoration: const InputDecoration(labelText: 'Timing'),
+                        items: _timings.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                        onChanged: (v) => setState(() => _selectedTiming = v!),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 200,
+                      child: TextFormField(
+                        controller: _instructionsController,
+                        decoration: const InputDecoration(labelText: 'Instructions', hintText: 'e.g. After Food'),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton.icon(
+                    onPressed: _addMedication,
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add Medication'),
+                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE3F2FD), foregroundColor: const Color(0xFF1976D2)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        _buildListManagerCard(
+          'Family History',
+          _familyHistory,
+          _familyHistoryInput,
+          'Enter family history (e.g. Diabetes - Father)...',
+        ),
+        const SizedBox(height: 20),
+        _buildSectionTitle('Follow Up'),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextFormField(
+                    controller: _followUpReasonController,
+                    decoration: const InputDecoration(labelText: 'Reason for Follow Up', hintText: 'e.g. Review'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextFormField(
+                    controller: _followUpDateController,
+                    decoration: const InputDecoration(labelText: 'Date', hintText: 'YYYY-MM-DD'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextFormField(
+                    controller: _followUpTimeController,
+                    decoration: const InputDecoration(labelText: 'Time', hintText: 'HH:MM'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         const SizedBox(height: 32),
         _buildFormActionButtons(
           onSave: () => widget.onSaved(_collectData()),
@@ -864,6 +1137,8 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
         'height': _heightController.text,
         'weight': _weightController.text,
         'bmi': _bmiController.text,
+        'bpSystolic': _bpSysController.text,
+        'bpDiastolic': _bpDiaController.text,
         'respRate': _respRateController.text,
         'heartRate': _heartRateController.text,
         'spO2': _spo2Controller.text,
@@ -876,6 +1151,16 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
       'draftMedicalHistory': _historyInput.text,
       'investigationAdvice': _investigations,
       'draftInvestigationAdvice': _investigationInput.text,
+      'procedures': _procedures,
+      'draftProcedure': _procedureInput.text,
+      'medications': _medications,
+      'familyHistory': _familyHistory,
+      'draftFamilyHistory': _familyHistoryInput.text,
+      'followUp': {
+        'reason': _followUpReasonController.text,
+        'date': _followUpDateController.text,
+        'time': _followUpTimeController.text,
+      }
     };
   }
 }

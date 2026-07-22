@@ -69,22 +69,32 @@ const normalizeHiType = (raw) => {
 const escapePdfText = (value) => text(value)
   .replace(/\\/g, "\\\\")
   .replace(/\(/g, "\\(")
-  .replace(/\)/g, "\\)")
-  .replace(/[\r\n]+/g, " ");
+  .replace(/\)/g, "\\)");
 
 const createPdfBase64 = (title, content) => {
-  const safeTitle = escapePdfText(title || "Health Record");
-  const safeContent = escapePdfText(content || "Clinical record generated for ABDM transfer.");
-  const stream = [
+  const safeTitle = escapePdfText(title || "Health Record").replace(/[\r\n]+/g, " ");
+  const rawContent = (content || "Clinical record generated for ABDM transfer.").split(/\r?\n/);
+  
+  const lines = [
     "BT",
     "/F1 14 Tf",
     "72 760 Td",
     `(${safeTitle}) Tj`,
     "0 -24 Td",
-    "/F1 10 Tf",
-    `(${safeContent.slice(0, 900)}) Tj`,
-    "ET"
-  ].join("\n");
+    "/F1 10 Tf"
+  ];
+
+  let currentY = 736;
+  for (const line of rawContent) {
+    if (currentY < 50) break; // Avoid writing off bottom of page
+    const safeLine = escapePdfText(line).slice(0, 110);
+    lines.push(`(${safeLine}) Tj`);
+    lines.push("0 -14 Td");
+    currentY -= 14;
+  }
+  lines.push("ET");
+  
+  const stream = lines.join("\n");
   const pdf = [
     "%PDF-1.4",
     "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj",
@@ -338,6 +348,8 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   const respRate = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Respiratory rate|Resp Rate):\s*(.+)$/i);
   const heartRate = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Heart rate|Pulse):\s*(.+)$/i);
   const spo2 = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Oxygen|SpO2):\s*(.+)$/i);
+  const bpSys = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Bp Systolic|BP Systolic):\s*(.+)$/i);
+  const bpDia = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Bp Diastolic|BP Diastolic):\s*(.+)$/i);
 
   const allergiesList = extractIndentedList(lines, /^Allergies:/i);
   const historyList = extractIndentedList(lines, /^Medical History:/i);
@@ -349,6 +361,8 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   if (heartRate) vitals.push({ code: "8867-4", display: "Heart rate", value: Number(heartRate), unit: "/min" });
   if (spo2) vitals.push({ code: "2708-6", display: "Oxygen saturation in Arterial blood", value: Number(spo2), unit: "%" });
   if (temperature) vitals.push({ code: "8310-5", display: "Body surface temperature", value: Number(temperature), unit: "degF" });
+  if (bpSys) vitals.push({ code: "8480-6", display: "Systolic blood pressure", value: Number(bpSys), unit: "mmHg" });
+  if (bpDia) vitals.push({ code: "8462-4", display: "Diastolic blood pressure", value: Number(bpDia), unit: "mmHg" });
 
   const measurements = [];
   if (height) measurements.push({ code: "8302-2", display: "Body height", value: Number(height), unit: "cm" });
@@ -423,8 +437,62 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
       ? investigationsList.map(inv => ({ code: "718-7", display: inv, value: "Advised", unit: "" }))
       : [{ code: "718-7", display: reportName, value: "Recorded", unit: "" }];
 
+  // --- Extract Procedures ---
+  const proceduresList = extractIndentedList(lines, /^Procedures:/i);
+  const procedures = proceduresList.map(p => ({ display: p }));
+
+  // --- Extract Medications List (complex objects) ---
+  const medicationsList = [];
+  const medsStart = lines.findIndex((line) => /^Medications:/i.test(line));
+  if (medsStart >= 0) {
+    for (let i = medsStart + 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^(?:Family History|Follow Up|Items|Summary|Header|Draft Item):/i.test(line)) break;
+      const match = line.match(/^\s*Name:\s*(.+)$/i);
+      if (match && text(match[1]) !== "-") {
+        let name = text(match[1]);
+        let dose = "1-0-1", route = "Oral", timing = "After Food", instr = "";
+        for (let j = i + 1; j < Math.min(lines.length, i + 6); j++) {
+           if (/^\s*-\s*Item/i.test(lines[j])) break;
+           const dMatch = lines[j].match(/^\s*Dose:\s*(.+)$/i);
+           if (dMatch) dose = text(dMatch[1]);
+           const rMatch = lines[j].match(/^\s*Route:\s*(.+)$/i);
+           if (rMatch) route = text(rMatch[1]);
+           const tMatch = lines[j].match(/^\s*Timing:\s*(.+)$/i);
+           if (tMatch) timing = text(tMatch[1]);
+           const iMatch = lines[j].match(/^\s*Instructions:\s*(.+)$/i);
+           if (iMatch) instr = text(iMatch[1]);
+        }
+        medicationsList.push({ drugName: name, dose, route, timing, instructions: instr });
+      }
+    }
+  }
+
+  // Fallback to simple extraction if empty (for single Medication or Prescription)
+  if (medicationsList.length === 0) {
+    if (medicationName) {
+      medicationsList.push({ drugName: medicationName, dose: dosage, route, timing, instructions });
+    }
+  }
+
+  // --- Extract Family History ---
+  const familyHistoryList = extractIndentedList(lines, /^Family History:/i);
+  const familyHistory = familyHistoryList.map(fh => ({ display: fh }));
+
+  // --- Extract Follow Up ---
+  const followUpReason = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Reason:\s*(.+)$/i);
+  const followUpDate = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Date:\s*(.+)$/i);
+  const followUpTime = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Time:\s*(.+)$/i);
+  const followUp = (followUpReason || followUpDate) ? { reason: followUpReason, date: followUpDate, time: followUpTime } : null;
+
+  // Replace string building PDF with pdfmake generator
+  const { generateOPConsultationPDF } = require("./pdfGenerator");
+  
+  // Note: we can't call await here if buildBusinessDataFromTextFile is synchronous.
+  // We'll attach the pdfBase64 asynchronously in generateOPConsultationBundle instead!
+  
   return {
-    patientName,
+    patientName: patientName,
     abhaAddress,
     abhaNumber,
     mobile,
@@ -435,9 +503,6 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     facilityName: hospitalConfig.hospitalName,
     facilityCode: process.env.FACILITY_ID || hospitalConfig.hipId,
     timestamp: nowIso(),
-    pdfBase64: createPdfBase64(file.hiType, file.content || summary),
-    dataBase64: Buffer.from(file.content || summary).toString("base64"),
-    contentType: "text/plain",
     title: file.fileName.replace(/\.txt$/i, ""),
     textContent: file.content,
     complaints,
@@ -448,6 +513,10 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     history,
     investigations,
     invoiceItems,
+    procedures,
+    medicationsList,
+    familyHistory,
+    followUp,
     invoiceTotal,
     diagnosticReports: [{ code: "11502-2", display: reportName, conclusion: cleanConclusion }],
     treatments: medicationName ? [{ medCode: inferDrugCode(medDisplay), medDisplay: medDisplay, instructionText: instructionText }] : [{ medCode: "387458008", medDisplay: "Clinical treatment as recorded", instructionText: "As directed" }],
@@ -473,8 +542,23 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   };
 };
 
-const buildWithRecordBuilder = ({ abhaId, folderName, file, canonicalHiType, recordType }) => {
+const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiType, recordType }) => {
   const businessData = buildBusinessDataFromTextFile({ abhaId, folderName, file });
+  
+  if (recordType === "OP Consultation") {
+    const { generateOPConsultationPDF } = require("./pdfGenerator");
+    try {
+      businessData.pdfBase64 = await generateOPConsultationPDF(businessData);
+    } catch (e) {
+      console.error("Failed to generate OP Consultation PDF", e);
+      businessData.pdfBase64 = Buffer.from(businessData.textContent || "Record").toString("base64");
+    }
+  } else {
+    businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+  }
+  businessData.dataBase64 = businessData.pdfBase64;
+  businessData.contentType = "application/pdf";
+
   const bundle = M2FHIRBuilder.buildBundle(recordType, businessData);
   log("Built dedicated ABDM record bundle from text file", {
     abhaId,
@@ -485,7 +569,7 @@ const buildWithRecordBuilder = ({ abhaId, folderName, file, canonicalHiType, rec
   return bundle;
 };
 
-const generatePrescriptionRecordBundle = ({ abhaId, folderName, file, canonicalHiType }) => {
+const generatePrescriptionRecordBundle = async ({ abhaId, folderName, file, canonicalHiType }) => {
   const businessData = buildBusinessDataFromTextFile({ abhaId, folderName, file });
   const bundle = generatePrescriptionBundle(buildPrescriptionInput(businessData));
   log("Built dedicated PrescriptionRecord ABDM bundle from text file", {
@@ -496,25 +580,25 @@ const generatePrescriptionRecordBundle = ({ abhaId, folderName, file, canonicalH
   return bundle;
 };
 
-const generateDiagnosticReportBundle = (context) =>
+const generateDiagnosticReportBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "Diagnostic Report" });
 
-const generateOPConsultationBundle = (context) =>
+const generateOPConsultationBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "OP Consultation" });
 
-const generateDischargeSummaryBundle = (context) =>
+const generateDischargeSummaryBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "Discharge Summary" });
 
-const generateImmunizationRecordBundle = (context) =>
+const generateImmunizationRecordBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "Immunization" });
 
-const generateHealthDocumentRecordBundle = (context) =>
+const generateHealthDocumentRecordBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "Health Document" });
 
-const generateWellnessRecordBundle = (context) =>
+const generateWellnessRecordBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "Wellness" });
 
-const generateInvoiceRecordBundle = (context) =>
+const generateInvoiceRecordBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "Invoice" });
 
 const FILE_BUNDLE_GENERATORS = {
@@ -924,7 +1008,7 @@ const buildBundle = (transaction) => {
   };
 };
 
-const buildBundleFromFiles = ({ abhaId, folderName, files }) => {
+const buildBundleFromFiles = async ({ abhaId, folderName, files }) => {
   const firstFile = Array.isArray(files) ? files[0] : null;
   if (!firstFile) {
     throw new Error("Cannot build bundle from files: at least one source text file is required.");
@@ -946,7 +1030,7 @@ const buildBundleFromFiles = ({ abhaId, folderName, files }) => {
   }
 
   const generator = FILE_BUNDLE_GENERATORS[canonicalHiType] || generateHealthDocumentRecordBundle;
-  return generator({ abhaId, folderName, file: firstFile, canonicalHiType });
+  return await generator({ abhaId, folderName, file: firstFile, canonicalHiType });
 };
 
 module.exports = { buildBundle, buildBundleFromFiles, normalizeHiType, HI_TYPE_TO_FHIR_RESOURCE };

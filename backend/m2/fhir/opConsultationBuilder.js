@@ -5,7 +5,7 @@
  */
 
 const { v4: uuidv4 } = require("uuid");
-const { createObservation, createCondition, createMedicationRequest } = require("./fhirHelpers");
+const { createObservation, createCondition, createMedicationRequest, createProcedure, createFamilyMemberHistory, createAppointment } = require("./fhirHelpers");
 
 class OpConsultationBuilder {
   /**
@@ -88,6 +88,13 @@ class OpConsultationBuilder {
           meta: {
             profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/AllergyIntolerance"]
           },
+          clinicalStatus: {
+            coding: [{ system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical", code: "active", display: "Active" }]
+          },
+          verificationStatus: {
+            coding: [{ system: "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification", code: "confirmed", display: "Confirmed" }]
+          },
+          recordedDate: params.timestamp,
           code: {
             coding: [
               {
@@ -141,25 +148,72 @@ class OpConsultationBuilder {
       if (sectionEntries.length > 0) sections.push({ title: "Investigations", entry: sectionEntries });
     }
 
+    // 6a. Procedures
+    if (params.procedures && Array.isArray(params.procedures)) {
+      const sectionEntries = [];
+      for (const proc of params.procedures) {
+        const item = createProcedure({
+          patientId: ids.patientId,
+          display: proc.display,
+          timestamp: params.timestamp
+        });
+        entries.push(item);
+        sectionEntries.push({ reference: item.fullUrl, display: proc.display });
+      }
+      if (sectionEntries.length > 0) sections.push({ title: "Procedures", entry: sectionEntries });
+    }
+
     // 7. Medications (MedicationRequests)
-    const meds = params.medications || params.treatments || [];
+    // Handle both old 'treatments' logic and new 'medicationsList' complex array
+    const meds = params.medicationsList || params.medications || params.treatments || [];
     if (meds.length > 0) {
       const sectionEntries = [];
       for (const med of meds) {
         const item = createMedicationRequest({
           patientId: ids.patientId,
           practitionerId: ids.practitionerId,
-          medCode: med.medCode || med.drugSnomedCode || "Pantoprazole",
-          medDisplay: med.medDisplay || med.drugName || "Pantoprazole 40 mg Tablet",
+          medCode: med.medCode || med.drugSnomedCode || "387517004", // default Paracetamol
+          medDisplay: med.medDisplay || med.drugName || "Medication",
           reasonCode: med.reasonCode || med.indicationSnomedCode,
-          reasonDisplay: med.reasonDisplay || med.indicationText,
-          instructionText: med.instructionText || med.instructions,
+          reasonDisplay: med.reasonDisplay || med.indicationText || med.instructions,
+          instructionText: med.dose || "As directed",
+          routeText: med.route,
+          timingText: med.timing,
           timestamp: params.timestamp
         });
         entries.push(item);
-        sectionEntries.push({ reference: item.fullUrl, display: med.medDisplay || med.drugName });
+        sectionEntries.push({ reference: item.fullUrl, display: med.medDisplay || med.drugName || "Medication" });
       }
       if (sectionEntries.length > 0) sections.push({ title: "Medications", entry: sectionEntries });
+    }
+
+    // 7a. Family History
+    if (params.familyHistory && Array.isArray(params.familyHistory)) {
+      const sectionEntries = [];
+      for (const fh of params.familyHistory) {
+        const item = createCondition({
+          patientId: ids.patientId,
+          display: fh.display,
+          timestamp: params.timestamp
+        });
+        entries.push(item);
+        sectionEntries.push({ reference: item.fullUrl, display: fh.display });
+      }
+      if (sectionEntries.length > 0) sections.push({ title: "Family History", entry: sectionEntries });
+    }
+
+    // 7b. Follow Up
+    if (params.followUp) {
+      const sectionEntries = [];
+      const item = createAppointment({
+        patientId: ids.patientId,
+        practitionerId: ids.practitionerId,
+        reason: params.followUp.reason || "Review",
+        timestamp: params.followUp.date ? `${params.followUp.date}T${params.followUp.time || "00:00"}:00.000Z` : params.timestamp
+      });
+      entries.push(item);
+      sectionEntries.push({ reference: item.fullUrl, display: "Follow Up Appointment" });
+      sections.push({ title: "Follow Up", entry: sectionEntries });
     }
 
     // 8. Document Reference (PDF attachments)

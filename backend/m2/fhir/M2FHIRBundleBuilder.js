@@ -378,6 +378,24 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   if (caloriesBurned) physicalActivity.push({ code: "41981-2", display: "Calories Burned", value: Number(caloriesBurned), unit: "kcal" });
   if (stepCount) physicalActivity.push({ code: "55423-8", display: "Step Count", value: Number(stepCount), unit: "/d" });
 
+  const calIntake = extractIndentedValue(lines, /^General Assessment:/i, /^\s*Calories Intake:\s*(.+)$/i);
+  const fluidIntake = extractIndentedValue(lines, /^General Assessment:/i, /^\s*Fluid Intake:\s*(.+)$/i);
+  const generalAssessment = [];
+  if (calIntake) generalAssessment.push({ display: "Calorie intake", value: Number(calIntake) });
+  if (fluidIntake) generalAssessment.push({ display: "Fluid intake", value: Number(fluidIntake) });
+
+  const ageAtMenarche = extractIndentedValue(lines, /^Women Health:/i, /^\s*Age At Menarche:\s*(.+)$/i);
+  const lmd = extractIndentedValue(lines, /^Women Health:/i, /^\s*Last Menstrual Date:\s*(.+)$/i);
+  const womenHealth = [];
+  if (ageAtMenarche) womenHealth.push({ display: "Age at menarche", value: Number(ageAtMenarche) });
+  if (lmd) womenHealth.push({ display: "Last menstrual period start date", value: lmd });
+
+  const smoking = extractIndentedValue(lines, /^Lifestyle:/i, /^\s*Smoking:\s*(.+)$/i);
+  const diet = extractIndentedValue(lines, /^Lifestyle:/i, /^\s*Diet:\s*(.+)$/i);
+  const lifestyle = [];
+  if (smoking) lifestyle.push({ display: "Smoking status", value: smoking });
+  if (diet) lifestyle.push({ display: "Diet type", value: diet });
+
   const complaints = complaintsList.length > 0 
     ? complaintsList.map(c => ({ code: "386661006", display: c }))
     : [{ code: "386661006", display: primaryLine }];
@@ -509,6 +527,9 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     vitals,
     measurements,
     physicalActivity,
+    generalAssessment,
+    womenHealth,
+    lifestyle,
     allergies,
     history,
     investigations,
@@ -520,22 +541,20 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     invoiceTotal,
     diagnosticReports: [{ code: "11502-2", display: reportName, conclusion: cleanConclusion }],
     treatments: medicationName ? [{ medCode: inferDrugCode(medDisplay), medDisplay: medDisplay, instructionText: instructionText }] : [{ medCode: "387458008", medDisplay: "Clinical treatment as recorded", instructionText: "As directed" }],
-    medications: [
-      {
-        medCode: inferDrugCode(medDisplay),
-        medDisplay: medDisplay,
-        drugName: medDisplay,
-        drugSnomedCode: inferDrugCode(medDisplay),
-        indicationText: text(instructions) || "Clinical indication recorded",
-        indicationSnomedCode: inferIndicationCode(instructions),
-        dose: dosage,
-        dosage: parseDoseSchedule(dosage),
-        route,
-        foodTiming: timing,
-        instructionText: instructionText,
-        authoredOn: nowIso()
-      }
-    ],
+    medications: medicationsList.map(med => ({
+      medCode: inferDrugCode(med.drugName),
+      medDisplay: normalizeDrugName(med.drugName),
+      drugName: normalizeDrugName(med.drugName),
+      drugSnomedCode: inferDrugCode(med.drugName),
+      indicationText: text(med.instructions) || "Clinical indication recorded",
+      indicationSnomedCode: inferIndicationCode(med.instructions),
+      dose: med.dose,
+      dosage: parseDoseSchedule(med.dose),
+      route: med.route,
+      foodTiming: med.timing,
+      instructionText: text(med.instructions) || "As directed",
+      authoredOn: nowIso()
+    })),
     vaccineCode: "1119305005",
     vaccineDisplay: primaryLine,
     contentType: "application/pdf"
@@ -553,6 +572,22 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       console.error("Failed to generate OP Consultation PDF", e);
       businessData.pdfBase64 = Buffer.from(businessData.textContent || "Record").toString("base64");
     }
+  } else if (recordType === "Wellness") {
+    const { generateWellnessRecordPDF } = require("./pdfGenerator");
+    try {
+      businessData.pdfBase64 = await generateWellnessRecordPDF(businessData);
+    } catch (e) {
+      console.error("Failed to generate Wellness PDF", e);
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+    }
+  } else if (recordType === "Diagnostic Report") {
+    const { generateDiagnosticReportPDF } = require("./pdfGenerator");
+    try {
+      businessData.pdfBase64 = await generateDiagnosticReportPDF(businessData);
+    } catch (e) {
+      console.error("Failed to generate Diagnostic Report PDF", e);
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+    }
   } else {
     businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
   }
@@ -569,9 +604,14 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
   return bundle;
 };
 
+const { generatePrescriptionPDF } = require("./pdfGenerator");
+
 const generatePrescriptionRecordBundle = async ({ abhaId, folderName, file, canonicalHiType }) => {
   const businessData = buildBusinessDataFromTextFile({ abhaId, folderName, file });
-  const bundle = generatePrescriptionBundle(buildPrescriptionInput(businessData));
+  const pdfBase64 = await generatePrescriptionPDF(businessData);
+  const input = buildPrescriptionInput(businessData);
+  input.pdfBase64 = pdfBase64;
+  const bundle = generatePrescriptionBundle(input);
   log("Built dedicated PrescriptionRecord ABDM bundle from text file", {
     abhaId,
     hiType: canonicalHiType,

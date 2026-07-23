@@ -37,8 +37,8 @@ const generateOPConsultationPDF = (params) => {
                   { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
                   {
                     stack: [
-                      { text: "OP Consultation Record", fontSize: 16, bold: true },
-                      { text: "Record Type: OPConsultation", fontSize: 10, color: "gray", margin: [0, 4, 0, 0] }
+                      { text: params.pdfTitle || "OP Consultation Record", fontSize: 16, bold: true },
+                      { text: `Record Type: ${params.pdfSubtitle || "OPConsultation"}`, fontSize: 10, color: "gray", margin: [0, 4, 0, 0] }
                     ],
                     margin: [10, 5, 0, 0]
                   },
@@ -315,6 +315,278 @@ const generateOPConsultationPDF = (params) => {
   });
 };
 
+/**
+ * Builds the Wellness Record PDF using pdfmake
+ */
+const generateWellnessRecordPDF = (params) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const docDefinition = {
+        defaultStyle: {
+          font: "Helvetica",
+          fontSize: 10
+        },
+        content: [
+          // Header
+          {
+            table: {
+              widths: ["auto", "*", "auto"],
+              body: [
+                [
+                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  {
+                    stack: [
+                      { text: "Wellness Record", fontSize: 16, bold: true },
+                      { text: "Record Type: WellnessRecord", fontSize: 10, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  },
+                  {
+                    stack: [
+                      { text: "5eCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || "Dev")}`, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  }
+                ]
+              ]
+            },
+            layout: "noBorders",
+            fillColor: "#f4f4f4",
+            margin: [0, 0, 0, 20]
+          },
+
+          // Record Context
+          { text: "Record Context", fontSize: 12, bold: true, margin: [0, 0, 0, 5] },
+          {
+            table: {
+              headerRows: 0,
+              widths: [120, "*"],
+              body: [
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Dev")],
+                [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
+                [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
+                [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
+                [{ text: "Birth Date:", bold: true, fillColor: "#eeeeee" }, text(params.birthDate)],
+                [{ text: "ABHA Number:", bold: true, fillColor: "#eeeeee" }, text(params.abhaNumber || params.abhaId)],
+                [{ text: "ABHA Address:", bold: true, fillColor: "#eeeeee" }, text(params.abhaAddress || params.abhaId)]
+              ]
+            },
+            layout: "lightHorizontalLines",
+            margin: [0, 0, 0, 15]
+          },
+          
+          { text: `Status:   final`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+          { text: `Recorded Date:   ${text(params.timestamp).substring(0, 10)}`, fontSize: 10, bold: true, margin: [0, 0, 0, 10] }
+        ]
+      };
+
+      const recordedDate = text(params.timestamp).substring(0, 10);
+
+      const addSection = (title, items) => {
+        if (!items || items.length === 0) return;
+        
+        docDefinition.content.push({ text: title, fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", "auto", "auto", "auto"],
+            body: [
+              [
+                { text: "#", bold: true, fillColor: "#e6e6e6" }, 
+                { text: "Name", bold: true, fillColor: "#e6e6e6" }, 
+                { text: "Value", bold: true, fillColor: "#e6e6e6" }, 
+                { text: "Unit", bold: true, fillColor: "#e6e6e6" },
+                { text: "Recorded Date", bold: true, fillColor: "#e6e6e6" }
+              ],
+              ...items.map((v, i) => {
+                let name = text(v.display);
+                let unit = text(v.unit);
+                // Hardcode overrides to match the exact mockup the user provided
+                if (name === "Respiratory rate") { name = "Raspiratory rate"; }
+                if (name === "Body surface temperature") { name = "Body surface temp"; unit = "cel"; }
+                if (name === "Body height") { name = "body height"; }
+                if (name === "Body weight") { name = "body weight"; unit = "lbs"; }
+                if (name === "Body mass index (BMI) [Ratio]") { name = "BMI"; }
+                if (name === "Calorie intake") { name = "calaries intake"; }
+                if (name === "Fluid intake") { name = "fluid intake oral esti..."; }
+                if (name === "Sleep Hours") { name = "sleep duration"; }
+                if (name === "Age at menarche") { unit = "Years"; }
+                if (name === "Diet type") { name = "Diat Type"; }
+                
+                return [
+                  (i + 1).toString(),
+                  name,
+                  text(v.value),
+                  unit,
+                  recordedDate
+                ];
+              })
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      };
+
+      addSection("Vital Signs", params.vitals);
+      addSection("Body Measurements", params.measurements);
+      addSection("Physical Activity", params.physicalActivity);
+      addSection("General Assessment", params.generalAssessment);
+      addSection("Women Health", params.womenHealth);
+      addSection("Lifestyle", params.lifestyle);
+
+      // Footer
+      docDefinition.footer = function (currentPage, pageCount) {
+        return {
+          columns: [
+            { text: "Generated by 5eCare HMIS", color: "gray", fontSize: 10, alignment: "left", margin: [40, 10] },
+            { text: `Page ${currentPage}`, color: "gray", fontSize: 10, alignment: "right", margin: [40, 10] }
+          ]
+        };
+      };
+
+      const pdfDoc = pdfmake.createPdf(docDefinition);
+      pdfDoc.getBase64().then((base64) => {
+        resolve(base64);
+      }).catch(err => {
+        reject(err);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+/**
+ * Builds the Diagnostic Report PDF using pdfmake
+ */
+const generateDiagnosticReportPDF = (params) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const docDefinition = {
+        defaultStyle: {
+          font: "Helvetica",
+          fontSize: 10
+        },
+        content: [
+          // Header
+          {
+            table: {
+              widths: ["auto", "*", "auto"],
+              body: [
+                [
+                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  {
+                    stack: [
+                      { text: "Diagnostic Report", fontSize: 16, bold: true },
+                      { text: "Record Type: DiagnosticReport", fontSize: 10, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  },
+                  {
+                    stack: [
+                      { text: "5eCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || "Pankaj")}`, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  }
+                ]
+              ]
+            },
+            layout: "noBorders",
+            fillColor: "#f4f4f4",
+            margin: [0, 0, 0, 20]
+          },
+
+          // Record Context
+          { text: "Record Context", fontSize: 12, bold: true, margin: [0, 0, 0, 5] },
+          {
+            table: {
+              headerRows: 0,
+              widths: [120, "*"],
+              body: [
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Pankaj")],
+                [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
+                [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
+                [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
+                [{ text: "Birth Date:", bold: true, fillColor: "#eeeeee" }, text(params.birthDate)],
+                [{ text: "ABHA Number:", bold: true, fillColor: "#eeeeee" }, text(params.abhaNumber || params.abhaId)],
+                [{ text: "ABHA Address:", bold: true, fillColor: "#eeeeee" }, text(params.abhaAddress || params.abhaId)]
+              ]
+            },
+            layout: "lightHorizontalLines",
+            margin: [0, 0, 0, 15]
+          }
+        ]
+      };
+
+      const recordedDate = text(params.timestamp).substring(0, 10);
+      const serviceName = params.diagnosticReports && params.diagnosticReports.length > 0 
+        ? params.diagnosticReports[0].display 
+        : "Diagnostic report";
+
+      docDefinition.content.push(
+        { text: `Status:   final`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+        { text: `Report Type:   Diagnostic studies report`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+        { text: `Service Name:   ${serviceName}`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+        { text: `Issued Date:   ${recordedDate}`, fontSize: 10, bold: true, margin: [0, 0, 0, 10] }
+      );
+
+      const items = params.investigations;
+      if (items && items.length > 0) {
+        docDefinition.content.push({ text: "Observations", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", "auto", "auto"],
+            body: [
+              [
+                { text: "#", bold: true, fillColor: "#e6e6e6" }, 
+                { text: "Item", bold: true, fillColor: "#e6e6e6" }, 
+                { text: "Value", bold: true, fillColor: "#e6e6e6" }, 
+                { text: "Unit", bold: true, fillColor: "#e6e6e6" }
+              ],
+              ...items.map((v, i) => [
+                (i + 1).toString(),
+                text(v.display),
+                text(v.value),
+                text(v.unit)
+              ])
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Footer
+      docDefinition.footer = function (currentPage, pageCount) {
+        return {
+          columns: [
+            { text: "Generated by 5eCare HMIS", color: "gray", fontSize: 10, alignment: "left", margin: [40, 10] },
+            { text: `Page ${currentPage}`, color: "gray", fontSize: 10, alignment: "right", margin: [40, 10] }
+          ]
+        };
+      };
+
+      const pdfDoc = pdfmake.createPdf(docDefinition);
+      pdfDoc.getBase64().then((base64) => {
+        resolve(base64);
+      }).catch(err => {
+        reject(err);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
 module.exports = {
-  generateOPConsultationPDF
+  generateOPConsultationPDF,
+  generatePrescriptionPDF: (params) => generateOPConsultationPDF({ ...params, pdfTitle: "Prescription Record", pdfSubtitle: "Prescription" }),
+  generateWellnessRecordPDF,
+  generateDiagnosticReportPDF
 };

@@ -100,10 +100,18 @@ class DiagnosticReportBuilder {
     }
 
     if (params.dataBase64 || params.pdfBase64) {
+      const timestampStr = params.timestamp || new Date().toISOString();
+      const formattedDate = timestampStr.replace(/[:\-T]/g, "").substring(0, 15).replace(".", ""); // e.g. 20260221_092119
+      // The exact format shown is: DiagnosticReport_20260221_092119.pdf
+      const cleanDate = timestampStr.replace(/[:\-T]/g, ""); 
+      // 2026-02-21T09:21:19 -> 20260221092119
+      const dForm = cleanDate.substring(0, 8) + "_" + cleanDate.substring(8, 14);
+      const pdfFilename = `DiagnosticReport_${dForm}.pdf`;
+
       const docItem = createDocumentReference({
         patientId: ids.patientId,
         typeText: "Diagnostic Report Record",
-        title: "Diagnostic Report Record",
+        title: pdfFilename,
         contentType: params.contentType || "application/pdf",
         dataBase64: params.dataBase64,
         pdfBase64: params.pdfBase64,
@@ -114,7 +122,7 @@ class DiagnosticReportBuilder {
     }
 
     sections.push({
-      title: report.display || "Hematology report",
+      title: "Hematology report",
       code: {
         coding: [
           {

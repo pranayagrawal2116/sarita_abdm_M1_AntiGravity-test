@@ -191,14 +191,14 @@ const buildMedicationRequest = (med, input, ids, index) => {
     ],
     dosageInstruction: [
       {
-        text: `Doses: ${med.dosage.morning}-${med.dosage.afternoon}-${med.dosage.evening}`,
+        text: `• ${med.dosage.morning}-${med.dosage.afternoon}-${med.dosage.evening}`,
         route: {
           coding: [{ system: SNOMED_SYSTEM, code: route.code, display: route.display }],
-          text: `Route: ${route.display}`
+          text: route.display
         },
         method: {
           coding: [{ system: SNOMED_SYSTEM, code: timing.code, display: timing.display }],
-          text: `Method: ${timing.display}`
+          text: timing.display
         }
       }
     ]
@@ -343,7 +343,7 @@ const validateBundle = (bundle) => {
     assertCondition(text(mr.reasonCode[0].text), "reasonCode.text missing.");
     assertCondition(text(mr.dosageInstruction?.[0]?.route?.coding?.[0]?.code), "route.coding[0].code missing.");
     assertCondition(text(mr.dosageInstruction?.[0]?.method?.coding?.[0]?.code), "method.coding[0].code missing.");
-    assertCondition(/^Doses: \d+-\d+-\d+$/.test(mr.dosageInstruction?.[0]?.text || ""), "dosageInstruction.text must be pure Doses: X-X-X.");
+    assertCondition(/^• \d+-\d+-\d+$/.test(mr.dosageInstruction?.[0]?.text || ""), "dosageInstruction.text must be pure • X-X-X.");
   });
 
   const encounter = findResource(bundle, "Encounter");
@@ -360,7 +360,7 @@ const generatePrescriptionBundle = (input) => {
   const nowIst = toIST(now);
   const ids = generateIds(input.medications.length);
   const medicationRequests = input.medications.map((med, index) => buildMedicationRequest(med, input, ids, index));
-  const pdfBytes = renderPrescriptionPdf(input);
+  const pdfBytes = input.pdfBase64 ? Buffer.from(input.pdfBase64, "base64") : renderPrescriptionPdf(input);
   const binary = buildBinary(pdfBytes, ids);
   const bundle = {
     resourceType: "Bundle",

@@ -65,7 +65,8 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       case 'Prescription Record':
         return _PrescriptionForm(onSaved: _handleSave, onLink: _handleLink);
       case 'Wellness Record':
-        return _WellnessForm(onSaved: _handleSave, onLink: _handleLink);
+        final gender = widget.patientProfile['gender']?.toString().toLowerCase() ?? '';
+        return _WellnessForm(onSaved: _handleSave, onLink: _handleLink, gender: gender);
       case 'Diagnostic Report':
         return _DiagnosticReportForm(onSaved: _handleSave, onLink: _handleLink);
       case 'Immunization Record':
@@ -1470,8 +1471,9 @@ class _PrescriptionFormState extends State<_PrescriptionForm> {
 class _WellnessForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onSaved;
   final Function(Map<String, dynamic>) onLink;
+  final String gender;
 
-  const _WellnessForm({required this.onSaved, required this.onLink});
+  const _WellnessForm({required this.onSaved, required this.onLink, this.gender = ''});
 
   @override
   State<_WellnessForm> createState() => _WellnessFormState();
@@ -1487,6 +1489,17 @@ class _WellnessFormState extends State<_WellnessForm> {
   bool _enableWomenHealth = false;
   final _menarcheAge = TextEditingController();
   final _lmdController = TextEditingController();
+
+  final _respRate = TextEditingController();
+  final _heartRate = TextEditingController();
+  final _temp = TextEditingController();
+
+  final _height = TextEditingController();
+  final _weight = TextEditingController();
+  final _bmi = TextEditingController();
+
+  final _calIntake = TextEditingController();
+  final _fluidIntake = TextEditingController();
 
   final List<String> _smokingOptions = [
     'Never smoked',
@@ -1509,6 +1522,14 @@ class _WellnessFormState extends State<_WellnessForm> {
     _steps.dispose();
     _menarcheAge.dispose();
     _lmdController.dispose();
+    _respRate.dispose();
+    _heartRate.dispose();
+    _temp.dispose();
+    _height.dispose();
+    _weight.dispose();
+    _bmi.dispose();
+    _calIntake.dispose();
+    _fluidIntake.dispose();
     super.dispose();
   }
 
@@ -1517,7 +1538,7 @@ class _WellnessFormState extends State<_WellnessForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildSectionTitle('Lifestyle'),
+        _buildSectionTitle('Vital Signs'),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
@@ -1526,53 +1547,54 @@ class _WellnessFormState extends State<_WellnessForm> {
                 final isWide = constraints.maxWidth > 550;
                 final fields = [
                   _buildFormTextColumn(
-                    'Smoking Status',
-                    DropdownButtonFormField<String>(
-                      initialValue: _smoking,
-                      items: _smokingOptions
-                          .map(
-                            (s) => DropdownMenuItem(value: s, child: Text(s)),
-                          )
-                          .toList(),
-                      onChanged: (val) => setState(() => _smoking = val!),
-                    ),
+                    'Respiratory Rate (/min)',
+                    TextFormField(controller: _respRate, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 16')),
                   ),
                   _buildFormTextColumn(
-                    'Dietary Habit',
-                    DropdownButtonFormField<String>(
-                      initialValue: _diet,
-                      items: _dietOptions
-                          .map(
-                            (d) => DropdownMenuItem(value: d, child: Text(d)),
-                          )
-                          .toList(),
-                      onChanged: (val) => setState(() => _diet = val!),
-                    ),
+                    'Heart Rate (/min)',
+                    TextFormField(controller: _heartRate, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 72')),
+                  ),
+                  _buildFormTextColumn(
+                    'Body Surface Temp (°C)',
+                    TextFormField(controller: _temp, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 37')),
                   ),
                 ];
-                if (isWide) {
-                  return Row(
-                    children: fields
-                        .map(
-                          (f) => Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8.0,
-                              ),
-                              child: f,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  );
-                } else {
-                  return Column(children: fields);
-                }
+                return isWide
+                    ? Row(children: fields.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList())
+                    : Column(children: fields);
               },
             ),
           ),
         ),
         const SizedBox(height: 20),
+        _buildSectionTitle('Body Measurement'),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth > 550;
+                final fields = [
+                  _buildFormTextColumn(
+                    'Body Height (cm)',
+                    TextFormField(controller: _height, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 170')),
+                  ),
+                  _buildFormTextColumn(
+                    'Body Weight (kg)',
+                    TextFormField(controller: _weight, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 70')),
+                  ),
+                  _buildFormTextColumn(
+                    'BMI (kg/m2)',
+                    TextFormField(controller: _bmi, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 24.2')),
+                  ),
+                ];
+                return isWide
+                    ? Row(children: fields.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList())
+                    : Column(children: fields);
+              },
+            ),
+          ),
+        ),
         _buildSectionTitle('Physical Activity'),
         Card(
           child: Padding(
@@ -1629,95 +1651,124 @@ class _WellnessFormState extends State<_WellnessForm> {
           ),
         ),
         const SizedBox(height: 20),
+        _buildSectionTitle('General Assessment'),
         Card(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Women Health Data',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    Switch(
-                      value: _enableWomenHealth,
-                      onChanged: (val) =>
-                          setState(() => _enableWomenHealth = val),
-                    ),
-                  ],
-                ),
-                if (_enableWomenHealth) ...[
-                  const SizedBox(height: 16),
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWide = constraints.maxWidth > 550;
-                      final fields = [
-                        _buildFormTextColumn(
-                          'Age at Menarche',
-                          TextFormField(
-                            controller: _menarcheAge,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                              hintText: 'e.g. 13',
-                            ),
-                          ),
-                        ),
-                        _buildFormTextColumn(
-                          'Last Menstrual Date',
-                          TextFormField(
-                            controller: _lmdController,
-                            readOnly: true,
-                            decoration: const InputDecoration(
-                              hintText: 'Select Date',
-                              suffixIcon: Icon(Icons.calendar_today_outlined),
-                            ),
-                            onTap: () async {
-                              final d = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(1900),
-                                lastDate: DateTime.now(),
-                              );
-                              if (d != null) {
-                                _lmdController.text =
-                                    '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}';
-                              }
-                            },
-                          ),
-                        ),
-                      ];
-                      if (isWide) {
-                        return Row(
-                          children: fields
-                              .map(
-                                (f) => Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8.0,
-                                    ),
-                                    child: f,
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                        );
-                      } else {
-                        return Column(children: fields);
-                      }
-                    },
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth > 550;
+                final fields = [
+                  _buildFormTextColumn(
+                    'Calories Intake (kcal)',
+                    TextFormField(controller: _calIntake, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 2500')),
                   ),
-                ],
-              ],
+                  _buildFormTextColumn(
+                    'Fluid Intake Oral Estimated (L)',
+                    TextFormField(controller: _fluidIntake, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 3')),
+                  ),
+                ];
+                return isWide
+                    ? Row(children: fields.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList())
+                    : Column(children: fields);
+              },
             ),
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 20),
+        if (widget.gender != 'm' && widget.gender != 'male') ...[
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Women Health Data',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Switch(
+                        value: _enableWomenHealth,
+                        onChanged: (val) =>
+                            setState(() => _enableWomenHealth = val),
+                      ),
+                    ],
+                  ),
+                  if (_enableWomenHealth) ...[
+                    const SizedBox(height: 16),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isWide = constraints.maxWidth > 550;
+                        final fields = [
+                          _buildFormTextColumn(
+                            'Age at Menarche',
+                            TextFormField(
+                              controller: _menarcheAge,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                hintText: 'e.g. 13',
+                              ),
+                            ),
+                          ),
+                          _buildFormTextColumn(
+                            'Last Menstrual Date',
+                            TextFormField(
+                              controller: _lmdController,
+                              readOnly: true,
+                              decoration: const InputDecoration(
+                                hintText: 'Select Date',
+                                suffixIcon: Icon(Icons.calendar_today_outlined),
+                              ),
+                              onTap: () async {
+                                final d = await showDatePicker(
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(1900),
+                                  lastDate: DateTime.now(),
+                                );
+                                if (d != null) {
+                                  _lmdController.text =
+                                      '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}';
+                                }
+                              },
+                            ),
+                          ),
+                        ];
+                        if (isWide) {
+                          return Row(
+                            children: fields
+                                .map(
+                                  (f) => Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0,
+                                      ),
+                                      child: f,
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          );
+                        } else {
+                          return Column(children: fields);
+                        }
+                      },
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+        ] else ...[
+          const SizedBox(height: 12),
+        ],
         _buildFormActionButtons(
           onSave: () => widget.onSaved(_collectData()),
           onLink: () => widget.onLink(_collectData()),
@@ -1728,11 +1779,24 @@ class _WellnessFormState extends State<_WellnessForm> {
 
   Map<String, dynamic> _collectData() {
     return {
-      'lifestyle': {'smoking': _smoking, 'diet': _diet},
+      'vitals': {
+        'respiratoryRate': _respRate.text,
+        'heartRate': _heartRate.text,
+        'temperature': _temp.text,
+      },
+      'measurements': {
+        'height': _height.text,
+        'weight': _weight.text,
+        'bmi': _bmi.text,
+      },
       'physicalActivity': {
         'sleepHours': _sleepHours.text,
         'caloriesBurned': _calories.text,
         'stepCount': _steps.text,
+      },
+      'generalAssessment': {
+        'caloriesIntake': _calIntake.text,
+        'fluidIntake': _fluidIntake.text,
       },
       'womenHealth': _enableWomenHealth
           ? {
@@ -1740,6 +1804,7 @@ class _WellnessFormState extends State<_WellnessForm> {
               'lastMenstrualDate': _lmdController.text,
             }
           : null,
+      'lifestyle': {'smoking': _smoking, 'diet': _diet},
     };
   }
 }

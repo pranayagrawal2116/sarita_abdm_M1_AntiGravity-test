@@ -4,70 +4,144 @@
  * Responsibility: Maps business datasets to Observation and DocumentReference resources.
  */
 
-const { createObservation, createDocumentReference } = require("./fhirHelpers");
+const { createDocumentReference } = require("./fhirHelpers");
+const { v4: uuidv4 } = require("uuid");
+
+const DATA_POINT_MAPPING = {
+  // Vitals
+  "Respiratory rate": { kind: "NUMERIC", loinc: "9279-1", unit: "/min", category: "vital-signs", categoryDisplay: "Vital Signs" },
+  "Heart rate": { kind: "NUMERIC", loinc: "8867-4", unit: "/min", category: "vital-signs", categoryDisplay: "Vital Signs" },
+  "Oxygen saturation in Arterial blood": { kind: "NUMERIC", loinc: "2708-6", unit: "%", category: "vital-signs", categoryDisplay: "Vital Signs" },
+  "Body surface temperature": { kind: "NUMERIC", loinc: "8310-5", unit: "Cel", category: "vital-signs", categoryDisplay: "Vital Signs" },
+  "Systolic blood pressure": { kind: "NUMERIC", loinc: "8480-6", unit: "mm[Hg]", category: "vital-signs", categoryDisplay: "Vital Signs" },
+  "Diastolic blood pressure": { kind: "NUMERIC", loinc: "8462-4", unit: "mm[Hg]", category: "vital-signs", categoryDisplay: "Vital Signs" },
+  
+  // Measurements
+  "Body height": { kind: "NUMERIC", loinc: "8302-2", unit: "cm", category: "survey", categoryDisplay: "Survey" },
+  "Body weight": { kind: "NUMERIC", loinc: "29463-7", unit: "kg", category: "survey", categoryDisplay: "Survey" },
+  "Body mass index (BMI) [Ratio]": { kind: "NUMERIC", loinc: "39156-5", unit: "kg/m2", category: "survey", categoryDisplay: "Survey" },
+
+  // Physical Activity
+  "Step Count": { kind: "NUMERIC", loinc: "55423-8", unit: "{steps}", category: "activity", categoryDisplay: "Activity" },
+  "Calories Burned": { kind: "NUMERIC", loinc: "41981-2", unit: "kcal", category: "activity", categoryDisplay: "Activity" },
+  "Sleep Hours": { kind: "NUMERIC", loinc: "248263006", unit: "h", category: "activity", categoryDisplay: "Activity" },
+
+  // General Assessment
+  "Calorie intake": { kind: "NUMERIC", loinc: "8981-3", unit: "kcal", category: "survey", categoryDisplay: "Survey" },
+  "Fluid intake": { kind: "NUMERIC", loinc: "8982-1", unit: "L", category: "survey", categoryDisplay: "Survey" },
+
+  // Women Health
+  "Age at menarche": { kind: "NUMERIC", loinc: "42798-8", unit: "a", category: "survey", categoryDisplay: "Survey" },
+  "Last menstrual period start date": { kind: "FREE_TEXT", loinc: "8665-2", category: "survey", categoryDisplay: "Survey" },
+
+  // Lifestyle
+  "Diet type": { kind: "CATEGORICAL", loinc: "8983-9", category: "survey", categoryDisplay: "Survey" },
+  "Smoking status": { kind: "CATEGORICAL", loinc: "72166-2", category: "survey", categoryDisplay: "Survey" }
+};
+
+const getSnomedForDiet = (diet) => {
+  const d = diet.toLowerCase();
+  if (d.includes("veg")) return { code: "765021002", display: "Vegetarian diet" };
+  if (d.includes("vegan")) return { code: "300488009", display: "Vegan diet" };
+  return { code: "765021002", display: "Vegetarian diet" };
+};
+
+const getSnomedForSmoking = (smoking) => {
+  const s = smoking.toLowerCase();
+  if (s.includes("never")) return { code: "266919005", display: "Never smoked" };
+  if (s.includes("former")) return { code: "8517006", display: "Former smoker" };
+  return { code: "77176002", display: "Smoker" };
+};
 
 class WellnessBuilder {
-  /**
-   * Builds Wellness specific FHIR entries.
-   * @param {Object} params - Clinical data records.
-   * @param {Object} ids - Standard pre-generated URN references.
-   * @returns {Object} Bundle payload coordinates.
-   */
+
+  static buildWellnessObservation(dataPoint, patientRef, timestamp) {
+    const id = uuidv4();
+    const mapInfo = DATA_POINT_MAPPING[dataPoint.display] || { kind: "FREE_TEXT", loinc: dataPoint.code || "8982-1", category: "survey", categoryDisplay: "Survey" };
+    
+    const base = {
+      resourceType: "Observation",
+      id,
+      meta: { profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"] },
+      status: "final",
+      category: [{
+        coding: [{
+          system: "http://terminology.hl7.org/CodeSystem/observation-category",
+          code: mapInfo.category,
+          display: mapInfo.categoryDisplay
+        }]
+      }],
+      code: { 
+        coding: [{ system: "http://loinc.org", code: mapInfo.loinc, display: dataPoint.display }], 
+        text: dataPoint.display 
+      },
+      subject: { reference: patientRef },
+      effectiveDateTime: timestamp
+    };
+
+    switch (mapInfo.kind) {
+      case "NUMERIC":
+        base.valueQuantity = {
+          value: Number(dataPoint.value),
+          unit: mapInfo.unit || dataPoint.unit || "unit",
+          system: "http://unitsofmeasure.org",
+          code: mapInfo.unit || dataPoint.unit || "unit"
+        };
+        break;
+      case "FREE_TEXT":
+        base.valueString = String(dataPoint.value);
+        break;
+      case "CATEGORICAL":
+        let snomed = { code: "22253000", display: dataPoint.value };
+        if (dataPoint.display === "Diet type") snomed = getSnomedForDiet(dataPoint.value);
+        if (dataPoint.display === "Smoking status") snomed = getSnomedForSmoking(dataPoint.value);
+        
+        base.valueCodeableConcept = { 
+          coding: [{ system: "http://snomed.info/sct", code: snomed.code, display: snomed.display }], 
+          text: dataPoint.value 
+        };
+        break;
+      default:
+        base.valueString = String(dataPoint.value);
+    }
+    
+    return { fullUrl: `urn:uuid:${id}`, resource: base };
+  }
+
   static build(params, ids) {
     const entries = [];
-    const finalEntry = [];
+    const sections = [];
+    const patientRef = ids.patientId;
+    const timestamp = params.timestamp;
 
-    // 1. Vital Signs (Observations)
-    if (params.vitals && Array.isArray(params.vitals)) {
-      for (const vital of params.vitals) {
-        const item = createObservation({
-          patientId: ids.patientId,
-          code: vital.code || "8867-4",
-          display: vital.display || "Heart rate",
-          value: vital.value || 72,
-          unit: vital.unit || "/min",
-          system: "http://loinc.org",
-          timestamp: params.timestamp
-        });
+    const processCategory = (title, dataList) => {
+      if (!dataList || dataList.length === 0) return;
+      const finalEntry = [];
+      for (const dp of dataList) {
+        const item = this.buildWellnessObservation(dp, patientRef, timestamp);
         entries.push(item);
-        finalEntry.push({ reference: item.fullUrl, display: vital.display });
+        finalEntry.push({ reference: item.fullUrl, display: dp.display });
       }
-    }
-
-    // 2. Body Measurements (Observations)
-    if (params.measurements && Array.isArray(params.measurements)) {
-      for (const measure of params.measurements) {
-        const item = createObservation({
-          patientId: ids.patientId,
-          code: measure.code || "8302-2",
-          display: measure.display || "Body height",
-          value: measure.value || 175,
-          unit: measure.unit || "cm",
-          system: "http://loinc.org",
-          timestamp: params.timestamp
+      if (finalEntry.length > 0) {
+        sections.push({
+          title: title,
+          code: {
+            coding: [{ system: "http://snomed.info/sct", code: "425044008", display: "Physical findings of general status" }]
+          },
+          entry: finalEntry
         });
-        entries.push(item);
-        finalEntry.push({ reference: item.fullUrl, display: measure.display });
       }
-    }
+    };
 
-    // 3. Physical Activity (Observations)
-    if (params.physicalActivity && Array.isArray(params.physicalActivity)) {
-      for (const activity of params.physicalActivity) {
-        const item = createObservation({
-          patientId: ids.patientId,
-          code: activity.code || "8982-1",
-          display: activity.display || "Physical activity",
-          value: activity.value || "Normal",
-          system: "http://loinc.org",
-          timestamp: params.timestamp
-        });
-        entries.push(item);
-        finalEntry.push({ reference: item.fullUrl, display: activity.display });
-      }
-    }
+    // Build the sections in the exact order
+    processCategory("Vital Signs", params.vitals);
+    processCategory("Body Measurement", params.measurements);
+    processCategory("Physical Activity", params.physicalActivity);
+    processCategory("General Assessment", params.generalAssessment);
+    processCategory("Women Health", params.womenHealth);
+    processCategory("Lifestyle", params.lifestyle);
 
-    // 4. Document Reference (if document details provided)
+    // Document Reference
     if (params.dataBase64 || params.pdfBase64) {
       const docItem = createDocumentReference({
         patientId: ids.patientId,
@@ -79,17 +153,12 @@ class WellnessBuilder {
         timestamp: params.timestamp
       });
       entries.push(docItem);
-      finalEntry.push({ reference: docItem.fullUrl, display: "DocumentReference" });
-    }
-
-    const sections = [];
-    if (finalEntry.length > 0) {
       sections.push({
-        title: "Physical findings of general status",
+        title: "Document Reference",
         code: {
-          coding: [{ system: "http://snomed.info/sct", code: "425044008", display: "Physical findings of general status" }]
+          coding: [{ system: "http://snomed.info/sct", code: "371530004", display: "Clinical consultation report" }]
         },
-        entry: finalEntry
+        entry: [{ reference: docItem.fullUrl, display: "DocumentReference" }]
       });
     }
 
@@ -107,11 +176,6 @@ class WellnessBuilder {
     };
   }
 
-  /**
-   * Validates mandatory elements for Wellness record.
-   * @param {Object} params - Clinical data records.
-   * @returns {Object} Validation report.
-   */
   static validate(params) {
     if (!params) {
       return { isValid: false, reason: "Missing Wellness parameters dataset." };

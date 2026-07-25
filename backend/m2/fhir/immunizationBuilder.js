@@ -18,108 +18,106 @@ class ImmunizationBuilder {
     const entries = [];
     const sections = [];
 
-    // 1. Patient Information Section
-    sections.push({
-      title: "Patient Information",
-      entry: [{ reference: ids.patientId, display: params.patientName || "Patient" }]
-    });
+    // 2. Immunization Resource(s)
+    const immunizations = params.immunizationsList && params.immunizationsList.length > 0
+      ? params.immunizationsList
+      : [{
+          vaccineName: params.vaccineDisplay || "COVID-19 mRNA Vaccine",
+          brand: "",
+          date: params.occurrenceDateTime || ids.timestamp.split('.')[0] || ids.timestamp,
+          lotNumber: "",
+          doseNo: "1"
+        }];
 
-    // 2. Immunization Resource
-    const immId = uuidv4();
-    const immunizationResource = {
-      resourceType: "Immunization",
-      id: immId,
-      meta: {
-        profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization"]
-      },
-      status: params.status || "completed",
-      vaccineCode: {
-        coding: [
-          {
-            system: "https://www.snomed.org",
-            code: params.vaccineCode || "1119349007",
-            display: params.vaccineDisplay || "COVID-19 mRNA Vaccine"
+    immunizations.forEach((imm) => {
+      const immId = uuidv4();
+      
+      let parsedDate = ids.timestamp;
+      if (imm.date) {
+        try {
+          // Try parsing DD MMM YYYY if possible, or just pass as is if format matches ISO
+          const dMatch = imm.date.match(/(\d+)\s+([a-zA-Z]+)\s+(\d{4})/);
+          if (dMatch) {
+            parsedDate = new Date(imm.date).toISOString().replace(/\.\d{3}Z$/, '+05:30');
+          } else {
+            parsedDate = new Date(imm.date).toISOString().replace(/\.\d{3}Z$/, '+05:30');
           }
-        ],
-        text: params.vaccineDisplay || "COVID-19 mRNA Vaccine"
-      },
-      patient: {
-        reference: ids.patientId,
-        display: params.patientName || "Patient"
-      },
-      encounter: {
-        reference: ids.encounterId,
-        display: "Encounter"
-      },
-      occurrenceDateTime: params.occurrenceDateTime || ids.timestamp.split('.')[0] || ids.timestamp,
-      primarySource: true,
-      performer: [
-        {
-          actor: {
-            reference: ids.practitionerId,
-            display: "Practitioner"
-          }
-        }
-      ]
-    };
-    entries.push({ fullUrl: `urn:uuid:${immId}`, resource: immunizationResource });
-    sections.push({
-      title: "Immunization Details",
-      entry: [{ reference: `urn:uuid:${immId}`, display: "Immunization" }]
-    });
+        } catch (e) {}
+      }
 
-    // 3. Immunization Recommendation Resource (Optional)
-    const recId = uuidv4();
-    const recResource = {
-      resourceType: "ImmunizationRecommendation",
-      id: recId,
-      meta: {
-        profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecommendation"]
-      },
-      patient: {
-        reference: ids.patientId,
-        display: params.patientName || "Patient"
-      },
-      date: ids.timestamp,
-      recommendation: [
-        {
-          vaccineCode: [
+      const immunizationResource = {
+        resourceType: "Immunization",
+        id: immId,
+        meta: {
+          profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization"]
+        },
+        status: params.status || "completed",
+        vaccineCode: {
+          coding: [
             {
-              coding: [
-                {
-                  system: "https://www.snomed.org",
-                  code: params.recommendationVaccineCode || "28531000087107",
-                  display: params.recommendationVaccineDisplay || ""
-                }
-              ]
+              system: "https://www.snomed.org",
+              code: "1119349007",
+              display: imm.vaccineName || "Vaccine"
             }
           ],
-          forecastStatus: {
-            text: "Due"
-          },
-          dateCriterion: [
-            {
-              code: {
-                text: "Next Dose Due Date"
-              },
-              value: params.nextDoseDate || ids.timestamp
+          text: imm.vaccineName || "Vaccine"
+        },
+        patient: {
+          reference: ids.patientId,
+          display: params.patientName || "Patient"
+        },
+        encounter: {
+          reference: ids.encounterId,
+          display: "Encounter"
+        },
+        occurrenceDateTime: parsedDate || ids.timestamp,
+        primarySource: true,
+        performer: [
+          {
+            actor: {
+              reference: ids.practitionerId,
+              display: "Practitioner"
             }
-          ]
+          }
+        ]
+      };
+
+      if (imm.brand) {
+        immunizationResource.manufacturer = { display: imm.brand };
+      }
+      if (imm.lotNumber) {
+        immunizationResource.lotNumber = imm.lotNumber;
+      }
+      if (imm.doseNo) {
+        const doseNumber = parseInt(imm.doseNo, 10);
+        if (!isNaN(doseNumber)) {
+          immunizationResource.protocolApplied = [
+            { doseNumberPositiveInt: doseNumber }
+          ];
+        } else {
+          immunizationResource.protocolApplied = [
+            { doseNumberString: imm.doseNo }
+          ];
         }
-      ]
-    };
-    entries.push({ fullUrl: `urn:uuid:${recId}`, resource: recResource });
-    sections.push({
-      title: "Immunization Recommendation",
-      entry: [{ reference: `urn:uuid:${recId}`, display: "ImmunizationRecommendation" }]
+      }
+
+      entries.push({ fullUrl: `urn:uuid:${immId}`, resource: immunizationResource });
+      sections.push({
+        title: "Immunization Details",
+        entry: [{ reference: `urn:uuid:${immId}`, display: "Immunization" }]
+      });
     });
 
     // 4. Document Reference (Optional)
     if (params.dataBase64 || params.pdfBase64) {
+      const timestampStr = params.timestamp || ids.timestamp || new Date().toISOString();
+      const formattedDate = timestampStr.replace(/[:\-T]/g, "").substring(0, 14);
+      const filename = `ImmunizationRecord_${formattedDate}.pdf`;
+
       const docItem = createDocumentReference({
         patientId: ids.patientId,
         typeText: "Immunization Record",
-        title: "Immunization Record",
+        title: filename,
         contentType: params.contentType || "application/pdf",
         dataBase64: params.dataBase64,
         pdfBase64: params.pdfBase64,

@@ -584,9 +584,145 @@ const generateDiagnosticReportPDF = (params) => {
   });
 };
 
+/**
+ * Builds the Immunization Record PDF using pdfmake
+ */
+const generateImmunizationRecordPDF = (params) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const docDefinition = {
+        defaultStyle: {
+          font: "Helvetica",
+          fontSize: 10
+        },
+        content: [
+          // Header
+          {
+            table: {
+              widths: ["auto", "*", "auto"],
+              body: [
+                [
+                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  {
+                    stack: [
+                      { text: "Immunization Record", fontSize: 16, bold: true },
+                      { text: "Record Type: ImmunizationRecord", fontSize: 10, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  },
+                  {
+                    stack: [
+                      { text: "5eCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || "Pankaj")}`, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  }
+                ]
+              ]
+            },
+            layout: "noBorders",
+            fillColor: "#f4f4f4",
+            margin: [0, 0, 0, 20]
+          },
+
+          // Record Context
+          { text: "Record Context", fontSize: 12, bold: true, margin: [0, 0, 0, 5] },
+          {
+            table: {
+              headerRows: 0,
+              widths: [120, "*"],
+              body: [
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Pankaj")],
+                [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
+                [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
+                [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
+                [{ text: "Birth Date:", bold: true, fillColor: "#eeeeee" }, text(params.birthDate)],
+                [{ text: "ABHA Number:", bold: true, fillColor: "#eeeeee" }, text(params.abhaNumber || params.abhaId)],
+                [{ text: "ABHA Address:", bold: true, fillColor: "#eeeeee" }, text(params.abhaAddress || params.abhaId)]
+              ]
+            },
+            layout: "lightHorizontalLines",
+            margin: [0, 0, 0, 20]
+          },
+
+          // Immunizations Details
+          { text: [ { text: "Status:   ", bold: true }, "final" ], margin: [0, 0, 0, 5] },
+          { text: "Immunizations", fontSize: 12, bold: true, margin: [0, 0, 0, 5] },
+          {
+            table: {
+              headerRows: 1,
+              widths: ["auto", "auto", "auto", "auto", "auto", "*", "auto"],
+              body: [
+                [
+                  { text: "#", bold: true, fillColor: "#eeeeee" },
+                  { text: "Vaccine", bold: true, fillColor: "#eeeeee" },
+                  { text: "Occurrence Date", bold: true, fillColor: "#eeeeee" },
+                  { text: "Lot Number", bold: true, fillColor: "#eeeeee" },
+                  { text: "Dose Number", bold: true, fillColor: "#eeeeee" },
+                  { text: "Manufacturer", bold: true, fillColor: "#eeeeee" },
+                  { text: "Status", bold: true, fillColor: "#eeeeee" }
+                ],
+                ...(params.immunizationsList && params.immunizationsList.length > 0
+                  ? params.immunizationsList.map((imm, idx) => [
+                      text(idx + 1),
+                      text(imm.vaccineName),
+                      text(imm.date),
+                      text(imm.lotNumber),
+                      text(imm.doseNo),
+                      text(imm.brand),
+                      text("completed")
+                    ])
+                  : [
+                      [
+                        text(1),
+                        text(params.vaccineDisplay || "COVID-19 mRNA Vaccine"),
+                        text(params.occurrenceDateTime || params.timestamp),
+                        text(params.lotNumber || ""),
+                        text(params.doseNo || "1"),
+                        text(params.brand || ""),
+                        text("completed")
+                      ]
+                    ])
+              ]
+            },
+            layout: "lightHorizontalLines",
+            margin: [0, 0, 0, 20]
+          }
+        ],
+        styles: {
+          header: { fontSize: 18, bold: true, margin: [0, 0, 0, 10] },
+          subheader: { fontSize: 14, bold: true, margin: [0, 10, 0, 5] }
+        },
+        footer: function(currentPage, pageCount) {
+          return [
+            { canvas: [{ type: "line", x1: 40, y1: 0, x2: 555, y2: 0, lineWidth: 1, lineColor: "#cccccc" }] },
+            {
+              columns: [
+                { text: "Generated by 5eCare HMIS", color: "gray", fontSize: 10, alignment: "left", margin: [40, 10] },
+                { text: `Page ${currentPage}`, color: "gray", fontSize: 10, alignment: "right", margin: [40, 10] }
+              ]
+            }
+          ]
+        }
+      };
+
+      const pdfDoc = pdfmake.createPdf(docDefinition);
+      pdfDoc.getBase64().then((base64) => {
+        resolve(base64);
+      }).catch(err => {
+        reject(err);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
 module.exports = {
   generateOPConsultationPDF,
   generatePrescriptionPDF: (params) => generateOPConsultationPDF({ ...params, pdfTitle: "Prescription Record", pdfSubtitle: "Prescription" }),
   generateWellnessRecordPDF,
-  generateDiagnosticReportPDF
+  generateDiagnosticReportPDF,
+  generateImmunizationRecordPDF
 };

@@ -1,0 +1,93 @@
+/**
+ * Header: otpStore.js
+ * Purpose: Secure, in-memory OTP cache for linking flows.
+ * Responsibility: Generates, stores, validates, and expires OTPs.
+ */
+
+const crypto = require("crypto");
+const { nowIso } = require("./dateUtils");
+
+// Store structure: { [referenceNumber]: { otp: '123456', abhaAddress: '...', expiresAt: number } }
+const otpCache = new Map();
+
+const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Generate a 6-digit secure OTP.
+ * @returns {string} OTP
+ */
+const generateSecureOTP = () => {
+  // Generate random number between 100000 and 999999
+  return crypto.randomInt(100000, 1000000).toString();
+};
+
+/**
+ * Create a new OTP session for linking.
+ * @param {string} abhaAddress - Patient's ABHA Address
+ * @param {string} referenceNumber - Unique reference number for this session
+ * @returns {string} The generated OTP
+ */
+const createOTP = (abhaAddress, referenceNumber) => {
+  const otp = generateSecureOTP();
+  const expiresAt = Date.now() + OTP_EXPIRY_MS;
+
+  otpCache.set(referenceNumber, {
+    otp,
+    abhaAddress,
+    expiresAt,
+    createdAt: nowIso()
+  });
+
+  // Periodically clean up expired OTPs to prevent memory leaks
+  cleanUpExpiredOTPs();
+
+  return otp;
+};
+
+/**
+ * Verify an OTP.
+ * @param {string} referenceNumber - The session reference number
+ * @param {string} submittedOtp - The OTP provided by the user
+ * @returns {boolean} True if valid, false otherwise.
+ */
+const verifyOTP = (referenceNumber, submittedOtp) => {
+  if (!referenceNumber || !submittedOtp) return false;
+
+  const session = otpCache.get(referenceNumber);
+  if (!session) {
+    return false; // Not found or already expired
+  }
+
+  // Check expiry
+  if (Date.now() > session.expiresAt) {
+    otpCache.delete(referenceNumber);
+    return false; // Expired
+  }
+
+  // Check match
+  if (session.otp === submittedOtp) {
+    // Valid! Remove it so it can't be reused
+    otpCache.delete(referenceNumber);
+    return true;
+  }
+
+  return false;
+};
+
+/**
+ * Helper to clean up expired sessions.
+ */
+const cleanUpExpiredOTPs = () => {
+  const now = Date.now();
+  for (const [ref, session] of otpCache.entries()) {
+    if (now > session.expiresAt) {
+      otpCache.delete(ref);
+    }
+  }
+};
+
+module.exports = {
+  createOTP,
+  verifyOTP,
+  generateSecureOTP
+};

@@ -42,7 +42,7 @@ class InvoiceBuilder {
           currency: "INR"
         },
         totalGross: {
-          value: params.invoiceTotal || 0,
+          value: params.invoiceTotalGross || params.invoiceTotal || 0,
           currency: "INR"
         },
         lineItem: []
@@ -51,16 +51,116 @@ class InvoiceBuilder {
 
     if (params.invoiceItems && Array.isArray(params.invoiceItems)) {
       params.invoiceItems.forEach((item, index) => {
+        const chargeItemId = uuidv4();
+        
+        const chargeItem = {
+          fullUrl: `urn:uuid:${chargeItemId}`,
+          resource: {
+            resourceType: "ChargeItem",
+            id: chargeItemId,
+            meta: {
+              profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/ChargeItem"]
+            },
+            status: "billable",
+            code: {
+              text: item.name || "Consultation"
+            },
+            subject: {
+              reference: ids.patientId,
+              display: params.patientName
+            },
+            quantity: {
+              value: item.qty || 1
+            }
+          }
+        };
+        entries.push(chargeItem);
+
         invoice.resource.lineItem.push({
           sequence: index + 1,
-          chargeItemCodeableConcept: {
-            text: item.name || "Consultation"
+          chargeItemReference: {
+            reference: chargeItem.fullUrl,
+            display: item.name || "Consultation"
           },
           priceComponent: [
             {
-              type: "base",
+              type: "informational",
+              code: {
+                coding: [
+                  {
+                    system: "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                    code: "00",
+                    display: "MRP"
+                  }
+                ]
+              },
+              factor: item.qty || 1,
               amount: {
-                value: item.total || 0,
+                value: item.mrp || 0,
+                currency: "INR"
+              }
+            },
+            {
+              type: "discount",
+              code: {
+                coding: [
+                  {
+                    system: "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                    code: "02",
+                    display: "Discount"
+                  }
+                ]
+              },
+              amount: {
+                value: item.discount || 0,
+                currency: "INR"
+              }
+            },
+            {
+              type: "base",
+              code: {
+                coding: [
+                  {
+                    system: "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                    code: "01",
+                    display: "Rate"
+                  }
+                ]
+              },
+              amount: {
+                value: item.rate || 0,
+                currency: "INR"
+              }
+            },
+            {
+              type: "tax",
+              code: {
+                coding: [
+                  {
+                    system: "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                    code: "03",
+                    display: "CGST"
+                  }
+                ]
+              },
+              amount: {
+                value: item.gstAmt ? item.gstAmt / 2 : 0,
+                currency: "INR"
+              }
+            },
+            {
+              type: "tax",
+              code: {
+                coding: [
+                  {
+                    system: "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                    code: "04",
+                    display: "SGST"
+                  }
+                ]
+              },
+              amount: {
+                value: item.gstAmt ? item.gstAmt / 2 : 0,
                 currency: "INR"
               }
             }

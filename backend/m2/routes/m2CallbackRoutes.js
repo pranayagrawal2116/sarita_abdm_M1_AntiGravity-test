@@ -62,6 +62,31 @@ router.post(
   M2CallbackController.onHealthInformationNotify
 );
 
+// User Initiated Linking (HIP) callbacks
+router.post(
+  [
+    "/api/v3/care-contexts/discover",
+    "/v3/care-contexts/discover"
+  ],
+  M2CallbackController.handleDiscover
+);
+
+router.post(
+  [
+    "/api/v3/links/link/init",
+    "/v3/links/link/init"
+  ],
+  M2CallbackController.handleLinkInit
+);
+
+router.post(
+  [
+    "/api/v3/links/link/confirm",
+    "/v3/links/link/confirm"
+  ],
+  M2CallbackController.handleLinkConfirm
+);
+
 router.post("/api/m2/callbacks/:type", M2CallbackController.receive);
 router.post("/api/m2/callbacks", M2CallbackController.receive);
 

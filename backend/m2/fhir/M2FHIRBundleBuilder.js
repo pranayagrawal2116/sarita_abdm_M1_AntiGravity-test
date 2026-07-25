@@ -415,7 +415,7 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
       const match = line.match(/^\s*Name:\s*(.+)$/i);
       if (match && text(match[1]) !== "-") {
         let name = text(match[1]);
-        let rate = 0, qty = 1, total = 0;
+        let rate = 0, qty = 1, total = 0, mrp = 0, discount = 0, gstPct = 0, gstAmt = 0;
         for (let j = i + 1; j < Math.min(lines.length, i + 12); j++) {
            if (/^\s*-\s*Item/i.test(lines[j])) break; // Stop at next item
            const rMatch = lines[j].match(/^\s*Rate:\s*([\d.]+)/i);
@@ -424,13 +424,23 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
            if (qMatch) qty = Number(qMatch[1]);
            const tMatch = lines[j].match(/^\s*Total:\s*([\d.]+)/i);
            if (tMatch) total = Number(tMatch[1]);
+           
+           const mrpMatch = lines[j].match(/^\s*Mrp:\s*([\d.]+)/i);
+           if (mrpMatch) mrp = Number(mrpMatch[1]);
+           const dMatch = lines[j].match(/^\s*Discount:\s*([\d.]+)/i);
+           if (dMatch) discount = Number(dMatch[1]);
+           const gpMatch = lines[j].match(/^\s*Gst Pct:\s*([\d.]+)/i);
+           if (gpMatch) gstPct = Number(gpMatch[1]);
+           const gaMatch = lines[j].match(/^\s*Gst Amt:\s*([\d.]+)/i);
+           if (gaMatch) gstAmt = Number(gaMatch[1]);
         }
-        invoiceItems.push({ name, rate, qty, total });
+        invoiceItems.push({ name, rate, qty, total, mrp, discount, gstPct, gstAmt });
       }
     }
   }
 
   let invoiceTotal = 0;
+  let invoiceTotalGross = invoiceItems.reduce((acc, item) => acc + (item.rate * item.qty), 0);
   for (const line of lines) {
     const m = line.match(/^\s*Grand Total:\s*([\d.]+)/i);
     if (m) {
@@ -493,15 +503,66 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     }
   }
 
+  // --- Extract Immunizations List ---
+  const immunizationsList = [];
+  const immStart = lines.findIndex((line) => /^\s*Entries:/i.test(line));
+  if (immStart >= 0) {
+    for (let i = immStart + 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^(?:Draft Entry):/i.test(line)) break;
+      const match = line.match(/^\s*Vaccine Name:\s*(.+)$/i);
+      if (match && text(match[1]) !== "-") {
+        let vaccineName = text(match[1]);
+        let brand = "", date = "", lotNumber = "", doseNo = "";
+        for (let j = i + 1; j < Math.min(lines.length, i + 6); j++) {
+           if (/^\s*-\s*Item/i.test(lines[j])) break;
+           const bMatch = lines[j].match(/^\s*Brand:\s*(.+)$/i);
+           if (bMatch) brand = text(bMatch[1]);
+           const dMatch = lines[j].match(/^\s*Date:\s*(.+)$/i);
+           if (dMatch) date = text(dMatch[1]);
+           const lMatch = lines[j].match(/^\s*Lot Number:\s*(.+)$/i);
+           if (lMatch) lotNumber = text(lMatch[1]);
+           const dnMatch = lines[j].match(/^\s*Dose No:\s*(.+)$/i);
+           if (dnMatch) doseNo = text(dnMatch[1]);
+        }
+        immunizationsList.push({ vaccineName, brand, date, lotNumber, doseNo });
+      }
+    }
+  }
+
+  // Fallback to Draft Entry if empty
+  if (immunizationsList.length === 0) {
+    const draftVaccineName = extractIndentedValue(lines, /^Draft Entry:/i, /^\s*Vaccine Name:\s*(.+)$/i) || 
+                             extractIndentedValue(lines, /^Draft Entry/i, /^\s*Vaccine Name:\s*(.+)$/i);
+    const draftBrand = extractIndentedValue(lines, /^Draft Entry/i, /^\s*Brand:\s*(.+)$/i);
+    const draftDate = extractIndentedValue(lines, /^Draft Entry/i, /^\s*Date:\s*(.+)$/i);
+    const draftLotNumber = extractIndentedValue(lines, /^Draft Entry/i, /^\s*Lot Number:\s*(.+)$/i);
+    const draftDoseNo = extractIndentedValue(lines, /^Draft Entry/i, /^\s*Dose No:\s*(.+)$/i);
+
+    if (draftVaccineName) {
+      immunizationsList.push({ vaccineName: draftVaccineName, brand: draftBrand, date: draftDate, lotNumber: draftLotNumber, doseNo: draftDoseNo });
+    }
+  }
+
   // --- Extract Family History ---
   const familyHistoryList = extractIndentedList(lines, /^Family History:/i);
   const familyHistory = familyHistoryList.map(fh => ({ display: fh }));
 
   // --- Extract Follow Up ---
-  const followUpReason = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Reason:\s*(.+)$/i);
-  const followUpDate = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Date:\s*(.+)$/i);
-  const followUpTime = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Time:\s*(.+)$/i);
+  const followUpReason = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Reason:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*Reason:\s*(.+)$/i);
+  const followUpDate = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Date:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*Follow Up Date:\s*(.+)$/i);
+  const followUpTime = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Time:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*Follow Up Time:\s*(.+)$/i);
   const followUp = (followUpReason || followUpDate) ? { reason: followUpReason, date: followUpDate, time: followUpTime } : null;
+
+  // --- Extract Care Plan ---
+  const carePlanTitle = extractIndentedValue(lines, /^Care Plan:/i, /^\s*Title:\s*(.+)$/i);
+  const carePlanDesc = extractIndentedValue(lines, /^Care Plan:/i, /^\s*Description:\s*(.+)$/i);
+  let carePlan = null;
+  if (carePlanTitle || carePlanDesc) {
+    carePlan = { title: carePlanTitle, description: carePlanDesc };
+  } else if (followUp) {
+    carePlan = { title: "Discharge Care Plan", description: "Follow up as directed" };
+  }
 
   // Replace string building PDF with pdfmake generator
   const { generateOPConsultationPDF } = require("./pdfGenerator");
@@ -537,8 +598,11 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     procedures,
     medicationsList,
     familyHistory,
+    carePlan,
     followUp,
     invoiceTotal,
+    invoiceTotalGross,
+    immunizationsList,
     diagnosticReports: [{ code: "11502-2", display: reportName, conclusion: cleanConclusion }],
     treatments: medicationName ? [{ medCode: inferDrugCode(medDisplay), medDisplay: medDisplay, instructionText: instructionText }] : [{ medCode: "387458008", medDisplay: "Clinical treatment as recorded", instructionText: "As directed" }],
     medications: medicationsList.map(med => ({
@@ -586,6 +650,14 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       businessData.pdfBase64 = await generateDiagnosticReportPDF(businessData);
     } catch (e) {
       console.error("Failed to generate Diagnostic Report PDF", e);
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+    }
+  } else if (recordType === "Immunization") {
+    const { generateImmunizationRecordPDF } = require("./pdfGenerator");
+    try {
+      businessData.pdfBase64 = await generateImmunizationRecordPDF(businessData);
+    } catch (e) {
+      console.error("Failed to generate Immunization PDF", e);
       businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
     }
   } else {

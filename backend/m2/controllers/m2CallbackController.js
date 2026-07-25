@@ -8,6 +8,7 @@ const Logger = require("../logging/logger");
 const M2CallbackManager = require("../callbacks/M2CallbackManager");
 const M2TransactionStore = require("../transactions/M2TransactionStore");
 const M2EncryptionService = require("../encryption/M2EncryptionService");
+const M2HipLinkingController = require("./m2HipLinkingController");
 require("../consent/M2ConsentManager");
 require("../transfer/M2DataTransferManager");
 
@@ -256,6 +257,60 @@ class M2CallbackController {
       Logger.error("M2CallbackController", "Error processing health information notify callback.", err);
       return res.status(500).json({ error: err.message });
     }
+  }
+
+  /**
+   * Webhook: POST /v3/care-contexts/discover
+   * @param {Object} req 
+   * @param {Object} res 
+   */
+  static async handleDiscover(req, res) {
+    Logger.info("M2CallbackController", "HIP handleDiscover webhook received.");
+    const payload = req.body || {};
+    
+    // ABDM expects immediate 202
+    res.status(202).json({});
+
+    // Process asynchronously
+    setImmediate(() => {
+      M2HipLinkingController.processDiscovery(payload);
+    });
+  }
+
+  /**
+   * Webhook: POST /v3/links/link/init
+   * @param {Object} req 
+   * @param {Object} res 
+   */
+  static async handleLinkInit(req, res) {
+    Logger.info("M2CallbackController", "HIP handleLinkInit webhook received.");
+    const payload = req.body || {};
+    
+    // ABDM expects immediate 202
+    res.status(202).json({});
+
+    // Process asynchronously
+    setImmediate(() => {
+      M2HipLinkingController.processLinkInit(payload);
+    });
+  }
+
+  /**
+   * Webhook: POST /v3/links/link/confirm
+   * @param {Object} req 
+   * @param {Object} res 
+   */
+  static async handleLinkConfirm(req, res) {
+    Logger.info("M2CallbackController", "HIP handleLinkConfirm webhook received.");
+    const payload = req.body || {};
+    
+    // ABDM expects immediate 202
+    res.status(202).json({});
+
+    // Process asynchronously
+    setImmediate(() => {
+      M2HipLinkingController.processLinkConfirm(payload);
+    });
   }
 }
 

@@ -7,6 +7,7 @@ const hospitalConfig = require("./config/hospitalConfig");
 const fs = require('fs');
 const path = require('path');
 const { startWatcher } = require("./m2/fhir/M2FolderWatcher");
+const M2AuthenticationManager = require("./m2/authentication/M2AuthenticationManager");
 
 const app = express();
 
@@ -403,4 +404,12 @@ app.listen(PORT, HOST, () => {
     console.log("⚠️ PUBLIC_BASE_URL is not set. ABDM callbacks will not reach this server unless you expose it publicly.");
   }
   console.log("🛠 Callback config:", `${localBaseUrl}/api/config/callbacks`);
+
+  // Initialize M2 Token Manager (Gateway & Session tokens) on startup
+  const M2TokenManager = require("./m2/tokens/M2TokenManager");
+  M2TokenManager.initialize().then(() => {
+    console.log("✅ ABDM M2 Tokens (Gateway & Session) initialized on startup.");
+  }).catch(err => {
+    console.error("❌ Failed to initialize ABDM M2 Tokens on startup:", err.message);
+  });
 });

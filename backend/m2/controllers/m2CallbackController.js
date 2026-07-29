@@ -267,6 +267,9 @@ class M2CallbackController {
   static async handleDiscover(req, res) {
     Logger.info("M2CallbackController", "HIP handleDiscover webhook received.");
     const payload = req.body || {};
+    if (!payload.requestId && (req.headers["request-id"] || req.headers["request_id"])) {
+      payload.requestId = req.headers["request-id"] || req.headers["request_id"];
+    }
     
     // ABDM expects immediate 202
     res.status(202).json({});
@@ -285,6 +288,9 @@ class M2CallbackController {
   static async handleLinkInit(req, res) {
     Logger.info("M2CallbackController", "HIP handleLinkInit webhook received.");
     const payload = req.body || {};
+    if (!payload.requestId && (req.headers["request-id"] || req.headers["request_id"])) {
+      payload.requestId = req.headers["request-id"] || req.headers["request_id"];
+    }
     
     // ABDM expects immediate 202
     res.status(202).json({});
@@ -303,6 +309,9 @@ class M2CallbackController {
   static async handleLinkConfirm(req, res) {
     Logger.info("M2CallbackController", "HIP handleLinkConfirm webhook received.");
     const payload = req.body || {};
+    if (!payload.requestId && (req.headers["request-id"] || req.headers["request_id"])) {
+      payload.requestId = req.headers["request-id"] || req.headers["request_id"];
+    }
     
     // ABDM expects immediate 202
     res.status(202).json({});

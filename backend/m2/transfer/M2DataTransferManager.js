@@ -148,6 +148,7 @@ class M2DataTransferManager {
       let totalRecords = 0;
       let checksumStr = "";
 
+      let bundleIndex = 0;
       for (const payload of selectedPayloads) {
         const fhirBundle = payload.bundle;
         const serializedBundle = JSON.stringify(fhirBundle);
@@ -155,8 +156,11 @@ class M2DataTransferManager {
         
         const transferCareContextReference = this.resolveCareContextReferenceForBundle(
           M2TransactionStore.getTransaction(transactionId) || {},
-          payload
+          payload,
+          bundleIndex
         );
+        bundleIndex++;
+
         
         const encryptionRes = M2EncryptionService.encryptBundle(
           serializedBundle,
@@ -855,7 +859,7 @@ class M2DataTransferManager {
     return first?.careContextReference || first?.referenceNumber || first?.id || "";
   }
 
-  resolveCareContextReferenceForBundle(tx = {}, selectedPayload = {}) {
+  resolveCareContextReferenceForBundle(tx = {}, selectedPayload = {}, index = 0) {
     if (selectedPayload.meta?.careContextReference) return selectedPayload.meta.careContextReference;
 
     const selectedBundle = selectedPayload.bundle || {};
@@ -867,6 +871,11 @@ class M2DataTransferManager {
       if (!bundle || typeof bundle !== "object") continue;
       if (selectedId && bundle.id === selectedId) return careContextReference;
       if (selectedIdentifier && bundle.identifier?.value === selectedIdentifier) return careContextReference;
+    }
+
+    if (Array.isArray(tx.careContexts) && tx.careContexts.length > 0) {
+      const idx = index % tx.careContexts.length;
+      return tx.careContexts[idx].careContextReference || tx.careContexts[idx].referenceNumber || tx.careContexts[idx].id || "";
     }
 
     return this.getCareContextReference(tx);

@@ -11,7 +11,7 @@ const toIsoTimestamp = (value, fallback = new Date().toISOString()) => {
   return Number.isNaN(parsed.getTime()) ? fallback : parsed.toISOString();
 };
 
-const nowIso = () => new Date().toISOString();
+const nowIso = (date = new Date()) => date.toISOString();
 
 module.exports = {
   toIsoTimestamp,

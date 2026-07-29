@@ -66,7 +66,9 @@ router.post(
 router.post(
   [
     "/api/v3/care-contexts/discover",
-    "/v3/care-contexts/discover"
+    "/v3/care-contexts/discover",
+    "/api/v3/hip/patient/care-context/discover",
+    "/v3/hip/patient/care-context/discover"
   ],
   M2CallbackController.handleDiscover
 );
@@ -74,7 +76,9 @@ router.post(
 router.post(
   [
     "/api/v3/links/link/init",
-    "/v3/links/link/init"
+    "/v3/links/link/init",
+    "/api/v3/hip/link/care-context/init",
+    "/v3/hip/link/care-context/init"
   ],
   M2CallbackController.handleLinkInit
 );
@@ -82,7 +86,9 @@ router.post(
 router.post(
   [
     "/api/v3/links/link/confirm",
-    "/v3/links/link/confirm"
+    "/v3/links/link/confirm",
+    "/api/v3/hip/link/care-context/confirm",
+    "/v3/hip/link/care-context/confirm"
   ],
   M2CallbackController.handleLinkConfirm
 );

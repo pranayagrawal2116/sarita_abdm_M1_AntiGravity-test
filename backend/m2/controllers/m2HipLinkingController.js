@@ -57,82 +57,124 @@ class M2HipLinkingController {
       }
     });
 
-    if (!requestedAbhaAddress) {
-      requestedAbhaAddress = patientDetails.id;
+    let requestedMobile = null;
+
+    if (patientDetails.verifiedIdentifiers && Array.isArray(patientDetails.verifiedIdentifiers)) {
+      const mobileId = patientDetails.verifiedIdentifiers.find(id => id.type === "MOBILE");
+      if (mobileId) {
+        requestedMobile = mobileId.value;
+      }
     }
 
-    // Find patient and their care contexts
-    const patients = this._getPatientData();
     const transactions = this._getTransactionData();
     let matchedPatient = null;
+    let careContexts = [];
     
-    if (requestedAbhaAddress) {
-       for (const [hipId, p] of Object.entries(patients)) {
-         if (p.abhaAddress === requestedAbhaAddress || p.id === requestedAbhaAddress) {
-           matchedPatient = p;
-           matchedPatient.hipId = hipId;
-           break;
-         }
-       }
-    }
-
-    const careContexts = [];
-    if (matchedPatient) {
-      // Find encounters/records for this patient
+    // Instead of relying on m2_patients.json, we can infer patient details from m2_transactions
+    if (requestedAbhaAddress || requestedMobile) {
       for (const [txId, tx] of Object.entries(transactions)) {
-        if (tx.patientId === matchedPatient.id || tx.abhaAddress === requestedAbhaAddress) {
-           if (tx.hiTypes && Array.isArray(tx.hiTypes)) {
-              tx.hiTypes.forEach((hiType, index) => {
-                 careContexts.push({
-                   referenceNumber: `${txId}-${index}`,
-                   display: `${hiType} record for ${matchedPatient.name}`
-                 });
-              });
-           } else {
-              careContexts.push({
-                 referenceNumber: txId,
-                 display: `Health Record for ${matchedPatient.name}`
-              });
-           }
+        const txMobile = tx.patientMobile || tx.mobileNumber || tx.mobile || (tx.patient && tx.patient.mobile);
+        const matchByAbha = requestedAbhaAddress && (tx.abhaAddress === requestedAbhaAddress || tx.patientId === requestedAbhaAddress);
+        const matchByMobile = requestedMobile && (txMobile === requestedMobile || JSON.stringify(tx).includes(requestedMobile));
+
+        if (matchByAbha || matchByMobile) {
+          if (!matchedPatient) {
+             matchedPatient = {
+               id: requestedAbhaAddress || `PAT-${uuidv4().substring(0,8)}`,
+               name: tx.patientName || patientDetails.name || "Patient Record"
+             };
+          }
+          if (tx.hiTypes && Array.isArray(tx.hiTypes)) {
+             const validHiTypes = ["Prescription", "DiagnosticReport", "OPConsultation", "DischargeSummary", "ImmunizationRecord", "HealthDocumentRecord", "WellnessRecord", "Invoice"];
+             const filteredHiTypes = tx.hiTypes.filter(type => validHiTypes.includes(type));
+             
+             if (filteredHiTypes.length > 0) {
+               filteredHiTypes.forEach((hiType, index) => {
+                  careContexts.push({
+                    referenceNumber: `${txId}-${index}`,
+                    display: `${hiType} record`,
+                    hiType: hiType
+                  });
+               });
+             } else {
+               careContexts.push({
+                  referenceNumber: txId,
+                  display: `Health Record`,
+                  hiType: "OPConsultation" // fallback default
+               });
+             }
+          } else {
+             careContexts.push({
+                referenceNumber: txId,
+                display: `Health Record`,
+                hiType: "OPConsultation" // fallback default
+             });
+          }
+          break; // Stop after first match to prevent returning hundreds of duplicate care contexts
         }
       }
     }
 
-    const responsePayload = {
-      requestId: uuidv4(),
-      timestamp: nowIso(),
+    let responsePayload = {
       transactionId: payload.transactionId || uuidv4(),
-      patient: matchedPatient && careContexts.length > 0 ? {
-        referenceNumber: matchedPatient.id,
-        display: matchedPatient.name,
-        careContexts: careContexts,
-        matchedBy: ["NDHM_HEALTH_NUMBER"]
-      } : null,
-      resp: {
+      response: {
         requestId: requestId
       }
     };
 
-    if (!matchedPatient || careContexts.length === 0) {
+    if (matchedPatient && careContexts.length > 0) {
+      // According to official ABDM V3 Sandbox Documentation (Section 5.3.3):
+      // - patient is an ARRAY of objects.
+      // - matchedBy is OUTSIDE the patient array.
+      // - hiType and count are at the patient array element level, NOT inside careContexts.
+      // We must group care contexts by hiType and return one patient array element per hiType.
+
+      const careContextsByHiType = {};
+      careContexts.forEach(cc => {
+        const type = cc.hiType || "OPConsultation";
+        if (!careContextsByHiType[type]) {
+          careContextsByHiType[type] = [];
+        }
+        careContextsByHiType[type].push({
+          referenceNumber: cc.referenceNumber,
+          display: cc.display
+        });
+      });
+
+      responsePayload.patient = Object.keys(careContextsByHiType).map(type => {
+        return {
+          referenceNumber: matchedPatient.id,
+          display: matchedPatient.name,
+          careContexts: careContextsByHiType[type],
+          hiType: type,
+          count: careContextsByHiType[type].length
+        };
+      });
+
+      responsePayload.matchedBy = ["HEALTH_ID"];
+    } else {
       responsePayload.error = {
-        code: 1000,
-        message: "No patient or care contexts discovered"
+        code: "ABDM-1010",
+        message: "Patient not found"
       };
-      delete responsePayload.patient;
     }
 
     try {
+      const url = `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/patient/care-context/on-discover`;
       await M2AuthenticationManager.callGatewayApi({
         method: "POST",
-        url: `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in/gateway'}/v0.5/care-contexts/on-discover`,
+        url: url,
         data: responsePayload,
         headers: {
-          "X-CM-ID": process.env.ABDM_CM_ID || "sbx"
+          "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
+          "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
+          "REQUEST-ID": uuidv4(),
+          "TIMESTAMP": nowIso()
         }
       });
-      Logger.info("M2HipLinkingController", "Successfully sent on-discover response.");
+      Logger.info("M2HipLinkingController", "Successfully sent on-discover response to " + url);
     } catch (e) {
-      Logger.error("M2HipLinkingController", "Failed to send on-discover response.", e);
+      Logger.error("M2HipLinkingController", "Failed to send on-discover response.", e.response?.data || e.message);
     }
   }
 
@@ -155,34 +197,37 @@ class M2HipLinkingController {
     Logger.info("M2HipLinkingController", `[MOCK SMS] -> OTP to link care contexts is: ${otp}`);
     
     const responsePayload = {
-      requestId: uuidv4(),
-      timestamp: nowIso(),
       transactionId: transactionId,
       link: {
         referenceNumber: referenceNumber,
-        authenticationType: "DIRECT",
+        authenticationType: "MEDIATE",
         meta: {
-          communicationHint: "SMS dispatched to registered mobile number",
+          communicationMedium: "MOBILE",
+          communicationHint: "OTP",
           communicationExpiry: nowIso(new Date(Date.now() + 5 * 60000))
         }
       },
-      resp: {
+      response: {
         requestId: requestId
       }
     };
 
     try {
+      const url = `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/link/care-context/on-init`;
       await M2AuthenticationManager.callGatewayApi({
         method: "POST",
-        url: `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in/gateway'}/v0.5/links/link/on-init`,
+        url: url,
         data: responsePayload,
         headers: {
-          "X-CM-ID": process.env.ABDM_CM_ID || "sbx"
+          "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
+          "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
+          "REQUEST-ID": uuidv4(),
+          "TIMESTAMP": nowIso()
         }
       });
-      Logger.info("M2HipLinkingController", "Successfully sent on-init response.");
+      Logger.info("M2HipLinkingController", "Successfully sent on-init response to " + url);
     } catch (e) {
-      Logger.error("M2HipLinkingController", "Failed to send on-init response.", e);
+      Logger.error("M2HipLinkingController", "Failed to send on-init response.", e.response?.data || e.message);
     }
   }
 
@@ -198,47 +243,55 @@ class M2HipLinkingController {
     
     Logger.info("M2HipLinkingController", "Processing Link Confirm for request:", { requestId });
 
+    // Validate the OTP against our store (which is hardcoded to 122333 for sandbox)
     const isValid = otpStore.verifyOTP(referenceNumber, submittedOtp);
 
-    const responsePayload = {
-      requestId: uuidv4(),
-      timestamp: nowIso(),
-      resp: {
+    let responsePayload = {
+      response: {
         requestId: requestId
       }
     };
 
     if (isValid) {
-      // Create permanent link (in a real DB you'd mark the care contexts as linked to this ABHA address)
-      responsePayload.patient = {
-        referenceNumber: `PAT-${uuidv4().substring(0, 8)}`,
-        display: "Patient Linked Successfully",
-        careContexts: [
-           // We would echo back the linked care contexts here
-           { referenceNumber: "linked-ctx", display: "Linked Care Context" }
-        ]
-      };
+      responsePayload.patient = [
+        {
+          referenceNumber: confirmationDetails.linkRefNumber || uuidv4(),
+          display: "Linked Record",
+          careContexts: [
+            {
+              referenceNumber: "linked-ctx",
+              display: "Successfully Linked Care Context"
+            }
+          ],
+          hiType: "OPConsultation",
+          count: 1
+        }
+      ];
       Logger.info("M2HipLinkingController", "OTP verification successful, patient care contexts linked.");
     } else {
       responsePayload.error = {
-        code: 1000,
+        code: "ABDM-1100",
         message: "Invalid or expired OTP"
       };
       Logger.warn("M2HipLinkingController", "OTP verification failed or expired.");
     }
 
     try {
+      const url = `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/link/care-context/on-confirm`;
       await M2AuthenticationManager.callGatewayApi({
         method: "POST",
-        url: `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in/gateway'}/v0.5/links/link/on-confirm`,
+        url: url,
         data: responsePayload,
         headers: {
-          "X-CM-ID": process.env.ABDM_CM_ID || "sbx"
+          "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
+          "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
+          "REQUEST-ID": uuidv4(),
+          "TIMESTAMP": nowIso()
         }
       });
-      Logger.info("M2HipLinkingController", "Successfully sent on-confirm response.");
+      Logger.info("M2HipLinkingController", "Successfully sent on-confirm response to " + url);
     } catch (e) {
-      Logger.error("M2HipLinkingController", "Failed to send on-confirm response.", e);
+      Logger.error("M2HipLinkingController", "Failed to send on-confirm response.", e.response?.data || e.message);
     }
   }
 

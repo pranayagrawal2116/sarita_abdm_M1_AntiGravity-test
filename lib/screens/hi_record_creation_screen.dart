@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:convert';
+import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
 import '../services/hip_linking_workflow_service.dart';
@@ -75,6 +77,9 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
         return _InvoiceForm(onSaved: _handleSave, onLink: _handleLink);
       case 'Discharge Summary':
         return _DischargeSummaryForm(onSaved: _handleSave, onLink: _handleLink);
+      case 'Health Document Record':
+      case 'HealthDocumentRecord':
+        return _HealthDocumentForm(onSaved: _handleSave, onLink: _handleLink);
       default:
         return Card(
           child: Padding(
@@ -236,8 +241,15 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
     buffer
       ..writeln()
       ..writeln('--- Record Data ---')
-      ..writeln()
-      ..write(_textForValue(recordData, 0));
+      ..writeln();
+      
+    if (recordData.containsKey('PDF_BASE64')) {
+      buffer.writeln('PDF_BASE64: ${recordData['PDF_BASE64']}');
+      final copy = Map<String, dynamic>.from(recordData)..remove('PDF_BASE64');
+      buffer.write(_textForValue(copy, 0));
+    } else {
+      buffer.write(_textForValue(recordData, 0));
+    }
     return buffer.toString();
   }
 
@@ -3035,11 +3047,98 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
     super.dispose();
   }
 
+  void _autofillForm() {
+    setState(() {
+      _complaints.clear();
+      _complaints.add('Fever');
+      
+      _systolicController.text = '110';
+      _diastolicController.text = '90';
+      _heartRateController.text = '110';
+      _respRateController.text = '30';
+      _spo2Controller.text = '99';
+      _tempController.text = '98';
+      _heightController.text = '178';
+      _weightController.text = '79';
+      _calculateBmi();
+      
+      _allergies.clear();
+      _allergies.add('Dust');
+      
+      _history.clear();
+      _history.add('Discharge Diagnosis - Headache');
+      
+      _procedures.clear();
+      _procedures.add('Colonoscopy');
+      
+      _labReports.clear();
+      final labReport = _LabReportData();
+      labReport.nameController.text = 'Blood Test';
+      
+      labReport.observations[0].testNameController.text = 'WBC';
+      labReport.observations[0].valueController.text = '6000';
+      labReport.observations[0].unitController.text = 'uL';
+      
+      labReport.observations.add(
+        _ObservationData()
+          ..testNameController.text = 'Platelet'
+          ..valueController.text = '20000'
+          ..unitController.text = 'uL',
+      );
+      
+      labReport.observations.add(
+        _ObservationData()
+          ..testNameController.text = 'MCV'
+          ..valueController.text = '60'
+          ..unitController.text = 'fL',
+      );
+      
+      labReport.observations.add(
+        _ObservationData()
+          ..testNameController.text = 'MCH'
+          ..valueController.text = '30'
+          ..unitController.text = 'pg',
+      );
+      
+      _labReports.add(labReport);
+      
+      _medications.clear();
+      _medications.add({
+        'name': 'Paracetamole headache',
+        'dose': '1-1-1',
+        'route': 'Oral',
+        'timing': 'After Food',
+        'instructions': '',
+      });
+      
+      _familyHistory.clear();
+      _familyHistory.add({
+        'condition': 'Diabetes',
+        'relationship': 'Father',
+        'notes': '',
+      });
+      
+      _carePlanTitle.text = 'plan';
+      _carePlanDesc.text = 'Bed rest for 5 days';
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        ElevatedButton.icon(
+          onPressed: _autofillForm,
+          icon: const Icon(Icons.auto_awesome),
+          label: const Text('Auto-fill from Sample Data'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo.shade50,
+            foregroundColor: Colors.indigo.shade900,
+          ),
+        ),
+        const SizedBox(height: 20),
         _buildListManagerCard(
           'Chief Complaints',
           _complaints,
@@ -4162,4 +4261,93 @@ Widget _buildFormActionButtons({
       }
     },
   );
+}
+
+class _HealthDocumentForm extends StatefulWidget {
+  final Function(Map<String, dynamic>) onSaved;
+  final Function(Map<String, dynamic>) onLink;
+
+  const _HealthDocumentForm({required this.onSaved, required this.onLink});
+
+  @override
+  State<_HealthDocumentForm> createState() => _HealthDocumentFormState();
+}
+
+class _HealthDocumentFormState extends State<_HealthDocumentForm> {
+  final _formKey = GlobalKey<FormState>();
+  String? _selectedFileName;
+  String? _base64Pdf;
+
+  Future<void> _pickPdf() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+    );
+    if (result != null && result.files.single.path != null) {
+      final file = File(result.files.single.path!);
+      final bytes = await file.readAsBytes();
+      setState(() {
+        _selectedFileName = result.files.single.name;
+        _base64Pdf = base64Encode(bytes);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const Text(
+            'Health Document Record',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _pickPdf,
+            icon: const Icon(Icons.picture_as_pdf),
+            label: const Text('Select PDF Document'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+          ),
+          if (_selectedFileName != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Text(
+                'Selected: $_selectedFileName',
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+              ),
+            )
+          else
+            const Padding(
+              padding: EdgeInsets.only(top: 16.0),
+              child: Text(
+                'No PDF selected yet.',
+                style: TextStyle(color: Colors.redAccent),
+              ),
+            ),
+          const SizedBox(height: 24),
+          _buildFormActionButtons(
+            onSave: () {
+              if (_base64Pdf == null) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a PDF first.')));
+                return;
+              }
+              widget.onSaved({'PDF_BASE64': _base64Pdf});
+            },
+            onLink: () {
+              if (_base64Pdf == null) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a PDF first.')));
+                return;
+              }
+              widget.onLink({'PDF_BASE64': _base64Pdf});
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }

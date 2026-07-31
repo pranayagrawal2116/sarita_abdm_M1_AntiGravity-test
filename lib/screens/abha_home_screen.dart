@@ -30,6 +30,7 @@ class _AbhaHomeScreenState extends State<AbhaHomeScreen> {
     'Immunization Record',
     'Invoice Record',
     'Discharge Summary',
+    'Health Document Record',
   ];
 
   late Future<Map<String, dynamic>> _profileFuture;

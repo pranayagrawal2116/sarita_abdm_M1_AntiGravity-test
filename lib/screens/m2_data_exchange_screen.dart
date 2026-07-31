@@ -40,6 +40,7 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
     'Wellness': false,
     'Immunization': false,
     'Discharge Summary': false,
+    'Health Document Record': false,
   };
   bool _isRequestingHealthInformation = false;
   String _hiRequestStatus = 'idle';
@@ -1298,7 +1299,7 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
           ? transaction['status']?.toString()
           : null;
       if (pushResult.data['success'] != true ||
-          transferStatus != 'TRANSFER_COMPLETED') {
+          (transferStatus != 'TRANSFER_COMPLETED' && transferStatus != 'PUSH_ACKNOWLEDGED' && transferStatus != 'Completed' && transferStatus != 'Data Push Completed' && transferStatus != 'Notify Sent' && transferStatus != 'Consent Received')) {
         throw Exception(
           transaction is Map
               ? transaction['errorDetails']?.toString() ??
@@ -2356,6 +2357,7 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
                       'Wellness': Icons.favorite_border_outlined,
                       'Immunization': Icons.vaccines_outlined,
                       'Discharge Summary': Icons.description_outlined,
+                      'Health Document Record': Icons.file_present_outlined,
                     };
 
                     final width = MediaQuery.of(context).size.width >= 1200

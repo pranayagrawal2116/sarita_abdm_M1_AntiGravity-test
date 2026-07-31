@@ -567,11 +567,16 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   // Replace string building PDF with pdfmake generator
   const { generateOPConsultationPDF } = require("./pdfGenerator");
   
+  // --- Extract Base64 PDF if present ---
+  const pdfBase64Match = file.content.match(/^PDF_BASE64:\s*([A-Za-z0-9+/=]+)$/m);
+  const explicitPdfBase64 = pdfBase64Match ? pdfBase64Match[1] : null;
+
   // Note: we can't call await here if buildBusinessDataFromTextFile is synchronous.
   // We'll attach the pdfBase64 asynchronously in generateOPConsultationBundle instead!
   
   return {
     patientName: patientName,
+    pdfBase64: explicitPdfBase64,
     abhaAddress,
     abhaNumber,
     mobile,
@@ -628,7 +633,10 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
 const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiType, recordType }) => {
   const businessData = buildBusinessDataFromTextFile({ abhaId, folderName, file });
   
-  if (recordType === "OP Consultation") {
+  if (businessData.pdfBase64) {
+    // Explicitly provided via PDF_BASE64 in the text file
+    log("Using explicit PDF_BASE64 from text document for", { recordType });
+  } else if (recordType === "OP Consultation") {
     const { generateOPConsultationPDF } = require("./pdfGenerator");
     try {
       businessData.pdfBase64 = await generateOPConsultationPDF(businessData);
@@ -658,6 +666,14 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       businessData.pdfBase64 = await generateImmunizationRecordPDF(businessData);
     } catch (e) {
       console.error("Failed to generate Immunization PDF", e);
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+    }
+  } else if (recordType === "Discharge Summary") {
+    const { generateDischargeSummaryPDF } = require("./pdfGenerator");
+    try {
+      businessData.pdfBase64 = await generateDischargeSummaryPDF(businessData);
+    } catch (e) {
+      console.error("Failed to generate Discharge Summary PDF", e);
       businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
     }
   } else {

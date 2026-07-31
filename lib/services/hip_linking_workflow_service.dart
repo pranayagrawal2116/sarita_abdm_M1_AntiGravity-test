@@ -451,6 +451,9 @@ class HipLinkingWorkflowService {
       case 'Discharge Summary':
       case 'DischargeSummary':
         return 'DischargeSummary';
+      case 'Health Document Record':
+      case 'HealthDocumentRecord':
+        return 'HealthDocumentRecord';
       default:
         return selectedHiType.trim().replaceAll(' ', '');
     }

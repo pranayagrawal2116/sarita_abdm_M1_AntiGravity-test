@@ -245,6 +245,14 @@ class _HipLinkingPatientScreenState extends State<HipLinkingPatientScreen> {
                   value: 'DischargeSummary',
                   child: Text('DischargeSummary'),
                 ),
+                DropdownMenuItem(
+                  value: 'HealthDocumentRecord',
+                  child: Text('HealthDocumentRecord'),
+                ),
+                DropdownMenuItem(
+                  value: 'WellnessRecord',
+                  child: Text('WellnessRecord'),
+                ),
               ],
               onChanged: (value) {
                 if (value == null) return;

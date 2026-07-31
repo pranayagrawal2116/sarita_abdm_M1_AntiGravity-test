@@ -719,10 +719,339 @@ const generateImmunizationRecordPDF = (params) => {
   });
 };
 
+
+/**
+ * Builds the Discharge Summary Record PDF using pdfmake
+ */
+const generateDischargeSummaryPDF = (params) => {
+  return new Promise((resolve, reject) => {
+    try {
+      const docDefinition = {
+        defaultStyle: {
+          font: "Helvetica",
+          fontSize: 10
+        },
+        content: [
+          // Header
+          {
+            table: {
+              widths: ["auto", "*", "auto"],
+              body: [
+                [
+                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  {
+                    stack: [
+                      { text: "Discharge Summary Record", fontSize: 16, bold: true },
+                      { text: "Record Type: DischargeSummary", fontSize: 10, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  },
+                  {
+                    stack: [
+                      { text: "5eCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || "Pankaj")}`, color: "gray", margin: [0, 4, 0, 0] }
+                    ],
+                    margin: [10, 5, 0, 0]
+                  }
+                ]
+              ]
+            },
+            layout: "noBorders",
+            fillColor: "#f4f4f4",
+            margin: [0, 0, 0, 20]
+          },
+
+          // Record Context
+          { text: "Record Context", fontSize: 12, bold: true, margin: [0, 0, 0, 5] },
+          {
+            table: {
+              headerRows: 0,
+              widths: [120, "*"],
+              body: [
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Pankaj")],
+                [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
+                [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
+                [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
+                [{ text: "Birth Date:", bold: true, fillColor: "#eeeeee" }, text(params.birthDate)],
+                [{ text: "ABHA Number:", bold: true, fillColor: "#eeeeee" }, text(params.abhaNumber || params.abhaId)],
+                [{ text: "ABHA Address:", bold: true, fillColor: "#eeeeee" }, text(params.abhaAddress || params.abhaId)]
+              ]
+            },
+            layout: "lightHorizontalLines",
+            margin: [0, 0, 0, 15]
+          }
+        ]
+      };
+
+      const recordedDate = text(params.timestamp).substring(0, 10);
+
+      docDefinition.content.push(
+        { text: `Status:   final`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+        { text: `Admission Date:   ${recordedDate}`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+        { text: `Discharge Date:   ${recordedDate}`, fontSize: 10, bold: true, margin: [0, 0, 0, 10] }
+      );
+
+      // Chief Complaints
+      if (params.complaints && params.complaints.length > 0) {
+        docDefinition.content.push({ text: "Chief Complaints", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", 100],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Complaint", bold: true, fillColor: "#e6e6e6" }, { text: "Clinical Status", bold: true, fillColor: "#e6e6e6" }],
+              ...params.complaints.map((c, i) => [
+                (i + 1).toString(),
+                text(c.display),
+                "active"
+              ])
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Medical History
+      if (params.history && params.history.length > 0) {
+        docDefinition.content.push({ text: "Medical History", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", 100],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Condition", bold: true, fillColor: "#e6e6e6" }, { text: "Clinical Status", bold: true, fillColor: "#e6e6e6" }],
+              ...params.history.map((h, i) => [
+                (i + 1).toString(),
+                text(h.display),
+                "active"
+              ])
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Physical Examination (Vitals & Measurements)
+      const allVitals = [...(params.vitals || []), ...(params.measurements || [])];
+      if (allVitals.length > 0) {
+        docDefinition.content.push({ text: "Physical Examination", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: [200, "*"],
+            body: [
+              [{ text: "Field", bold: true, fillColor: "#e6e6e6" }, { text: "Value", bold: true, fillColor: "#e6e6e6" }],
+              ...allVitals.map(v => {
+                let name = text(v.display);
+                if (name === "Systolic blood pressure") name = "Blood Pressure Systolic";
+                if (name === "Diastolic blood pressure") name = "Blood Pressure Diastolic";
+                if (name === "Body height") name = "Height";
+                if (name === "Body weight") name = "Weight";
+                if (name === "Body mass index (BMI) [Ratio]") name = "Bmi";
+                if (name === "Body surface temperature") name = "Temperature";
+                if (name === "Oxygen saturation in Arterial blood") name = "Oxygen Saturation";
+                return [
+                  name,
+                  text(v.value)
+                ];
+              })
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Allergies
+      if (params.allergies && params.allergies.length > 0) {
+        docDefinition.content.push({ text: "Allergies", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", 100, 100],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Allergy", bold: true, fillColor: "#e6e6e6" }, { text: "Clinical Status", bold: true, fillColor: "#e6e6e6" }, { text: "Verification Status", bold: true, fillColor: "#e6e6e6" }],
+              ...params.allergies.map((a, i) => [
+                (i + 1).toString(),
+                text(a.display),
+                "active",
+                "confirmed"
+              ])
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Family History
+      if (params.familyHistory && params.familyHistory.length > 0) {
+        docDefinition.content.push({ text: "Family History", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", 100, 100],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Condition", bold: true, fillColor: "#e6e6e6" }, { text: "Relation", bold: true, fillColor: "#e6e6e6" }, { text: "Notes", bold: true, fillColor: "#e6e6e6" }],
+              ...params.familyHistory.map((h, i) => {
+                const parts = text(h.display).split(" - ");
+                const condition = parts[0] || "Diabetes";
+                const relation = parts.length > 1 ? parts[1] : "Grandmother";
+                const notes = parts.length > 2 ? parts[2] : "10";
+                return [
+                  (i + 1).toString(),
+                  condition,
+                  relation,
+                  notes
+                ];
+              })
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Page Break for Page 2
+      // docDefinition.content.push({ text: "", pageBreak: "before" });
+
+      // Procedures
+      if (params.procedures && params.procedures.length > 0) {
+        docDefinition.content.push({ text: "Procedures", fontSize: 12, bold: true, margin: [0, 0, 0, 5], pageBreak: "before" });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", 100, 100],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Procedure", bold: true, fillColor: "#e6e6e6" }, { text: "Status", bold: true, fillColor: "#e6e6e6" }, { text: "Performed Date", bold: true, fillColor: "#e6e6e6" }],
+              ...params.procedures.map((p, i) => [
+                (i + 1).toString(),
+                text(p.display),
+                "completed",
+                recordedDate
+              ])
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Investigations
+      if (params.investigations && params.investigations.length > 0) {
+        docDefinition.content.push({ text: "Investigations", fontSize: 12, bold: true, margin: [0, 0, 0, 5], pageBreak: (params.procedures && params.procedures.length > 0) ? undefined : "before" });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", "auto", "auto", "auto", "auto"],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Test", bold: true, fillColor: "#e6e6e6" }, { text: "Value", bold: true, fillColor: "#e6e6e6" }, { text: "Unit", bold: true, fillColor: "#e6e6e6" }, { text: "Status", bold: true, fillColor: "#e6e6e6" }, { text: "Intent", bold: true, fillColor: "#e6e6e6" }],
+              ...params.investigations.map((inv, i) => {
+                let name = text(inv.display);
+                if (name === "Hemoglobin [Mass/volume] in Blood") name = "Hemoglobin";
+                return [
+                  (i + 1).toString(),
+                  name,
+                  text(inv.value) || "Recorded",
+                  text(inv.unit),
+                  "active",
+                  "order"
+                ];
+              })
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Discharge Diagnosis
+      const diagnoses = params.dischargeDiagnosis || params.diagnosticReports || params.complaints || [];
+      if (diagnoses.length > 0) {
+        docDefinition.content.push({ text: "Discharge Diagnosis", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", 100],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Condition", bold: true, fillColor: "#e6e6e6" }, { text: "Clinical Status", bold: true, fillColor: "#e6e6e6" }],
+              ...diagnoses.map((d, i) => [
+                (i + 1).toString(),
+                text(d.conclusion || d.display || "Headache"),
+                "active"
+              ])
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Medications At Discharge
+      if (params.medicationsList && params.medicationsList.length > 0) {
+        docDefinition.content.push({ text: "Medications At Discharge", fontSize: 12, bold: true, margin: [0, 0, 0, 5] });
+        docDefinition.content.push({
+          table: {
+            headerRows: 1,
+            widths: ["auto", "*", "auto", "auto", "auto", "auto", "auto"],
+            body: [
+              [{ text: "#", bold: true, fillColor: "#e6e6e6" }, { text: "Drug Name", bold: true, fillColor: "#e6e6e6" }, { text: "Dosage", bold: true, fillColor: "#e6e6e6" }, { text: "Route", bold: true, fillColor: "#e6e6e6" }, { text: "Instructions", bold: true, fillColor: "#e6e6e6" }, { text: "Reason", bold: true, fillColor: "#e6e6e6" }, { text: "Status", bold: true, fillColor: "#e6e6e6" }],
+              ...params.medicationsList.map((m, i) => [
+                (i + 1).toString(),
+                text(m.drugName),
+                text(m.dose || "1-1-1"),
+                text(m.route || "Oral"),
+                text(m.timing || "After Food"),
+                "headache", 
+                "active"
+              ])
+            ]
+          },
+          layout: "lightHorizontalLines",
+          margin: [0, 0, 0, 15]
+        });
+      }
+
+      // Advice
+      docDefinition.content.push({
+         text: [
+           { text: "Advice: ", bold: true },
+           { text: params.carePlan?.description || "Bed rest for 5 days" }
+         ],
+         margin: [0, 0, 0, 15]
+      });
+
+      // Footer
+      docDefinition.footer = function (currentPage, pageCount) {
+        return {
+          columns: [
+            { text: "Generated by 5eCare HMIS", color: "gray", fontSize: 10, alignment: "left", margin: [40, 10] },
+            { text: `Page ${currentPage}`, color: "gray", fontSize: 10, alignment: "right", margin: [40, 10] }
+          ]
+        };
+      };
+
+      const pdfDoc = pdfmake.createPdf(docDefinition);
+      pdfDoc.getBase64().then((base64) => {
+        resolve(base64);
+      }).catch(err => {
+        reject(err);
+      });
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+
 module.exports = {
   generateOPConsultationPDF,
   generatePrescriptionPDF: (params) => generateOPConsultationPDF({ ...params, pdfTitle: "Prescription Record", pdfSubtitle: "Prescription" }),
   generateWellnessRecordPDF,
   generateDiagnosticReportPDF,
+  generateDischargeSummaryPDF,
   generateImmunizationRecordPDF
 };

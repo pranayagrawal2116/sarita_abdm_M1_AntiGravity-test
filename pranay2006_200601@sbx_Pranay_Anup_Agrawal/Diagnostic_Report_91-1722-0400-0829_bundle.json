@@ -1,0 +1,356 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-94943958-2587-4d33-848b-46d2de2b54ba",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-08-04T16:46:29.610+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "18fb6beb-af7c-4d14-9a89-e3acfe9d61c7"
+  },
+  "type": "document",
+  "timestamp": "2026-08-04T16:46:29.610+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:c7816e33-35a4-4a55-a30d-69486d6b59e9",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "c7816e33-35a4-4a55-a30d-69486d6b59e9",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "721981007",
+              "display": "Diagnostic studies report"
+            }
+          ],
+          "text": "Diagnostic Report- Lab"
+        },
+        "subject": {
+          "reference": "urn:uuid:8bccb0f4-da54-483c-a1db-0e84ebc05e86",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:abc1977c-2d17-4340-ad5f-48440bc15e64",
+          "display": "Ambulatory"
+        },
+        "date": "2026-08-04T16:46:29.610+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:9a6323fd-a413-4521-b262-27b5c64cf302",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Diagnostic report",
+        "custodian": {
+          "reference": "urn:uuid:672720f2-2180-42aa-a0d6-339fb3ee8bc4",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Hematology report",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "4321000179101",
+                  "display": "Hematology report"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:e49fda6b-9abf-481d-a53c-b3a1404886fc",
+                "display": "Complete Blood Count"
+              },
+              {
+                "reference": "urn:uuid:b4d3ff2e-26d6-4f83-a58a-7010ca02bad7",
+                "display": "WBC"
+              },
+              {
+                "reference": "urn:uuid:70ba9ff5-51c9-49fe-813a-42291df9a57a",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8bccb0f4-da54-483c-a1db-0e84ebc05e86",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "8bccb0f4-da54-483c-a1db-0e84ebc05e86",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-04T16:46:29.610+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranay2006_200601@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9a6323fd-a413-4521-b262-27b5c64cf302",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "9a6323fd-a413-4521-b262-27b5c64cf302",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-04T16:46:29.610+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:672720f2-2180-42aa-a0d6-339fb3ee8bc4",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "672720f2-2180-42aa-a0d6-339fb3ee8bc4",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:abc1977c-2d17-4340-ad5f-48440bc15e64",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "abc1977c-2d17-4340-ad5f-48440bc15e64",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "48934116-bcdc-4351-a686-81e4520f65f0"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:8bccb0f4-da54-483c-a1db-0e84ebc05e86",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-08-04T16:46:29.610+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:b4d3ff2e-26d6-4f83-a58a-7010ca02bad7",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "b4d3ff2e-26d6-4f83-a58a-7010ca02bad7",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "718-7",
+              "display": "WBC"
+            }
+          ],
+          "text": "WBC"
+        },
+        "subject": {
+          "reference": "urn:uuid:8bccb0f4-da54-483c-a1db-0e84ebc05e86"
+        },
+        "effectiveDateTime": "2026-08-04T11:16:29.610Z",
+        "valueQuantity": {
+          "value": 6000,
+          "unit": "10^3/uml",
+          "system": "http://unitsofmeasure.org",
+          "code": "10^3/uml"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e49fda6b-9abf-481d-a53c-b3a1404886fc",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "e49fda6b-9abf-481d-a53c-b3a1404886fc",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "708196005",
+                "display": "Hematology service"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11502-2",
+              "display": "Complete Blood Count"
+            }
+          ],
+          "text": "Complete Blood Count"
+        },
+        "subject": {
+          "reference": "urn:uuid:8bccb0f4-da54-483c-a1db-0e84ebc05e86",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:abc1977c-2d17-4340-ad5f-48440bc15e64"
+        },
+        "performer": [
+          {
+            "reference": "urn:uuid:672720f2-2180-42aa-a0d6-339fb3ee8bc4",
+            "display": "Sarita Health Care"
+          }
+        ],
+        "resultsInterpreter": [
+          {
+            "reference": "urn:uuid:9a6323fd-a413-4521-b262-27b5c64cf302",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "effectiveDateTime": "2026-08-04T11:16:29.610Z",
+        "issued": "2026-08-04T11:16:29.610Z",
+        "result": [
+          {
+            "reference": "urn:uuid:b4d3ff2e-26d6-4f83-a58a-7010ca02bad7",
+            "display": "WBC"
+          }
+        ],
+        "conclusion": "Clinical diagnostic report generated successfully."
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:70ba9ff5-51c9-49fe-813a-42291df9a57a",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "70ba9ff5-51c9-49fe-813a-42291df9a57a",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Diagnostic Report Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:8bccb0f4-da54-483c-a1db-0e84ebc05e86"
+        },
+        "date": "2026-08-04T11:16:29.610Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "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fMBpaXpiA1wfS0zuuQJHegYihcn6AwyoVy3nUT2X1T6fivllx+JnoXvwesmygq67TOkktOD8jVnnDOeqo9xeLR+XnGHN9HfUx+PhMuo39XncyePhdum3ET3q5FByndHpSi5CKerhxWlFC41cZB5OVl6kBhGgOEhliJwLofXj7+AYNcM663fO4X59XN0LCxXcvDOyqNppfjdGtzr0YOL0qKpsTfvnAjaHzVdynyvKwubmifNw9WTp2WLz+1tWCp4wz/Wrr2o0J+3QSLowr4yzL3c0Zys1ZayQHW6DvA6iHp1JqaKF5wsS4dXwpWRCRQYna9J/6l4/VwplbmRzdHJlYW0KZW5kb2JqCjE0IDAgb2JqCihwZGZtYWtlKQplbmRvYmoKMTUgMCBvYmoKKHBkZm1ha2UpCmVuZG9iagoxNiAwIG9iagooRDoyMDI2MDgwNDExMTYyOVopCmVuZG9iagoxMyAwIG9iago8PAovUHJvZHVjZXIgMTQgMCBSCi9DcmVhdG9yIDE1IDAgUgovQ3JlYXRpb25EYXRlIDE2IDAgUgo+PgplbmRvYmoKMTAgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL0Jhc2VGb250IC9IZWx2ZXRpY2EtQm9sZAovU3VidHlwZSAvVHlwZTEKL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcKPj4KZW5kb2JqCjExIDAgb2JqCjw8Ci9UeXBlIC9Gb250Ci9CYXNlRm9udCAvSGVsdmV0aWNhCi9TdWJ0eXBlIC9UeXBlMQovRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZwo+PgplbmRvYmoKNCAwIG9iago8PAo+PgplbmRvYmoKMyAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMSAwIFIKL05hbWVzIDIgMCBSCj4+CmVuZG9iagoxIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovQ291bnQgMQovS2lkcyBbNyAwIFJdCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9EZXN0cyA8PAogIC9OYW1lcyBbCl0KPj4KPj4KZW5kb2JqCnhyZWYKMCAxNwowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDI1MTMgMDAwMDAgbiAKMDAwMDAwMjU3MCAwMDAwMCBuIAowMDAwMDAyNDUxIDAwMDAwIG4gCjAwMDAwMDI0MzAgMDAwMDAgbiAKMDAwMDAwMDQ0NiAwMDAwMCBuIAowMDAwMDAwMjc2IDAwMDAwIG4gCjAwMDAwMDAxNTQgMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMDU5IDAwMDAwIG4gCjAwMDAwMDIyMjkgMDAwMDAgbiAKMDAwMDAwMjMzMiAwMDAwMCBuIAowMDAwMDAwMTA5IDAwMDAwIG4gCjAwMDAwMDIxNTMgMDAwMDAgbiAKMDAwMDAwMjA2NSAwMDAwMCBuIAowMDAwMDAyMDkxIDAwMDAwIG4gCjAwMDAwMDIxMTcgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSAxNwovUm9vdCAzIDAgUgovSW5mbyAxMyAwIFIKL0lEIFs8YjljMzBjN2I4YTE1YjNkMWExOWZhZWRhYjM1MzhkYTc+IDxiOWMzMGM3YjhhMTViM2QxYTE5ZmFlZGFiMzUzOGRhNz5dCj4+CnN0YXJ0eHJlZgoyNjE3CiUlRU9GCg==",
+              "title": "DiagnosticReport_20260804_111629.pdf",
+              "creation": "2026-08-04T11:16:29.610Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

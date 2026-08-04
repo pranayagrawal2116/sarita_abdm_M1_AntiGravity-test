@@ -1,25 +1,25 @@
 {
   "resourceType": "Bundle",
-  "id": "prescription record-8adbb80f-806a-48ec-ac53-449bd5c03e6e",
+  "id": "prescription-record-63c3a746-bd47-4dce-ba5a-a6f2b5f07a3a",
   "meta": {
     "versionId": "1",
-    "lastUpdated": "2026-07-31T14:30:22.955+05:30",
+    "lastUpdated": "2026-08-04T16:46:30.154+05:30",
     "profile": [
       "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
     ]
   },
   "identifier": {
     "system": "https://abdm.gov.in/fhir/r4/document",
-    "value": "6efda81c-3256-496f-a4c5-0ac0e669e23e"
+    "value": "815d2bfe-9505-4ece-9502-bd128b169635"
   },
   "type": "document",
-  "timestamp": "2026-07-31T14:30:22.955+05:30",
+  "timestamp": "2026-08-04T16:46:30.154+05:30",
   "entry": [
     {
-      "fullUrl": "urn:uuid:56e5607e-c275-4bf8-a9b4-2b7a1888a882",
+      "fullUrl": "urn:uuid:b872b449-bf6f-4e1a-9358-3cb962f6e0d3",
       "resource": {
         "resourceType": "Composition",
-        "id": "56e5607e-c275-4bf8-a9b4-2b7a1888a882",
+        "id": "b872b449-bf6f-4e1a-9358-3cb962f6e0d3",
         "meta": {
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
@@ -27,26 +27,33 @@
         },
         "status": "final",
         "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "440545006",
+              "display": "Prescription record"
+            }
+          ],
           "text": "Prescription record"
         },
         "subject": {
-          "reference": "urn:uuid:0d10962f-ae71-4a4a-a03f-06726439791a",
+          "reference": "urn:uuid:939c033e-da14-4c05-9ccc-87b2729b94ed",
           "display": "Pranay Anup Agrawal"
         },
         "encounter": {
-          "reference": "urn:uuid:598d9b60-e2d5-4606-80da-37cab73da11f",
+          "reference": "urn:uuid:c0d42894-e5e9-4fcc-9633-74e68dc542be",
           "display": "Ambulatory"
         },
-        "date": "2026-07-31T14:30:22.955+05:30",
+        "date": "2026-08-04T16:46:30.154+05:30",
         "author": [
           {
-            "reference": "urn:uuid:9f8cb317-ee8d-4918-ac01-cd7a86dd41e2",
+            "reference": "urn:uuid:ec5fb9bd-5c13-43af-a084-9aef19085c68",
             "display": "Dr. Sarita"
           }
         ],
         "title": "Prescription record",
         "custodian": {
-          "reference": "urn:uuid:241c9574-ae1f-46cc-be2e-78620718879f",
+          "reference": "urn:uuid:d7188375-f37e-4eae-ac35-36c81b2bb465",
           "display": "Sarita Health Care"
         },
         "section": [
@@ -54,7 +61,7 @@
             "title": "Patient Information",
             "entry": [
               {
-                "reference": "urn:uuid:0d10962f-ae71-4a4a-a03f-06726439791a",
+                "reference": "urn:uuid:939c033e-da14-4c05-9ccc-87b2729b94ed",
                 "display": "Pranay Anup Agrawal"
               }
             ]
@@ -72,11 +79,11 @@
             },
             "entry": [
               {
-                "reference": "urn:uuid:ff14b609-497d-4afb-8412-bca62534d0da",
+                "reference": "urn:uuid:72a66432-e02f-4dc6-99a3-50ed0b9142ee",
                 "display": "Dolo 650mg"
               },
               {
-                "reference": "urn:uuid:515e2ee5-804c-4e54-8513-6931c8c7c428",
+                "reference": "urn:uuid:0f2ac802-a248-4517-a785-48ea7b9ae8e5",
                 "display": "Azithromycin"
               }
             ]
@@ -85,7 +92,7 @@
             "title": "Prescription Record",
             "entry": [
               {
-                "reference": "urn:uuid:834a388c-808e-4f08-b3fc-c09b2d4d9bae",
+                "reference": "urn:uuid:f0b0da85-dfd2-4f3d-a466-9ca93d757e23",
                 "display": "Binary"
               }
             ]
@@ -94,13 +101,13 @@
       }
     },
     {
-      "fullUrl": "urn:uuid:0d10962f-ae71-4a4a-a03f-06726439791a",
+      "fullUrl": "urn:uuid:939c033e-da14-4c05-9ccc-87b2729b94ed",
       "resource": {
         "resourceType": "Patient",
-        "id": "0d10962f-ae71-4a4a-a03f-06726439791a",
+        "id": "939c033e-da14-4c05-9ccc-87b2729b94ed",
         "meta": {
           "versionId": "1",
-          "lastUpdated": "2026-07-31T14:30:22.955+05:30",
+          "lastUpdated": "2026-08-04T16:46:30.154+05:30",
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
           ]
@@ -138,13 +145,13 @@
       }
     },
     {
-      "fullUrl": "urn:uuid:9f8cb317-ee8d-4918-ac01-cd7a86dd41e2",
+      "fullUrl": "urn:uuid:ec5fb9bd-5c13-43af-a084-9aef19085c68",
       "resource": {
         "resourceType": "Practitioner",
-        "id": "9f8cb317-ee8d-4918-ac01-cd7a86dd41e2",
+        "id": "ec5fb9bd-5c13-43af-a084-9aef19085c68",
         "meta": {
           "versionId": "1",
-          "lastUpdated": "2026-07-31T14:30:22.955+05:30",
+          "lastUpdated": "2026-08-04T16:46:30.154+05:30",
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
           ]
@@ -173,10 +180,10 @@
       }
     },
     {
-      "fullUrl": "urn:uuid:241c9574-ae1f-46cc-be2e-78620718879f",
+      "fullUrl": "urn:uuid:d7188375-f37e-4eae-ac35-36c81b2bb465",
       "resource": {
         "resourceType": "Organization",
-        "id": "241c9574-ae1f-46cc-be2e-78620718879f",
+        "id": "d7188375-f37e-4eae-ac35-36c81b2bb465",
         "meta": {
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
@@ -202,10 +209,10 @@
       }
     },
     {
-      "fullUrl": "urn:uuid:598d9b60-e2d5-4606-80da-37cab73da11f",
+      "fullUrl": "urn:uuid:c0d42894-e5e9-4fcc-9633-74e68dc542be",
       "resource": {
         "resourceType": "Encounter",
-        "id": "598d9b60-e2d5-4606-80da-37cab73da11f",
+        "id": "c0d42894-e5e9-4fcc-9633-74e68dc542be",
         "meta": {
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
@@ -214,7 +221,7 @@
         "identifier": [
           {
             "system": "https://abdm.gov.in/fhir/encounter",
-            "value": "715faee9-58f0-4594-9753-c9bfe6e963ed"
+            "value": "659f8076-aa68-4eba-8fff-669fb8d7c400"
           }
         ],
         "status": "arrived",
@@ -224,19 +231,19 @@
           "display": "Ambulatory-Walkable Outpatient Encounter"
         },
         "subject": {
-          "reference": "urn:uuid:0d10962f-ae71-4a4a-a03f-06726439791a",
+          "reference": "urn:uuid:939c033e-da14-4c05-9ccc-87b2729b94ed",
           "display": "Pranay Anup Agrawal"
         },
         "period": {
-          "start": "2026-07-31T09:00:22.950Z"
+          "start": "2026-08-04T11:16:30.148Z"
         }
       }
     },
     {
-      "fullUrl": "urn:uuid:ff14b609-497d-4afb-8412-bca62534d0da",
+      "fullUrl": "urn:uuid:72a66432-e02f-4dc6-99a3-50ed0b9142ee",
       "resource": {
         "resourceType": "MedicationRequest",
-        "id": "ff14b609-497d-4afb-8412-bca62534d0da",
+        "id": "72a66432-e02f-4dc6-99a3-50ed0b9142ee",
         "meta": {
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
@@ -255,12 +262,12 @@
           "text": "Dolo 650mg"
         },
         "subject": {
-          "reference": "urn:uuid:0d10962f-ae71-4a4a-a03f-06726439791a",
+          "reference": "urn:uuid:939c033e-da14-4c05-9ccc-87b2729b94ed",
           "display": "Pranay Anup Agrawal"
         },
-        "authoredOn": "2026-07-31T09:00:22.950Z",
+        "authoredOn": "2026-08-04T11:16:30.148Z",
         "requester": {
-          "reference": "urn:uuid:9f8cb317-ee8d-4918-ac01-cd7a86dd41e2",
+          "reference": "urn:uuid:ec5fb9bd-5c13-43af-a084-9aef19085c68",
           "display": "Dr. Sarita"
         },
         "reasonCode": [
@@ -303,10 +310,10 @@
       }
     },
     {
-      "fullUrl": "urn:uuid:515e2ee5-804c-4e54-8513-6931c8c7c428",
+      "fullUrl": "urn:uuid:0f2ac802-a248-4517-a785-48ea7b9ae8e5",
       "resource": {
         "resourceType": "MedicationRequest",
-        "id": "515e2ee5-804c-4e54-8513-6931c8c7c428",
+        "id": "0f2ac802-a248-4517-a785-48ea7b9ae8e5",
         "meta": {
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
@@ -325,12 +332,12 @@
           "text": "Azithromycin"
         },
         "subject": {
-          "reference": "urn:uuid:0d10962f-ae71-4a4a-a03f-06726439791a",
+          "reference": "urn:uuid:939c033e-da14-4c05-9ccc-87b2729b94ed",
           "display": "Pranay Anup Agrawal"
         },
-        "authoredOn": "2026-07-31T09:00:22.950Z",
+        "authoredOn": "2026-08-04T11:16:30.148Z",
         "requester": {
-          "reference": "urn:uuid:9f8cb317-ee8d-4918-ac01-cd7a86dd41e2",
+          "reference": "urn:uuid:ec5fb9bd-5c13-43af-a084-9aef19085c68",
           "display": "Dr. Sarita"
         },
         "reasonCode": [
@@ -373,17 +380,17 @@
       }
     },
     {
-      "fullUrl": "urn:uuid:834a388c-808e-4f08-b3fc-c09b2d4d9bae",
+      "fullUrl": "urn:uuid:f0b0da85-dfd2-4f3d-a466-9ca93d757e23",
       "resource": {
         "resourceType": "Binary",
-        "id": "834a388c-808e-4f08-b3fc-c09b2d4d9bae",
+        "id": "f0b0da85-dfd2-4f3d-a466-9ca93d757e23",
         "meta": {
           "profile": [
             "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Binary"
           ]
         },
         "contentType": "application/pdf",
-        "data": "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cm9kdWNlciAxNCAwIFIKL0NyZWF0b3IgMTUgMCBSCi9DcmVhdGlvbkRhdGUgMTYgMCBSCj4+CmVuZG9iagoxMCAwIG9iago8PAovVHlwZSAvRm9udAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkCi9TdWJ0eXBlIC9UeXBlMQovRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZwo+PgplbmRvYmoKMTEgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL0Jhc2VGb250IC9IZWx2ZXRpY2EKL1N1YnR5cGUgL1R5cGUxCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iago0IDAgb2JqCjw8Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9DYXRhbG9nCi9QYWdlcyAxIDAgUgovTmFtZXMgMiAwIFIKPj4KZW5kb2JqCjEgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9Db3VudCAxCi9LaWRzIFs3IDAgUl0KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Rlc3RzIDw8CiAgL05hbWVzIFsKXQo+Pgo+PgplbmRvYmoKeHJlZgowIDE3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMzA0NiAwMDAwMCBuIAowMDAwMDAzMTAzIDAwMDAwIG4gCjAwMDAwMDI5ODQgMDAwMDAgbiAKMDAwMDAwMjk2MyAwMDAwMCBuIAowMDAwMDAwNDQ2IDAwMDAwIG4gCjAwMDAwMDAyNzYgMDAwMDAgbiAKMDAwMDAwMDE1NCAwMDAwMCBuIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAwNTkgMDAwMDAgbiAKMDAwMDAwMjc2MiAwMDAwMCBuIAowMDAwMDAyODY1IDAwMDAwIG4gCjAwMDAwMDAxMDkgMDAwMDAgbiAKMDAwMDAwMjY4NiAwMDAwMCBuIAowMDAwMDAyNTk4IDAwMDAwIG4gCjAwMDAwMDI2MjQgMDAwMDAgbiAKMDAwMDAwMjY1MCAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9TaXplIDE3Ci9Sb290IDMgMCBSCi9JbmZvIDEzIDAgUgovSUQgWzxhZWVjYmQ0MzI4OGM3ZWY4MGRjOGQ1YWFiMmM4YmQwNz4gPGFlZWNiZDQzMjg4YzdlZjgwZGM4ZDVhYWIyYzhiZDA3Pl0KPj4Kc3RhcnR4cmVmCjMxNTAKJSVFT0YK"
+        "data": "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VHlwZSAvUGFnZXMKL0NvdW50IDEKL0tpZHMgWzcgMCBSXQo+PgplbmRvYmoKMiAwIG9iago8PAovRGVzdHMgPDwKICAvTmFtZXMgWwpdCj4+Cj4+CmVuZG9iagp4cmVmCjAgMTcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAyNjg4IDAwMDAwIG4gCjAwMDAwMDI3NDUgMDAwMDAgbiAKMDAwMDAwMjYyNiAwMDAwMCBuIAowMDAwMDAyNjA1IDAwMDAwIG4gCjAwMDAwMDA0NDYgMDAwMDAgbiAKMDAwMDAwMDI3NiAwMDAwMCBuIAowMDAwMDAwMTU0IDAwMDAwIG4gCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA1OSAwMDAwMCBuIAowMDAwMDAyNDA0IDAwMDAwIG4gCjAwMDAwMDI1MDcgMDAwMDAgbiAKMDAwMDAwMDEwOSAwMDAwMCBuIAowMDAwMDAyMzI4IDAwMDAwIG4gCjAwMDAwMDIyNDAgMDAwMDAgbiAKMDAwMDAwMjI2NiAwMDAwMCBuIAowMDAwMDAyMjkyIDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgMTcKL1Jvb3QgMyAwIFIKL0luZm8gMTMgMCBSCi9JRCBbPGMwODFkOWE3OTEyNDY3MDg1ZjBkMWQzOGY2NGI4ZDQ5PiA8YzA4MWQ5YTc5MTI0NjcwODVmMGQxZDM4ZjY0YjhkNDk+XQo+PgpzdGFydHhyZWYKMjc5MgolJUVPRgo="
       }
     }
   ]

@@ -413,6 +413,19 @@ const stripPatientReferenceForNotify = (value) => {
   return text.replace(/@(sbx|abdm)$/i, "");
 };
 
+const guessHiType = (fileName) => {
+  const normalized = toText(fileName).toLowerCase().replace(/[^a-z]/g, "");
+  if (normalized.includes("diagnosticreport")) return "DiagnosticReport";
+  if (normalized.includes("prescription")) return "Prescription";
+  if (normalized.includes("opconsultation")) return "OPConsultation";
+  if (normalized.includes("dischargesummary")) return "DischargeSummary";
+  if (normalized.includes("immunizationrecord")) return "ImmunizationRecord";
+  if (normalized.includes("healthdocumentrecord")) return "HealthDocumentRecord";
+  if (normalized.includes("wellnessrecord")) return "WellnessRecord";
+  if (normalized.includes("invoice")) return "Invoice";
+  return "DocumentReference";
+};
+
 const normalizePatientEntriesForLinking = (patient = [], abhaAddress = "") =>
   patient.map((entry) => {
     if (!entry || typeof entry !== "object") {
@@ -431,16 +444,23 @@ const normalizePatientEntriesForLinking = (patient = [], abhaAddress = "") =>
         fallbackName
       ),
       careContexts: Array.isArray(entry.careContexts)
-        ? entry.careContexts.map((careContext) => {
+        ? entry.careContexts.flatMap((careContext) => {
             if (!careContext || typeof careContext !== "object") {
               return careContext;
             }
-            return {
+            
+            const baseReference = normalizeCareContextReferenceForLinking(careContext.referenceNumber);
+            const baseDisplay = careContext.display || "";
+            const types = careContext.hiTypes || [guessHiType(careContext.display)];
+            
+            // Create a separate Care Context for each hiType so they display individually in the app
+            return types.map(type => ({
               ...careContext,
-              referenceNumber: normalizeCareContextReferenceForLinking(
-                careContext.referenceNumber
-              ),
-            };
+              referenceNumber: `${baseReference}-${type}`,
+              display: baseDisplay ? `${baseDisplay} - ${type}` : type,
+              hiTypes: [type],
+              hiType: type,
+            }));
           })
         : entry.careContexts,
     };
@@ -717,6 +737,15 @@ exports.notifyContext = async (req, res) => {
       });
     }
 
+    const baseCareContextRef = toText(notification.careContext?.careContextReference);
+    let finalCareContextRef = baseCareContextRef;
+    if (Array.isArray(notification.hiTypes) && notification.hiTypes.length > 0) {
+      const type = notification.hiTypes[0];
+      if (!baseCareContextRef.endsWith(`-${type}`)) {
+        finalCareContextRef = `${baseCareContextRef}-${type}`;
+      }
+    }
+
     const payload = {
       notification: {
         ...notification,
@@ -728,9 +757,7 @@ exports.notifyContext = async (req, res) => {
         careContext: {
           ...toObject(notification.careContext),
           patientReference: stripPatientReferenceForNotify(patientReference),
-          careContextReference: toText(
-            notification.careContext?.careContextReference
-          ),
+          careContextReference: finalCareContextRef,
         },
         hip: notification.hip || { id: hipId },
       },

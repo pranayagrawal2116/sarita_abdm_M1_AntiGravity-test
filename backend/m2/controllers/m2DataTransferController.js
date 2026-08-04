@@ -37,10 +37,42 @@ class M2DataTransferController {
       if (!patientId) {
         throw new Error("Transaction failed: Patient ID missing from live data.");
       }
-      const recordType = (Array.isArray(recordTypes) && recordTypes.length > 0 ? recordTypes : (tx.recordTypes || [tx.recordType || "OPConsultation"])).map(type => type === "OP Consultation" ? "OPConsultation" : type);
-      const receiverPublicKey = tx.hiuPublicKey || tx.receiverPublicKey || (tx.keyMaterial && tx.keyMaterial.dhPublicKey?.keyValue);
-      const receiverNonce = tx.hiuNonce || tx.receiverNonce || (tx.keyMaterial && tx.keyMaterial.nonce);
-      const dataPushUrl = tx.dataPushUrl;
+      // Get dashboard requested types
+      const dashboardTypes = Array.isArray(recordTypes) && recordTypes.length > 0 ? recordTypes : (tx.recordTypes || [tx.recordType || "OPConsultation"]);
+
+      // Get consent authorized types
+      const allTxs = M2TransactionStore.listTransactions();
+      const consentTx = allTxs.find(t => t.consentId === consentId || t.consentDetails?.consentId === consentId);
+      const authorizedHiTypes = tx.consentDetails?.hiTypes || tx.hiTypes || consentTx?.consentDetails?.hiTypes || ["OPConsultation"];
+
+      // Map dashboard record type to canonical HI Type
+      const canonicalMap = {
+        "Prescription": "Prescription",
+        "Diagnostic Report": "DiagnosticReport",
+        "OP Consultation": "OPConsultation",
+        "OPConsultation": "OPConsultation",
+        "Discharge Summary": "DischargeSummary",
+        "Immunization": "ImmunizationRecord",
+        "Health Document": "HealthDocumentRecord",
+        "Wellness": "WellnessRecord",
+        "Invoice": "Invoice"
+      };
+
+      // Filter dashboard types by what's actually authorized
+      const recordType = dashboardTypes.filter(type => {
+        const canonical = canonicalMap[type] || type.replace(/\s+/g, "");
+        return authorizedHiTypes.includes(canonical);
+      });
+
+      if (recordType.length === 0) {
+        throw new Error(`Transaction failed: The selected record types (${dashboardTypes.join(", ")}) do not match the authorized HI Types in the consent (${authorizedHiTypes.join(", ")}).`);
+      }
+
+      // Prioritize the actual HI request payload from the mobile app (Gateway) over any mock data
+      const actualHiRequest = tx.hiRequestPayload?.hiRequest;
+      const receiverPublicKey = actualHiRequest?.keyMaterial?.dhPublicKey?.keyValue || tx.hiuPublicKey || tx.receiverPublicKey || (tx.keyMaterial && tx.keyMaterial.dhPublicKey?.keyValue);
+      const receiverNonce = actualHiRequest?.keyMaterial?.nonce || tx.hiuNonce || tx.receiverNonce || (tx.keyMaterial && tx.keyMaterial.nonce);
+      const dataPushUrl = actualHiRequest?.dataPushUrl || tx.dataPushUrl;
 
       if (!receiverPublicKey || !receiverNonce || !dataPushUrl) {
         throw new Error("Missing receiver keyMaterial or dataPushUrl in transaction store.");
@@ -52,7 +84,8 @@ class M2DataTransferController {
         recordType,
         receiverPublicKey,
         receiverNonce,
-        dataPushUrl
+        dataPushUrl,
+        transactionId
       );
 
       // Map status for legacy client expectations

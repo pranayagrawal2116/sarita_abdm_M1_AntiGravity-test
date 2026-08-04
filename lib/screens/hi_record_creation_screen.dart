@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:flutter/material.dart';
 import '../services/hip_linking_workflow_service.dart';
+import '../services/m2_automated_workflow_service.dart';
 
 double _maxNum(double a, double b) => a > b ? a : b;
 
@@ -118,26 +119,33 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       }
 
       if (!mounted) return;
+      final progressNotifier = ValueNotifier<String>('Running HIP linking API sequence (M1)...');
+
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(
+        builder: (context) => Center(
           child: Card(
             child: Padding(
-              padding: EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(32.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text(
-                    'Running HIP linking API sequence...',
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Automating Data Exchange...',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Waiting for ABDM approval and polling the callback every 3 seconds.',
-                    textAlign: TextAlign.center,
+                  const SizedBox(height: 8),
+                  ValueListenableBuilder<String>(
+                    valueListenable: progressNotifier,
+                    builder: (context, value, child) {
+                      return Text(
+                        value,
+                        textAlign: TextAlign.center,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -146,19 +154,41 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
         ),
       );
 
-      await HipLinkingWorkflowService.runRecordLinking(
-        patientProfile: widget.patientProfile,
-        selectedHiType: widget.hiType,
-        formattedRecordText: _buildCareContextDisplay(),
-      );
-
-      if (mounted) {
-        Navigator.pop(context); // Close loading dialog
-        _showToast(
-          context,
-          'HIP linking sequence completed. Local draft: ${savedFile.path}',
+      try {
+        await HipLinkingWorkflowService.runRecordLinking(
+          patientProfile: widget.patientProfile,
+          selectedHiType: widget.hiType,
+          formattedRecordText: _buildCareContextDisplay(),
         );
-        Navigator.pop(context); // Return to home screen
+
+        if (mounted) {
+          progressNotifier.value = 'HIP linking completed.';
+          
+          // TEMPORARILY DISABLED M2 Automation for manual testing
+          /*
+          await M2AutomatedWorkflowService.runAutomatedDataTransfer(
+            patientProfile: widget.patientProfile,
+            hiType: widget.hiType,
+            onProgress: (message) {
+              progressNotifier.value = message;
+            },
+          );
+          */
+        }
+
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          _showToast(
+            context,
+            'Linking completed! Local draft: ${savedFile.path}',
+          );
+          Navigator.pop(context); // Return to home screen
+        }
+      } catch (e) {
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          _showErrorToast(context, 'Automation failed: $e');
+        }
       }
     } else {
       _showErrorToast(context, 'Please fix the validation errors in the form.');

@@ -63,6 +63,23 @@ class InvoiceBuilder {
             },
             status: "billable",
             code: {
+              coding: [
+                {
+                  system: "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-billing-codes",
+                  code: "01",
+                  display: item.name || "Consultation"
+                }
+              ],
+              text: item.name || "Consultation"
+            },
+            productCodeableConcept: {
+              coding: [
+                {
+                  system: "http://snomed.info/sct",
+                  code: "X-0001",
+                  display: item.name || "Consultation"
+                }
+              ],
               text: item.name || "Consultation"
             },
             subject: {

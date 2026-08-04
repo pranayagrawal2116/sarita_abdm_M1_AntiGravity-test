@@ -266,7 +266,10 @@ const buildComposition = (input, ids, nowIst) => ({
   id: ids.composition,
   meta: { profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"] },
   status: "final",
-  type: { text: "Prescription record" },
+  type: {
+    coding: [{ system: SNOMED_SYSTEM, code: "440545006", display: "Prescription record" }],
+    text: "Prescription record"
+  },
   subject: { reference: urnRef(ids.patient), display: input.patient.fullName },
   encounter: { reference: urnRef(ids.encounter), display: "Ambulatory" },
   date: nowIst,
@@ -313,11 +316,11 @@ const validateBundle = (bundle) => {
   assertCondition(bundle.resourceType === "Bundle", "Bundle.resourceType must be Bundle.");
   assertCondition(bundle.type === "document", "Bundle.type must be document.");
   assertCondition(bundle.meta?.profile?.includes("https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"), "Bundle profile must be PrescriptionRecord.");
-  assertCondition(text(bundle.id).startsWith("prescription record-"), "Bundle.id must start with prescription record-.");
+  assertCondition(text(bundle.id).startsWith("prescription-record-"), "Bundle.id must start with prescription-record-.");
   assertCondition(bundle.entry?.[0]?.resource?.resourceType === "Composition", "Composition must be the first bundle entry.");
 
   const composition = bundle.entry[0].resource;
-  assertCondition(JSON.stringify(composition.type) === JSON.stringify({ text: "Prescription record" }), "Prescription Composition.type must be text-only.");
+  assertCondition(composition.type?.coding?.[0]?.code === "440545006", "Prescription Composition.type must contain SNOMED code 440545006.");
   assertCondition(composition.title === "Prescription record", "Composition.title must be Prescription record.");
   assertCondition(composition.section?.length === 3, "Prescription Composition must contain exactly three sections.");
   assertCondition(composition.section[0].title === "Patient Information", "First section must be Patient Information.");
@@ -364,7 +367,7 @@ const generatePrescriptionBundle = (input) => {
   const binary = buildBinary(pdfBytes, ids);
   const bundle = {
     resourceType: "Bundle",
-    id: `prescription record-${ids.bundle}`,
+    id: `prescription-record-${ids.bundle}`,
     meta: {
       versionId: "1",
       lastUpdated: nowIst,

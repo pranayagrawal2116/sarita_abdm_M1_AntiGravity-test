@@ -88,16 +88,29 @@ const getErrorPayload = (err) => {
   };
 };
 
-const postToAbdm = async ({ path, body, extraHeaders = {} }) => {
-  const gatewayToken = await getGatewayToken();
-  const response = await axios.post(
-    `${process.env.GATEWAY_BASE}${path}`,
-    body,
-    {
-      headers: { ...getHeaders(gatewayToken), ...extraHeaders },
-    },
-  );
-  return response.data;
+const postToAbdm = async ({ path, body, extraHeaders = {} }, isRetry = false) => {
+  let gatewayToken = await getGatewayToken();
+  try {
+    const response = await axios.post(
+      `${process.env.GATEWAY_BASE}${path}`,
+      body,
+      {
+        headers: { ...getHeaders(gatewayToken), ...extraHeaders },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    if (!isRetry && error.response && error.response.status === 401) {
+      console.log("[ABDM] 401 Unauthorized encountered. Forcing token refresh and retrying...");
+      // Force token refresh by invalidating cache
+      const gatewayService = require("../services/gatewayService");
+      if (gatewayService.clearCache) {
+        gatewayService.clearCache();
+      }
+      return await postToAbdm({ path, body, extraHeaders }, true);
+    }
+    throw error;
+  }
 };
 
 exports.initConsentRequest = async (req, res) => {

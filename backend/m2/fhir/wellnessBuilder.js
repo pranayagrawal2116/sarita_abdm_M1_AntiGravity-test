@@ -117,7 +117,44 @@ class WellnessBuilder {
     const processCategory = (title, dataList) => {
       if (!dataList || dataList.length === 0) return;
       const finalEntry = [];
-      for (const dp of dataList) {
+      
+      const bpSys = dataList.find(d => d.display === "Systolic blood pressure");
+      const bpDia = dataList.find(d => d.display === "Diastolic blood pressure");
+      const others = dataList.filter(d => d.display !== "Systolic blood pressure" && d.display !== "Diastolic blood pressure");
+
+      if (bpSys && bpDia) {
+        const id = uuidv4();
+        const item = {
+          fullUrl: `urn:uuid:${id}`,
+          resource: {
+            resourceType: "Observation",
+            id,
+            meta: { profile: ["https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"] },
+            status: "final",
+            category: [{ coding: [{ system: "http://terminology.hl7.org/CodeSystem/observation-category", code: "vital-signs", display: "Vital Signs" }] }],
+            code: { coding: [{ system: "http://loinc.org", code: "85354-9", display: "Blood pressure panel with all children optional" }], text: "Blood pressure panel with all children optional" },
+            subject: { reference: patientRef },
+            effectiveDateTime: timestamp,
+            component: [
+              {
+                code: { coding: [{ system: "http://loinc.org", code: "8480-6", display: "Systolic blood pressure" }], text: "Systolic blood pressure" },
+                valueQuantity: { value: Number(bpSys.value), unit: "mmHg", system: "http://unitsofmeasure.org", code: "mm[Hg]" }
+              },
+              {
+                code: { coding: [{ system: "http://loinc.org", code: "8462-4", display: "Diastolic blood pressure" }], text: "Diastolic blood pressure" },
+                valueQuantity: { value: Number(bpDia.value), unit: "mmHg", system: "http://unitsofmeasure.org", code: "mm[Hg]" }
+              }
+            ]
+          }
+        };
+        entries.push(item);
+        finalEntry.push({ reference: item.fullUrl, display: "Blood pressure panel" });
+      } else {
+        if (bpSys) others.push(bpSys);
+        if (bpDia) others.push(bpDia);
+      }
+
+      for (const dp of others) {
         const item = this.buildWellnessObservation(dp, patientRef, timestamp);
         entries.push(item);
         finalEntry.push({ reference: item.fullUrl, display: dp.display });
@@ -156,7 +193,7 @@ class WellnessBuilder {
       sections.push({
         title: "Document Reference",
         code: {
-          coding: [{ system: "http://snomed.info/sct", code: "371530004", display: "Clinical consultation report" }]
+          text: "Document Reference"
         },
         entry: [{ reference: docItem.fullUrl, display: "DocumentReference" }]
       });

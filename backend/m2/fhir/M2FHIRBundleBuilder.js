@@ -304,6 +304,7 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     matchField(file.content, "DOB") ||
     matchField(file.content, "Date of Birth")
   );
+  const patientUhid = matchField(file.content, "UHID") || matchField(file.content, "Patient UHID") || matchField(file.content, "Patient ID");
   const medicationName =
     extractIndentedValue(lines, /^Medications:/i, /^\s*Name:\s*(.+)$/i) ||
     extractIndentedValue(lines, /^Draft Medication:/i, /^\s*Name:\s*(.+)$/i) ||
@@ -342,9 +343,9 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   }
 
   const temperature = extractIndentedValue(lines, /^Vitals:/i, /^\s*Temperature:\s*(.+)$/i);
-  const height = extractIndentedValue(lines, /^Vitals:/i, /^\s*Height:\s*(.+)$/i);
-  const weight = extractIndentedValue(lines, /^Vitals:/i, /^\s*Weight:\s*(.+)$/i);
-  const bmi = extractIndentedValue(lines, /^Vitals:/i, /^\s*Bmi:\s*(.+)$/i);
+  const height = extractIndentedValue(lines, /^Measurements:/i, /^\s*Height:\s*(.+)$/i);
+  const weight = extractIndentedValue(lines, /^Measurements:/i, /^\s*Weight:\s*(.+)$/i);
+  const bmi = extractIndentedValue(lines, /^Measurements:/i, /^\s*Bmi:\s*(.+)$/i);
   const respRate = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Respiratory rate|Resp Rate):\s*(.+)$/i);
   const heartRate = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Heart rate|Pulse):\s*(.+)$/i);
   const spo2 = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Oxygen|SpO2):\s*(.+)$/i);
@@ -525,6 +526,7 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
            const dnMatch = lines[j].match(/^\s*Dose No:\s*(.+)$/i);
            if (dnMatch) doseNo = text(dnMatch[1]);
         }
+        date = nowIso();
         immunizationsList.push({ vaccineName, brand, date, lotNumber, doseNo });
       }
     }
@@ -540,7 +542,7 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     const draftDoseNo = extractIndentedValue(lines, /^Draft Entry/i, /^\s*Dose No:\s*(.+)$/i);
 
     if (draftVaccineName) {
-      immunizationsList.push({ vaccineName: draftVaccineName, brand: draftBrand, date: draftDate, lotNumber: draftLotNumber, doseNo: draftDoseNo });
+      immunizationsList.push({ vaccineName: draftVaccineName, brand: draftBrand, date: nowIso(), lotNumber: draftLotNumber, doseNo: draftDoseNo });
     }
   }
 
@@ -576,6 +578,7 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   
   return {
     patientName: patientName,
+    patientUhid,
     pdfBase64: explicitPdfBase64,
     abhaAddress,
     abhaNumber,

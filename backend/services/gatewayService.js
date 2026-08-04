@@ -48,3 +48,8 @@ exports.getGatewayToken = async () => {
 
     return accessToken;
 };
+
+exports.clearCache = () => {
+    cachedAccessToken = "";
+    cachedExpiryMs = 0;
+};

@@ -2386,7 +2386,13 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
                         child: InkWell(
                           onTap: () {
                             setState(() {
-                              _selectedRecords[recordType] = !isChecked;
+                              final newValue = !isChecked;
+                              if (newValue) {
+                                for (var key in _selectedRecords.keys.toList()) {
+                                  _selectedRecords[key] = false;
+                                }
+                              }
+                              _selectedRecords[recordType] = newValue;
                             });
                           },
                           borderRadius: BorderRadius.circular(20),
@@ -2402,8 +2408,13 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
                                   activeColor: const Color(0xFF0D47A1),
                                   onChanged: (val) {
                                     setState(() {
-                                      _selectedRecords[recordType] =
-                                          val ?? false;
+                                      final newValue = val ?? false;
+                                      if (newValue) {
+                                        for (var key in _selectedRecords.keys.toList()) {
+                                          _selectedRecords[key] = false;
+                                        }
+                                      }
+                                      _selectedRecords[recordType] = newValue;
                                     });
                                   },
                                 ),

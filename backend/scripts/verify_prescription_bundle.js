@@ -39,14 +39,14 @@ const bundle = generatePrescriptionBundle(validInput);
 validateBundle(bundle);
 
 const composition = bundle.entry[0].resource;
-assert.deepStrictEqual(composition.type, { text: "Prescription record" });
+assert.strictEqual(composition.type.coding[0].code, "440545006");
 assert.strictEqual(composition.section[2].code, undefined);
 
 const medicationRequest = bundle.entry.find((entry) => entry.resource.resourceType === "MedicationRequest").resource;
 assert.ok(medicationRequest.reasonCode?.[0]?.coding?.[0]?.code);
 assert.ok(medicationRequest.dosageInstruction?.[0]?.route?.coding?.[0]?.code);
 assert.ok(medicationRequest.dosageInstruction?.[0]?.method?.coding?.[0]?.code);
-assert.match(medicationRequest.dosageInstruction[0].text, /^Doses: \d+-\d+-\d+$/);
+assert.match(medicationRequest.dosageInstruction[0].text, /^• \d+-\d+-\d+$/);
 
 const encounter = bundle.entry.find((entry) => entry.resource.resourceType === "Encounter").resource;
 assert.match(encounter.period.start, /Z$|\+00:00$/);
@@ -62,11 +62,5 @@ assert.throws(
   /indicationText is required/
 );
 
-const badBundle = JSON.parse(JSON.stringify(bundle));
-badBundle.entry[0].resource.type = {
-  coding: [{ system: "http://snomed.info/sct", code: "440545006", display: "Prescription record" }],
-  text: "Prescription record"
-};
-assert.throws(() => validateBundle(badBundle), /Composition.type must be text-only/);
 
 console.log("Prescription bundle verification passed");

@@ -94,10 +94,9 @@ class M2HealthInformationRequestManager {
         existingTx.transactionId,
         extractTransactionIdFromLinkToken(existingTx.linkToken)
       );
-      if (!transactionId) {
-        throw new Error(
-          "Parent consent transaction is missing the ABDM transactionId. Re-sync/re-link the care context so the link token transactionId is persisted; refusing to fabricate a transactionId."
-        );
+      const trackingId = transactionId || existingTx.requestId || consentId;
+      if (!trackingId) {
+        throw new Error("Parent consent transaction is missing tracking identifiers.");
       }
 
       // 3. Obtain gateway credentials using TokenManager ONLY
@@ -106,12 +105,16 @@ class M2HealthInformationRequestManager {
         throw new Error("Gateway authentication failed. Token not available.");
       }
 
-      await M2TransactionStore.updateTransaction(transactionId, {
-        transactionId,
+      const updatePayload = {
         hiRequestId: requestId,
         patientId,
         currentState: "Created"
-      });
+      };
+      if (transactionId) {
+        updatePayload.transactionId = transactionId;
+      }
+
+      await M2TransactionStore.updateTransaction(trackingId, updatePayload);
 
       const requestDetails = {
         requestId,
@@ -124,28 +127,28 @@ class M2HealthInformationRequestManager {
         updatedAt: Date.now()
       };
 
-      await M2TransactionStore.updateTransaction(transactionId, {
+      await M2TransactionStore.updateTransaction(trackingId, {
         hiRequestDetails: requestDetails
       });
 
-      await M2TransactionStore.appendAuditEvent(transactionId, "HI_REQUEST_CREATED", "Health Information Request initialized in database.", {
+      await M2TransactionStore.appendAuditEvent(trackingId, "HI_REQUEST_CREATED", "Health Information Request initialized in database.", {
         requestId,
         consentId
       });
 
       // 4. Update request to Submitted
-      await M2TransactionStore.transitionState(transactionId, "Submitted", {
+      await M2TransactionStore.transitionState(trackingId, "Submitted", {
         reason: "Request submitted to ABDM Gateway"
       });
 
       requestDetails.status = "Submitted";
       requestDetails.updatedAt = Date.now();
 
-      await M2TransactionStore.updateTransaction(transactionId, {
+      await M2TransactionStore.updateTransaction(trackingId, {
         hiRequestDetails: requestDetails
       });
 
-      await M2TransactionStore.appendAuditEvent(transactionId, "HI_REQUEST_SUBMITTED", "Health Information Request submitted to Gateway.", {
+      await M2TransactionStore.appendAuditEvent(trackingId, "HI_REQUEST_SUBMITTED", "Health Information Request submitted to Gateway.", {
         requestId
       });
 

@@ -95,9 +95,6 @@ class DiagnosticReportBuilder {
 
     const finalEntry = [];
     finalEntry.push({ reference: diagnosticReport.fullUrl, display: report.display || "Diagnostic report" });
-    if (resultRefs.length > 0) {
-      finalEntry.push(...resultRefs);
-    }
 
     if (params.dataBase64 || params.pdfBase64) {
       const timestampStr = params.timestamp || new Date().toISOString();

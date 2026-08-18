@@ -228,8 +228,10 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
     final patientFolder = Directory('${appFolder.path}/$patientFolderName');
     await patientFolder.create(recursive: true);
 
+    final now = DateTime.now();
+    final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
     final fileName =
-        '${_sanitizePathSegment(widget.hiType)}_${_sanitizePathSegment(patientNumber)}.txt';
+        '${_sanitizePathSegment(widget.hiType)}_${_sanitizePathSegment(patientNumber)}_$timestamp.txt';
     final file = File('${patientFolder.path}/$fileName');
     await file.writeAsString(_buildTextDocument(recordData), flush: true);
     return file;

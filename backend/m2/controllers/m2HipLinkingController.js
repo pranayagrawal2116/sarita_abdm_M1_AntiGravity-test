@@ -70,47 +70,40 @@ class M2HipLinkingController {
     let matchedPatient = null;
     let careContexts = [];
     
-    // Instead of relying on m2_patients.json, we can infer patient details from m2_transactions
     if (requestedAbhaAddress || requestedMobile) {
-      for (const [txId, tx] of Object.entries(transactions)) {
-        const txMobile = tx.patientMobile || tx.mobileNumber || tx.mobile || (tx.patient && tx.patient.mobile);
-        const matchByAbha = requestedAbhaAddress && (tx.abhaAddress === requestedAbhaAddress || tx.patientId === requestedAbhaAddress);
-        const matchByMobile = requestedMobile && (txMobile === requestedMobile || JSON.stringify(tx).includes(requestedMobile));
-
-        if (matchByAbha || matchByMobile) {
-          if (!matchedPatient) {
-             matchedPatient = {
-               id: requestedAbhaAddress || `PAT-${uuidv4().substring(0,8)}`,
-               name: tx.patientName || patientDetails.name || "Patient Record"
-             };
+      const searchId = requestedAbhaAddress || requestedMobile;
+      const BundleRegistry = require("../fhir/BundleRegistry");
+      const fs = require("fs");
+      const path = require("path");
+      
+      const bundles = BundleRegistry.getBundlesForPatient(searchId);
+      if (bundles && bundles.length > 0) {
+        matchedPatient = {
+          id: requestedAbhaAddress || `PAT-${uuidv4().substring(0,8)}`,
+          name: patientDetails.name || "Patient Record"
+        };
+        
+        for (const bundle of bundles) {
+          if (bundle.sourceTxtFile) {
+            const folderPath = path.dirname(bundle.sourceTxtFile);
+            const trackerFile = path.join(folderPath, "sent_records.json");
+            let sentRecords = [];
+            if (fs.existsSync(trackerFile)) {
+              try {
+                sentRecords = JSON.parse(fs.readFileSync(trackerFile, "utf-8"));
+              } catch(e) {}
+            }
+            
+            const fileName = path.basename(bundle.sourceTxtFile);
+            // ONLY include the care context if it hasn't been sent
+            if (!sentRecords.includes(fileName)) {
+              careContexts.push({
+                referenceNumber: bundle.bundleFileName || `${uuidv4()}`,
+                display: `${bundle.hiType || 'OPConsultation'} record`,
+                hiType: bundle.hiType || "OPConsultation"
+              });
+            }
           }
-          if (tx.hiTypes && Array.isArray(tx.hiTypes)) {
-             const validHiTypes = ["Prescription", "DiagnosticReport", "OPConsultation", "DischargeSummary", "ImmunizationRecord", "HealthDocumentRecord", "WellnessRecord", "Invoice"];
-             const filteredHiTypes = tx.hiTypes.filter(type => validHiTypes.includes(type));
-             
-             if (filteredHiTypes.length > 0) {
-               filteredHiTypes.forEach((hiType, index) => {
-                  careContexts.push({
-                    referenceNumber: `${txId}-${index}`,
-                    display: `${hiType} record`,
-                    hiType: hiType
-                  });
-               });
-             } else {
-               careContexts.push({
-                  referenceNumber: txId,
-                  display: `Health Record`,
-                  hiType: "OPConsultation" // fallback default
-               });
-             }
-          } else {
-             careContexts.push({
-                referenceNumber: txId,
-                display: `Health Record`,
-                hiType: "OPConsultation" // fallback default
-             });
-          }
-          break; // Stop after first match to prevent returning hundreds of duplicate care contexts
         }
       }
     }
@@ -185,13 +178,14 @@ class M2HipLinkingController {
   static async processLinkInit(payload) {
     const requestId = payload.requestId || uuidv4();
     const transactionId = payload.transactionId;
-    const patientDetails = payload.patient || {};
+    const patientDetailsArray = Array.isArray(payload.patient) ? payload.patient : [];
+    const abhaAddress = payload.abhaAddress || "Unknown";
     
     Logger.info("M2HipLinkingController", "Processing Link Init for request:", { requestId, transactionId });
 
     // Generate reference number and OTP
     const referenceNumber = uuidv4();
-    const otp = otpStore.createOTP(patientDetails.id || "Unknown", referenceNumber);
+    const otp = otpStore.createOTP(abhaAddress, referenceNumber, { patient: patientDetailsArray });
     
     // Simulated SMS delivery
     Logger.info("M2HipLinkingController", `[MOCK SMS] -> OTP to link care contexts is: ${otp}`);
@@ -244,7 +238,7 @@ class M2HipLinkingController {
     Logger.info("M2HipLinkingController", "Processing Link Confirm for request:", { requestId });
 
     // Validate the OTP against our store (which is hardcoded to 122333 for sandbox)
-    const isValid = otpStore.verifyOTP(referenceNumber, submittedOtp);
+    const session = otpStore.verifyOTP(referenceNumber, submittedOtp);
 
     let responsePayload = {
       response: {
@@ -252,8 +246,19 @@ class M2HipLinkingController {
       }
     };
 
-    if (isValid) {
-      responsePayload.patient = [
+    if (session) {
+      const storedPatientArray = Array.isArray(session.patient) ? session.patient : [];
+      
+      responsePayload.patient = storedPatientArray.length > 0 ? storedPatientArray.map(p => ({
+        referenceNumber: p.referenceNumber || confirmationDetails.linkRefNumber || uuidv4(),
+        display: p.display || "Linked Record",
+        careContexts: (p.careContexts || []).map(cc => ({
+          referenceNumber: cc.referenceNumber,
+          display: cc.display || "Successfully Linked Care Context"
+        })),
+        hiType: p.hiType || "OPConsultation",
+        count: p.count || (p.careContexts ? p.careContexts.length : 1)
+      })) : [
         {
           referenceNumber: confirmationDetails.linkRefNumber || uuidv4(),
           display: "Linked Record",

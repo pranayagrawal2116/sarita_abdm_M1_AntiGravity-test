@@ -329,6 +329,12 @@ app.use("/api/m2/hip/transfer", require("./m2/routes/m2DataTransferRoutes"));
 app.use("/api/m2", require("./m2/routes/m2AuthRoutes"));
 app.use("/", require("./m2/routes/m2CallbackRoutes"));
 
+// Mount new M3 module routes
+app.use("/api/m3/auth", require("./m3/routes/m3AuthRoutes"));
+app.use("/api/m3/consent", require("./m3/routes/m3ConsentRoutes"));
+app.use("/", require("./m3/routes/m3CallbackRoutes"));
+app.use("/api/m3/subscriptions", require("./m3/routes/m3SubscriptionRoutes"));
+
 const scanShareController = require("./controllers/scanShareController");
 const hipLinkingController = require("./controllers/hipLinkingController");
 // const hipDataTransferController = require("./controllers/hipDataTransferController");
@@ -411,5 +417,22 @@ app.listen(PORT, HOST, () => {
     console.log("✅ ABDM M2 Tokens (Gateway & Session) initialized on startup.");
   }).catch(err => {
     console.error("❌ Failed to initialize ABDM M2 Tokens on startup:", err.message);
+  });
+
+  // Initialize M3 Token Manager (Gateway tokens) on startup
+  const M3TokenManager = require("./m3/tokens/M3TokenManager");
+  M3TokenManager.initialize().then(() => {
+    console.log("✅ ABDM M3 Tokens (Gateway) initialized on startup.");
+    if (publicBaseUrl) {
+      const M3AuthService = require("./m3/services/m3AuthService");
+      const trimmedUrl = publicBaseUrl.replace(/\/$/, "");
+      M3AuthService.updateBridgeUrl(trimmedUrl).then(() => {
+         console.log("✅ ABDM M3 Bridge URL automatically updated to:", trimmedUrl);
+      }).catch(err => {
+         console.error("⚠️ Failed to update M3 Bridge URL on startup. Callbacks may fail.", err.message);
+      });
+    }
+  }).catch(err => {
+    console.error("❌ Failed to initialize ABDM M3 Tokens on startup:", err.message);
   });
 });

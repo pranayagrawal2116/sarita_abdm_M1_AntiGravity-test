@@ -28,7 +28,7 @@ const generateSecureOTP = () => {
  * @param {string} referenceNumber - Unique reference number for this session
  * @returns {string} The generated OTP
  */
-const createOTP = (abhaAddress, referenceNumber) => {
+const createOTP = (abhaAddress, referenceNumber, additionalData = {}) => {
   const otp = generateSecureOTP();
   const expiresAt = Date.now() + OTP_EXPIRY_MS;
 
@@ -36,7 +36,8 @@ const createOTP = (abhaAddress, referenceNumber) => {
     otp,
     abhaAddress,
     expiresAt,
-    createdAt: nowIso()
+    createdAt: nowIso(),
+    ...additionalData
   });
 
   // Periodically clean up expired OTPs to prevent memory leaks
@@ -49,30 +50,30 @@ const createOTP = (abhaAddress, referenceNumber) => {
  * Verify an OTP.
  * @param {string} referenceNumber - The session reference number
  * @param {string} submittedOtp - The OTP provided by the user
- * @returns {boolean} True if valid, false otherwise.
+ * @returns {object|null} The session data if valid, null otherwise.
  */
 const verifyOTP = (referenceNumber, submittedOtp) => {
-  if (!referenceNumber || !submittedOtp) return false;
+  if (!referenceNumber || !submittedOtp) return null;
 
   const session = otpCache.get(referenceNumber);
   if (!session) {
-    return false; // Not found or already expired
+    return null; // Not found or already expired
   }
 
   // Check expiry
   if (Date.now() > session.expiresAt) {
     otpCache.delete(referenceNumber);
-    return false; // Expired
+    return null; // Expired
   }
 
   // Check match
   if (session.otp === submittedOtp) {
     // Valid! Remove it so it can't be reused
     otpCache.delete(referenceNumber);
-    return true;
+    return session;
   }
-
-  return false;
+  
+  return null;
 };
 
 /**

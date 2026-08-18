@@ -15,6 +15,7 @@ import 'package:sarita_abdm/widgets/scan_share_qr_dialog.dart';
 
 import '../utils/app_runtime_store.dart';
 import '../utils/registered_users_store.dart';
+import '../m3/screens/hiu_module_screen.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -293,12 +294,12 @@ class _StartScreenState extends State<StartScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const HipLinkingPatientScreen(),
+                              builder: (_) => const HiuModuleScreen(),
                             ),
                           );
                         },
-                        icon: const Icon(Icons.link_rounded),
-                        label: const Text('HIP Linking'),
+                        icon: const Icon(Icons.health_and_safety_rounded),
+                        label: const Text('HIU Module'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF2F8F5B),
                           foregroundColor: Colors.white,

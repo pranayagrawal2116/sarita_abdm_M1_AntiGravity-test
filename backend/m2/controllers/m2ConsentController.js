@@ -338,7 +338,8 @@ class M2ConsentController {
         };
       }
 
-      const tx = await M2TransactionStore.updateTransaction(requestDetails.transactionId, {
+      const trackingId = requestDetails.transactionId || requestDetails.requestId || consentId;
+      const tx = await M2TransactionStore.updateTransaction(trackingId, {
         dataPushUrl: normalizedDataPushUrl,
         keyMaterial: normalizedKeyMaterial,
         receiverPrivateKey,
@@ -359,7 +360,7 @@ class M2ConsentController {
         req,
       });
 
-      await M2TransactionStore.appendAuditEvent(tx.transactionId, "HI_REQUEST_DISPATCHED", "Health Information Request sent to ABDM Gateway.", {
+      await M2TransactionStore.appendAuditEvent(trackingId, "HI_REQUEST_DISPATCHED", "Health Information Request sent to ABDM Gateway.", {
         requestId: requestDetails.requestId,
         dataPushUrl: outbound.dataPushUrl,
       });

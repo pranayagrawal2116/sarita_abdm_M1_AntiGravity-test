@@ -1,0 +1,352 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-dec85312-f62b-4f88-8ee1-72475362f6ea",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-08-18T19:01:19.387+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "e89af145-c708-463e-b569-857c7f9e4af2"
+  },
+  "type": "document",
+  "timestamp": "2026-08-18T19:01:19.387+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:753687d6-c1d5-47ac-93ed-bbfb7277a5dd",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "753687d6-c1d5-47ac-93ed-bbfb7277a5dd",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "721981007",
+              "display": "Diagnostic studies report"
+            }
+          ],
+          "text": "Diagnostic Report- Lab"
+        },
+        "subject": {
+          "reference": "urn:uuid:9bc93071-b7d4-4c61-ad42-acecf8e9bea5",
+          "display": "Saurav Kumar"
+        },
+        "encounter": {
+          "reference": "urn:uuid:1e58149c-5530-4eec-9db7-1399e4a0b82a",
+          "display": "Ambulatory"
+        },
+        "date": "2026-08-18T19:01:19.387+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:36b0ea3f-9cc3-4138-96a9-7457016eb4ce",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Diagnostic report",
+        "custodian": {
+          "reference": "urn:uuid:158179f8-17e5-47e0-9997-dc4ab8446480",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Hematology report",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "4321000179101",
+                  "display": "Hematology report"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:7be290b6-93a7-41a3-8f01-f7dfe2f5d5e7",
+                "display": "Complete Blood Count"
+              },
+              {
+                "reference": "urn:uuid:2699f97e-7a9f-414d-b1e0-205f0208e756",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9bc93071-b7d4-4c61-ad42-acecf8e9bea5",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "9bc93071-b7d4-4c61-ad42-acecf8e9bea5",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-18T19:01:19.387+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "saurav_50505@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Saurav Kumar"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "8298540343",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2000-11-05"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:36b0ea3f-9cc3-4138-96a9-7457016eb4ce",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "36b0ea3f-9cc3-4138-96a9-7457016eb4ce",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-18T19:01:19.387+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:158179f8-17e5-47e0-9997-dc4ab8446480",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "158179f8-17e5-47e0-9997-dc4ab8446480",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:1e58149c-5530-4eec-9db7-1399e4a0b82a",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "1e58149c-5530-4eec-9db7-1399e4a0b82a",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "89b11c70-15d1-40c8-836b-5e18649fdbfb"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:9bc93071-b7d4-4c61-ad42-acecf8e9bea5",
+          "display": "Saurav Kumar"
+        },
+        "period": {
+          "start": "2026-08-18T19:01:19.387+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d75eb0ac-8034-4a6f-8606-19a3928cd0bf",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "d75eb0ac-8034-4a6f-8606-19a3928cd0bf",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "718-7",
+              "display": "WBC"
+            }
+          ],
+          "text": "WBC"
+        },
+        "subject": {
+          "reference": "urn:uuid:9bc93071-b7d4-4c61-ad42-acecf8e9bea5"
+        },
+        "effectiveDateTime": "2026-08-18T13:31:19.387Z",
+        "valueQuantity": {
+          "value": 6000,
+          "unit": "10^3/uml",
+          "system": "http://unitsofmeasure.org",
+          "code": "10^3/uml"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7be290b6-93a7-41a3-8f01-f7dfe2f5d5e7",
+      "resource": {
+        "resourceType": "DiagnosticReport",
+        "id": "7be290b6-93a7-41a3-8f01-f7dfe2f5d5e7",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DiagnosticReportLab"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "708196005",
+                "display": "Hematology service"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11502-2",
+              "display": "Complete Blood Count"
+            }
+          ],
+          "text": "Complete Blood Count"
+        },
+        "subject": {
+          "reference": "urn:uuid:9bc93071-b7d4-4c61-ad42-acecf8e9bea5",
+          "display": "Saurav Kumar"
+        },
+        "encounter": {
+          "reference": "urn:uuid:1e58149c-5530-4eec-9db7-1399e4a0b82a"
+        },
+        "performer": [
+          {
+            "reference": "urn:uuid:158179f8-17e5-47e0-9997-dc4ab8446480",
+            "display": "Sarita Health Care"
+          }
+        ],
+        "resultsInterpreter": [
+          {
+            "reference": "urn:uuid:36b0ea3f-9cc3-4138-96a9-7457016eb4ce",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "effectiveDateTime": "2026-08-18T13:31:19.387Z",
+        "issued": "2026-08-18T13:31:19.387Z",
+        "result": [
+          {
+            "reference": "urn:uuid:d75eb0ac-8034-4a6f-8606-19a3928cd0bf",
+            "display": "WBC"
+          }
+        ],
+        "conclusion": "Clinical diagnostic report generated successfully."
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2699f97e-7a9f-414d-b1e0-205f0208e756",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "2699f97e-7a9f-414d-b1e0-205f0208e756",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Diagnostic Report Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:9bc93071-b7d4-4c61-ad42-acecf8e9bea5"
+        },
+        "date": "2026-08-18T13:31:19.387Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "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I+sP0GO6zDiP6qSs9vncyS07eD4J3YFL1xgr6Km2FA9CC87fSSUykvca5X5o+bjklGimv70+nnbXPb+rz/1Onnb3N7+P6F4nu43WCZ2uNEU4BmOP6ybrh4cyRebhdOVFbhABygSpDFFKaajVxKgZlqzbEOF2fdxUAfMV3FwPWbTbaX77JBU40nHE4VFUKUhPtqw5bL6SG1NBFzaaJy7D5Q4fXwdVsLrh8fNcv/kyRHPShEbThXllnHx9ojlb3VOGCtnhvsXrIOqQTIwVLbxcQfCvhi9H4ysyOFiT/gfBSR2ACmVuZHN0cmVhbQplbmRvYmoKMTQgMCBvYmoKKHBkZm1ha2UpCmVuZG9iagoxNSAwIG9iagoocGRmbWFrZSkKZW5kb2JqCjE2IDAgb2JqCihEOjIwMjYwODE4MTMzMTE5WikKZW5kb2JqCjEzIDAgb2JqCjw8Ci9Qcm9kdWNlciAxNCAwIFIKL0NyZWF0b3IgMTUgMCBSCi9DcmVhdGlvbkRhdGUgMTYgMCBSCj4+CmVuZG9iagoxMCAwIG9iago8PAovVHlwZSAvRm9udAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkCi9TdWJ0eXBlIC9UeXBlMQovRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZwo+PgplbmRvYmoKMTEgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL0Jhc2VGb250IC9IZWx2ZXRpY2EKL1N1YnR5cGUgL1R5cGUxCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iago0IDAgb2JqCjw8Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9DYXRhbG9nCi9QYWdlcyAxIDAgUgovTmFtZXMgMiAwIFIKPj4KZW5kb2JqCjEgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9Db3VudCAxCi9LaWRzIFs3IDAgUl0KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Rlc3RzIDw8CiAgL05hbWVzIFsKXQo+Pgo+PgplbmRvYmoKeHJlZgowIDE3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMjQ5MSAwMDAwMCBuIAowMDAwMDAyNTQ4IDAwMDAwIG4gCjAwMDAwMDI0MjkgMDAwMDAgbiAKMDAwMDAwMjQwOCAwMDAwMCBuIAowMDAwMDAwNDQ2IDAwMDAwIG4gCjAwMDAwMDAyNzYgMDAwMDAgbiAKMDAwMDAwMDE1NCAwMDAwMCBuIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAwNTkgMDAwMDAgbiAKMDAwMDAwMjIwNyAwMDAwMCBuIAowMDAwMDAyMzEwIDAwMDAwIG4gCjAwMDAwMDAxMDkgMDAwMDAgbiAKMDAwMDAwMjEzMSAwMDAwMCBuIAowMDAwMDAyMDQzIDAwMDAwIG4gCjAwMDAwMDIwNjkgMDAwMDAgbiAKMDAwMDAwMjA5NSAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9TaXplIDE3Ci9Sb290IDMgMCBSCi9JbmZvIDEzIDAgUgovSUQgWzw3Y2RjODUzMzcwYjIzMGQ2NjJhMjFiZWZhMWEyZGRkYz4gPDdjZGM4NTMzNzBiMjMwZDY2MmEyMWJlZmExYTJkZGRjPl0KPj4Kc3RhcnR4cmVmCjI1OTUKJSVFT0YK",
+              "title": "DiagnosticReport_20260818_133119.pdf",
+              "creation": "2026-08-18T13:31:19.387Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

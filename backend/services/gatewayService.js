@@ -32,7 +32,7 @@ exports.getGatewayToken = async () => {
     const clientSecret = process.env.CLIENT_SECRET || process.env.ABDM_CLIENT_SECRET;
 
     const res = await axios.post(
-        `${process.env.GATEWAY_BASE}/api/hiecm/gateway/v3/sessions`,
+        `${process.env.GATEWAY_BASE}/gateway/v0.5/sessions`,
         {
             clientId,
             clientSecret,

@@ -5,7 +5,7 @@
  */
 
 const { v4: uuidv4 } = require("uuid");
-const { createDocumentReference } = require("./fhirHelpers");
+const { createDocumentReference, formatTimestamp } = require("./fhirHelpers");
 
 class ImmunizationBuilder {
   /**
@@ -35,13 +35,7 @@ class ImmunizationBuilder {
       let parsedDate = ids.timestamp;
       if (imm.date) {
         try {
-          // Try parsing DD MMM YYYY if possible, or just pass as is if format matches ISO
-          const dMatch = imm.date.match(/(\d+)\s+([a-zA-Z]+)\s+(\d{4})/);
-          if (dMatch) {
-            parsedDate = new Date(imm.date).toISOString().replace(/\.\d{3}Z$/, '+05:30');
-          } else {
-            parsedDate = new Date(imm.date).toISOString().replace(/\.\d{3}Z$/, '+05:30');
-          }
+          parsedDate = formatTimestamp(imm.date);
         } catch (e) {}
       }
 

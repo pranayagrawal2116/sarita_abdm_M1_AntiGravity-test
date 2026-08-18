@@ -88,7 +88,7 @@ class M2DataTransferManager {
       let requestDetails = null;
       if (!transactionId) {
         requestDetails = await M2HealthInformationRequestManager.createRequest(consentId, patientId);
-        transactionId = requestDetails.transactionId;
+        transactionId = requestDetails.transactionId || requestDetails.requestId || consentId;
       } else {
         const tx = M2TransactionStore.getTransaction(transactionId);
         if (!tx) throw new Error("Transaction not found for provided transactionId.");
@@ -249,6 +249,31 @@ class M2DataTransferManager {
         reason: "Data package acknowledged by HIU receiver.",
         statusCode: dataPushResult.statusCode
       });
+      
+      // Track sent records in the patient's folder
+      try {
+        const fs = require('fs');
+        const path = require('path');
+        for (const payload of selectedPayloads) {
+          if (payload.meta && payload.meta.sourceTxtFile) {
+            const folderPath = path.dirname(payload.meta.sourceTxtFile);
+            const trackerFile = path.join(folderPath, "sent_records.json");
+            let sentRecords = [];
+            if (fs.existsSync(trackerFile)) {
+              try {
+                sentRecords = JSON.parse(fs.readFileSync(trackerFile, "utf-8"));
+              } catch(e) {}
+            }
+            const fileName = path.basename(payload.meta.sourceTxtFile);
+            if (!sentRecords.includes(fileName)) {
+              sentRecords.push(fileName);
+            }
+            fs.writeFileSync(trackerFile, JSON.stringify(sentRecords, null, 2));
+          }
+        }
+      } catch (err) {
+        Logger.error("M2DataTransferManager", "Failed to update sent_records.json", err);
+      }
 
       const currentTx = M2TransactionStore.getTransaction(transactionId);
       const notifyConsentId = this.resolveConsentArtifactId(currentTx, consentId);
@@ -949,15 +974,11 @@ class M2DataTransferManager {
         return matchingContext.careContextReference || matchingContext.referenceNumber || matchingContext.id;
       }
 
-      // If no explicit hiType match is found, DO NOT fall back to an unrelated care context 
-      // from the consent (e.g. ImmunizationRecord) because ABDM Gateway will merge the hiTypes.
-      // Instead, we MUST return a matching suffix or a new UUID so the Gateway handles it properly
-      // or rejects it if it's outside the consent scope.
+      // If no explicit hiType match is found, just return the exact care context reference
+      // that the HIU requested. Appending a suffix breaks the linkage for User Initiated Linking
+      // because the HIU expects the exact reference it authorized.
       const firstCc = requestedCareContexts[0];
-      const baseRef = firstCc.careContextReference || firstCc.referenceNumber || firstCc.id;
-      // Strip any existing hiType suffix from the base ref and append the correct one
-      const strippedBase = baseRef.replace(/-[A-Za-z]+$/, "");
-      return `${strippedBase}-${selectedPayload.meta?.hiType || bundleHiType}`;
+      return firstCc.careContextReference || firstCc.referenceNumber || firstCc.id;
     }
 
     // Secondary fallback to legacy handling

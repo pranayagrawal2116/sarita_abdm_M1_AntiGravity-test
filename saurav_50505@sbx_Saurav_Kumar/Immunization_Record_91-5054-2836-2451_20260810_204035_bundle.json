@@ -1,0 +1,296 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-5bc6cc25-b06c-44e2-869b-cbeeb18e7435",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-08-18T19:01:19.418+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "290f713f-f377-4e81-b151-6d0db2336930"
+  },
+  "type": "document",
+  "timestamp": "2026-08-18T19:01:19.418+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:96e15c43-c8a9-432e-b71f-c9b4fb56e4dd",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "96e15c43-c8a9-432e-b71f-c9b4fb56e4dd",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ImmunizationRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Immunization record"
+        },
+        "subject": {
+          "reference": "urn:uuid:f5fd7d3c-d3ce-4590-942a-9e786a68660f",
+          "display": "Saurav Kumar"
+        },
+        "encounter": {
+          "reference": "urn:uuid:c51dd021-5a8a-4c78-838d-86d5ee5bb9db",
+          "display": "Ambulatory"
+        },
+        "date": "2026-08-18T19:01:19.418+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:d161210d-f243-4361-89ad-15994753d2b7",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Immunization record",
+        "custodian": {
+          "reference": "urn:uuid:68750724-f75d-4889-86ac-1ca76714ec4a",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Immunization Details",
+            "entry": [
+              {
+                "reference": "urn:uuid:034201f6-6caf-41ad-ad59-fbf48c243c9d",
+                "display": "Immunization"
+              }
+            ]
+          },
+          {
+            "title": "Document Reference",
+            "entry": [
+              {
+                "reference": "urn:uuid:e2fef3d3-8c6c-4ed5-a969-88ee06d8d90e",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f5fd7d3c-d3ce-4590-942a-9e786a68660f",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "f5fd7d3c-d3ce-4590-942a-9e786a68660f",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-18T19:01:19.418+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "saurav_50505@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Saurav Kumar"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "8298540343",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2000-11-05"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d161210d-f243-4361-89ad-15994753d2b7",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "d161210d-f243-4361-89ad-15994753d2b7",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-18T19:01:19.418+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:68750724-f75d-4889-86ac-1ca76714ec4a",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "68750724-f75d-4889-86ac-1ca76714ec4a",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c51dd021-5a8a-4c78-838d-86d5ee5bb9db",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "c51dd021-5a8a-4c78-838d-86d5ee5bb9db",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "1fe9dfd8-63d4-4726-a82f-e3cd06fb300b"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:f5fd7d3c-d3ce-4590-942a-9e786a68660f",
+          "display": "Saurav Kumar"
+        },
+        "period": {
+          "start": "2026-08-18T19:01:19.418+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:034201f6-6caf-41ad-ad59-fbf48c243c9d",
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "034201f6-6caf-41ad-ad59-fbf48c243c9d",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Immunization"
+          ]
+        },
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://www.snomed.org",
+              "code": "1119349007",
+              "display": "Hpeatits B"
+            }
+          ],
+          "text": "Hpeatits B"
+        },
+        "patient": {
+          "reference": "urn:uuid:f5fd7d3c-d3ce-4590-942a-9e786a68660f",
+          "display": "Saurav Kumar"
+        },
+        "encounter": {
+          "reference": "urn:uuid:c51dd021-5a8a-4c78-838d-86d5ee5bb9db",
+          "display": "Encounter"
+        },
+        "occurrenceDateTime": "2026-08-18T19:01:19.418+05:30",
+        "primarySource": true,
+        "performer": [
+          {
+            "actor": {
+              "reference": "urn:uuid:d161210d-f243-4361-89ad-15994753d2b7",
+              "display": "Practitioner"
+            }
+          }
+        ],
+        "manufacturer": {
+          "display": "Engerix-B"
+        },
+        "lotNumber": "LOT08134",
+        "protocolApplied": [
+          {
+            "doseNumberPositiveInt": 1
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e2fef3d3-8c6c-4ed5-a969-88ee06d8d90e",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "e2fef3d3-8c6c-4ed5-a969-88ee06d8d90e",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Immunization Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:f5fd7d3c-d3ce-4590-942a-9e786a68660f"
+        },
+        "date": "2026-08-18T13:31:19.418Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "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PGhjuzu19ibvTNvYV5Wzm1wqG1p+flqzQ6tsWIRzQfbVh8TPI8W2yENsbm1q+MvHhJx7y+aVKbhJUyBtQ5qIt1h6AO8VQdXFPDF7PFliXDL7lm29cpuhyEWXFjqBJ4PLb7/mjFjpO889WlQAVnsVsdbzMQ83y4VlVKnt/HhQYdzvZcktX1nzlMuccYDlpFvEkwMG9MRBZcUd5wLz6HhLeY0h6ASTYnG+OZ3ehz6/Z8Xj5gdXZG1EdjKOLT6sZU9mu4MdruN4SuAsZ8vEaTwX4uN1UAVtlfZlrt99jqI5aWsUz7HLynj1yYvmbIkLtgrZ8ajGdRBFTuoxVrSwP73gr4avS4m4yPco7/8PICiFkwplbmRzdHJlYW0KZW5kb2JqCjE0IDAgb2JqCihwZGZtYWtlKQplbmRvYmoKMTUgMCBvYmoKKHBkZm1ha2UpCmVuZG9iagoxNiAwIG9iagooRDoyMDI2MDgxODEzMzExOVopCmVuZG9iagoxMyAwIG9iago8PAovUHJvZHVjZXIgMTQgMCBSCi9DcmVhdG9yIDE1IDAgUgovQ3JlYXRpb25EYXRlIDE2IDAgUgo+PgplbmRvYmoKMTAgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL0Jhc2VGb250IC9IZWx2ZXRpY2EtQm9sZAovU3VidHlwZSAvVHlwZTEKL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcKPj4KZW5kb2JqCjExIDAgb2JqCjw8Ci9UeXBlIC9Gb250Ci9CYXNlRm9udCAvSGVsdmV0aWNhCi9TdWJ0eXBlIC9UeXBlMQovRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZwo+PgplbmRvYmoKNCAwIG9iago8PAo+PgplbmRvYmoKMyAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMSAwIFIKL05hbWVzIDIgMCBSCj4+CmVuZG9iagoxIDAgb2JqCjw8Ci9UeXBlIC9QYWdlcwovQ291bnQgMQovS2lkcyBbNyAwIFJdCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9EZXN0cyA8PAogIC9OYW1lcyBbCl0KPj4KPj4KZW5kb2JqCnhyZWYKMCAxNwowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDI1MzcgMDAwMDAgbiAKMDAwMDAwMjU5NCAwMDAwMCBuIAowMDAwMDAyNDc1IDAwMDAwIG4gCjAwMDAwMDI0NTQgMDAwMDAgbiAKMDAwMDAwMDQ0NiAwMDAwMCBuIAowMDAwMDAwMjc2IDAwMDAwIG4gCjAwMDAwMDAxNTQgMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMDU5IDAwMDAwIG4gCjAwMDAwMDIyNTMgMDAwMDAgbiAKMDAwMDAwMjM1NiAwMDAwMCBuIAowMDAwMDAwMTA5IDAwMDAwIG4gCjAwMDAwMDIxNzcgMDAwMDAgbiAKMDAwMDAwMjA4OSAwMDAwMCBuIAowMDAwMDAyMTE1IDAwMDAwIG4gCjAwMDAwMDIxNDEgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSAxNwovUm9vdCAzIDAgUgovSW5mbyAxMyAwIFIKL0lEIFs8NjRlNWZjMzllM2I5ZTBhZTc3MTdhMDc2NjRlZDdiMzA+IDw2NGU1ZmMzOWUzYjllMGFlNzcxN2EwNzY2NGVkN2IzMD5dCj4+CnN0YXJ0eHJlZgoyNjQxCiUlRU9GCg==",
+              "title": "ImmunizationRecord_20260818133119.pdf",
+              "creation": "2026-08-18T13:31:19.418Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

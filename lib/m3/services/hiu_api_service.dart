@@ -54,6 +54,12 @@ class HiuApiService {
       final decoded = jsonDecode(response.body);
       return decoded['data'] ?? [];
     } else {
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded['error'] != null) {
+          throw Exception(decoded['error']);
+        }
+      } catch (_) {}
       throw Exception('Failed to fetch health documents: ${response.statusCode} - ${response.body}');
     }
   }

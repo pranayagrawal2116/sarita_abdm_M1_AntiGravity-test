@@ -628,7 +628,15 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                     default: statusColor = Colors.grey;
                   }
 
-                  final hiTypesWidget = Wrap(
+                  final details = req['details'];
+                  List<String> grantedTypes = [];
+                  if (details != null && details['hiTypes'] != null) {
+                    grantedTypes = (details['hiTypes'] as List).map((e) => e.toString()).toList();
+                  } else {
+                    grantedTypes = List.from(hiTypes);
+                  }
+
+                  final requestedHiTypesWidget = Wrap(
                     spacing: 6,
                     runSpacing: 6,
                     direction: Axis.vertical,
@@ -640,6 +648,27 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                       ),
                       child: Text(type, style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 11, fontWeight: FontWeight.w500)),
                     )).toList(),
+                  );
+
+                  final grantedHiTypesWidget = Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    direction: Axis.vertical,
+                    children: hiTypes.map((type) {
+                      final isGranted = grantedTypes.contains(type);
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isGranted ? const Color(0xFFF3FCF7) : const Color(0xFFFDECEC),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(type, style: TextStyle(
+                          color: isGranted ? const Color(0xFF2F8F5B) : Colors.red,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        )),
+                      );
+                    }).toList(),
                   );
 
                   return DataRow(
@@ -667,7 +696,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                         )
                       ),
                       // REQUESTED FOR
-                      DataCell(Padding(padding: const EdgeInsets.symmetric(vertical: 24), child: hiTypesWidget)),
+                      DataCell(Padding(padding: const EdgeInsets.symmetric(vertical: 24), child: requestedHiTypesWidget)),
                       // STATUS (e.g. GRANTED)
                       DataCell(
                         Container(
@@ -681,7 +710,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                         )
                       ),
                       // GRANTED FOR
-                      DataCell(Padding(padding: const EdgeInsets.symmetric(vertical: 24), child: displayStatus == 'GRANTED' ? hiTypesWidget : const Text('-', style: TextStyle(color: Colors.grey)))),
+                      DataCell(Padding(padding: const EdgeInsets.symmetric(vertical: 24), child: displayStatus == 'GRANTED' ? grantedHiTypesWidget : const Text('-', style: TextStyle(color: Colors.grey)))),
                       // REQUESTED DATES
                       DataCell(
                         Column(

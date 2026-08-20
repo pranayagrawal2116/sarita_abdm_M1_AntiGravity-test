@@ -89,13 +89,23 @@ class M3CallbackController {
       // Send on-notify acknowledgment back to ABDM
       const M3TokenManager = require("../tokens/M3TokenManager");
       const token = await M3TokenManager.getGatewayToken();
-      const onNotifyPayload = {
-        acknowledgement: [
-          {
+      const acknowledgements = [];
+      if (notification.consentArtefacts && notification.consentArtefacts.length > 0) {
+        notification.consentArtefacts.forEach(artefact => {
+          acknowledgements.push({
             status: "OK",
-            consentId: notification.consentRequestId
-          }
-        ],
+            consentId: artefact.id
+          });
+        });
+      } else {
+        acknowledgements.push({
+          status: "OK",
+          consentId: notification.consentRequestId
+        });
+      }
+
+      const onNotifyPayload = {
+        acknowledgement: acknowledgements,
         response: {
           requestId: reqId
         }
@@ -150,6 +160,36 @@ class M3CallbackController {
   static async onHealthInfoRequest(req, res) {
     Logger.info("M3Callback", "Received health info on-request", req.body);
     res.status(202).send();
+
+    try {
+      const { hiRequest, response, error } = req.body;
+      if (response && response.requestId) {
+        const transactions = M3ConsentStore.transactions || {};
+        let txn = null;
+        let matchedOldTxnId = null;
+
+        for (const [oldTransactionId, t] of Object.entries(transactions)) {
+          if (t.requestId === response.requestId) {
+            txn = t;
+            matchedOldTxnId = oldTransactionId;
+            break;
+          }
+        }
+
+        if (txn) {
+          if (error) {
+            Logger.error("M3Callback", `Error from on-request for ${matchedOldTxnId}: ${error.message}`);
+            txn.error = error.message;
+            M3ConsentStore.save();
+          } else if (hiRequest && hiRequest.transactionId) {
+            Logger.info("M3Callback", `Mapping ABDM transactionId ${hiRequest.transactionId} to our internal transaction.`);
+            M3ConsentStore.addTransaction(hiRequest.transactionId, txn);
+          }
+        }
+      }
+    } catch (e) {
+      Logger.error("M3Callback", "Error mapping transactionId from on-request", { error: e.message });
+    }
   }
 
   // Receives actual health data from HIP (FIData)
@@ -184,7 +224,13 @@ class M3CallbackController {
         fs.mkdirSync(path.join(rootDir, targetUserDir), { recursive: true });
       }
 
-      const hospitalDir = path.join(rootDir, targetUserDir, "Other_hospital_data", "HIP_Data");
+      let hospitalFolderName = "Other_hospital_data/HIP_Data";
+      if (transaction && transaction.consentId) {
+        const hName = (transaction.hipName || transaction.hipId || "UnknownHIP").replace(/[^a-zA-Z0-9_\-]/g, '_');
+        hospitalFolderName = `${transaction.consentId}_${hName}`;
+      }
+
+      const hospitalDir = path.join(rootDir, targetUserDir, hospitalFolderName);
       fs.mkdirSync(hospitalDir, { recursive: true });
 
       const fileName = `HealthData_${transactionId}_${new Date().getTime()}.json`;
@@ -194,7 +240,6 @@ class M3CallbackController {
 
       // Now notify ABDM that we received the data
       const M3ConsentService = require("../services/m3ConsentService");
-      const transaction = M3ConsentStore.getTransaction(transactionId);
       
       if (transaction) {
         await M3ConsentService.notifyHealthInformationStatus({

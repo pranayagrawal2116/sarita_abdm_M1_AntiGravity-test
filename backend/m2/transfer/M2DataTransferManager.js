@@ -143,12 +143,15 @@ class M2DataTransferManager {
         return timeB - timeA;
       });
 
+      const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/');
+      
       for (const payload of matchedPayloads) {
-        const normType = this.normalizeHiType(payload.meta?.hiType);
-        if (!seenTypes.has(normType)) {
-          seenTypes.add(normType);
-          selectedPayloads.push(payload);
+        if (!isDesktopApp) {
+          const hiType = this.normalizeHiType(payload.meta?.hiType);
+          if (seenTypes.has(hiType)) continue;
+          seenTypes.add(hiType);
         }
+        selectedPayloads.push(payload);
       }
 
       if (selectedPayloads.length === 0) {
@@ -683,9 +686,35 @@ class M2DataTransferManager {
     if (requestedHiTypes.length === 0) {
       requestedHiTypes = ["OP Consultation"];
     }
-    // Enforce strictly one HI type at a time as requested by user
-    if (requestedHiTypes.length > 1) {
-      requestedHiTypes = [requestedHiTypes[0]];
+    
+    // Enforce strictly one HI type at a time for Mobile App (M2), but send ALL for Desktop App (M3)
+    const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/');
+    if (!isDesktopApp && requestedHiTypes.length > 1) {
+      try {
+        const BundleRegistry = require("../fhir/BundleRegistry");
+        const abhaMatch = patientId.match(/^(.+?@sbx)/);
+        const searchId = abhaMatch ? abhaMatch[1] : patientId;
+        const patientBundles = BundleRegistry.getBundlesForPatient(searchId, {
+          abhaNumber: this.extractAbhaNumberFromTransaction(currentTx)
+        });
+        
+        const normalizedRequested = requestedHiTypes.map(r => this.normalizeHiType(r));
+        const matchedBundles = patientBundles.filter(b => normalizedRequested.includes(this.normalizeHiType(b.hiType)));
+        
+        if (matchedBundles.length > 0) {
+          matchedBundles.sort((a, b) => {
+            const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+            const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+            return timeB - timeA;
+          });
+          requestedHiTypes = [matchedBundles[0].hiType];
+        } else {
+          requestedHiTypes = [requestedHiTypes[0]];
+        }
+      } catch (e) {
+        console.error("Failed to automatically find the newest bundle for M2 push. Falling back.", e);
+        requestedHiTypes = [requestedHiTypes[0]];
+      }
     }
     
     console.log(`Requested HI Types: ${requestedHiTypes.join(", ")}`);
@@ -697,10 +726,15 @@ class M2DataTransferManager {
     });
 
     // We only Acknowledge the request, and wait for the manual push from the Desktop UI
-    const hiResponse = await this.sendHealthInformationOnRequestResponse({
+    let hiResponse = null;
+    try {
+      hiResponse = await this.sendHealthInformationOnRequestResponse({
       requestId: gatewayRequestId,
-      transactionId: currentTx.transactionId
-    });
+        transactionId: currentTx.transactionId
+      });
+    } catch (e) {
+      Logger.warn("M2DataTransferManager", "Failed to send HI on-request to ABDM Gateway. Proceeding with transfer anyway.", e);
+    }
 
     await M2TransactionStore.transitionState(currentTx.transactionId, "Acknowledged", {
       requestId: gatewayRequestId,
@@ -708,8 +742,6 @@ class M2DataTransferManager {
     });
 
     // Automatically trigger data push in the background to prevent HIU timeouts
-    // TEMPORARILY DISABLED for manual testing
-    /*
     setTimeout(async () => {
       try {
         Logger.info("M2DataTransferManager", "Initiating automatic data push to HIU.");
@@ -727,13 +759,13 @@ class M2DataTransferManager {
         Logger.error("M2DataTransferManager", "Failed to perform automatic data push", err);
       }
     }, 1000);
-    */
 
     return {
 
       success: true,
       requestId: gatewayRequestId,
-      transactionId: currentTx.transactionId,
+      requestId: gatewayRequestId,
+
       hiResponse
     };
   }

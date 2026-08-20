@@ -46,8 +46,6 @@ router.post(
   [
     "/api/v3/health-information/on-request",
     "/v3/health-information/on-request",
-    "/api/v3/hiu/health-information/on-request",
-    "/v3/hiu/health-information/on-request"
   ],
   M2CallbackController.onHealthInformationOnRequest
 );
@@ -56,8 +54,6 @@ router.post(
   [
     "/api/v3/health-information/notify",
     "/v3/health-information/notify",
-    "/api/v3/hiu/health-information/notify",
-    "/v3/hiu/health-information/notify"
   ],
   M2CallbackController.onHealthInformationNotify
 );

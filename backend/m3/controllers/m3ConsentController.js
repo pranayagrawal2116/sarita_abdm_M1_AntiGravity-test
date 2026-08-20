@@ -103,26 +103,32 @@ class M3ConsentController {
       const dirs = fs.readdirSync(rootDir);
       let targetUserDir = dirs.find(d => d.includes("@sbx"));
       const docIdVar = typeof docId !== 'undefined' ? docId : null;
-      const consentReq = typeof hipId !== 'undefined' ? M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[hipId]) : null;
+      const consentReq = typeof hipId !== 'undefined' ? M3ConsentStore.consents.find(c => c.artefactDetails && (c.artefactDetails[hipId] || Object.values(c.artefactDetails).some(art => art.hip && art.hip.id === hipId))) : null;
       if (consentReq && consentReq.patientId) {
         const found = dirs.find(d => d.startsWith(consentReq.patientId));
         if (found) targetUserDir = found;
       }
       if (!targetUserDir) return res.json({ success: true, data: [] });
       
-      const hospitalDir = path.join(rootDir, targetUserDir, "Other_hospital_data", "HIP_Data");
-      let files = fs.existsSync(hospitalDir) 
-          ? fs.readdirSync(hospitalDir).filter(f => f.startsWith("HealthData_") && f.endsWith(".json")).map(f => path.join(hospitalDir, f))
-          : [];
-      
-      if (files.length === 0) {
-          const userFiles = fs.readdirSync(path.join(rootDir, targetUserDir))
-            .filter(f => f.endsWith("_bundle.json"))
-            .map(f => path.join(rootDir, targetUserDir, f));
-          files = userFiles;
+      const userDirPath = path.join(rootDir, targetUserDir);
+      let files = [];
+      if (fs.existsSync(userDirPath)) {
+         const items = fs.readdirSync(userDirPath, { withFileTypes: true });
+         for (const item of items) {
+            if (item.isDirectory()) {
+               const subDirPath = path.join(userDirPath, item.name);
+               const subFiles = fs.readdirSync(subDirPath)
+                   .filter(f => f.startsWith("HealthData_") && f.endsWith(".json"))
+                   .map(f => path.join(subDirPath, f));
+               files.push(...subFiles);
+            } else if (item.name.startsWith("HealthData_") && item.name.endsWith(".json")) {
+               files.push(path.join(userDirPath, item.name));
+            }
+         }
       }
       
       let documents = [];
+      const globalSeenCareContexts = new Set();
 
       for (const filePath of files) {
         const file = path.basename(filePath);
@@ -139,7 +145,7 @@ class M3ConsentController {
           let bundlesToProcess = [];
           
           if (data.entries && Array.isArray(data.entries)) {
-            data.entries.forEach(entry => {
+            for (const entry of data.entries) {
               if (entry.content) {
                  let contentStr = entry.content;
                  if (typeof contentStr === 'string' && !contentStr.trim().startsWith('{')) {
@@ -147,8 +153,8 @@ class M3ConsentController {
                    const transaction = M3ConsentStore.getTransaction(tId);
                    if (transaction && transaction.privateKeyBase64) {
                      try {
-                       const fhirEncryptionService = require('../../../services/fhirEncryptionService');
-                       contentStr = fhirEncryptionService.decrypt(
+                       const fhirEncryptionService = require('../../services/fhirEncryptionService');
+                       contentStr = await fhirEncryptionService.decrypt(
                          contentStr,
                          transaction.privateKeyBase64,
                          data.keyMaterial.dhPublicKey.keyValue,
@@ -160,54 +166,87 @@ class M3ConsentController {
                      }
                    }
                  }
-                 let bundle = typeof contentStr === 'string' ? JSON.parse(contentStr) : contentStr;
-                 bundlesToProcess.push(bundle);
+                 try {
+                   let bundle = typeof contentStr === 'string' ? JSON.parse(contentStr) : contentStr;
+                   bundle._careContextReference = entry.careContextReference;
+                   bundlesToProcess.push(bundle);
+                 } catch(e) {}
               }
-            });
+            }
           } else if (data.resourceType === "Bundle") {
             bundlesToProcess.push(data);
           }
+          
           bundlesToProcess.forEach((bundle, bIdx) => {
-            if (bundle.entry && Array.isArray(bundle.entry)) {
-              bundle.entry.forEach((bEntry, index) => {
-                const resource = bEntry.resource;
-                if (resource && (resource.resourceType === 'DocumentReference' || resource.resourceType === 'DiagnosticReport')) {
-                  let title = resource.resourceType;
-                  let docType = resource.resourceType;
-                  let dateStr = new Date().toISOString();
-                  let doctor = "Unknown";
-                  let hasPdf = false;
-
-                  if (resource.resourceType === 'DocumentReference') {
-                    if (resource.type && resource.type.text) title = resource.type.text;
-                    if (resource.date) dateStr = resource.date;
-                    if (resource.author && resource.author[0] && resource.author[0].display) doctor = resource.author[0].display;
-                    
-                    const attachment = resource.content && resource.content[0] && resource.content[0].attachment;
-                    if (attachment && attachment.data) hasPdf = true;
-                  } else if (resource.resourceType === 'DiagnosticReport') {
-                    if (resource.code && resource.code.text) title = resource.code.text;
-                    if (resource.effectiveDateTime) dateStr = resource.effectiveDateTime;
-                    if (resource.performer && resource.performer[0] && resource.performer[0].display) doctor = resource.performer[0].display;
-                    if (resource.presentedForm && resource.presentedForm[0] && resource.presentedForm[0].data) hasPdf = true;
-                  }
-
-                  documents.push({
-                    id: `${transactionId}_${file}_${index}`,
-                    type: docType.toUpperCase(),
-                    title: title,
-                    date: new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-                    doctor: doctor,
-                    hasPdf: hasPdf
-                  });
-                }
-              });
-            }
+             if (!bundle || bundle.resourceType !== 'Bundle') return;
+             
+             let docTitle = bundle._careContextReference || "Health Document";
+             let docType = "DOCUMENT";
+             let docDateStr = new Date().toISOString();
+             let doctor = "Unknown";
+             let hasPdf = false;
+             let dedupeId = bundle._careContextReference || bundle.id || `${transactionId}_${bIdx}`;
+             
+             if (bundle.entry && Array.isArray(bundle.entry)) {
+               const comp = bundle.entry.find(e => e && e.resource && e.resource.resourceType === 'Composition');
+               const diag = bundle.entry.find(e => e && e.resource && e.resource.resourceType === 'DiagnosticReport');
+               const docRef = bundle.entry.find(e => e && e.resource && e.resource.resourceType === 'DocumentReference');
+               
+               if (comp && comp.resource) {
+                 docType = "COMPOSITION";
+                 dedupeId = bundle._careContextReference || comp.resource.id || dedupeId;
+                 if (comp.resource.title) docTitle = comp.resource.title;
+                 if (comp.resource.date) docDateStr = comp.resource.date;
+                 if (comp.resource.author && comp.resource.author[0] && comp.resource.author[0].display) doctor = comp.resource.author[0].display;
+               } else if (diag && diag.resource) {
+                 docType = "DIAGNOSTIC_REPORT";
+                 dedupeId = bundle._careContextReference || diag.resource.id || dedupeId;
+                 if (diag.resource.code && diag.resource.code.text) docTitle = diag.resource.code.text;
+                 if (diag.resource.effectiveDateTime) docDateStr = diag.resource.effectiveDateTime;
+                 if (diag.resource.performer && diag.resource.performer[0]) doctor = diag.resource.performer[0].display || doctor;
+               } else if (docRef && docRef.resource) {
+                 docType = "DOCUMENT_REFERENCE";
+                 dedupeId = bundle._careContextReference || docRef.resource.id || dedupeId;
+                 if (docRef.resource.type && docRef.resource.type.text) docTitle = docRef.resource.type.text;
+                 if (docRef.resource.date) docDateStr = docRef.resource.date;
+                 if (docRef.resource.author && docRef.resource.author[0]) doctor = docRef.resource.author[0].display || doctor;
+               } else {
+                 const first = bundle.entry.find(e => e && e.resource && !['Patient', 'Practitioner', 'Organization'].includes(e.resource.resourceType));
+                 if (first && first.resource) {
+                    docType = first.resource.resourceType.toUpperCase();
+                    dedupeId = bundle._careContextReference || first.resource.id || dedupeId;
+                    if (first.resource.date || first.resource.effectiveDateTime) docDateStr = first.resource.date || first.resource.effectiveDateTime;
+                 }
+               }
+               
+               const hasAttachment = JSON.stringify(bundle).includes('"contentType":"application/pdf"');
+               if (hasAttachment) hasPdf = true;
+             }
+             
+             if (globalSeenCareContexts.has(dedupeId)) return;
+             globalSeenCareContexts.add(dedupeId);
+             documents.push({
+                id: `${transactionId}_${file}_${bIdx}`,
+                type: docType,
+                title: docTitle,
+                date: new Date(docDateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                doctor: doctor,
+                hasPdf: hasPdf,
+                _originalId: dedupeId
+             });
           });
         } catch(e) {
           Logger.warn("M3ConsentController", "Failed to parse " + file, { error: e.message });
         }
       }
+
+      if (documents.length === 0 && typeof hipId !== 'undefined' && M3ConsentStore.transactions) {
+        const txnWithError = Object.values(M3ConsentStore.transactions).find(t => t.hipId === hipId && t.error);
+        if (txnWithError) {
+          return res.status(400).json({ success: false, error: "Data pull was unsuccfull, please try again after some time", originalError: txnWithError.error });
+        }
+      }
+
       res.status(200).json({ success: true, data: documents });
     } catch (error) {
       Logger.error("M3ConsentController", "getHealthDocuments failed", { error: error.message });
@@ -218,40 +257,54 @@ class M3ConsentController {
   static async getHealthDocumentPdf(req, res) {
     try {
       const { docId } = req.params;
-      const lastUnderscore = docId.lastIndexOf('_');
-      const indexStr = docId.substring(lastUnderscore + 1);
-      const index = parseInt(indexStr, 10);
+      const parts = docId.split('_');
+      if (parts.length < 3) return res.status(400).send("Invalid docId");
       
-      const firstUnderscore = docId.indexOf('_');
-      const transactionId = docId.substring(0, firstUnderscore);
-      const file = docId.substring(firstUnderscore + 1, lastUnderscore);
+      const transactionId = parts[0];
+      const bundleIdx = parseInt(parts[parts.length - 1], 10);
+      const file = parts.slice(1, parts.length - 1).join('_');
 
       const fs = require('fs');
       const path = require('path');
       const rootDir = path.resolve(__dirname, "../../../");
       const dirs = fs.readdirSync(rootDir);
-      let targetUserDir = dirs.find(d => d.includes("@sbx"));
-      const docIdVar = typeof docId !== 'undefined' ? docId : null;
-      const consentReq = typeof hipId !== 'undefined' ? M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[hipId]) : null;
-      if (consentReq && consentReq.patientId) {
-        const found = dirs.find(d => d.startsWith(consentReq.patientId));
-        if (found) targetUserDir = found;
-      }
-      if (!targetUserDir) return res.status(404).send("Not found");
-      
-      const hospitalDir = path.join(rootDir, targetUserDir, "Other_hospital_data", "HIP_Data");
-      let filePath = path.join(hospitalDir, file);
-      
-      // Fallback for M1/M2 bundles
-      if (!fs.existsSync(filePath)) {
-         filePath = path.join(rootDir, targetUserDir, file);
+      let userDirs = dirs.filter(d => d.includes("@sbx"));
+      if (userDirs.length === 0) {
+        const Logger = require("../logging/logger");
+        Logger.error("M3ConsentController", "404 No target user dir @sbx found", { docId });
+        return res.status(404).send("Not found");
       }
       
-      if (!fs.existsSync(filePath)) return res.status(404).send("File not found");
+      let filePath = null;
+      for (const targetUserDir of userDirs) {
+        const userDirPath = path.join(rootDir, targetUserDir);
+        if (fs.existsSync(userDirPath)) {
+           const items = fs.readdirSync(userDirPath, { withFileTypes: true });
+           for (const item of items) {
+              if (item.isDirectory()) {
+                 const subDirPath = path.join(userDirPath, item.name);
+                 const testPath = path.join(subDirPath, file);
+                 if (fs.existsSync(testPath)) {
+                    filePath = testPath;
+                    break;
+                 }
+              } else if (item.name === file) {
+                 filePath = path.join(userDirPath, item.name);
+                 break;
+              }
+           }
+        }
+        if (filePath) break;
+      }
+      
+      if (!filePath || !fs.existsSync(filePath)) {
+        const Logger = require("../logging/logger");
+        Logger.error("M3ConsentController", "404 File path not found", { docId, file });
+        return res.status(404).send("File not found");
+      }
 
       const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
       let base64Pdf = null;
-      let globalIndex = 0;
       
       const transaction = M3ConsentStore.getTransaction(transactionId);
       
@@ -261,54 +314,61 @@ class M3ConsentController {
           if (entry.content) {
             let contentStr = entry.content;
             if (typeof contentStr === 'string' && !contentStr.trim().startsWith('{')) {
-              // It is encrypted
               if (transaction && transaction.privateKeyBase64) {
                 try {
-                  const fhirEncryptionService = require('../../../services/fhirEncryptionService');
-                  contentStr = fhirEncryptionService.decrypt(
+                  const fhirEncryptionService = require('../../services/fhirEncryptionService');
+                  contentStr = await fhirEncryptionService.decrypt(
                     contentStr,
                     transaction.privateKeyBase64,
                     data.keyMaterial.dhPublicKey.keyValue,
                     data.keyMaterial.nonce,
                     transaction.nonceBase64
                   );
-                } catch (err) {
-                  Logger.warn("M3ConsentController", "Failed to decrypt pdf entry", { error: err.message });
-                }
+                } catch (err) {}
               }
             }
-            let bundle = typeof contentStr === 'string' ? JSON.parse(contentStr) : contentStr;
-            bundlesToProcess.push(bundle);
+            try {
+              let bundle = typeof contentStr === 'string' ? JSON.parse(contentStr) : contentStr;
+              bundle._careContextReference = entry.careContextReference;
+              bundlesToProcess.push(bundle);
+            } catch(e) {}
           }
         }
       } else if (data.resourceType === "Bundle") {
         bundlesToProcess.push(data);
       }
 
-      for (const bundle of bundlesToProcess) {
-        if (bundle.entry && Array.isArray(bundle.entry)) {
-          for (let bIdx = 0; bIdx < bundle.entry.length; bIdx++) {
-            const bEntry = bundle.entry[bIdx];
-            const resource = bEntry.resource;
-            if (resource && (resource.resourceType === 'DocumentReference' || resource.resourceType === 'DiagnosticReport')) {
-              if (bIdx === index) {
+      let bundle = bundlesToProcess[bundleIdx];
+      if (bundle && bundle.entry && Array.isArray(bundle.entry)) {
+         for (const bEntry of bundle.entry) {
+            const resource = bEntry ? bEntry.resource : null;
+            if (resource) {
                 if (resource.resourceType === 'DocumentReference') {
                   const attachment = resource.content && resource.content[0] && resource.content[0].attachment;
                   if (attachment && attachment.data) base64Pdf = attachment.data;
                 } else if (resource.resourceType === 'DiagnosticReport') {
                   if (resource.presentedForm && resource.presentedForm[0] && resource.presentedForm[0].data) base64Pdf = resource.presentedForm[0].data;
                 }
-              }
             }
-          }
-        }
+            if (base64Pdf) break;
+         }
       }
 
       if (base64Pdf) {
         const pdfBuffer = Buffer.from(base64Pdf, 'base64');
         res.setHeader('Content-Type', 'application/pdf');
         res.send(pdfBuffer);
+      } else if (bundle) {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(bundle);
       } else {
+        const Logger = require("../logging/logger");
+        Logger.error("M3ConsentController", "404 No bundle or PDF found", { 
+           docId, 
+           bundleIdx, 
+           bundlesCount: bundlesToProcess.length, 
+           hasBundle: !!bundle 
+        });
         res.status(404).send("PDF data not found in document");
       }
     } catch (error) {

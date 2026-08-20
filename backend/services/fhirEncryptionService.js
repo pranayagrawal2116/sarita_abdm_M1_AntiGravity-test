@@ -61,8 +61,11 @@ exports.encrypt = (plaintextPlain, receiverPublicKeyBase64, receiverNonceBase64)
   let receiverPublicKeyBuffer;
   try {
     receiverPublicKeyBuffer = Buffer.from(receiverPublicKeyBase64, "base64");
-    // If the uncompressed format byte 0x04 is missing, prepend it (64 bytes -> 65 bytes)
-    if (receiverPublicKeyBuffer.length === 64) {
+    if (receiverPublicKeyBuffer.length > 65 && receiverPublicKeyBuffer[receiverPublicKeyBuffer.length - 65] === 0x04) {
+      receiverPublicKeyBuffer = receiverPublicKeyBuffer.subarray(-65);
+    } else if (receiverPublicKeyBuffer.length === 93) {
+      receiverPublicKeyBuffer = receiverPublicKeyBuffer.subarray(28);
+    } else if (receiverPublicKeyBuffer.length === 64) {
       receiverPublicKeyBuffer = Buffer.concat([Buffer.from([0x04]), receiverPublicKeyBuffer]);
     }
     // Test if parsing is valid
@@ -135,7 +138,11 @@ exports.decrypt = (encryptedContentBase64, receiverPrivateKeyBase64, senderPubli
   const receiverPrivateKey = ec.keyFromPrivate(Buffer.from(receiverPrivateKeyBase64, "base64"));
   
   let senderPublicKeyBuffer = Buffer.from(senderPublicKeyBase64, "base64");
-  if (senderPublicKeyBuffer.length === 64) {
+  if (senderPublicKeyBuffer.length > 65 && senderPublicKeyBuffer[senderPublicKeyBuffer.length - 65] === 0x04) {
+    senderPublicKeyBuffer = senderPublicKeyBuffer.subarray(-65);
+  } else if (senderPublicKeyBuffer.length === 93) {
+    senderPublicKeyBuffer = senderPublicKeyBuffer.subarray(28);
+  } else if (senderPublicKeyBuffer.length === 64) {
     senderPublicKeyBuffer = Buffer.concat([Buffer.from([0x04]), senderPublicKeyBuffer]);
   }
   const senderKey = ec.keyFromPublic(senderPublicKeyBuffer);

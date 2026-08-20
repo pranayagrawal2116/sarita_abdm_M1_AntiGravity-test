@@ -1,0 +1,230 @@
+
+  void _showDocumentDialog(BuildContext context, Map<String, dynamic> doc) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        bool isPdfOpen = false;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Container(
+                width: isPdfOpen ? 1000 : 600,
+                height: isPdfOpen ? MediaQuery.of(context).size.height * 0.85 : null,
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: isPdfOpen ? MainAxisSize.max : MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFE6F7F9),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.description, color: Color(0xFF0C8A99), size: 24),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  doc['title'], 
+                                  style: const TextStyle(color: Color(0xFF17324A), fontSize: 20, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        IconButton(
+                          icon: const Icon(Icons.close, color: Color(0xFF7A8D9C)),
+                          onPressed: () => Navigator.pop(context),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Metadata Row
+                    Row(
+                      children: [
+                        const Icon(Icons.access_time, size: 14, color: Color(0xFF7A8D9C)),
+                        const SizedBox(width: 6),
+                        Text('${doc['date']}, 04:19 PM', style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 13)),
+                        const SizedBox(width: 16),
+                        const Icon(Icons.link, size: 14, color: Color(0xFF7A8D9C)),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            doc['id'], 
+                            style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 13),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text('OK', style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    if (isPdfOpen)
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xFFE2F0F9)),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: SfPdfViewer.network('${HiuApiService.baseUrl}/documents/${doc['id']}/pdf'),
+                        ),
+                      )
+                    else ...[
+                      // First Inner Card (Record Artifact Details)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: const Color(0xFFE2F0F9)),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF2F5F8),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(Icons.assignment_outlined, color: Color(0xFF7A8D9C), size: 24),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(doc['type'].toUpperCase(), style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 10, fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 4),
+                                  Text('Record Artifact for ${doc['title']}', style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 4),
+                                  Text('${doc['date']}, 04:19 PM', style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 32,
+                              height: 32,
+                              decoration: const BoxDecoration(color: Color(0xFF0C8A99), shape: BoxShape.circle),
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('- MRN:', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 12)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(doc['type'].toUpperCase(), style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      
+                      // PDF Document Card or No Data Message
+                      doc['hasPdf'] == true
+                          ? Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: const Color(0xFFE2F0F9)),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFDECEC),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.picture_as_pdf, color: Colors.red, size: 24),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text('PDF document', style: TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
+                                      const SizedBox(height: 8),
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            isPdfOpen = true;
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFE6F7F9),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.open_in_new, size: 12, color: Color(0xFF0C8A99)),
+                                              SizedBox(width: 4),
+                                              Text('Open PDF', style: TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: const Color(0xFFE2F0F9)),
+                                borderRadius: BorderRadius.circular(8),
+                                color: const Color(0xFFF8FCFF),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text('No PDF data available.', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 14)),
+                            ),
+                    ],
+                    const SizedBox(height: 24),
+                    
+                    // Footer
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: OutlinedButton(
+                        onPressed: isPdfOpen
+                            ? () {
+                                setState(() {
+                                  isPdfOpen = false;
+                                });
+                              }
+                            : () => Navigator.pop(context),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFF0C8A99)),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        ),
+                        child: Text(isPdfOpen ? 'Back to Summary' : 'Close', style: const TextStyle(color: Color(0xFF0C8A99))),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}

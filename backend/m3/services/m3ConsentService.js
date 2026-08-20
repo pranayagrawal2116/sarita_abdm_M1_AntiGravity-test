@@ -202,9 +202,11 @@ class M3ConsentService {
       
       // Look up HIP ID from the consent artefact details
       let hipId = "unknown";
+      let hipName = "unknown";
       const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[consentId]);
       if (consentReq && consentReq.artefactDetails[consentId].hip) {
          hipId = consentReq.artefactDetails[consentId].hip.id;
+         hipName = consentReq.artefactDetails[consentId].hip.name || hipId;
       }
 
       // Generate real ECDH keypair for ABDM data transfer
@@ -220,9 +222,11 @@ class M3ConsentService {
       M3ConsentStore.addTransaction(transactionId, {
         consentId: consentId,
         hipId: hipId,
+        hipName: hipName,
         privateKeyBase64: privateKeyBase64,
         nonceBase64: nonceBase64,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        requestId: requestId
       });
 
       const abdmPayload = {
@@ -288,7 +292,7 @@ class M3ConsentService {
           doneAt: new Date().toISOString(),
           notifier: {
             type: "HIU",
-            id: config.hiuId || "HIU_ID"
+            id: hospitalConfig.hiuId || config.clientId || "HIU_ID"
           },
           statusNotification: {
             sessionStatus: payload.sessionStatus, // RECEIVED, FAILED, TRANSFERRED

@@ -59,20 +59,26 @@ class M2DataTransferController {
       };
 
       // Filter dashboard types by what's actually authorized
-      const recordType = dashboardTypes.filter(type => {
+      let recordType = dashboardTypes.filter(type => {
         const canonical = canonicalMap[type] || type.replace(/\s+/g, "");
         return authorizedHiTypes.includes(canonical);
       });
-
-      if (recordType.length === 0) {
-        throw new Error(`Transaction failed: The selected record types (${dashboardTypes.join(", ")}) do not match the authorized HI Types in the consent (${authorizedHiTypes.join(", ")}).`);
-      }
 
       // Prioritize the actual HI request payload from the mobile app (Gateway) over any mock data
       const actualHiRequest = tx.hiRequestPayload?.hiRequest;
       const receiverPublicKey = actualHiRequest?.keyMaterial?.dhPublicKey?.keyValue || tx.hiuPublicKey || tx.receiverPublicKey || (tx.keyMaterial && tx.keyMaterial.dhPublicKey?.keyValue);
       const receiverNonce = actualHiRequest?.keyMaterial?.nonce || tx.hiuNonce || tx.receiverNonce || (tx.keyMaterial && tx.keyMaterial.nonce);
       const dataPushUrl = actualHiRequest?.dataPushUrl || tx.dataPushUrl;
+
+      // Enforce strictly one HI type at a time for Mobile App (M2), but send ALL for Desktop App (M3)
+      const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/');
+      if (!isDesktopApp && recordType.length > 1) {
+        recordType = [recordType[0]];
+      }
+
+      if (recordType.length === 0) {
+        throw new Error(`Transaction failed: The selected record types (${dashboardTypes.join(", ")}) do not match the authorized HI Types in the consent (${authorizedHiTypes.join(", ")}).`);
+      }
 
       if (!receiverPublicKey || !receiverNonce || !dataPushUrl) {
         throw new Error("Missing receiver keyMaterial or dataPushUrl in transaction store.");

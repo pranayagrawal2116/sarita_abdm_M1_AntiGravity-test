@@ -32,7 +32,17 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
           widget.request['status']?.toString().toUpperCase() ?? '';
       if (rawStatus == 'FETCHED') return;
 
-      final displayStatus = _mapStatus(rawStatus);
+      String displayStatus = _mapStatus(rawStatus);
+      final dateEraseAtStr = widget.request['dateEraseAt'] ?? '';
+      if (displayStatus != 'DENIED' && dateEraseAtStr.isNotEmpty) {
+        try {
+          final expireTime = DateTime.parse(dateEraseAtStr).toLocal();
+          if (DateTime.now().isAfter(expireTime)) {
+            displayStatus = 'EXPIRED';
+          }
+        } catch (_) {}
+      }
+      
       if (displayStatus != 'GRANTED') return;
 
       final artefacts =
@@ -103,7 +113,8 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     final s = rawStatus.toUpperCase();
     if (s == 'FETCHED' || s == 'GRANTED') return 'GRANTED';
     if (s == 'INITIATED' || s == 'REQUESTED') return 'REQUESTED';
-    if (s == 'REVOKED' || s == 'EXPIRED') return 'EXPIRED';
+    if (s == 'REVOKED') return 'REVOKED';
+    if (s == 'EXPIRED') return 'EXPIRED';
     if (s == 'DENIED') return 'DENIED';
     return 'REQUESTED';
   }
@@ -188,7 +199,22 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final rawStatus = widget.request['status']?.toString() ?? 'UNKNOWN';
-    final displayStatus = _mapStatus(rawStatus);
+    String displayStatus = _mapStatus(rawStatus);
+    
+    String? grantedDateEraseAtStr = widget.request['dateEraseAt']?.toString() ?? '';
+    if (widget.request['details'] != null && widget.request['details']['permission'] != null) {
+      grantedDateEraseAtStr = widget.request['details']['permission']['dataEraseAt']?.toString() ?? grantedDateEraseAtStr;
+    }
+    
+    // Auto-expire logic based on current time
+    if (displayStatus != 'DENIED' && displayStatus != 'REVOKED' && grantedDateEraseAtStr.isNotEmpty) {
+      try {
+        final expireTime = DateTime.parse(grantedDateEraseAtStr).toLocal();
+        if (DateTime.now().isAfter(expireTime)) {
+          displayStatus = 'EXPIRED';
+        }
+      } catch (_) {}
+    }
     final reqId =
         widget.request['requestId']?.toString() ??
         widget.request['id']?.toString() ??
@@ -209,6 +235,9 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       case 'EXPIRED':
         statusColor = Colors.orange;
         break;
+      case 'REVOKED':
+        statusColor = Colors.red;
+        break;
       default:
         statusColor = Colors.grey;
     }
@@ -219,19 +248,32 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
         (widget.request['consentArtefacts'] as List?)?.length ?? 0;
     final createdStr =
         widget.request['timestamp'] ?? widget.request['createdAt'];
+    final updatedStr = widget.request['updatedAt'] ?? createdStr;
 
     // Dates
     final dateFrom = widget.request['dateFrom'];
     final dateTo = widget.request['dateTo'];
     final dateEraseAt = widget.request['dateEraseAt'];
+    
+    String? grantedDateFrom = dateFrom;
+    String? grantedDateTo = dateTo;
+    String? grantedDateEraseAt = dateEraseAt;
+    if (widget.request['details'] != null && widget.request['details']['permission'] != null) {
+      final perm = widget.request['details']['permission'];
+      if (perm['dateRange'] != null) {
+        grantedDateFrom = perm['dateRange']['from']?.toString() ?? grantedDateFrom;
+        grantedDateTo = perm['dateRange']['to']?.toString() ?? grantedDateTo;
+      }
+      grantedDateEraseAt = perm['dataEraseAt']?.toString() ?? grantedDateEraseAt;
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FCFF),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 1,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF577086)),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF17324A)),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -242,18 +284,15 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
                 color: const Color(0xFFE6F7F9),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.security,
-                color: Color(0xFF0C8A99),
-                size: 20,
-              ),
+              child:
+                  const Icon(Icons.security, color: Color(0xFF0C8A99), size: 24),
             ),
             const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'HIU Consent Detail',
+                  'Consent Artefact Details',
                   style: TextStyle(
                     color: Color(0xFF17324A),
                     fontWeight: FontWeight.bold,
@@ -296,37 +335,36 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
             onPressed: () {},
           ),
           const SizedBox(width: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            child: ElevatedButton.icon(
-              onPressed: _isRequestingAll
-                  ? null
-                  : () => _handleRequestAll(
-                      widget.request['consentArtefacts'] as List<dynamic>? ??
-                          [],
-                    ),
-              icon: _isRequestingAll
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
+          if (displayStatus == 'GRANTED')
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              child: ElevatedButton.icon(
+                onPressed: _isRequestingAll
+                    ? null
+                    : () => _handleRequestAll(
+                        widget.request['consentArtefacts'] as List<dynamic>? ??
+                            [],
                       ),
-                    )
-                  : const Icon(Icons.download, size: 16, color: Colors.white),
-              label: Text(
-                _isRequestingAll ? 'Requesting...' : 'Request All',
-                style: const TextStyle(color: Colors.white),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(
-                  0xFF75C8C6,
-                ), // Light teal color from screenshot
-                disabledBackgroundColor: const Color(0xFFB1E5CB),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
+                icon: _isRequestingAll
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.download, size: 16, color: Colors.white),
+                label: Text(
+                  _isRequestingAll ? 'Requesting...' : 'Request All',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF75C8C6),
+                  disabledBackgroundColor: const Color(0xFFB1E5CB),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(6),
                 ),
               ),
             ),
@@ -348,12 +386,14 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
                     purpose,
                     artefactsCount,
                     createdStr,
-                    createdStr,
+                    updatedStr,
+                    grantedDateEraseAt,
+                    displayStatus,
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _buildValidityCard(dateFrom, dateTo, dateEraseAt),
+                  child: _buildValidityCard(dateFrom, dateTo, dateEraseAt, grantedDateFrom, grantedDateTo, grantedDateEraseAt, displayStatus),
                 ),
               ],
             ),
@@ -407,6 +447,8 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     int artefacts,
     String? createdAt,
     String? grantedAt,
+    String? expiredAt,
+    String status,
   ) {
     return _buildCard(
       title: 'CONSENT',
@@ -418,24 +460,35 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
           _buildInfoRow('Requested HIP :', 'Any Facility'),
           _buildInfoRow('Artefacts :', '$artefacts'),
           _buildInfoRow('Consent Created At :', _formatDate(createdAt)),
-          _buildInfoRow('Consent Granted On :', _formatDate(grantedAt)),
+          if (status == 'EXPIRED')
+            _buildInfoRow('Consent Expired On :', _formatDate(expiredAt))
+          else if (status == 'REVOKED')
+            _buildInfoRow('Consent Revoked On :', _formatDate(grantedAt))
+          else if (status == 'GRANTED')
+            _buildInfoRow('Consent Granted On :', _formatDate(grantedAt))
+          else if (status == 'DENIED')
+            _buildInfoRow('Consent Denied On :', _formatDate(grantedAt)),
         ],
       ),
     );
   }
 
-  Widget _buildValidityCard(String? dateFrom, String? dateTo, String? eraseAt) {
-    final range = '${_formatDateOnly(dateFrom)} -> ${_formatDateOnly(dateTo)}';
+  Widget _buildValidityCard(String? dateFrom, String? dateTo, String? eraseAt, String? grantedFrom, String? grantedTo, String? grantedEraseAt, String status) {
+    final reqRange = '${_formatDateOnly(dateFrom)} -> ${_formatDateOnly(dateTo)}';
+    final grantedRange = '${_formatDateOnly(grantedFrom)} -> ${_formatDateOnly(grantedTo)}';
+    
     return _buildCard(
       title: 'VALIDITY',
       icon: Icons.calendar_today_outlined,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInfoRow('Request Date Range :', range),
+          _buildInfoRow('Request Date Range :', reqRange),
           _buildInfoRow('Request Erased On :', _formatDate(eraseAt)),
-          _buildInfoRow('Granted Date Range :', range),
-          _buildInfoRow('Granted Erase On :', _formatDate(eraseAt)),
+          if (status == 'GRANTED' || status == 'EXPIRED' || status == 'REVOKED') ...[
+            _buildInfoRow(status == 'EXPIRED' ? 'Expired Date Range :' : status == 'REVOKED' ? 'Revoked Date Range :' : 'Granted Date Range :', grantedRange),
+            _buildInfoRow(status == 'EXPIRED' ? 'Expired On :' : status == 'REVOKED' ? 'Revoked On :' : 'Granted Erase On :', _formatDate(grantedEraseAt)),
+          ],
         ],
       ),
     );

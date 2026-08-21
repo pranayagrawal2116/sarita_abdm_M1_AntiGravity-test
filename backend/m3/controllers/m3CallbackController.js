@@ -35,7 +35,8 @@ class M3CallbackController {
     if (consentRequest && consentRequest.id) {
       M3ConsentStore.updateConsentByConsentRequestId(consentRequest.id, {
         status: consentRequest.status,
-        consentArtefacts: consentRequest.consentArtefacts
+        consentArtefacts: consentRequest.consentArtefacts,
+        updatedAt: req.body.timestamp || new Date().toISOString()
       });
     }
     res.status(202).send();
@@ -45,6 +46,7 @@ class M3CallbackController {
     Logger.info("M3Callback", "Received HIU notify", req.body);
     const { notification } = req.body;
     const reqId = req.headers["request-id"] || req.headers["REQUEST-ID"];
+    const timestamp = req.body.timestamp || new Date().toISOString();
     
     res.status(202).send(); // Immediate ACK
     
@@ -54,7 +56,8 @@ class M3CallbackController {
         // notification.consentArtefacts is an array
         let updated = M3ConsentStore.updateConsentByConsentRequestId(notification.consentRequestId, {
             status: "GRANTED",
-            consentArtefacts: notification.consentArtefacts
+            consentArtefacts: notification.consentArtefacts,
+            updatedAt: timestamp
         });
           
         if (!updated) {
@@ -64,6 +67,7 @@ class M3CallbackController {
               latestPending.consentRequestId = notification.consentRequestId;
               latestPending.status = "GRANTED";
               latestPending.consentArtefacts = notification.consentArtefacts;
+              latestPending.updatedAt = timestamp;
               M3ConsentStore.save();
             }
         }
@@ -74,13 +78,15 @@ class M3CallbackController {
         }
       } else {
          let updated = M3ConsentStore.updateConsentByConsentRequestId(notification.consentRequestId, {
-            status: notification.status
+            status: notification.status,
+            updatedAt: timestamp
           });
          if (!updated) {
            const latestPending = M3ConsentStore.consents.find(c => c.status === "REQUESTED" || c.status === "INITIATED");
            if (latestPending) {
               latestPending.consentRequestId = notification.consentRequestId;
               latestPending.status = notification.status;
+              latestPending.updatedAt = timestamp;
               M3ConsentStore.save();
            }
          }

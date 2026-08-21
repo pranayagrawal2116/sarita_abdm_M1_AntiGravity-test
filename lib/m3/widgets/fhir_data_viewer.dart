@@ -1,51 +1,51 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 
 class FhirDataViewer extends StatelessWidget {
   final Map<String, dynamic> bundle;
 
-  const FhirDataViewer({Key? key, required this.bundle}) : super(key: key);
+  const FhirDataViewer({super.key, required this.bundle});
 
   String _capitalize(String s) => s.isNotEmpty ? '${s[0].toUpperCase()}${s.substring(1)}' : '';
 
   @override
   Widget build(BuildContext context) {
-    List<dynamic> entries = [];
-    if (bundle['resourceType'] == 'Bundle' && bundle['entry'] != null) {
-      entries = bundle['entry'] as List<dynamic>;
-    } else if (bundle['resourceType'] != null) {
-      entries = [{'resource': bundle}];
-    }
-    
-    if (entries.isEmpty) {
-      return const Center(child: Text('No structured data available in this document.'));
+    if (bundle['resourceType'] != 'Bundle' || bundle['entry'] == null) {
+      return const Center(child: Text("Invalid FHIR Bundle"));
     }
 
-    // Extract summary information
-    String docType = "HEALTH RECORD";
-    String docTitle = "Health Document";
-    String docDate = "";
-    String doctorName = "Unknown Doctor";
-    String encounterType = "";
-    
-    String patientName = "Unknown";
-    String patientGender = "";
-    String patientMrn = "";
-    
-    List<Map<String, dynamic>> records = [];
+    final entries = bundle['entry'] as List<dynamic>;
 
+    // Extraction variables
+    String patientName = '';
+    String patientGender = '';
+    String patientMrn = '';
+    String doctorName = 'Unknown Doctor';
+    String docDate = '';
+    String docTitle = 'Health Document';
+    String docType = 'CLINICAL DOCUMENT';
+    String encounterType = '';
+
+    List<Map<String, dynamic>> allergies = [];
+    List<Map<String, dynamic>> vitals = [];
+    List<Map<String, dynamic>> diagnoses = [];
+    List<Map<String, dynamic>> symptoms = [];
+    List<Map<String, dynamic>> familyHistory = [];
+    List<Map<String, dynamic>> investigations = [];
+    List<Map<String, dynamic>> followUps = [];
+    List<Map<String, dynamic>> medications = [];
+    List<Map<String, dynamic>> others = [];
+
+    // First pass: extract summary & categorize
     for (var entry in entries) {
       final res = entry['resource'];
       if (res == null) continue;
-      
+
       final type = res['resourceType'];
-      
+
       if (type == 'Composition') {
-        if (res['type'] != null && res['type']['text'] != null) {
-          docType = res['type']['text'].toString().toUpperCase();
-        }
-        docTitle = res['title'] ?? docTitle;
         docDate = res['date'] ?? docDate;
+        if (res['title'] != null) docTitle = res['title'];
+        if (res['type'] != null && res['type']['text'] != null) docType = res['type']['text'].toUpperCase();
         if (res['author'] != null && res['author'].isNotEmpty) {
           doctorName = res['author'][0]['display'] ?? doctorName;
         }
@@ -65,244 +65,216 @@ class FhirDataViewer extends StatelessWidget {
         if (res['class'] != null) {
           encounterType = res['class']['display'] ?? res['class']['code'] ?? encounterType;
         }
-      } else if (!['Patient', 'Practitioner', 'Organization', 'Composition', 'Encounter'].contains(type)) {
-        // Collect as a record
-        records.add(res as Map<String, dynamic>);
+      } else if (type == 'AllergyIntolerance') {
+        allergies.add(res);
+      } else if (type == 'Condition') {
+        // Simple heuristic: if category contains 'symptom', it's a symptom. Otherwise diagnosis.
+        bool isSymptom = false;
+        if (res['category'] != null) {
+          for (var cat in res['category']) {
+            final text = (cat['text'] ?? '').toLowerCase();
+            if (text.contains('symptom')) {
+              isSymptom = true;
+              break;
+            }
+          }
+        }
+        if (isSymptom) {
+          symptoms.add(res);
+        } else {
+          diagnoses.add(res);
+        }
+      } else if (type == 'Observation') {
+        // If vital signs
+        bool isVital = false;
+        if (res['category'] != null) {
+           for(var cat in res['category']) {
+             if (cat['coding'] != null) {
+               for (var coding in cat['coding']) {
+                 if (coding['code'] == 'vital-signs') isVital = true;
+               }
+             }
+           }
+        }
+        if (isVital || type == 'Observation') { 
+          // For mock, put all observations in vitals unless it's obviously a symptom
+          vitals.add(res);
+        } else {
+          others.add(res);
+        }
+      } else if (type == 'FamilyMemberHistory') {
+        familyHistory.add(res);
+      } else if (type == 'ServiceRequest' || type == 'DiagnosticReport') {
+        investigations.add(res);
+      } else if (type == 'Appointment' || type == 'CarePlan') {
+        followUps.add(res);
+      } else if (type == 'MedicationRequest') {
+        medications.add(res);
+      } else if (!['Patient', 'Practitioner', 'Organization', 'Composition', 'Encounter', 'DocumentReference'].contains(type)) {
+        others.add(res);
       }
     }
 
-    // Default to something if docTitle is generic and we have a single record type
-    if (docTitle == "Health Document" && records.isNotEmpty) {
-      if (records.every((r) => r['resourceType'] == 'MedicationRequest')) {
-        docType = "PRESCRIPTION RECORD";
-        docTitle = "Prescription Record for $patientName";
-      } else if (records.every((r) => r['resourceType'] == 'Invoice' || r['resourceType'] == 'ChargeItem')) {
-        docType = "INVOICE RECORD";
-        docTitle = "Invoice Record for $patientName";
-      }
-    }
-
-    // Format date string
-    String dateStr = docDate.length > 10 ? docDate.substring(0, 10) : docDate; // simple formatting
+    String dateStr = docDate.length > 10 ? docDate.substring(0, 10) : docDate;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // SUMMARY CARD
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFE2F0F9)),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Icon block
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE6F7F9),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.description, color: Color(0xFF0C8A99), size: 28),
-                ),
-                const SizedBox(width: 16),
-                
-                // Document Details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(docType, style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-                      const SizedBox(height: 4),
-                      Text(docTitle, style: const TextStyle(color: Color(0xFF17324A), fontSize: 16, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 4),
-                      Text('$dateStr • $doctorName ${encounterType.isNotEmpty ? ' • $encounterType' : ''}', 
-                           style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 12)),
-                    ],
-                  ),
-                ),
-                
-                // Patient Details Block
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FCFF),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: const Color(0xFF0C8A99),
-                        child: Text(
-                          patientName.isNotEmpty ? patientName[0].toUpperCase() : '?',
-                          style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(patientName, style: const TextStyle(color: Color(0xFF17324A), fontSize: 13, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 2),
-                          Text('${patientGender.isNotEmpty ? patientGender : ''}${patientMrn.isNotEmpty ? ' • MRN: $patientMrn' : ''}', 
-                               style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 11)),
-                        ],
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
+          _buildSection("ALLERGIES", Icons.do_not_disturb_alt, Colors.red, allergies, _buildAllergyItem),
+          _buildSection("VITALS / MEASURES", Icons.monitor_heart, const Color(0xFF0C8A99), vitals, _buildVitalItem),
+          _buildSection("DIAGNOSIS", Icons.medical_information, const Color(0xFF673AB7), diagnoses, _buildFullWidthItem),
+          _buildSection("SYMPTOMS", Icons.access_time, Colors.orange, symptoms, _buildFullWidthItem),
+          _buildSection("FAMILY HISTORY", Icons.family_restroom, Colors.pink, familyHistory, _buildFullWidthItem),
+          _buildSection("INVESTIGATION ADVICE", Icons.biotech, const Color(0xFF0C8A99), investigations, _buildFullWidthItem),
+          _buildSection("FOLLOW UP", Icons.calendar_today, Colors.green, followUps, _buildFullWidthItem),
+          _buildSection("MEDICATIONS", Icons.medication, const Color(0xFF0C8A99), medications, _buildFullWidthItem),
+          _buildSection("OTHER RECORDS", Icons.folder, const Color(0xFF0C8A99), others, _buildFullWidthItem),
           
-          const SizedBox(height: 32),
-          
-          // RECORDS LIST
-          if (records.isNotEmpty) ...[
-            Text(docType, style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
-            const SizedBox(height: 16),
-            
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: records.map((res) => _buildRecordCard(res)).toList(),
-            ),
-          ] else ...[
+          if (allergies.isEmpty && vitals.isEmpty && diagnoses.isEmpty && symptoms.isEmpty && 
+              familyHistory.isEmpty && investigations.isEmpty && followUps.isEmpty && 
+              medications.isEmpty && others.isEmpty)
              const Center(child: Text("No actionable records found in this document.", style: TextStyle(color: Color(0xFF7A8D9C)))),
-          ]
         ],
       ),
     );
   }
 
-  Widget _buildRecordCard(Map<String, dynamic> res) {
-    final type = res['resourceType'];
-    String title = type;
-    String subtitle = '';
-    String status = res['status'] ?? 'Active';
-    IconData icon = Icons.data_usage;
-    Color iconColor = const Color(0xFF0C8A99);
-    Color iconBg = const Color(0xFFE6F7F9);
+  Widget _buildSection(String title, IconData icon, Color color, List<Map<String, dynamic>> items, Widget Function(Map<String, dynamic>, Color) builder) {
+    if (items.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: color, size: 16),
+            const SizedBox(width: 8),
+            Text(title, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+          ]
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: items.map((res) => builder(res, color)).toList(),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
 
-    if (type == 'MedicationRequest') {
-      icon = Icons.medication;
-      if (res['medicationCodeableConcept'] != null) {
-        title = res['medicationCodeableConcept']['text'] ?? 'Unknown Medication';
-      }
-      if (res['dosageInstruction'] != null && res['dosageInstruction'].isNotEmpty) {
-        subtitle = 'Doses: ${res['dosageInstruction'][0]['text'] ?? ''}';
-      }
-    } else if (type == 'Observation') {
-      icon = Icons.science;
-      if (res['code'] != null) {
-        title = res['code']['text'] ?? 'Observation';
-      }
-      if (res['valueQuantity'] != null) {
-        subtitle = 'Result: ${res['valueQuantity']['value']} ${res['valueQuantity']['unit'] ?? ''}';
-      } else if (res['valueString'] != null) {
-        subtitle = 'Result: ${res['valueString']}';
-      }
-    } else if (type == 'Invoice') {
-      icon = Icons.receipt_long;
-      title = 'Invoice Summary';
-      if (res['totalGross'] != null) {
-        subtitle = 'Gross: ${res['totalGross']['value']} ${res['totalGross']['currency'] ?? ''}';
-      }
-    } else if (type == 'ChargeItem') {
-      icon = Icons.payments_outlined;
-      if (res['code'] != null && res['code']['text'] != null) {
-        title = res['code']['text'];
-      } else {
-        title = 'Charge Item';
-      }
-      if (res['priceOverride'] != null) {
-        subtitle = 'Amount: ${res['priceOverride']['value']} ${res['priceOverride']['currency'] ?? ''}';
-      }
-    } else if (type == 'DiagnosticReport') {
-      icon = Icons.assessment;
-      if (res['code'] != null) {
-        title = res['code']['text'] ?? 'Diagnostic Report';
-      }
-      subtitle = 'Issued: ${res['issued'] ?? ''}';
-    } else if (type == 'Condition') {
-      icon = Icons.coronavirus;
-      if (res['code'] != null) {
-        title = res['code']['text'] ?? 'Condition';
-      }
-      subtitle = 'Recorded: ${res['recordedDate'] ?? ''}';
-    } else if (type == 'AllergyIntolerance') {
-       icon = Icons.warning_amber_rounded;
-       iconColor = Colors.orange;
-       iconBg = Colors.orange.withOpacity(0.1);
-       if (res['code'] != null) {
-          title = res['code']['text'] ?? 'Allergy';
-       }
-    } else if (type == 'Procedure') {
-       icon = Icons.healing;
-       if (res['code'] != null) {
-          title = res['code']['text'] ?? 'Procedure';
-       }
-    } else if (type == 'DocumentReference') {
-       icon = Icons.description_outlined;
-       if (res['type'] != null) {
-          title = res['type']['text'] ?? 'Document Reference';
-       } else {
-          title = 'Document Reference';
-       }
-    } else {
-      if (res['code'] != null && res['code']['text'] != null) {
-        title = res['code']['text'];
-      }
+  Widget _buildAllergyItem(Map<String, dynamic> res, Color color) {
+    String text = 'Unknown Allergy';
+    if (res['code'] != null && res['code']['text'] != null) {
+      text = res['code']['text'];
     }
-
     return Container(
-      width: 400,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFE2F0F9)),
-        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(20),
+        color: color.withOpacity(0.05),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.do_not_disturb_alt, color: color, size: 14),
+          const SizedBox(width: 8),
+          Text(text, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVitalItem(Map<String, dynamic> res, Color color) {
+    String value = '';
+    String label = 'Observation';
+    IconData icon = Icons.science;
+    
+    if (res['code'] != null && res['code']['text'] != null) {
+      label = res['code']['text'];
+    }
+    
+    if (res['valueQuantity'] != null) {
+      value = '${res['valueQuantity']['value']} ${res['valueQuantity']['unit'] ?? ''}';
+    } else if (res['valueString'] != null) {
+      value = res['valueString'];
+    }
+    
+    // Guess icon based on label
+    if (label.toLowerCase().contains('height')) icon = Icons.height;
+    if (label.toLowerCase().contains('bp') || label.toLowerCase().contains('blood pressure')) icon = Icons.monitor_heart;
+    if (label.toLowerCase().contains('step')) icon = Icons.directions_walk;
+    if (label.toLowerCase().contains('calor')) icon = Icons.local_fire_department;
+    if (label.toLowerCase().contains('spc') || label.toLowerCase().contains('oxy')) icon = Icons.water_drop;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFE2F0F9)),
+        borderRadius: BorderRadius.circular(8),
+        color: Colors.white,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(8)),
-            child: Icon(icon, color: iconColor, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
-                if (subtitle.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(subtitle, style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 12)),
-                ],
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE9F7EF),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    _capitalize(status),
-                    style: const TextStyle(color: Color(0xFF27AE60), fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                )
-              ],
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FCFF),
+              borderRadius: BorderRadius.circular(8),
             ),
-          )
+            child: Icon(icon, color: const Color(0xFF577086), size: 16),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(value, style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
+              Text(label.toUpperCase(), style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 10, fontWeight: FontWeight.bold)),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFullWidthItem(Map<String, dynamic> res, Color color) {
+    final type = res['resourceType'];
+    String text = '';
+    
+    if (type == 'Condition') {
+      text = res['code']?['text'] ?? 'Unknown Condition';
+    } else if (type == 'FamilyMemberHistory') {
+      text = res['condition']?[0]?['code']?['text'] ?? 'Family History';
+      final relation = res['relationship']?['text'] ?? '';
+      if (relation.isNotEmpty) text += ' — Relationship: $relation';
+    } else if (type == 'ServiceRequest') {
+      text = res['code']?['text'] ?? 'Investigation';
+    } else if (type == 'Appointment' || type == 'CarePlan') {
+      text = res['description'] ?? res['title'] ?? 'Follow up';
+    } else if (type == 'MedicationRequest') {
+      text = res['medicationCodeableConcept']?['text'] ?? 'Medication';
+      if (res['dosageInstruction'] != null && res['dosageInstruction'].isNotEmpty) {
+        text += ' - ${res['dosageInstruction'][0]['text'] ?? ''}';
+      }
+    } else if (type == 'DiagnosticReport') {
+      text = res['code']?['text'] ?? 'Diagnostic Report';
+    } else {
+      text = res['code']?['text'] ?? type;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.05),
+        border: Border(left: BorderSide(color: color, width: 4)),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(color: Color(0xFF17324A), fontSize: 13, fontWeight: FontWeight.w600),
       ),
     );
   }

@@ -347,7 +347,8 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
       final s = rawStatus.toUpperCase();
       if (s == 'FETCHED' || s == 'GRANTED') return 'GRANTED';
       if (s == 'INITIATED' || s == 'REQUESTED') return 'REQUESTED';
-      if (s == 'REVOKED' || s == 'EXPIRED') return 'EXPIRED';
+      if (s == 'REVOKED') return 'REVOKED';
+      if (s == 'EXPIRED') return 'EXPIRED';
       if (s == 'DENIED') return 'DENIED';
       return 'REQUESTED';
     }
@@ -593,7 +594,6 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                   DataColumn(label: Text('GRANTED FOR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF17324A)))),
                   DataColumn(label: Text('REQUESTED DATES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF17324A)))),
                   DataColumn(label: Text('GRANTED DATES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF17324A)))),
-                  DataColumn(label: Text('CONSENT DATE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF17324A)))),
                   DataColumn(label: Text('CREATED AT / EXPIRES AT', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF17324A)))),
                   DataColumn(label: Text('DETAIL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF17324A)))),
                 ],
@@ -601,7 +601,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                   final index = entry.key;
                   final req = entry.value;
                   final rawStatus = req['status']?.toString() ?? 'UNKNOWN';
-                  final displayStatus = _mapStatus(rawStatus);
+                  String displayStatus = _mapStatus(rawStatus);
                   final patientId = req['patientId']?.toString() ?? 'Unknown';
                   final hiTypes = (req['hiTypes'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
                   
@@ -609,6 +609,29 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                   final dateToStr = req['dateTo'] ?? '';
                   final dateEraseAtStr = req['dateEraseAt'] ?? '';
                   final createdStr = req['timestamp'] ?? req['createdAt'] ?? '';
+                  final updatedStr = req['updatedAt'] ?? createdStr;
+                  
+                  String grantedDateFromStr = dateFromStr;
+                  String grantedDateToStr = dateToStr;
+                  String grantedDateEraseAtStr = dateEraseAtStr;
+                  if (req['details'] != null && req['details']['permission'] != null) {
+                    final perm = req['details']['permission'];
+                    if (perm['dateRange'] != null) {
+                      grantedDateFromStr = perm['dateRange']['from']?.toString() ?? grantedDateFromStr;
+                      grantedDateToStr = perm['dateRange']['to']?.toString() ?? grantedDateToStr;
+                    }
+                    grantedDateEraseAtStr = perm['dataEraseAt']?.toString() ?? grantedDateEraseAtStr;
+                  }
+                  
+                  // Auto-expire logic based on current time
+                  if (displayStatus != 'DENIED' && displayStatus != 'REVOKED' && grantedDateEraseAtStr.isNotEmpty) {
+                    try {
+                      final expireTime = DateTime.parse(grantedDateEraseAtStr).toLocal();
+                      if (DateTime.now().isAfter(expireTime)) {
+                        displayStatus = 'EXPIRED';
+                      }
+                    } catch (_) {}
+                  }
                   
                   String formatDate(String isoStr) {
                     if (isoStr.isEmpty) return '-';
@@ -725,25 +748,27 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                       ),
                       // GRANTED DATES
                       DataCell(
-                        displayStatus == 'GRANTED' 
+                        (displayStatus == 'GRANTED' || displayStatus == 'EXPIRED' || displayStatus == 'REVOKED')
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('From : ${formatDate(dateFromStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
+                                Text('From : ${formatDate(grantedDateFromStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
                                 const SizedBox(height: 6),
-                                Text('To : ${formatDate(dateToStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
+                                Text('To : ${formatDate(grantedDateToStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
                                 const SizedBox(height: 6),
-                                Text('Granted At : ${formatDate(createdStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
+                                Text(displayStatus == 'EXPIRED' ? 'Expired At : ${formatDate(grantedDateEraseAtStr)}' : displayStatus == 'REVOKED' ? 'Revoked At : ${formatDate(updatedStr)}' : 'Granted At : ${formatDate(updatedStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
                               ],
                             )
-                          : const Text('-', style: TextStyle(color: Colors.grey))
-                      ),
-                      // CONSENT DATE
-                      DataCell(
-                         displayStatus == 'GRANTED'
-                          ? Text('Granted At : \n${formatDate(createdStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086)))
-                          : const Text('-', style: TextStyle(color: Colors.grey))
+                          : displayStatus == 'DENIED'
+                            ? Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('Denied At : ${formatDate(updatedStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
+                                ],
+                              )
+                            : const Text('-', style: TextStyle(color: Colors.grey))
                       ),
                       // CREATED AT / EXPIRES AT
                       DataCell(

@@ -104,6 +104,23 @@ class M3ConsentController {
       let targetUserDir = dirs.find(d => d.includes("@sbx"));
       const docIdVar = typeof docId !== 'undefined' ? docId : null;
       const consentReq = typeof hipId !== 'undefined' ? M3ConsentStore.consents.find(c => c.artefactDetails && (c.artefactDetails[hipId] || Object.values(c.artefactDetails).some(art => art.hip && art.hip.id === hipId))) : null;
+      
+      let allowedHiTypes = [];
+      if (consentReq) {
+         let art = null;
+         if (consentReq.artefactDetails && consentReq.artefactDetails[hipId]) {
+             art = consentReq.artefactDetails[hipId];
+         } else if (consentReq.artefactDetails) {
+             art = Object.values(consentReq.artefactDetails).find(a => a.hip && a.hip.id === hipId) || Object.values(consentReq.artefactDetails)[0];
+         }
+         
+         if (art && art.hiTypes) {
+             allowedHiTypes = art.hiTypes.map(t => String(t || "").replace(/\s+/g, "").toLowerCase());
+         } else if (consentReq.hiTypes) {
+             allowedHiTypes = consentReq.hiTypes.map(t => String(t || "").replace(/\s+/g, "").toLowerCase());
+         }
+      }
+
       if (consentReq && consentReq.patientId) {
         const found = dirs.find(d => d.startsWith(consentReq.patientId));
         if (found) targetUserDir = found;
@@ -221,6 +238,34 @@ class M3ConsentController {
                
                const hasAttachment = JSON.stringify(bundle).includes('"contentType":"application/pdf"');
                if (hasAttachment) hasPdf = true;
+             }
+             
+             let deducedType = "healthdocumentrecord";
+             const t = docTitle.toLowerCase();
+             if (t.includes("prescription") || t.includes("medication")) deducedType = "prescription";
+             else if (t.includes("diagnostic") || t.includes("lab") || docType === "DIAGNOSTIC_REPORT") deducedType = "diagnosticreport";
+             else if (t.includes("consultation") || t.includes("evisit") || t.includes("visit") || docType === "ENCOUNTER") deducedType = "opconsultation";
+             else if (t.includes("discharge")) deducedType = "dischargesummary";
+             else if (t.includes("immunization") || t.includes("vaccine") || docType === "IMMUNIZATION") deducedType = "immunizationrecord";
+             else if (t.includes("vital") || t.includes("wellness")) deducedType = "wellnessrecord";
+             else if (t.includes("inv-") || t.includes("invoice") || docType === "INVOICE") deducedType = "invoice";
+             
+             if (bundle.entry && Array.isArray(bundle.entry)) {
+               const comp = bundle.entry.find(e => e.resource && e.resource.resourceType === 'Composition');
+               if (comp && comp.resource && comp.resource.type && comp.resource.type.coding && comp.resource.type.coding.length > 0) {
+                 const code = comp.resource.type.coding[0].code;
+                 if (code === '440545006') deducedType = 'prescription';
+                 else if (code === '721981007') deducedType = 'diagnosticreport';
+                 else if (code === '371530004') deducedType = 'opconsultation';
+                 else if (code === '373942005') deducedType = 'dischargesummary';
+                 else if (code === '41000179103') deducedType = 'immunizationrecord';
+                 else if (code === '419891008') deducedType = 'healthdocumentrecord';
+                 else if (code === '736271009') deducedType = 'wellnessrecord';
+               }
+             }
+
+             if (allowedHiTypes.length > 0 && !allowedHiTypes.includes(deducedType)) {
+                 return; // Skip this document as it is not granted
              }
              
              if (globalSeenCareContexts.has(dedupeId)) return;
@@ -354,7 +399,7 @@ class M3ConsentController {
          }
       }
 
-      if (base64Pdf) {
+      if (base64Pdf && req.query.format !== 'json') {
         const pdfBuffer = Buffer.from(base64Pdf, 'base64');
         res.setHeader('Content-Type', 'application/pdf');
         res.send(pdfBuffer);

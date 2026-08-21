@@ -34,7 +34,26 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
   Future<void> _fetchDocuments() async {
     try {
       final apiService = HiuApiService();
-      final docs = await apiService.fetchHealthDocuments(widget.hipId);
+      var docs = await apiService.fetchHealthDocuments(widget.hipId);
+      
+      if (docs.isEmpty) {
+        // Auto-fetch from HIP if data does not exist locally
+        try {
+          await apiService.requestHealthData({'consentId': widget.hipId});
+          // Poll for data up to 10 times (20 seconds max)
+          for (int i = 0; i < 10; i++) {
+            await Future.delayed(const Duration(seconds: 2));
+            final retryDocs = await apiService.fetchHealthDocuments(widget.hipId);
+            if (retryDocs.isNotEmpty) {
+              docs = retryDocs;
+              break;
+            }
+          }
+        } catch (err) {
+          debugPrint("Auto data pull failed: $err");
+        }
+      }
+
       if (mounted) {
         setState(() {
           _documents = List<Map<String, dynamic>>.from(docs);
@@ -46,7 +65,7 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
       if (mounted) {
         if (e.toString().contains('Data pull was unsuccfull')) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data pull was unsuccfull, please try again after some time'))
+            const SnackBar(content: Text('Data pull was unsuccessful, please try again after some time'))
           );
         }
         setState(() {
@@ -349,13 +368,16 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
         dynamic _contentData;
         String? _errorMessage;
 
-        Future<void> fetchContent(StateSetter setState) async {
+        Future<void> fetchContent(StateSetter setState, {bool forceJson = false}) async {
           setState(() {
             _isLoadingContent = true;
             _errorMessage = null;
           });
           try {
-            final response = await http.get(Uri.parse('${HiuApiService.baseUrl}/documents/${doc['id']}/pdf'));
+            final url = forceJson 
+              ? '${HiuApiService.baseUrl}/documents/${doc['id']}/pdf?format=json'
+              : '${HiuApiService.baseUrl}/documents/${doc['id']}/pdf';
+            final response = await http.get(Uri.parse(url));
             if (response.statusCode == 200) {
               final contentType = response.headers['content-type']?.toLowerCase() ?? '';
               setState(() {
@@ -557,32 +579,66 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
                                   style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)
                                 ),
                                 const SizedBox(height: 8),
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      isPdfOpen = true;
-                                    });
-                                    if (_contentData == null && !_isLoadingContent) {
-                                      fetchContent(setState);
-                                    }
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFE6F7F9),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(Icons.open_in_new, size: 12, color: Color(0xFF0C8A99)),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          doc['hasPdf'] == true ? 'Open PDF' : 'View Data', 
-                                          style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)
+                                Row(
+                                  children: [
+                                    if (doc['hasPdf'] == true) ...[
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            isPdfOpen = true;
+                                          });
+                                          if (_contentData == null && !_isLoadingContent) {
+                                            fetchContent(setState);
+                                          } else if (_contentType == 'json') {
+                                            fetchContent(setState, forceJson: false);
+                                          }
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFE6F7F9),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Row(
+                                            children: const [
+                                              Icon(Icons.picture_as_pdf, size: 12, color: Color(0xFF0C8A99)),
+                                              SizedBox(width: 4),
+                                              Text('Open PDF', style: TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
+                                            ],
+                                          ),
                                         ),
-                                      ],
+                                      ),
+                                      const SizedBox(width: 12),
+                                    ],
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          isPdfOpen = true;
+                                        });
+                                        // If PDF exists, force JSON mode for this button
+                                        if (_contentData == null && !_isLoadingContent) {
+                                          fetchContent(setState, forceJson: doc['hasPdf'] == true);
+                                        } else if (doc['hasPdf'] == true && _contentType != 'json') {
+                                          // Re-fetch if they previously loaded the PDF
+                                          fetchContent(setState, forceJson: true);
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFE6F7F9),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Row(
+                                          children: const [
+                                            Icon(Icons.data_object, size: 12, color: Color(0xFF0C8A99)),
+                                            SizedBox(width: 4),
+                                            Text('Read Data', style: TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ],
                             ),

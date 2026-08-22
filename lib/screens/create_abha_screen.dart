@@ -740,7 +740,7 @@ class _CreateAbhaScreenState extends State<CreateAbhaScreen> {
           onChanged: _onAadhaarChanged,
           onTap: _handleAadhaarFieldTap,
           inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9 ]')),
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9Xx ]')),
           ],
           decoration: InputDecoration(
             labelText: 'Aadhaar Number *',
@@ -842,7 +842,7 @@ class _CreateAbhaScreenState extends State<CreateAbhaScreen> {
     if (_updatingAadhaarText) {
       return;
     }
-    final digits = normalizeAadhaarDigits(value);
+    final digits = normalizeAadhaarDigits(value, previousRaw: _aadhaarRaw);
     _aadhaarRaw = digits;
     _syncAadhaarText();
     setState(() {});
@@ -1204,9 +1204,7 @@ class _CreateAbhaScreenState extends State<CreateAbhaScreen> {
     final phrProfile =
         AppRuntimeStore.getValue<Map<String, dynamic>>('phr.profile') ??
         const <String, dynamic>{};
-    final cardPayload =
-        AppRuntimeStore.getValue<Map<String, dynamic>>('phr.card') ??
-        const <String, dynamic>{};
+    final cardPayload = const <String, dynamic>{};
     final rawAddressMap = rawProfile['addr'] is Map
         ? Map<String, dynamic>.from(rawProfile['addr'] as Map)
         : const <String, dynamic>{};
@@ -1424,9 +1422,7 @@ class _CreateAbhaScreenState extends State<CreateAbhaScreen> {
       'state': state,
       'district': district,
       'imageBase64': imageBase64,
-      'cardPayload':
-          AppRuntimeStore.getValue<Map<String, dynamic>>('phr.card') ??
-          const <String, dynamic>{},
+      'cardPayload': const <String, dynamic>{},
       'rawProfile': rawProfile,
       'sessionToken': sessionToken,
       'refreshToken': refreshToken,
@@ -1594,9 +1590,7 @@ class _CreateAbhaScreenState extends State<CreateAbhaScreen> {
       'state': state,
       'district': district,
       'imageBase64': imageBase64,
-      'cardPayload':
-          AppRuntimeStore.getValue<Map<String, dynamic>>('phr.card') ??
-          const <String, dynamic>{},
+      'cardPayload': const <String, dynamic>{},
       'rawProfile': rawProfile,
       'sessionToken': sessionToken,
       'refreshToken': normalizedRefreshToken,

@@ -74,9 +74,17 @@ class BundleRegistry {
     );
 
     if (existingIndex >= 0) {
-      this.registry[existingIndex] = { ...this.registry[existingIndex], ...bundleData, updatedAt: new Date().toISOString() };
+      this.registry[existingIndex] = { 
+        ...this.registry[existingIndex], 
+        ...bundleData, 
+        updatedAt: bundleData.updatedAt || new Date().toISOString() 
+      };
     } else {
-      this.registry.push({ ...bundleData, createdAt: new Date().toISOString() });
+      this.registry.push({ 
+        ...bundleData, 
+        createdAt: bundleData.createdAt || new Date().toISOString(),
+        updatedAt: bundleData.updatedAt || new Date().toISOString()
+      });
     }
     
     this.save();

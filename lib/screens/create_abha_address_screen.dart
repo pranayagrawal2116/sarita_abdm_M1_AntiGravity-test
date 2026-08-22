@@ -500,9 +500,7 @@ class _CreateAbhaAddressScreenState extends State<CreateAbhaAddressScreen> {
     final phrProfile =
         AppRuntimeStore.getValue<Map<String, dynamic>>('phr.profile') ??
         const <String, dynamic>{};
-    final cardPayload =
-        AppRuntimeStore.getValue<Map<String, dynamic>>('phr.card') ??
-        const <String, dynamic>{};
+    final cardPayload = const <String, dynamic>{};
 
     final linkFirstName = _firstNonEmpty([linkAbhaProfile['firstName']]);
     final linkMiddleName = _firstNonEmpty([linkAbhaProfile['middleName']]);

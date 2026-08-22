@@ -9,6 +9,31 @@ const path = require("path");
 
 class M3CallbackController {
   
+  static _deleteDataForConsent(consentId) {
+    if (!consentId) return;
+    try {
+      const rootDir = path.resolve(__dirname, "../../../");
+      if (!fs.existsSync(rootDir)) return;
+      
+      const dirs = fs.readdirSync(rootDir, { withFileTypes: true });
+      for (const dir of dirs) {
+        if (dir.isDirectory() && dir.name.includes("@sbx")) {
+          const patientDirPath = path.join(rootDir, dir.name);
+          const subDirs = fs.readdirSync(patientDirPath, { withFileTypes: true });
+          
+          for (const subDir of subDirs) {
+            if (subDir.isDirectory() && subDir.name.startsWith(`${consentId}_`)) {
+              const dirToDelete = path.join(patientDirPath, subDir.name);
+              Logger.info("M3Callback", `Deleting expired consent data directory: ${dirToDelete}`);
+              fs.rmSync(dirToDelete, { recursive: true, force: true });
+            }
+          }
+        }
+      }
+    } catch (e) {
+      Logger.error("M3Callback", `Failed to delete data for consent ${consentId}`, { error: e.message });
+    }
+  }
   static async onConsentInit(req, res) {
     Logger.info("M3Callback", "Received consent on-init", req.body);
     const { consentRequest, error, response } = req.body;
@@ -38,6 +63,25 @@ class M3CallbackController {
         consentArtefacts: consentRequest.consentArtefacts,
         updatedAt: req.body.timestamp || new Date().toISOString()
       });
+      
+      if (consentRequest.status === "EXPIRED" || consentRequest.status === "REVOKED") {
+         const existingReq = M3ConsentStore.consents.find(c => c.consentRequestId === consentRequest.id);
+         if (existingReq) {
+            if (existingReq.consentArtefacts) {
+               existingReq.consentArtefacts.forEach(artefact => {
+                  M3CallbackController._deleteDataForConsent(artefact.id);
+               });
+            }
+            if (existingReq.consentId) {
+               M3CallbackController._deleteDataForConsent(existingReq.consentId);
+            }
+         }
+         if (consentRequest.consentArtefacts) {
+            consentRequest.consentArtefacts.forEach(artefact => {
+               M3CallbackController._deleteDataForConsent(artefact.id);
+            });
+         }
+      }
     }
     res.status(202).send();
   }
@@ -89,6 +133,25 @@ class M3CallbackController {
               latestPending.updatedAt = timestamp;
               M3ConsentStore.save();
            }
+         }
+         
+         if (notification.status === "EXPIRED" || notification.status === "REVOKED") {
+            const existingReq = M3ConsentStore.consents.find(c => c.consentRequestId === notification.consentRequestId);
+            if (existingReq) {
+               if (existingReq.consentArtefacts) {
+                  existingReq.consentArtefacts.forEach(artefact => {
+                     M3CallbackController._deleteDataForConsent(artefact.id);
+                  });
+               }
+               if (existingReq.consentId) {
+                  M3CallbackController._deleteDataForConsent(existingReq.consentId);
+               }
+            }
+            if (notification.consentArtefacts) {
+               notification.consentArtefacts.forEach(artefact => {
+                  M3CallbackController._deleteDataForConsent(artefact.id);
+               });
+            }
          }
       }
 

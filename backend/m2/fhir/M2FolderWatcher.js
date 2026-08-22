@@ -59,12 +59,15 @@ const startWatcher = () => {
       const fileData = txtFiles.map((fileName) => {
         const filePath = path.join(folderPath, fileName);
         const content = fs.readFileSync(filePath, "utf8");
+        const stats = fs.statSync(filePath);
         
         return {
           fileName,
           filePath,
           content,
           hiType: guessHiType(fileName),
+          createdAt: stats.birthtime.toISOString(),
+          updatedAt: stats.mtime.toISOString(),
         };
       });
 
@@ -101,7 +104,9 @@ const startWatcher = () => {
           bundleFileName,
           bundlePath,
           sourceTxtFile: file.filePath,
-          status: "READY"
+          status: "READY",
+          createdAt: file.createdAt,
+          updatedAt: file.updatedAt
         });
         
         log("Successfully generated and saved FHIR bundle", { bundlePath, hiType: file.hiType });

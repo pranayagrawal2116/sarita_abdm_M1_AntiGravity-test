@@ -778,7 +778,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                           children: [
                             Text('Created At : ${formatDate(createdStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
                             const SizedBox(height: 6),
-                            Text('Expires At : ${formatDate(dateEraseAtStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
+                            Text('Expires At : ${formatDate(grantedDateEraseAtStr)}', style: const TextStyle(fontSize: 13, color: Color(0xFF577086))),
                           ],
                         )
                       ),

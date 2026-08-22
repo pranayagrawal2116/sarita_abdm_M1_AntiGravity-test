@@ -362,11 +362,11 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        bool isPdfOpen = false;
         bool _isLoadingContent = false;
-        String? _contentType;
+        String _contentType = 'json';
         dynamic _contentData;
         String? _errorMessage;
+        bool _initFetch = false;
 
         Future<void> fetchContent(StateSetter setState, {bool forceJson = false}) async {
           setState(() {
@@ -411,14 +411,18 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
 
         return StatefulBuilder(
           builder: (context, setState) {
+            if (!_initFetch) {
+              _initFetch = true;
+              fetchContent(setState, forceJson: true);
+            }
             return Dialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Container(
-                width: isPdfOpen ? 1000 : 600,
-                height: isPdfOpen ? MediaQuery.of(context).size.height * 0.85 : null,
+                width: 1000,
+                height: MediaQuery.of(context).size.height * 0.85,
                 padding: const EdgeInsets.all(24),
                 child: Column(
-                  mainAxisSize: isPdfOpen ? MainAxisSize.max : MainAxisSize.min,
+                  mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Header
@@ -448,6 +452,19 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
                           ),
                         ),
                         const SizedBox(width: 12),
+                        if (doc['hasPdf'] == true)
+                          OutlinedButton.icon(
+                            onPressed: () {
+                              fetchContent(setState, forceJson: _contentType == 'pdf');
+                            },
+                            icon: Icon(_contentType == 'pdf' ? Icons.data_object : Icons.picture_as_pdf, size: 16),
+                            label: Text(_contentType == 'pdf' ? 'View Structured Data' : 'View PDF'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF0C8A99),
+                              side: const BorderSide(color: Color(0xFF0C8A99)),
+                            ),
+                          ),
+                        const SizedBox(width: 16),
                         IconButton(
                           icon: const Icon(Icons.close, color: Color(0xFF7A8D9C)),
                           onPressed: () => Navigator.pop(context),
@@ -486,184 +503,35 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
                     ),
                     const SizedBox(height: 24),
                     
-                    if (isPdfOpen)
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFE2F0F9)),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: _isLoadingContent 
-                              ? const Center(child: CircularProgressIndicator(color: Color(0xFF0C8A99)))
-                              : _errorMessage != null
-                                  ? Center(child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)))
-                                  : _contentType == 'json'
-                                      ? (_contentData is Map<String, dynamic>
-                                          ? FhirDataViewer(bundle: _contentData as Map<String, dynamic>)
-                                          : const Center(child: Text('Invalid JSON data', style: TextStyle(color: Colors.red))))
-                                      : SfPdfViewer.memory(_contentData),
-                        ),
-                      )
-                    else ...[
-                      // First Inner Card (Record Artifact Details)
-                      Container(
-                        padding: const EdgeInsets.all(16),
+                    Expanded(
+                      child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: const Color(0xFFE2F0F9)),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF2F5F8),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(Icons.assignment_outlined, color: Color(0xFF7A8D9C), size: 24),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(doc['type'].toUpperCase(), style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 10, fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  Text('Record Artifact for ${doc['title']}', style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
-                                  const SizedBox(height: 4),
-                                  Text('${doc['date']}, 04:19 PM', style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 12)),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: 32,
-                              height: 32,
-                              decoration: const BoxDecoration(color: Color(0xFF0C8A99), shape: BoxShape.circle),
-                            ),
-                            const SizedBox(width: 8),
-                            const Text('- MRN:', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 12)),
-                          ],
-                        ),
+                        child: _isLoadingContent 
+                            ? const Center(child: CircularProgressIndicator(color: Color(0xFF0C8A99)))
+                            : _errorMessage != null
+                                ? Center(child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)))
+                                : _contentType == 'json'
+                                    ? (_contentData is Map<String, dynamic>
+                                        ? FhirDataViewer(bundle: _contentData as Map<String, dynamic>)
+                                        : const Center(child: Text('Invalid JSON data', style: TextStyle(color: Colors.red))))
+                                    : SfPdfViewer.memory(_contentData),
                       ),
-                      const SizedBox(height: 16),
-                      Text(doc['type'].toUpperCase(), style: const TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      
-                      // PDF Document Card or No Data Message
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFFE2F0F9)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: doc['hasPdf'] == true ? const Color(0xFFFDECEC) : const Color(0xFFE6F7F9),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Icon(
-                                doc['hasPdf'] == true ? Icons.picture_as_pdf : Icons.data_object, 
-                                color: doc['hasPdf'] == true ? Colors.red : const Color(0xFF0C8A99), 
-                                size: 24
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  doc['hasPdf'] == true ? 'PDF document' : 'Document Data', 
-                                  style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    if (doc['hasPdf'] == true) ...[
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            isPdfOpen = true;
-                                          });
-                                          if (_contentData == null && !_isLoadingContent) {
-                                            fetchContent(setState);
-                                          } else if (_contentType == 'json') {
-                                            fetchContent(setState, forceJson: false);
-                                          }
-                                        },
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFE6F7F9),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: Row(
-                                            children: const [
-                                              Icon(Icons.picture_as_pdf, size: 12, color: Color(0xFF0C8A99)),
-                                              SizedBox(width: 4),
-                                              Text('Open PDF', style: TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                    ],
-                                    InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          isPdfOpen = true;
-                                        });
-                                        // If PDF exists, force JSON mode for this button
-                                        if (_contentData == null && !_isLoadingContent) {
-                                          fetchContent(setState, forceJson: doc['hasPdf'] == true);
-                                        } else if (doc['hasPdf'] == true && _contentType != 'json') {
-                                          // Re-fetch if they previously loaded the PDF
-                                          fetchContent(setState, forceJson: true);
-                                        }
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFE6F7F9),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Row(
-                                          children: const [
-                                            Icon(Icons.data_object, size: 12, color: Color(0xFF0C8A99)),
-                                            SizedBox(width: 4),
-                                            Text('Read Data', style: TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                     const SizedBox(height: 24),
                     
                     // Footer
                     Align(
                       alignment: Alignment.bottomRight,
                       child: OutlinedButton(
-                        onPressed: isPdfOpen
-                            ? () {
-                                setState(() {
-                                  isPdfOpen = false;
-                                });
-                              }
-                            : () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(context),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFF0C8A99)),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                         ),
-                        child: Text(isPdfOpen ? 'Back to Summary' : 'Close', style: const TextStyle(color: Color(0xFF0C8A99))),
+                        child: const Text('Close', style: TextStyle(color: Color(0xFF0C8A99))),
                       ),
                     ),
                   ],

@@ -136,14 +136,16 @@ class M2DataTransferManager {
          requestedTypes.includes(item.meta?.hiType)
       );
 
-      // Sort descending by date to get newest first
-      matchedPayloads.sort((a, b) => {
-        const timeA = new Date(a.meta?.updatedAt || a.meta?.createdAt || 0).getTime();
-        const timeB = new Date(b.meta?.updatedAt || b.meta?.createdAt || 0).getTime();
-        return timeB - timeA;
-      });
-
       const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/');
+      
+      if (!isDesktopApp) {
+        // Sort descending by date to get newest first
+        matchedPayloads.sort((a, b) => {
+          const timeA = new Date(a.meta?.updatedAt || a.meta?.createdAt || 0).getTime();
+          const timeB = new Date(b.meta?.updatedAt || b.meta?.createdAt || 0).getTime();
+          return timeB - timeA;
+        });
+      }
       
       for (const payload of matchedPayloads) {
         if (!isDesktopApp) {

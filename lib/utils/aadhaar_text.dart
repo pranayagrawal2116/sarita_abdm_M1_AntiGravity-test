@@ -1,11 +1,25 @@
 import 'package:flutter/widgets.dart';
 
-String normalizeAadhaarDigits(String value) {
-  final digitsOnlyValue = value.replaceAll(RegExp(r'\D'), '');
-  if (digitsOnlyValue.length <= 12) {
-    return digitsOnlyValue;
+String normalizeAadhaarDigits(String value, {String previousRaw = ''}) {
+  if (!value.contains('X') && !value.contains('x')) {
+    final digitsOnlyValue = value.replaceAll(RegExp(r'\D'), '');
+    if (digitsOnlyValue.length <= 12) {
+      return digitsOnlyValue;
+    }
+    return digitsOnlyValue.substring(0, 12);
   }
-  return digitsOnlyValue.substring(0, 12);
+
+  int xCount = value.replaceAll(RegExp(r'[^Xx]'), '').length;
+  String visibleDigits = value.replaceAll(RegExp(r'\D'), '');
+  
+  int keepCount = xCount > previousRaw.length ? previousRaw.length : xCount;
+  String newHidden = previousRaw.substring(0, keepCount);
+  
+  String merged = newHidden + visibleDigits;
+  if (merged.length <= 12) {
+    return merged;
+  }
+  return merged.substring(0, 12);
 }
 
 String formatAadhaarDigits(String digits) {

@@ -323,7 +323,7 @@ class _AbhaLoginScreenState extends State<AbhaLoginScreen> {
       if (_updatingAadhaarIdentifierText) {
         return;
       }
-      final digits = normalizeAadhaarDigits(value);
+      final digits = normalizeAadhaarDigits(value, previousRaw: _aadhaarIdentifierRaw);
       setState(() {
         _aadhaarIdentifierRaw = digits;
         if (hasActiveFlow) {
@@ -1927,8 +1927,7 @@ class _AbhaLoginScreenState extends State<AbhaLoginScreen> {
     switch (type) {
       case 'AADHAAR_NUMBER':
         return <TextInputFormatter>[
-          FilteringTextInputFormatter.digitsOnly,
-          LengthLimitingTextInputFormatter(12),
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9Xx ]')),
         ];
       case 'MOBILE':
         return <TextInputFormatter>[

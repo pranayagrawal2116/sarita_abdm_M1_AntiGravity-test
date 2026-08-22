@@ -279,7 +279,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
                           inputFormatters: _identifierType == 'AADHAAR_NUMBER'
                               ? [
                                   FilteringTextInputFormatter.allow(
-                                    RegExp(r'[0-9 ]'),
+                                    RegExp(r'[0-9Xx ]'),
                                   ),
                                 ]
                               : null,
@@ -600,7 +600,7 @@ class _PatientRegistrationScreenState extends State<PatientRegistrationScreen> {
     if (_updatingAadhaarIdentifierText) {
       return;
     }
-    final digits = normalizeAadhaarDigits(value);
+    final digits = normalizeAadhaarDigits(value, previousRaw: _aadhaarIdentifierRaw);
     setState(() {
       _aadhaarIdentifierRaw = digits;
       _syncAadhaarIdentifierText();

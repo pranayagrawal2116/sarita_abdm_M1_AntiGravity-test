@@ -16,11 +16,38 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
   bool _autoPullTriggered = false;
   bool _isRequestingAll = false;
   String? _selectedHiTypeFilter;
+  late Map<String, dynamic> _request;
 
   @override
   void initState() {
     super.initState();
+    _request = Map.from(widget.request);
     _scheduleAutoDataPull();
+  }
+
+  Future<void> _refreshRequestData() async {
+    try {
+      final apiService = HiuApiService();
+      final reqs = await apiService.fetchConsentRequests();
+      final reqId = _request['requestId']?.toString() ?? _request['id']?.toString();
+      final updatedReq = reqs.firstWhere((r) => (r['requestId']?.toString() ?? r['id']?.toString()) == reqId, orElse: () => null);
+      if (updatedReq != null) {
+        setState(() {
+          _request = updatedReq;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Data refreshed successfully!')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to refresh data')),
+        );
+      }
+    }
   }
 
   void _scheduleAutoDataPull() {
@@ -29,11 +56,11 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       if (_autoPullTriggered) return;
 
       final rawStatus =
-          widget.request['status']?.toString().toUpperCase() ?? '';
+          _request['status']?.toString().toUpperCase() ?? '';
       if (rawStatus == 'FETCHED') return;
 
       String displayStatus = _mapStatus(rawStatus);
-      final dateEraseAtStr = widget.request['dateEraseAt'] ?? '';
+      final dateEraseAtStr = _request['dateEraseAt'] ?? '';
       if (displayStatus != 'DENIED' && dateEraseAtStr.isNotEmpty) {
         try {
           final expireTime = DateTime.parse(dateEraseAtStr).toLocal();
@@ -46,7 +73,7 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       if (displayStatus != 'GRANTED') return;
 
       final artefacts =
-          widget.request['consentArtefacts'] as List<dynamic>? ?? [];
+          _request['consentArtefacts'] as List<dynamic>? ?? [];
       if (artefacts.isEmpty) return;
 
       setState(() {
@@ -68,11 +95,13 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
         if (hipId.isEmpty) continue;
 
         try {
+          final dates = _getGrantedDatesForHip(hipId);
           await apiService.requestHealthData({
             'consentId': hipId,
-            'patientId': widget.request['patientId'] ?? '',
-            'dateFrom': widget.request['dateFrom'] ?? '',
-            'dateTo': widget.request['dateTo'] ?? '',
+            'patientId': _request['patientId'] ?? '',
+            'dateFrom': dates['dateFrom'],
+            'dateTo': dates['dateTo'],
+            'dataEraseAt': dates['dataEraseAt'],
           });
           // Add a tiny delay between requests to avoid overwhelming the server
           await Future.delayed(const Duration(milliseconds: 500));
@@ -143,11 +172,13 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
           ),
         );
 
+        final dates = _getGrantedDatesForHip(hipId);
         await apiService.requestHealthData({
           'consentId': hipId,
-          'patientId': widget.request['patientId'] ?? '',
-          'dateFrom': widget.request['dateFrom'] ?? '',
-          'dateTo': widget.request['dateTo'] ?? '',
+          'patientId': _request['patientId'] ?? '',
+          'dateFrom': dates['dateFrom'],
+          'dateTo': dates['dateTo'],
+          'dataEraseAt': dates['dataEraseAt'],
         });
 
         // Wait until data is received or timeout (max 16 seconds per hospital)
@@ -196,14 +227,44 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     }
   }
 
+  Map<String, String> _getGrantedDatesForHip(String hipId) {
+    String dateFrom = _request['dateFrom']?.toString() ?? '';
+    String dateTo = _request['dateTo']?.toString() ?? '';
+    String dataEraseAt = _request['dateEraseAt']?.toString() ?? '';
+
+    dynamic artDetails;
+    if (_request['artefactDetails'] != null && _request['artefactDetails'][hipId] != null) {
+      artDetails = _request['artefactDetails'][hipId];
+    } else if (_request['details'] != null && _request['details']['consentId'] == hipId) {
+      artDetails = _request['details'];
+    } else if (_request['details'] != null && _request['details']['hip'] != null) {
+      artDetails = _request['details'];
+    }
+
+    if (artDetails != null && artDetails['permission'] != null) {
+      final perm = artDetails['permission'];
+      if (perm['dateRange'] != null) {
+        dateFrom = perm['dateRange']['from']?.toString() ?? dateFrom;
+        dateTo = perm['dateRange']['to']?.toString() ?? dateTo;
+      }
+      dataEraseAt = perm['dataEraseAt']?.toString() ?? dataEraseAt;
+    }
+
+    return {
+      'dateFrom': dateFrom,
+      'dateTo': dateTo,
+      'dataEraseAt': dataEraseAt,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    final rawStatus = widget.request['status']?.toString() ?? 'UNKNOWN';
+    final rawStatus = _request['status']?.toString() ?? 'UNKNOWN';
     String displayStatus = _mapStatus(rawStatus);
     
-    String? grantedDateEraseAtStr = widget.request['dateEraseAt']?.toString() ?? '';
-    if (widget.request['details'] != null && widget.request['details']['permission'] != null) {
-      grantedDateEraseAtStr = widget.request['details']['permission']['dataEraseAt']?.toString() ?? grantedDateEraseAtStr;
+    String? grantedDateEraseAtStr = _request['dateEraseAt']?.toString() ?? '';
+    if (_request['details'] != null && _request['details']['permission'] != null) {
+      grantedDateEraseAtStr = _request['details']['permission']['dataEraseAt']?.toString() ?? grantedDateEraseAtStr;
     }
     
     // Auto-expire logic based on current time
@@ -216,8 +277,8 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       } catch (_) {}
     }
     final reqId =
-        widget.request['requestId']?.toString() ??
-        widget.request['id']?.toString() ??
+        _request['requestId']?.toString() ??
+        _request['id']?.toString() ??
         '-';
     final shortId = reqId.length > 8 ? '${reqId.substring(0, 8)}...' : reqId;
 
@@ -242,24 +303,24 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
         statusColor = Colors.grey;
     }
 
-    final patientId = widget.request['patientId']?.toString() ?? '-';
-    final purpose = widget.request['purpose']?.toString() ?? '-';
+    final patientId = _request['patientId']?.toString() ?? '-';
+    final purpose = _request['purpose']?.toString() ?? '-';
     final artefactsCount =
-        (widget.request['consentArtefacts'] as List?)?.length ?? 0;
+        (_request['consentArtefacts'] as List?)?.length ?? 0;
     final createdStr =
-        widget.request['timestamp'] ?? widget.request['createdAt'];
-    final updatedStr = widget.request['updatedAt'] ?? createdStr;
+        _request['timestamp'] ?? _request['createdAt'];
+    final updatedStr = _request['updatedAt'] ?? createdStr;
 
     // Dates
-    final dateFrom = widget.request['dateFrom'];
-    final dateTo = widget.request['dateTo'];
-    final dateEraseAt = widget.request['dateEraseAt'];
+    final dateFrom = _request['dateFrom'];
+    final dateTo = _request['dateTo'];
+    final dateEraseAt = _request['dateEraseAt'];
     
     String? grantedDateFrom = dateFrom;
     String? grantedDateTo = dateTo;
     String? grantedDateEraseAt = dateEraseAt;
-    if (widget.request['details'] != null && widget.request['details']['permission'] != null) {
-      final perm = widget.request['details']['permission'];
+    if (_request['details'] != null && _request['details']['permission'] != null) {
+      final perm = _request['details']['permission'];
       if (perm['dateRange'] != null) {
         grantedDateFrom = perm['dateRange']['from']?.toString() ?? grantedDateFrom;
         grantedDateTo = perm['dateRange']['to']?.toString() ?? grantedDateTo;
@@ -332,7 +393,7 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Color(0xFF577086)),
-            onPressed: () {},
+            onPressed: _refreshRequestData,
           ),
           const SizedBox(width: 8),
           if (displayStatus == 'GRANTED')
@@ -342,7 +403,7 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
                 onPressed: _isRequestingAll
                     ? null
                     : () => _handleRequestAll(
-                        widget.request['consentArtefacts'] as List<dynamic>? ??
+                        _request['consentArtefacts'] as List<dynamic>? ??
                             [],
                       ),
                 icon: _isRequestingAll
@@ -399,16 +460,16 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
             ),
             const SizedBox(height: 32),
             _buildHiTypesSection(
-              widget.request['hiTypes'],
-              widget.request['details'],
+              _request['hiTypes'],
+              _request['details'],
             ),
             const SizedBox(height: 32),
             Expanded(
               child: _buildDocumentsSection(
                 context,
                 displayStatus,
-                widget.request['consentArtefacts'] as List<dynamic>? ?? [],
-                widget.request['details'],
+                _request['consentArtefacts'] as List<dynamic>? ?? [],
+                _request['details'],
               ),
             ),
           ],
@@ -715,6 +776,10 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     List<dynamic> artefacts,
     dynamic details,
   ) {
+    if (displayStatus == 'REVOKED' || displayStatus == 'EXPIRED') {
+      return _buildRevokedOrExpiredState(displayStatus);
+    }
+
     if (artefacts.isEmpty) {
       return _buildEmptyDocumentsSection();
     }
@@ -723,9 +788,9 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       if (_selectedHiTypeFilter == null) return true;
       final hipId = art['id']?.toString() ?? '';
       dynamic artDetails;
-      if (widget.request['artefactDetails'] != null &&
-          widget.request['artefactDetails'][hipId] != null) {
-        artDetails = widget.request['artefactDetails'][hipId];
+      if (_request['artefactDetails'] != null &&
+          _request['artefactDetails'][hipId] != null) {
+        artDetails = _request['artefactDetails'][hipId];
       } else if (details != null && details['consentId'] == hipId) {
         artDetails = details;
       } else if (details != null &&
@@ -842,9 +907,9 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
                 int records = 1;
 
                 dynamic artDetails;
-                if (widget.request['artefactDetails'] != null &&
-                    widget.request['artefactDetails'][hipId] != null) {
-                  artDetails = widget.request['artefactDetails'][hipId];
+                if (_request['artefactDetails'] != null &&
+                    _request['artefactDetails'][hipId] != null) {
+                  artDetails = _request['artefactDetails'][hipId];
                 } else if (details != null && details['consentId'] == hipId) {
                   artDetails = details;
                 } else if (details != null &&
@@ -941,7 +1006,7 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
                               Icons.refresh,
                               color: Color(0xFF0C8A99),
                             ),
-                            onPressed: () {},
+                            onPressed: _refreshRequestData,
                           ),
                           const SizedBox(width: 12),
                           ElevatedButton.icon(
@@ -953,12 +1018,13 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
                                   ),
                                 );
                                 final apiService = HiuApiService();
+                                final dates = _getGrantedDatesForHip(hipId);
                                 await apiService.requestHealthData({
                                   'consentId': hipId,
-                                  'patientId':
-                                      widget.request['patientId'] ?? '',
-                                  'dateFrom': widget.request['dateFrom'] ?? '',
-                                  'dateTo': widget.request['dateTo'] ?? '',
+                                  'patientId': _request['patientId'] ?? '',
+                                  'dateFrom': dates['dateFrom'],
+                                  'dateTo': dates['dateTo'],
+                                  'dataEraseAt': dates['dataEraseAt'],
                                 });
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1095,6 +1161,58 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
             'Once a HIP shares records under this consent, it will appear above with a "View Docs"\\nbutton.',
             textAlign: TextAlign.center,
             style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 13),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRevokedOrExpiredState(String status) {
+    final isRevoked = status == 'REVOKED';
+    final title = isRevoked ? 'Consent Revoked — Records Removed!' : 'Consent Expired — Records Removed!';
+    final desc = isRevoked 
+        ? 'The patient has revoked authorisation for this consent. All previously fetched\ndocuments and decryption keys have been deleted as required by ABDM.'
+        : 'The authorisation for this consent has expired. All previously fetched\ndocuments and decryption keys have been deleted as required by ABDM.';
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE2F0F9),
+          style: BorderStyle.solid,
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF2F5F8),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.block,
+              size: 32,
+              color: Color(0xFFB3C1CC),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Color(0xFF17324A),
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            desc,
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 13),
           ),
         ],
       ),

@@ -211,7 +211,7 @@ class M2DataTransferController {
               requestId: requestAudit?.details?.requestId || tx.hiRequestId || tx.requestId,
               consentId: requestAudit?.details?.consentId || tx.consentId,
               patientId: tx.patientId || tx.abhaAddress,
-              recordTypes: tx.recordType ? [tx.recordType] : [],
+              recordTypes: Array.isArray(tx.recordType) ? tx.recordType : (tx.recordType ? [tx.recordType] : []),
               recordsTransferred: Array.isArray(tx.entries) ? tx.entries.length : 0,
               startedAt: Number(started?.timestamp || completion.timestamp),
               completedAt: Number(completion.timestamp),

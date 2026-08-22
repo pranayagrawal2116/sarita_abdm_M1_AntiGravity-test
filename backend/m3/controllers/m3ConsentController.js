@@ -49,8 +49,8 @@ class M3ConsentController {
 
   static async requestHealthData(req, res) {
     try {
-      const { consentId, patientId, dateFrom, dateTo } = req.body;
-      const result = await M3ConsentService.requestHealthInformation(consentId, patientId, dateFrom, dateTo);
+      const { consentId, patientId, dateFrom, dateTo, dataEraseAt } = req.body;
+      const result = await M3ConsentService.requestHealthInformation(consentId, patientId, dateFrom, dateTo, dataEraseAt);
       res.status(202).json({
         success: true,
         transactionId: result.transactionId
@@ -236,7 +236,21 @@ class M3ConsentController {
                  }
                }
                
-               const hasAttachment = JSON.stringify(bundle).includes('"contentType":"application/pdf"');
+               let hasAttachment = JSON.stringify(bundle).includes('"contentType":"application/pdf"');
+               for (const bEntry of bundle.entry) {
+                  const resource = bEntry ? bEntry.resource : null;
+                  if (resource) {
+                      if (resource.resourceType === 'DocumentReference') {
+                        const attachment = resource.content && resource.content[0] && resource.content[0].attachment;
+                        if (attachment && attachment.data) hasAttachment = true;
+                      } else if (resource.resourceType === 'DiagnosticReport') {
+                        if (resource.presentedForm && resource.presentedForm[0] && resource.presentedForm[0].data) hasAttachment = true;
+                      } else if (resource.resourceType === 'Binary') {
+                        if (resource.contentType === 'application/pdf' && resource.data) hasAttachment = true;
+                      }
+                  }
+                  if (hasAttachment) break;
+               }
                if (hasAttachment) hasPdf = true;
              }
              
@@ -393,6 +407,8 @@ class M3ConsentController {
                   if (attachment && attachment.data) base64Pdf = attachment.data;
                 } else if (resource.resourceType === 'DiagnosticReport') {
                   if (resource.presentedForm && resource.presentedForm[0] && resource.presentedForm[0].data) base64Pdf = resource.presentedForm[0].data;
+                } else if (resource.resourceType === 'Binary' && resource.contentType === 'application/pdf') {
+                  if (resource.data) base64Pdf = resource.data;
                 }
             }
             if (base64Pdf) break;

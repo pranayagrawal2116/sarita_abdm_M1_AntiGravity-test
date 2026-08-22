@@ -175,8 +175,16 @@ class M3ConsentService {
    * Request Health Information from HIP
    * POST /api/hiecm/dataflow/v3/health-information/request
    */
-  static async requestHealthInformation(consentId, patientId, dateFrom, dateTo) {
+  static async requestHealthInformation(consentId, patientId, dateFrom, dateTo, dataEraseAt) {
     try {
+      const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[consentId]);
+      if (consentReq && consentReq.artefactDetails[consentId] && consentReq.artefactDetails[consentId].permission) {
+         const perm = consentReq.artefactDetails[consentId].permission;
+         if (!dateFrom && perm.dateRange && perm.dateRange.from) dateFrom = perm.dateRange.from;
+         if (!dateTo && perm.dateRange && perm.dateRange.to) dateTo = perm.dateRange.to;
+         if (!dataEraseAt && perm.dataEraseAt) dataEraseAt = perm.dataEraseAt;
+      }
+
       const fixDate = (dateStr) => {
         if (!dateStr) return new Date().toISOString();
         return new Date(dateStr).toISOString();
@@ -203,7 +211,6 @@ class M3ConsentService {
       // Look up HIP ID from the consent artefact details
       let hipId = "unknown";
       let hipName = "unknown";
-      const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[consentId]);
       if (consentReq && consentReq.artefactDetails[consentId].hip) {
          hipId = consentReq.artefactDetails[consentId].hip.id;
          hipName = consentReq.artefactDetails[consentId].hip.name || hipId;
@@ -243,7 +250,7 @@ class M3ConsentService {
             cryptoAlg: "ECDH",
             curve: "Curve25519",
             dhPublicKey: {
-              expiry: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+              expiry: dataEraseAt ? new Date(dataEraseAt).toISOString() : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
               parameters: "Curve25519/32byte random key",
               keyValue: publicKeyBase64
             },

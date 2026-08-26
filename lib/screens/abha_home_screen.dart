@@ -1,12 +1,13 @@
+import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import '../services/abha_api_service.dart';
 import '../utils/app_runtime_store.dart';
 import '../utils/auth_session.dart';
 import '../utils/registered_users_store.dart';
+import '../utils/download_helper.dart';
 import '../widgets/desktop_workspace.dart';
 import '../widgets/virtual_abha_card.dart';
 import 'hi_record_creation_screen.dart';
@@ -463,7 +464,6 @@ class _AbhaHomeScreenState extends State<AbhaHomeScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _hipLinkingOutputPanel(profile),
                 ],
               );
 
@@ -735,205 +735,7 @@ class _AbhaHomeScreenState extends State<AbhaHomeScreen> {
     );
   }
 
-  Widget _hipLinkingOutputPanel(Map<String, dynamic> profile) {
-    return ValueListenableBuilder<int>(
-      valueListenable: AppRuntimeStore.revision,
-      builder: (context, value, child) {
-        final run = AppRuntimeStore.getValue<Map<String, dynamic>>(
-          'hipLinking.latestRun',
-        );
-        if (run == null || run.isEmpty || !_runMatchesProfile(run, profile)) {
-          return const SizedBox.shrink();
-        }
 
-        final steps = (run['steps'] is List)
-            ? List<Map<String, dynamic>>.from(
-                (run['steps'] as List).whereType<Map>().map(
-                  (item) => Map<String, dynamic>.from(item),
-                ),
-              )
-            : const <Map<String, dynamic>>[];
-        final formattedText = run['formattedText']?.toString().trim() ?? '';
-
-        return Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF8FBFF),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFD8EAF9)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'HIP Linking Output',
-                style: const TextStyle(
-                  color: Color(0xFF17324A),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '${run['hiType'] ?? '-'} • ${run['status'] ?? '-'}',
-                style: const TextStyle(
-                  color: Color(0xFF5F7280),
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              if (formattedText.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                const Text(
-                  'Care Context Display',
-                  style: TextStyle(fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  constraints: const BoxConstraints(maxHeight: 180),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFE3F2FD)),
-                  ),
-                  child: SingleChildScrollView(
-                    child: SelectableText(
-                      formattedText,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 11,
-                        height: 1.35,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 12),
-              ...steps.map(_hipLinkingStepView),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _hipLinkingStepView(Map<String, dynamic> step) {
-    final ok = step['ok'] == true;
-    final status = step['status']?.toString() ?? '-';
-    final isPending =
-        status == 'running' || status == 'retrying' || status == 'waiting';
-    final response = step['response'];
-    final error = step['error']?.toString() ?? '';
-    final attempts = (step['attempts'] is List)
-        ? List<Map<String, dynamic>>.from(
-            (step['attempts'] as List).whereType<Map>().map(
-              (item) => Map<String, dynamic>.from(item),
-            ),
-          )
-        : const <Map<String, dynamic>>[];
-    final attemptDetails = attempts
-        .map((attempt) {
-          final attemptNumber = attempt['attempt']?.toString() ?? '-';
-          final attemptStatus = attempt['status']?.toString() ?? '-';
-          final attemptError = attempt['error']?.toString().trim() ?? '';
-          final retryAfter = attempt['nextRetryAfterSeconds']?.toString();
-          final pollAfter = attempt['nextPollAfterSeconds']?.toString();
-          final retryText = retryAfter == null
-              ? ''
-              : ' Retry after ${retryAfter}s.';
-          final pollText = pollAfter == null
-              ? ''
-              : ' Check again after ${pollAfter}s.';
-          return 'Attempt $attemptNumber: $attemptStatus'
-              '${attemptError.isEmpty ? '' : ' - $attemptError'}$retryText$pollText';
-        })
-        .join('\n');
-    final mainDetails = response != null
-        ? const JsonEncoder.withIndent('  ').convert(response)
-        : error;
-    final details = [
-      if (mainDetails.trim().isNotEmpty) mainDetails,
-      if (attemptDetails.trim().isNotEmpty) attemptDetails,
-    ].join('\n\n');
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: ok
-            ? const Color(0xFFEAF9F0)
-            : isPending
-            ? const Color(0xFFFFFAEC)
-            : const Color(0xFFFFF7F7),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: ok
-              ? const Color(0xFFBCE6CC)
-              : isPending
-              ? const Color(0xFFFFDFA3)
-              : const Color(0xFFFFD6D6),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            '${step['action'] ?? 'HIP API Call'} • $status',
-            style: TextStyle(
-              color: ok
-                  ? const Color(0xFF176B3A)
-                  : isPending
-                  ? const Color(0xFF8A5A00)
-                  : const Color(0xFFB3261E),
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          if (details.trim().isNotEmpty) ...[
-            const SizedBox(height: 6),
-            SelectableText(
-              details,
-              style: const TextStyle(
-                fontFamily: 'monospace',
-                fontSize: 10.5,
-                height: 1.3,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  bool _runMatchesProfile(
-    Map<String, dynamic> run,
-    Map<String, dynamic> profile,
-  ) {
-    final runAddress = (run['abhaAddress']?.toString() ?? '').toLowerCase();
-    final profileAddress =
-        (profile['AbhaAddress']?.toString() ??
-                profile['preferredAbhaAddress']?.toString() ??
-                '')
-            .toLowerCase();
-    if (runAddress.isNotEmpty && profileAddress.isNotEmpty) {
-      return runAddress == profileAddress;
-    }
-
-    final runNumber = (run['abhaNumber']?.toString() ?? '').replaceAll(
-      RegExp(r'\D'),
-      '',
-    );
-    final profileNumber =
-        (profile['AbhaNumber']?.toString() ??
-                profile['healthIdNumber']?.toString() ??
-                '')
-            .replaceAll(RegExp(r'\D'), '');
-    if (runNumber.isNotEmpty && profileNumber.isNotEmpty) {
-      return runNumber == profileNumber;
-    }
-
-    return true;
-  }
 
   Future<void> _downloadAbhaCard(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -995,22 +797,16 @@ class _AbhaHomeScreenState extends State<AbhaHomeScreen> {
         });
       }
 
-      final bytes = base64Decode(encoded);
       final extension = _fileExtensionForContentType(contentType);
       final safeName = fileName.contains('.')
           ? fileName
           : '$fileName.$extension';
-      final file = File('${Directory.systemTemp.path}/$safeName');
-
-      await file.writeAsBytes(bytes, flush: true);
-
-      if (Platform.isMacOS) {
-        await Process.run('open', [file.path]);
-      }
+          
+      final savedMessage = await saveAbhaCard(safeName, extension, encoded);
 
       if (!mounted) return;
       messenger.showSnackBar(
-        SnackBar(content: Text('ABHA card saved to ${file.path}')),
+        SnackBar(content: Text(savedMessage)),
       );
     } catch (e) {
       if (!mounted) return;

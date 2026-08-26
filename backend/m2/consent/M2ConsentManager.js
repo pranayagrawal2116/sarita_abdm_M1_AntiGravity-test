@@ -14,7 +14,7 @@
  */
 
 const Logger = require("../logging/logger");
-const axios = require("axios");
+const axios = require("../helpers/axiosClient");
 const M2TokenManager = require("../tokens/M2TokenManager");
 const M2TransactionStore = require("../transactions/M2TransactionStore");
 const M2CallbackManager = require("../callbacks/M2CallbackManager");

@@ -1,28 +1,30 @@
-const fs = require('fs');
-const path = require('path');
-const elliptic = require('elliptic');
+const fhirEncryptionService = require('./backend/services/fhirEncryptionService');
 const crypto = require('crypto');
+const elliptic = require('elliptic');
 const ec = new elliptic.ec("wei25519");
 
-const file = fs.readdirSync('saurav_50505@sbx_Saurav_Kumar/Other_hospital_data/HIP_Data').find(f => f.includes('df132d29-33c5-4345-ae02-372e0e21c78e'));
-const data = JSON.parse(fs.readFileSync('saurav_50505@sbx_Saurav_Kumar/Other_hospital_data/HIP_Data/' + file));
-const senderPublicKeyBase64 = data.keyMaterial.dhPublicKey.keyValue;
+// Generate HIU keys
+const hiuKey = ec.genKeyPair();
+const hiuPrivateKeyBase64 = Buffer.from(hiuKey.getPrivate().toArray("be", 32)).toString("base64");
+const hiuPublicKeyBase64 = Buffer.from(hiuKey.getPublic().encode("array", false)).toString("base64");
+const hiuNonceBase64 = crypto.randomBytes(32).toString("base64");
 
-let senderPublicKeyBuffer = Buffer.from(senderPublicKeyBase64, "base64");
-console.log("Original senderPublicKeyBuffer length:", senderPublicKeyBuffer.length);
+// Encrypt payload (Simulate HIP)
+const plaintext = JSON.stringify({ resourceType: "Bundle", id: "123" });
+const encrypted = fhirEncryptionService.encrypt(plaintext, hiuPublicKeyBase64, hiuNonceBase64);
 
-if (senderPublicKeyBuffer.length > 65 && senderPublicKeyBuffer[senderPublicKeyBuffer.length - 65] === 0x04) {
-  console.log("Extracting last 65 bytes!");
-  senderPublicKeyBuffer = senderPublicKeyBuffer.subarray(-65);
-} else if (senderPublicKeyBuffer.length === 93) {
-  senderPublicKeyBuffer = senderPublicKeyBuffer.subarray(28);
-} else if (senderPublicKeyBuffer.length === 64) {
-  senderPublicKeyBuffer = Buffer.concat([Buffer.from([0x04]), senderPublicKeyBuffer]);
-}
+console.log("Encrypted:", encrypted);
 
+// Decrypt payload (Simulate HIU)
 try {
-  const senderKey = ec.keyFromPublic(senderPublicKeyBuffer);
-  console.log("SUCCESS! Key format is valid.");
-} catch(e) {
-  console.log("ERROR parsing key:", e.message);
+  const decrypted = fhirEncryptionService.decrypt(
+    encrypted.encryptedContent,
+    hiuPrivateKeyBase64,
+    encrypted.ourPublicKey,
+    encrypted.ourNonce,
+    hiuNonceBase64
+  );
+  console.log("Decrypted:", decrypted);
+} catch (e) {
+  console.error("Decryption failed:", e.message);
 }

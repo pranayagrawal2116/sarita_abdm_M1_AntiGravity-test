@@ -6,7 +6,7 @@ consentController = consentController.replace(
   /const targetUserDir = dirs\.find\(d => d\.includes\("@sbx"\)\);/g,
   `let targetUserDir = dirs.find(d => d.includes("@sbx"));
       const docIdVar = typeof docId !== 'undefined' ? docId : null;
-      const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[hipId || docIdVar]);
+      const consentReq = M3ConsentStore.getConsents().find(c => c.artefactDetails && c.artefactDetails[hipId || docIdVar]);
       if (consentReq && consentReq.patientId) {
         const found = dirs.find(d => d.startsWith(consentReq.patientId));
         if (found) targetUserDir = found;
@@ -22,7 +22,7 @@ callbackController = callbackController.replace(
   `let targetUserDir = dirs.find(d => d.includes("@sbx"));
       const transaction = M3ConsentStore.getTransaction(transactionId);
       if (transaction && transaction.consentId) {
-        const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[transaction.consentId]);
+        const consentReq = M3ConsentStore.getConsents().find(c => c.artefactDetails && c.artefactDetails[transaction.consentId]);
         if (consentReq && consentReq.patientId) {
           const found = dirs.find(d => d.startsWith(consentReq.patientId));
           if (found) targetUserDir = found;

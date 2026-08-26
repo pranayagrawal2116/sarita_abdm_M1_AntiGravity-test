@@ -614,8 +614,14 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                   String grantedDateFromStr = dateFromStr;
                   String grantedDateToStr = dateToStr;
                   String grantedDateEraseAtStr = dateEraseAtStr;
-                  if (req['details'] != null && req['details']['permission'] != null) {
-                    final perm = req['details']['permission'];
+                  dynamic artDetails = req['details'];
+                  if (artDetails == null && req['artefactDetails'] != null) {
+                    final keys = (req['artefactDetails'] as Map).keys.toList();
+                    if (keys.isNotEmpty) artDetails = req['artefactDetails'][keys.first];
+                  }
+                  
+                  if (artDetails != null && artDetails['permission'] != null) {
+                    final perm = artDetails['permission'];
                     if (perm['dateRange'] != null) {
                       grantedDateFromStr = perm['dateRange']['from']?.toString() ?? grantedDateFromStr;
                       grantedDateToStr = perm['dateRange']['to']?.toString() ?? grantedDateToStr;

@@ -15,13 +15,19 @@ class ApiDebugHttp {
     Uri url, {
     Map<String, String>? headers,
   }) async {
-    _logRequest('GET', url, headers: headers);
+    final cacheBustedUrl = url.replace(
+      queryParameters: {
+        ...url.queryParameters,
+        '_t': DateTime.now().millisecondsSinceEpoch.toString(),
+      },
+    );
+    _logRequest('GET', cacheBustedUrl, headers: headers);
     try {
-      final response = await http.get(url, headers: headers);
-      _logResponse('GET', url, response);
+      final response = await http.get(cacheBustedUrl, headers: headers);
+      _logResponse('GET', cacheBustedUrl, response);
       return response;
     } catch (error, stackTrace) {
-      _logError('GET', url, error, stackTrace);
+      _logError('GET', cacheBustedUrl, error, stackTrace);
       rethrow;
     }
   }

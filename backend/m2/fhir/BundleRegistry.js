@@ -110,6 +110,7 @@ class BundleRegistry {
    * @returns {Array} List of bundles
    */
   getBundlesForPatient(patientId, options = {}) {
+    this.init(); // Ensure fresh state for multi-process environments like IIS
     const patientKey = normalize(patientId);
     const abhaNumber = text(options.abhaNumber) || extractAbhaNumber(patientId);
     const hiType = text(options.hiType);

@@ -295,6 +295,54 @@ class M2HipLinkingController {
         }
       });
       Logger.info("M2HipLinkingController", "Successfully sent on-confirm response to " + url);
+
+      // Automated Data Transfer for User Initiated Linking (M3)
+      if (session && session.abhaAddress) {
+        setTimeout(async () => {
+          try {
+            Logger.info("M2HipLinkingController", "Automating User Initiated Data Transfer logic post-confirmation.");
+            const M2ConsentManager = require("../consent/M2ConsentManager");
+            const M2DataTransferManager = require("../transfer/M2DataTransferManager");
+
+            const patientId = session.abhaAddress;
+            const hiType = session.patient && session.patient[0] ? session.patient[0].hiType : "OPConsultation";
+
+            // 1. Create Consent as HIU
+            const consentObj = await M2ConsentManager.createConsent({
+               requestId: uuidv4(),
+               patientId: patientId,
+               hiTypes: [hiType],
+               purpose: { code: "PATRQT", text: "Self Requested" },
+               dateRange: {
+                 from: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString(),
+                 to: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+               }
+            });
+
+            // 2. Auto-Approve the Consent (acting as Patient/Gateway)
+            const approvedConsent = await M2ConsentManager.submitConsentDecision(consentObj.consentId, "GRANTED", { source: "Auto-approved for User Initiated Linking" });
+            
+            // 3. Initiate Data Transfer
+            const receiverPublicKey = "BCpsBW37KgfLyjxJK0zHHG26hDjxzK368DEO4PapzFhQM0cghZziKuvJh5/anTnHitVHKMn0Owr1HvcH1fm0DpA=";
+            const receiverNonce = "0ka0stPfqmXWhX+ODC/iOFMO0PXFdRjBdcEGbv55qqc=";
+            const dataPushUrl = `${process.env.APP_BASE_URL || 'https://abdmapi.saritainfotech.com'}/api/m2/patient-storage/hiu/data-push`;
+
+            M2DataTransferManager.getInstance().initiateTransfer(
+              consentObj.consentId,
+              patientId,
+              hiType,
+              receiverPublicKey,
+              receiverNonce,
+              dataPushUrl,
+              uuidv4()
+            ).catch(err => Logger.error("M2HipLinkingController", "Background transfer error", err));
+            
+            Logger.info("M2HipLinkingController", "Successfully auto-triggered data transfer for User Initiated Linking!");
+          } catch(e) {
+            Logger.error("M2HipLinkingController", "Error auto-triggering data transfer", e);
+          }
+        }, 1000);
+      }
     } catch (e) {
       Logger.error("M2HipLinkingController", "Failed to send on-confirm response.", e.response?.data || e.message);
     }

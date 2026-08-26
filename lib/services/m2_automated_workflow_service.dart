@@ -46,6 +46,7 @@ class M2AutomatedWorkflowService {
     onProgress('Initializing M2 Token Manager...');
     await ConsentManagerApiService.initializeM2TokenManager();
 
+    
     onProgress('Step 1/7: Creating HIU Consent Request...');
     final requestId = _generateRequestId();
     final now = DateTime.now().toUtc();
@@ -83,6 +84,7 @@ class M2AutomatedWorkflowService {
       },
     });
 
+    
     onProgress('Step 2/7: Waiting for Consent Request ID from ABDM...');
     String? consentRequestId;
     for (int i = 0; i < 20; i++) {
@@ -100,6 +102,7 @@ class M2AutomatedWorkflowService {
       throw Exception('Failed to receive consent request ID callback from ABDM.');
     }
 
+    
     onProgress('Step 3/7: Auto-approving Consent Request (HIP)...');
     final grantResult = await ConsentApiService.submitConsentDecisionWithMetadata(
       consentRequestId,
@@ -109,6 +112,7 @@ class M2AutomatedWorkflowService {
     );
     final grantedConsentArtefactId = grantResult.consentArtefactId;
     if (grantedConsentArtefactId.isEmpty) {
+      
       onProgress('Step 4/7: Waiting for Consent Artefact generation...');
     }
 
@@ -133,6 +137,7 @@ class M2AutomatedWorkflowService {
       throw Exception('Failed to retrieve Consent Artefact ID.');
     }
 
+    
     onProgress('Step 5/7: Requesting Data Transfer (HIU)...');
     final hiRequestId = _generateRequestId();
     await ConsentManagerApiService.requestHealthInformationWithMetadata({
@@ -147,6 +152,7 @@ class M2AutomatedWorkflowService {
       },
     });
 
+    
     onProgress('Step 6/7: Waiting for Transaction ID...');
     String? transactionId;
     for (int i = 0; i < 20; i++) {
@@ -164,6 +170,7 @@ class M2AutomatedWorkflowService {
       throw Exception('Failed to receive HI Request transaction ID.');
     }
 
+    
     onProgress('Step 7/7: Pushing FHIR bundle to HIU (HIP)...');
     await ConsentManagerApiService.delegatePushToBackendWithMetadata(
       consentId: finalConsentArtefactId,

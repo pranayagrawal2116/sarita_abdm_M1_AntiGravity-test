@@ -53,7 +53,7 @@ class M3CallbackController {
       });
       
       if (consentRequest.status === "EXPIRED" || consentRequest.status === "REVOKED") {
-         const existingReq = M3ConsentStore.consents.find(c => c.consentRequestId === consentRequest.id);
+         const existingReq = M3ConsentStore.getConsents().find(c => c.consentRequestId === consentRequest.id);
          if (existingReq) {
              if (existingReq.consentArtefacts) {
                existingReq.consentArtefacts.forEach(artefact => {
@@ -94,7 +94,7 @@ class M3CallbackController {
           
         if (!updated) {
             Logger.warn("M3Callback", "consentRequestId not found, falling back to latest pending request");
-            const latestPending = M3ConsentStore.consents.find(c => c.status === "REQUESTED" || c.status === "INITIATED");
+            const latestPending = M3ConsentStore.getConsents().find(c => c.status === "REQUESTED" || c.status === "INITIATED");
             if (latestPending) {
               latestPending.consentRequestId = notification.consentRequestId;
               latestPending.status = "GRANTED";
@@ -114,7 +114,7 @@ class M3CallbackController {
             updatedAt: timestamp
           });
          if (!updated) {
-           const latestPending = M3ConsentStore.consents.find(c => c.status === "REQUESTED" || c.status === "INITIATED");
+           const latestPending = M3ConsentStore.getConsents().find(c => c.status === "REQUESTED" || c.status === "INITIATED");
            if (latestPending) {
               latestPending.consentRequestId = notification.consentRequestId;
               latestPending.status = notification.status;
@@ -124,7 +124,7 @@ class M3CallbackController {
          }
          
          if (notification.status === "EXPIRED" || notification.status === "REVOKED") {
-            const existingReq = M3ConsentStore.consents.find(c => c.consentRequestId === notification.consentRequestId);
+            const existingReq = M3ConsentStore.getConsents().find(c => c.consentRequestId === notification.consentRequestId);
             if (existingReq) {
                if (existingReq.consentArtefacts) {
                   existingReq.consentArtefacts.forEach(artefact => {
@@ -194,7 +194,7 @@ class M3CallbackController {
     
     if (consent && consent.consentDetail) {
       // Find the request that has this artefact
-      const consentReq = M3ConsentStore.consents.find(c => 
+      const consentReq = M3ConsentStore.getConsents().find(c => 
         (c.consentArtefacts && c.consentArtefacts.some(a => a.id === consent.consentDetail.consentId)) ||
         (c.consentId === consent.consentDetail.consentId)
       );
@@ -221,6 +221,7 @@ class M3CallbackController {
     try {
       const { hiRequest, resp, error } = req.body;
       if (resp && resp.requestId) {
+        M3ConsentStore.load(); // Ensure fresh state for multi-process environments
         const transactions = M3ConsentStore.transactions || {};
         let txn = null;
         let matchedOldTxnId = null;
@@ -265,11 +266,27 @@ class M3CallbackController {
       let consentId = "UnknownConsent";
       let hipName = "UnknownHIP";
 
-      const transaction = M3ConsentStore.getTransaction(transactionId);
+      let transaction = M3ConsentStore.getTransaction(transactionId);
+      
+      // Fallback for missing on-request webhook or race conditions
+      if (!transaction) {
+        M3ConsentStore.load();
+        const transactions = M3ConsentStore.transactions || {};
+        const pendingTxns = Object.values(transactions).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        if (pendingTxns.length > 0) {
+          transaction = pendingTxns[0];
+          
+          // Re-key it immediately so future chunks map correctly
+          M3ConsentStore.transactions[transactionId] = transaction;
+          M3ConsentStore.save();
+          Logger.warn("M3Callback", "Fallback used: Mapped unmapped transaction to incoming health data", { transactionId });
+        }
+      }
+
       if (transaction && transaction.consentId) {
         consentId = transaction.consentId;
         hipName = transaction.hipName || transaction.hipId || "UnknownHIP";
-        const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[transaction.consentId]);
+        const consentReq = M3ConsentStore.getConsents().find(c => c.artefactDetails && c.artefactDetails[transaction.consentId]);
         if (consentReq && consentReq.patientId) {
           abhaId = consentReq.patientId;
         }

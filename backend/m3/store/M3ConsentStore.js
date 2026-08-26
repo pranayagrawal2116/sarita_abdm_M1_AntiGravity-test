@@ -42,6 +42,7 @@ class M3ConsentStore {
   }
 
   addConsentRequest(consent) {
+    this.load();
     // consent: { requestId, status, patientId, purpose, hiTypes, dateFrom, dateTo, dateEraseAt, timestamp, consentId, error }
     this.consents.push({
       ...consent,
@@ -51,16 +52,27 @@ class M3ConsentStore {
   }
 
   addTransaction(transactionId, data) {
+    this.load();
     if (!this.transactions) this.transactions = {};
     this.transactions[transactionId] = data;
     this.save();
   }
 
+  getConsents() {
+    this.load();
+    return this.consents;
+  }
+
   getTransaction(transactionId) {
+    if (this.transactions && this.transactions[transactionId]) {
+      return this.transactions[transactionId];
+    }
+    this.load();
     return this.transactions ? this.transactions[transactionId] : null;
   }
 
   updateConsentByRequestId(requestId, updates) {
+    this.load();
     const consent = this.consents.find(c => c.requestId === requestId);
     if (consent) {
       Object.assign(consent, updates);
@@ -71,6 +83,7 @@ class M3ConsentStore {
   }
 
   updateConsentByConsentRequestId(consentRequestId, updates) {
+    this.load();
     const consent = this.consents.find(c => c.consentRequestId === consentRequestId);
     if (consent) {
       Object.assign(consent, updates);
@@ -81,6 +94,7 @@ class M3ConsentStore {
   }
 
   updateConsentByConsentId(consentId, updates) {
+    this.load();
     const consent = this.consents.find(c => c.consentId === consentId);
     if (consent) {
       Object.assign(consent, updates);
@@ -91,10 +105,12 @@ class M3ConsentStore {
   }
 
   getConsentByRequestId(requestId) {
+    this.load();
     return this.consents.find(c => c.requestId === requestId);
   }
 
   getAllConsents() {
+    this.load();
     // Return sorted by newest first
     return [...this.consents].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   }

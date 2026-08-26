@@ -317,7 +317,8 @@ class M2CallbackManager {
       const incomingTransactionId = this.extractTransactionId(payload, tx);
       const incomingConsentId = payload.notification?.consentId || payload.notification?.consentDetail?.consentId || payload.hiRequest?.consent?.id || payload.consentId || "";
       const incomingPatientId = this.extractNotificationPatientId(payload);
-      tx = await M2TransactionStore.updateTransaction(tx.transactionId || tx.requestId, {
+      
+      const updatePayload = {
         transactionId: incomingTransactionId,
         gatewayRequestId: callbackRequestId || tx.gatewayRequestId,
         consentId: type === "Consent Notification" ? (incomingConsentId || tx.consentId || "") : (tx.consentId || incomingConsentId),
@@ -329,7 +330,26 @@ class M2CallbackManager {
         receiverPublicKey: payload.hiRequest?.keyMaterial?.dhPublicKey?.keyValue || tx.receiverPublicKey || "",
         receiverNonce: payload.hiRequest?.keyMaterial?.nonce || tx.receiverNonce || "",
         careContexts: payload.notification?.consentDetail?.careContexts || payload.notification?.careContexts || tx.careContexts || []
-      });
+      };
+
+      if (type === "Health Information Request" && incomingTransactionId && tx.transactionId && incomingTransactionId !== tx.transactionId) {
+        // Prevent concurrent data transfer flows from overwriting each other's transactionId
+        // by creating a cloned child transaction for the new HI Request.
+        Logger.info("M2CallbackManager", "Spawning new transaction record for concurrent HI Request.", { incomingTransactionId, existingTransactionId: tx.transactionId });
+        tx = await M2TransactionStore.createTransaction({
+          ...tx,
+          ...updatePayload,
+          dataPushAcknowledgement: null,
+          dataPushError: null,
+          dataPushResult: null,
+          dataPushPayload: null,
+          auditHistory: [],
+          callbackHistory: [],
+          currentState: "Created"
+        });
+      } else {
+        tx = await M2TransactionStore.updateTransaction(tx.transactionId || tx.requestId, updatePayload);
+      }
     }
 
     const transactionId = tx.transactionId || tx.requestId;

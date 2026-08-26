@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../utils/api_config.dart';
 
 class HiuApiService {
-  static const String baseUrl = 'http://localhost:3000/api/m3/consent';
+  static const String baseUrl = '${ApiConfig.baseUrl}/m3/consent';
 
   Future<Map<String, dynamic>> initConsentRequest(Map<String, dynamic> payload) async {
     final response = await http.post(

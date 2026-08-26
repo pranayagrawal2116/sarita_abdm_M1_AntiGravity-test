@@ -90,6 +90,10 @@ class HipLinkingApiService {
     final requestId = linkResponse['requestId']?.toString().trim() ?? '';
     if (requestId.isEmpty) return;
 
+    // Artificial delay to prevent Ngrok rate-limiting (Failed to fetch)
+    // when consecutive rapid requests are fired because the link token is reused.
+    await Future.delayed(const Duration(seconds: 3));
+
     final response = await ApiDebugHttp.post(
       Uri.parse('${ApiConfig.baseUrl}/m2/consents/link/context'),
       headers: {'Content-Type': 'application/json'},

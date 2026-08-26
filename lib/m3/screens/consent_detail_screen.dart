@@ -51,71 +51,8 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
   }
 
   void _scheduleAutoDataPull() {
-    Future.delayed(const Duration(seconds: 5), () async {
-      if (!mounted) return;
-      if (_autoPullTriggered) return;
-
-      final rawStatus =
-          _request['status']?.toString().toUpperCase() ?? '';
-      if (rawStatus == 'FETCHED') return;
-
-      String displayStatus = _mapStatus(rawStatus);
-      final dateEraseAtStr = _request['dateEraseAt'] ?? '';
-      if (displayStatus != 'DENIED' && dateEraseAtStr.isNotEmpty) {
-        try {
-          final expireTime = DateTime.parse(dateEraseAtStr).toLocal();
-          if (DateTime.now().isAfter(expireTime)) {
-            displayStatus = 'EXPIRED';
-          }
-        } catch (_) {}
-      }
-      
-      if (displayStatus != 'GRANTED') return;
-
-      final artefacts =
-          _request['consentArtefacts'] as List<dynamic>? ?? [];
-      if (artefacts.isEmpty) return;
-
-      setState(() {
-        _autoPullTriggered = true;
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Auto-pulling data for ${artefacts.length} hospital(s)...',
-          ),
-        ),
-      );
-
-      final apiService = HiuApiService();
-      for (var art in artefacts) {
-        if (!mounted) return;
-        final hipId = art['id']?.toString() ?? '';
-        if (hipId.isEmpty) continue;
-
-        try {
-          final dates = _getGrantedDatesForHip(hipId);
-          await apiService.requestHealthData({
-            'consentId': hipId,
-            'patientId': _request['patientId'] ?? '',
-            'dateFrom': dates['dateFrom'],
-            'dateTo': dates['dateTo'],
-            'dataEraseAt': dates['dataEraseAt'],
-          });
-          // Add a tiny delay between requests to avoid overwhelming the server
-          await Future.delayed(const Duration(milliseconds: 500));
-        } catch (e) {
-          debugPrint('Auto-pull failed for $hipId: $e');
-        }
-      }
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Automated data pull completed!')),
-        );
-      }
-    });
+    // Auto-pull is disabled to prevent overloading the server and ABDM gateway.
+    // The user must manually click "Request All" or "Request" on individual hospitals.
   }
 
   String _formatDate(String? isoStr) {
@@ -155,7 +92,14 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     });
 
     final apiService = HiuApiService();
-    int successCount = 0;
+    int requestCount = 0;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Initiating data requests for ${artefacts.length} hospitals...'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
 
     for (var i = 0; i < artefacts.length; i++) {
       if (!mounted) break;
@@ -163,15 +107,6 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       if (hipId.isEmpty) continue;
 
       try {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Requesting data for ${i + 1}/${artefacts.length}...',
-            ),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-
         final dates = _getGrantedDatesForHip(hipId);
         await apiService.requestHealthData({
           'consentId': hipId,
@@ -180,37 +115,13 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
           'dateTo': dates['dateTo'],
           'dataEraseAt': dates['dataEraseAt'],
         });
-
-        // Wait until data is received or timeout (max 16 seconds per hospital)
-        bool dataReceived = false;
-        for (int attempt = 0; attempt < 8; attempt++) {
-          await Future.delayed(const Duration(seconds: 2));
-          if (!mounted) break;
-
-          try {
-            final docs = await apiService.fetchHealthDocuments(hipId);
-            if (docs.isNotEmpty) {
-              dataReceived = true;
-              break;
-            }
-          } catch (e) {
-            if (e.toString().contains('Data pull was unsuccfull')) {
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Data pull was unsuccfull, please try again after some time'))
-                );
-              }
-              break; // Stop polling since the request definitely failed
-            }
-          }
-        }
-
-        if (dataReceived) {
-          successCount++;
-        }
+        requestCount++;
       } catch (e) {
-        debugPrint('Request failed for $hipId: $e');
+        debugPrint('Failed to request data for $hipId: $e');
       }
+      
+      // 500ms delay to avoid overloading ABDM Sandbox Gateway
+      await Future.delayed(const Duration(milliseconds: 500));
     }
 
     if (mounted) {
@@ -219,11 +130,11 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'All requests completed! Successfully received data from $successCount hospital(s).',
-          ),
+          content: Text('Successfully initiated $requestCount requests. Click refresh to check for incoming data.'),
+          duration: const Duration(seconds: 4),
         ),
       );
+      _refreshRequestData();
     }
   }
 
@@ -263,8 +174,13 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     String displayStatus = _mapStatus(rawStatus);
     
     String? grantedDateEraseAtStr = _request['dateEraseAt']?.toString() ?? '';
-    if (_request['details'] != null && _request['details']['permission'] != null) {
-      grantedDateEraseAtStr = _request['details']['permission']['dataEraseAt']?.toString() ?? grantedDateEraseAtStr;
+    dynamic artDetails1 = _request['details'];
+    if (artDetails1 == null && _request['artefactDetails'] != null) {
+      final keys = (_request['artefactDetails'] as Map).keys.toList();
+      if (keys.isNotEmpty) artDetails1 = _request['artefactDetails'][keys.first];
+    }
+    if (artDetails1 != null && artDetails1['permission'] != null) {
+      grantedDateEraseAtStr = artDetails1['permission']['dataEraseAt']?.toString() ?? grantedDateEraseAtStr;
     }
     
     // Auto-expire logic based on current time
@@ -319,8 +235,13 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     String? grantedDateFrom = dateFrom;
     String? grantedDateTo = dateTo;
     String? grantedDateEraseAt = dateEraseAt;
-    if (_request['details'] != null && _request['details']['permission'] != null) {
-      final perm = _request['details']['permission'];
+    dynamic artDetails2 = _request['details'];
+    if (artDetails2 == null && _request['artefactDetails'] != null) {
+      final keys = (_request['artefactDetails'] as Map).keys.toList();
+      if (keys.isNotEmpty) artDetails2 = _request['artefactDetails'][keys.first];
+    }
+    if (artDetails2 != null && artDetails2['permission'] != null) {
+      final perm = artDetails2['permission'];
       if (perm['dateRange'] != null) {
         grantedDateFrom = perm['dateRange']['from']?.toString() ?? grantedDateFrom;
         grantedDateTo = perm['dateRange']['to']?.toString() ?? grantedDateTo;

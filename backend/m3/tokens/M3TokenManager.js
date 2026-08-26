@@ -80,14 +80,19 @@ class M3TokenManager {
 
     Logger.info("M3TokenManager", "Fetching new gateway session token for M3", { endpoint, requestId });
 
-    const response = await axios.post(endpoint, payload, { headers, timeout: 10000 });
-    const data = response.data;
-    
-    this.sessionToken = data.accessToken;
-    this.tokenExpiry = Date.now() + (data.expiresIn * 1000);
-    
-    Logger.info("M3TokenManager", "Successfully fetched M3 gateway session token");
-    return this.sessionToken;
+    try {
+      const response = await axios.post(endpoint, payload, { headers, timeout: 30000 });
+      const data = response.data;
+      
+      this.sessionToken = data.accessToken;
+      this.tokenExpiry = Date.now() + (data.expiresIn * 1000);
+      
+      Logger.info("M3TokenManager", "Successfully fetched M3 gateway session token");
+      return this.sessionToken;
+    } catch (e) {
+      Logger.error("M3TokenManager", "Token fetch failed", e);
+      throw e;
+    }
   }
 }
 

@@ -80,7 +80,7 @@ class M3ConsentService {
       const response = await axios.post(
         `${config.gatewayBaseUrl}/api/hiecm/consent/v3/request/init`,
         abdmPayload,
-        { headers }
+        { headers, timeout: 30000 }
       );
 
       return { requestId };
@@ -177,7 +177,7 @@ class M3ConsentService {
    */
   static async requestHealthInformation(consentId, patientId, dateFrom, dateTo, dataEraseAt) {
     try {
-      const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[consentId]);
+      const consentReq = M3ConsentStore.getConsents().find(c => c.artefactDetails && c.artefactDetails[consentId]);
       if (consentReq && consentReq.artefactDetails[consentId] && consentReq.artefactDetails[consentId].permission) {
          const perm = consentReq.artefactDetails[consentId].permission;
          if (!dateFrom && perm.dateRange && perm.dateRange.from) dateFrom = perm.dateRange.from;
@@ -261,10 +261,11 @@ class M3ConsentService {
 
       Logger.info("M3ConsentService", "Requesting Health Information", { consentId, transactionId });
 
+      Logger.info("M3ConsentService", "ABDM Payload for HI Request", JSON.stringify(abdmPayload, null, 2));
       await axios.post(
         `${config.gatewayBaseUrl}/api/hiecm/data-flow/v3/health-information/request`,
         abdmPayload,
-        { headers }
+        { headers, timeout: 90000 }
       );
 
       return { transactionId: transactionId, message: "HI Request submitted successfully" };

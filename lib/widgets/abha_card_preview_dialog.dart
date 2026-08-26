@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../utils/download_helper.dart';
 
 import '../services/abha_api_service.dart';
 import '../utils/app_runtime_store.dart';
@@ -647,17 +648,9 @@ Future<String> _saveCardPayload({
     throw Exception('ABHA card response was empty');
   }
 
-  final bytes = base64Decode(encoded);
   final extension = _fileExtensionForContentType(contentType);
-  final safeName = fileName.contains('.') ? fileName : '$fileName.$extension';
-  final file = File('${Directory.systemTemp.path}/$safeName');
-  await file.writeAsBytes(bytes, flush: true);
-
-  if (Platform.isMacOS) {
-    await Process.run('open', [file.path]);
-  }
-
-  return file.path;
+  
+  return await saveAbhaCard(fileName, extension, encoded);
 }
 
 String _fileExtensionForContentType(String contentType) {

@@ -7,11 +7,14 @@ import '../services/consent_api_service.dart';
 import '../services/consent_manager_api_service.dart';
 import '../utils/consent_mode.dart';
 import '../widgets/desktop_workspace.dart';
+import '../services/m2_automated_workflow_service.dart';
+
 
 class M2DataExchangeScreen extends StatefulWidget {
-  const M2DataExchangeScreen({super.key, required this.patientProfile});
+  const M2DataExchangeScreen({super.key, required this.patientProfile, this.autoStartHiType});
 
   final Map<String, dynamic> patientProfile;
+  final String? autoStartHiType;
 
   @override
   State<M2DataExchangeScreen> createState() => _M2DataExchangeScreenState();
@@ -124,6 +127,50 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
     _initializeTokenManager();
     _loadConsentInbox();
     _loadTransferHistory();
+    
+    if (widget.autoStartHiType != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _startAutomatedTransfer(widget.autoStartHiType!);
+      });
+    }
+  }
+
+  void _startAutomatedTransfer(String hiType) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Data transfer will take place in the background.'),
+        duration: Duration(seconds: 3),
+      ),
+    );
+
+    M2AutomatedWorkflowService.runAutomatedDataTransfer(
+      patientProfile: widget.patientProfile,
+      hiType: hiType,
+      onProgress: (message) {
+        debugPrint("[M2 Background Transfer] $message");
+      },
+    ).then((_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('M2 Data Transfer process completed successfully.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+        _loadConsentInbox();
+        _loadTransferHistory();
+      }
+    }).catchError((e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Background transfer failed: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
+          ),
+        );
+      }
+    });
   }
 
   Future<void> _loadTransferHistory() async {
@@ -3041,8 +3088,12 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
 
     // Default JSON View
     final currentResourceJSON = _getResourceJSON(_selectedFhirResource);
+    String jsonString = const JsonEncoder.withIndent('  ').convert(currentResourceJSON);
+    if (jsonString.length > 50000) {
+      jsonString = jsonString.substring(0, 50000) + '\n\n...[TRUNCATED FOR UI PERFORMANCE]...';
+    }
     return SelectableText(
-      const JsonEncoder.withIndent('  ').convert(currentResourceJSON),
+      jsonString,
       style: const TextStyle(
         fontFamily: 'monospace',
         fontSize: 12,
@@ -3935,7 +3986,10 @@ class _M2DataExchangeScreenState extends State<M2DataExchangeScreen> {
         border: Border.all(color: const Color(0xFF333333)),
       ),
       child: SelectableText(
-        const JsonEncoder.withIndent('  ').convert(jsonMap),
+        () {
+          String s = const JsonEncoder.withIndent('  ').convert(jsonMap);
+          return s.length > 50000 ? s.substring(0, 50000) + '\n\n...[TRUNCATED]' : s;
+        }(),
         style: const TextStyle(
           fontFamily: 'monospace',
           fontSize: 10.5,
@@ -4519,6 +4573,75 @@ class _PatientSummaryHeader extends StatelessWidget {
             color: const Color(0xFF212121),
           ),
         ),
+      ],
+    );
+  }
+}
+
+
+class _M2AutomationDialog extends StatefulWidget {
+  final Map<String, dynamic> patientProfile;
+  final String hiType;
+  const _M2AutomationDialog({required this.patientProfile, required this.hiType});
+
+  @override
+  State<_M2AutomationDialog> createState() => _M2AutomationDialogState();
+}
+
+class _M2AutomationDialogState extends State<_M2AutomationDialog> {
+  String status = 'Initializing M2 Data Transfer...';
+  bool isError = false;
+  bool isDone = false;
+
+  @override
+  void initState() {
+    super.initState();
+    M2AutomatedWorkflowService.runAutomatedDataTransfer(
+      patientProfile: widget.patientProfile,
+      hiType: widget.hiType,
+      onProgress: (message) {
+        if (mounted) {
+          setState(() { status = message; });
+        }
+      },
+    ).then((_) {
+      if (mounted) {
+        setState(() {
+          status = 'M2 Data Transfer process completed successfully.';
+          isDone = true;
+        });
+      }
+    }).catchError((e) {
+      if (mounted) {
+        setState(() {
+          status = 'Automation failed: $e';
+          isError = true;
+          isDone = true;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('M2 Data Transfer Workflow'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (!isDone) const CircularProgressIndicator(),
+          if (!isDone) const SizedBox(height: 16),
+          Text(status, textAlign: TextAlign.center, style: TextStyle(color: isError ? Colors.red : Colors.black)),
+        ],
+      ),
+      actions: [
+        if (isDone)
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Done'),
+          )
       ],
     );
   }

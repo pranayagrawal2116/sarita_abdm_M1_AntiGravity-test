@@ -11,7 +11,9 @@ const clone = (value) => JSON.parse(JSON.stringify(value));
 const callbacks = new Map();
 
 const requestIdFromPayload = (payload = {}) =>
-  toText(payload?.response?.requestId) || toText(payload?.requestId);
+  toText(payload?.resp?.requestId) ||
+  toText(payload?.response?.requestId) ||
+  toText(payload?.requestId);
 
 const extractLinkToken = (payload = {}) =>
   toText(payload?.linkToken) ||

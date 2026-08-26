@@ -15,7 +15,9 @@ router.post(
     "/api/v3/consent/request/hip/notify",
     "/v3/consent/request/hip/notify",
     "/api/v3/consent/request/hip/on-notify",
-    "/v3/consent/request/hip/on-notify"
+    "/v3/consent/request/hip/on-notify",
+    "/api/v3/consents/hip/notify",
+    "/v3/consents/hip/notify"
   ],
   M2CallbackController.onHipConsentNotify
 );

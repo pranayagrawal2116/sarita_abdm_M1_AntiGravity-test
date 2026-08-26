@@ -35,9 +35,13 @@ const startWatcher = () => {
   log("Starting M2 Folder Watcher for FHIR Bundle Generation", { projectRoot: PROJECT_ROOT });
 
   // Watch for .txt files in directories matching the abhaId pattern
-  const watchPattern = path.join(PROJECT_ROOT, "*@sbx_*", "*.txt");
+  // MacOS desktop writes directly to PROJECT_ROOT, Web backend writes to backend/data/
+  const watchPatterns = [
+    path.join(PROJECT_ROOT, "*@sbx_*", "*.txt"),
+    path.join(PROJECT_ROOT, "backend", "data", "*@sbx_*", "*.txt")
+  ];
   
-  const watcher = chokidar.watch(watchPattern, {
+  const watcher = chokidar.watch(watchPatterns, {
     ignored: /(^|[\/\\])\../,
     persistent: true,
     ignoreInitial: false, 
@@ -90,12 +94,25 @@ const startWatcher = () => {
       }
 
       for (const file of fileData) {
-        const bundle = await buildBundleFromFiles({ abhaId, folderName, files: [file] });
         const baseName = path.basename(file.fileName, ".txt");
         const bundleFileName = `${baseName}_bundle.json`;
         const bundlePath = path.join(folderPath, bundleFileName);
         
-        fs.writeFileSync(bundlePath, JSON.stringify(bundle, null, 2));
+        let needsUpdate = true;
+        if (fs.existsSync(bundlePath)) {
+            const bundleStats = fs.statSync(bundlePath);
+            const txtStats = fs.statSync(file.filePath);
+            if (bundleStats.mtime >= txtStats.mtime) {
+                needsUpdate = false;
+            }
+        }
+        
+        if (needsUpdate) {
+            const bundle = await buildBundleFromFiles({ abhaId, folderName, files: [file] });
+            fs.writeFileSync(bundlePath, JSON.stringify(bundle, null, 2));
+        } else {
+            // Log skipped to prevent spam but maintain logic
+        }
         
         BundleRegistry.addBundle({
           patientId: abhaId,

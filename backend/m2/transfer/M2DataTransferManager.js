@@ -374,9 +374,22 @@ class M2DataTransferManager {
       : this.maxRetries + 1;
     const retryDelayMs = Number(process.env.M2_DATA_PUSH_RETRY_DELAY_MS || 250);
 
+    // NAT Loopback Bypass for IIS/Windows Server deployments
+    let targetUrl = dataPushUrl;
+    try {
+      if (dataPushUrl && dataPushUrl.includes('abdmapi.saritainfotech.com')) {
+        const urlObj = new URL(dataPushUrl);
+        const port = process.env.PORT || 3000;
+        targetUrl = `http://127.0.0.1:${port}${urlObj.pathname}${urlObj.search}`;
+        Logger.info("M2DataTransferManager", "Rewrote dataPushUrl to localhost to bypass NAT loopback", { original: dataPushUrl, rewritten: targetUrl });
+      }
+    } catch (e) {
+      // Ignore URL parsing errors
+    }
+
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       try {
-        const response = await axios.post(dataPushUrl, payload, {
+        const response = await axios.post(targetUrl, payload, {
           headers: { "Content-Type": "application/json" },
           timeout: Number(process.env.M2_DATA_PUSH_TIMEOUT_MS || 30000)
         });

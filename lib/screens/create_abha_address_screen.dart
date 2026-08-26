@@ -424,9 +424,9 @@ class _CreateAbhaAddressScreenState extends State<CreateAbhaAddressScreen> {
           baseRecord['name'],
         ]),
         'AbhaAddress': _firstNonEmpty([
+          baseRecord['AbhaAddress'],
           refreshedProfile['AbhaAddress'],
           refreshedProfile['preferredAbhaAddress'],
-          baseRecord['AbhaAddress'],
         ]),
         'AbhaNumber': _firstNonEmpty([
           refreshedProfile['AbhaNumber'],
@@ -552,7 +552,7 @@ class _CreateAbhaAddressScreenState extends State<CreateAbhaAddressScreen> {
     ]);
     if (name.isEmpty) throw Exception("Transaction Failed: Patient name is missing from live ABDM response.");
     
-    final abhaAddress = _firstNonEmpty([linkPhrAddress, createdPhrAddress]);
+    final abhaAddress = _firstNonEmpty([createdPhrAddress, linkPhrAddress]);
     if (abhaAddress.isEmpty) throw Exception("Transaction Failed: ABHA Address missing from live ABDM response.");
     
     final abhaNumber = _firstNonEmpty([

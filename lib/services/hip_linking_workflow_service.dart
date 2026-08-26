@@ -1,11 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
+import 'dart:convert';
 import 'dart:math';
 
 import '../config/hospital_config.dart';
 import '../services/hip_linking_api_service.dart';
 import '../utils/app_runtime_store.dart';
+import '../utils/draft_helper.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import '../utils/api_config.dart';
 
 typedef HipLinkingStepListener = void Function(Map<String, dynamic> run);
 
@@ -33,7 +37,7 @@ class HipLinkingWorkflowService {
 
     try {
       final apiHiType = _apiHiType(selectedHiType);
-      final tokenFile = _tokenFileForPatient(patientProfile);
+      final tokenFilePath = _tokenFilePathForPatient(patientProfile);
       final run = <String, dynamic>{
         'startedAt': DateTime.now().toIso8601String(),
         'completedAt': null,
@@ -43,7 +47,7 @@ class HipLinkingWorkflowService {
         'abhaAddress': _abhaAddress(patientProfile),
         'hiType': selectedHiType,
         'apiHiType': apiHiType,
-        'tokenFilePath': tokenFile.path,
+        'tokenFilePath': tokenFilePath,
         'formattedText': formattedRecordText,
         'steps': <Map<String, dynamic>>[],
       };
@@ -150,7 +154,13 @@ class HipLinkingWorkflowService {
             }
 
             if (status == 'FAILED') {
-              final errorMsg = response['error']?.toString() ?? 'ABDM rejected the link token request.';
+              String errorMsg = 'ABDM rejected the link token request.';
+              final errObj = response['error'];
+              if (errObj is Map) {
+                errorMsg = errObj['message']?.toString() ?? errObj.toString();
+              } else if (errObj != null) {
+                errorMsg = errObj.toString();
+              }
               (step['attempts'] as List<Map<String, dynamic>>).add({
                 'attempt': attempt,
                 'status': 'failed',
@@ -229,7 +239,7 @@ class HipLinkingWorkflowService {
 
       String linkToken = '';
       String linkedAbhaAddress = '';
-      final savedToken = await _readSavedLinkToken(tokenFile);
+      final savedToken = await _readSavedLinkToken(patientProfile);
 
       if (savedToken != null) {
         linkToken = savedToken.token;
@@ -243,7 +253,7 @@ class HipLinkingWorkflowService {
           'response': {
             'message': 'Reused saved link token from patient folder.',
             'savedAt': savedToken.savedAt,
-            'tokenFilePath': tokenFile.path,
+            'tokenFilePath': tokenFilePath,
             'abhaAddress': savedToken.abhaAddress,
           },
         });
@@ -307,14 +317,14 @@ class HipLinkingWorkflowService {
           );
           if (linkToken.isNotEmpty) {
             await _saveLinkToken(
-              tokenFile: tokenFile,
+              patient: patientProfile,
               token: linkToken,
               abhaAddress: linkedAbhaAddress.isNotEmpty
                   ? linkedAbhaAddress
                   : _abhaAddress(patientProfile),
               abhaNumber: _abhaNumber(patientProfile),
             );
-            run['tokenFilePath'] = tokenFile.path;
+            run['tokenFilePath'] = tokenFilePath;
             publish();
           }
         }
@@ -572,9 +582,12 @@ class HipLinkingWorkflowService {
 
 
 
-  static Future<_SavedLinkToken?> _readSavedLinkToken(File tokenFile) async {
-    if (!await tokenFile.exists()) return null;
-    final content = await tokenFile.readAsString();
+  static Future<_SavedLinkToken?> _readSavedLinkToken(Map<String, dynamic> patient) async {
+    final abhaId = _tokenFolderAbhaId(patient);
+    final patientName = _patientName(patient);
+    final path = _tokenFilePathForPatient(patient);
+    final content = await readDraft(abhaId, patientName, path);
+    if (content == null || content.isEmpty) return null;
     final token = _extractField(content, 'Link Token');
     if (token.isEmpty || _isJwtExpired(token)) {
       return null;
@@ -587,24 +600,32 @@ class HipLinkingWorkflowService {
   }
 
   static Future<void> _saveLinkToken({
-    required File tokenFile,
+    required Map<String, dynamic> patient,
     required String token,
     required String abhaAddress,
     required String abhaNumber,
   }) async {
-    await tokenFile.parent.create(recursive: true);
     final now = DateTime.now().toIso8601String();
-    await tokenFile.writeAsString(
-      [
-        'Saved At: $now',
-        'ABHA Address: $abhaAddress',
-        'ABHA Number: $abhaNumber',
-        'Link Token:',
-        token,
-        '',
-      ].join('\n'),
-      flush: true,
-    );
+    final content = [
+      'Saved At: $now',
+      'ABHA Address: $abhaAddress',
+      'ABHA Number: $abhaNumber',
+      'Link Token:',
+      token,
+      '',
+    ].join('\n');
+    
+    final abhaId = _tokenFolderAbhaId(patient);
+    final patientName = _patientName(patient);
+    final path = _tokenFilePathForPatient(patient);
+    
+    if (!kIsWeb) {
+      final patientFolderName = '${_sanitizePathSegment(abhaId)}_${_sanitizePathSegment(patientName)}';
+      final patientFolder = Directory('${_localRecordRoot().path}/$patientFolderName');
+      await patientFolder.create(recursive: true);
+    }
+    
+    await saveDraft(abhaId, patientName, path, content);
   }
 
   static String _extractField(String content, String label) {
@@ -640,12 +661,11 @@ class HipLinkingWorkflowService {
     }
   }
 
-  static File _tokenFileForPatient(Map<String, dynamic> patient) {
+  static String _tokenFilePathForPatient(Map<String, dynamic> patient) {
+    if (kIsWeb) return 'hip_link_token.txt';
     final patientFolderName =
         '${_sanitizePathSegment(_tokenFolderAbhaId(patient))}_${_sanitizePathSegment(_patientName(patient))}';
-    return File(
-      '${_localRecordRoot().path}/$patientFolderName/hip_link_token.txt',
-    );
+    return '${_localRecordRoot().path}/$patientFolderName/hip_link_token.txt';
   }
 
   static String _tokenFolderAbhaId(Map<String, dynamic> patient) {

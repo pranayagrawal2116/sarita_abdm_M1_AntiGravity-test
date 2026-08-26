@@ -6,25 +6,30 @@ import '../services/hip_setup_api_service.dart';
 class ScanShareQrDialog {
   const ScanShareQrDialog._();
 
+  static bool _hasSetupRun = false;
+
   static Future<void> prepareAndShow(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
 
     try {
-      final setup = await HipSetupApiService.runScanShareSetup();
-      final ok = setup['ok'] == true;
-      if (!ok) {
-        final canShowQr = _scanShareSetupCanContinue(setup);
-        if (!canShowQr) {
-          throw Exception(_scanShareSetupMessage(setup));
+      if (!_hasSetupRun) {
+        final setup = await HipSetupApiService.runScanShareSetup();
+        final ok = setup['ok'] == true;
+        if (!ok) {
+          final canShowQr = _scanShareSetupCanContinue(setup);
+          if (!canShowQr) {
+            throw Exception(_scanShareSetupMessage(setup));
+          }
+          if (context.mounted) {
+            messenger.showSnackBar(
+              SnackBar(
+                content: Text(_scanShareSetupMessage(setup)),
+                duration: const Duration(seconds: 6),
+              ),
+            );
+          }
         }
-        if (context.mounted) {
-          messenger.showSnackBar(
-            SnackBar(
-              content: Text(_scanShareSetupMessage(setup)),
-              duration: const Duration(seconds: 6),
-            ),
-          );
-        }
+        _hasSetupRun = true;
       }
 
       if (!context.mounted) return;

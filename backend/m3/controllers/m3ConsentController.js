@@ -59,7 +59,7 @@ class M3ConsentController {
       Logger.error("M3ConsentController", "requestHealthData failed", { error: error.message });
       let details = error.message;
       if (error.response && error.response.data) {
-        details = JSON.stringify(error.response.data);
+        try { details = JSON.stringify(error.response.data); } catch(e) { details = String(error.response.data); }
       }
       res.status(500).json({ success: false, error: "Failed to request health data", details: details });
     }
@@ -97,16 +97,15 @@ class M3ConsentController {
   static async getHealthDocuments(req, res) {
     try {
       const { hipId } = req.query;
-      const rootDir = path.resolve(__dirname, "../../../");
-      if (!fs.existsSync(rootDir)) return res.json({ success: true, data: [] });
+      const M3PatientStorageService = require("../services/m3PatientStorageService");
       
-      const dirs = fs.readdirSync(rootDir);
-      let targetUserDir = dirs.find(d => d.includes("@sbx"));
       const docIdVar = typeof docId !== 'undefined' ? docId : null;
-      const consentReq = typeof hipId !== 'undefined' ? M3ConsentStore.consents.find(c => c.artefactDetails && (c.artefactDetails[hipId] || Object.values(c.artefactDetails).some(art => art.hip && art.hip.id === hipId))) : null;
+      const consentReq = typeof hipId !== 'undefined' ? M3ConsentStore.getConsents().find(c => c.artefactDetails && (c.artefactDetails[hipId] || Object.values(c.artefactDetails).some(art => art.hip && art.hip.id === hipId))) : null;
       
       let allowedHiTypes = [];
+      let targetPatientId = "UnknownPatient";
       if (consentReq) {
+         if (consentReq.patientId) targetPatientId = consentReq.patientId;
          let art = null;
          if (consentReq.artefactDetails && consentReq.artefactDetails[hipId]) {
              art = consentReq.artefactDetails[hipId];
@@ -121,28 +120,11 @@ class M3ConsentController {
          }
       }
 
-      if (consentReq && consentReq.patientId) {
-        const found = dirs.find(d => d.startsWith(consentReq.patientId));
-        if (found) targetUserDir = found;
+      if (targetPatientId === "UnknownPatient") {
+         return res.json({ success: true, data: [] });
       }
-      if (!targetUserDir) return res.json({ success: true, data: [] });
       
-      const userDirPath = path.join(rootDir, targetUserDir);
-      let files = [];
-      if (fs.existsSync(userDirPath)) {
-         const items = fs.readdirSync(userDirPath, { withFileTypes: true });
-         for (const item of items) {
-            if (item.isDirectory()) {
-               const subDirPath = path.join(userDirPath, item.name);
-               const subFiles = fs.readdirSync(subDirPath)
-                   .filter(f => f.startsWith("HealthData_") && f.endsWith(".json"))
-                   .map(f => path.join(subDirPath, f));
-               files.push(...subFiles);
-            } else if (item.name.startsWith("HealthData_") && item.name.endsWith(".json")) {
-               files.push(path.join(userDirPath, item.name));
-            }
-         }
-      }
+      const files = M3PatientStorageService.getAllHealthDataFiles(targetPatientId);
       
       let documents = [];
       const globalSeenCareContexts = new Set();
@@ -174,8 +156,8 @@ class M3ConsentController {
                        contentStr = await fhirEncryptionService.decrypt(
                          contentStr,
                          transaction.privateKeyBase64,
-                         data.keyMaterial.dhPublicKey.keyValue,
-                         data.keyMaterial.nonce,
+                         transaction.senderPublicKeyBase64 || data.keyMaterial?.dhPublicKey?.keyValue,
+                         transaction.senderNonceBase64 || data.keyMaterial?.nonce,
                          transaction.nonceBase64
                        );
                      } catch (err) {
@@ -323,38 +305,23 @@ class M3ConsentController {
       const bundleIdx = parseInt(parts[parts.length - 1], 10);
       const file = parts.slice(1, parts.length - 1).join('_');
 
-      const fs = require('fs');
-      const path = require('path');
-      const rootDir = path.resolve(__dirname, "../../../");
-      const dirs = fs.readdirSync(rootDir);
-      let userDirs = dirs.filter(d => d.includes("@sbx"));
-      if (userDirs.length === 0) {
-        const Logger = require("../logging/logger");
-        Logger.error("M3ConsentController", "404 No target user dir @sbx found", { docId });
-        return res.status(404).send("Not found");
+      const transaction = M3ConsentStore.getTransaction(transactionId);
+      if (!transaction) {
+         const Logger = require("../logging/logger");
+         Logger.error("M3ConsentController", "404 Transaction not found for docId", { docId });
+         return res.status(404).send("File not found");
       }
       
-      let filePath = null;
-      for (const targetUserDir of userDirs) {
-        const userDirPath = path.join(rootDir, targetUserDir);
-        if (fs.existsSync(userDirPath)) {
-           const items = fs.readdirSync(userDirPath, { withFileTypes: true });
-           for (const item of items) {
-              if (item.isDirectory()) {
-                 const subDirPath = path.join(userDirPath, item.name);
-                 const testPath = path.join(subDirPath, file);
-                 if (fs.existsSync(testPath)) {
-                    filePath = testPath;
-                    break;
-                 }
-              } else if (item.name === file) {
-                 filePath = path.join(userDirPath, item.name);
-                 break;
-              }
-           }
-        }
-        if (filePath) break;
+      let targetPatientId = "UnknownPatient";
+      if (transaction.consentId) {
+         const consentReq = M3ConsentStore.getConsents().find(c => c.artefactDetails && c.artefactDetails[transaction.consentId]);
+         if (consentReq && consentReq.patientId) {
+             targetPatientId = consentReq.patientId;
+         }
       }
+
+      const M3PatientStorageService = require("../services/m3PatientStorageService");
+      const filePath = M3PatientStorageService.findFileByTransactionAndName(targetPatientId, file);
       
       if (!filePath || !fs.existsSync(filePath)) {
         const Logger = require("../logging/logger");
@@ -364,8 +331,6 @@ class M3ConsentController {
 
       const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
       let base64Pdf = null;
-      
-      const transaction = M3ConsentStore.getTransaction(transactionId);
       
       let bundlesToProcess = [];
       if (data.entries && Array.isArray(data.entries)) {
@@ -379,8 +344,8 @@ class M3ConsentController {
                   contentStr = await fhirEncryptionService.decrypt(
                     contentStr,
                     transaction.privateKeyBase64,
-                    data.keyMaterial.dhPublicKey.keyValue,
-                    data.keyMaterial.nonce,
+                    transaction.senderPublicKeyBase64 || data.keyMaterial?.dhPublicKey?.keyValue,
+                    transaction.senderNonceBase64 || data.keyMaterial?.nonce,
                     transaction.nonceBase64
                   );
                 } catch (err) {}

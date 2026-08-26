@@ -1,9 +1,14 @@
 import 'dart:io';
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+
+import '../utils/draft_helper.dart';
 
 import 'package:flutter/material.dart';
 import '../services/hip_linking_workflow_service.dart';
+import 'm2_data_exchange_screen.dart';
+
 import '../services/m2_automated_workflow_service.dart';
 
 double _maxNum(double a, double b) => a > b ? a : b;
@@ -94,9 +99,9 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
   Future<void> _handleSave(Map<String, dynamic> data) async {
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        final file = await _saveLocalDoc(data);
+        final savedPath = await _saveLocalDoc(data);
         if (!mounted) return;
-        _showToast(context, 'Local draft saved: ${file.path}');
+        _showToast(context, 'Local draft saved: $savedPath');
         Navigator.pop(context);
       } catch (error) {
         if (!mounted) return;
@@ -109,9 +114,8 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
 
   void _handleLink(Map<String, dynamic> data) async {
     if (_formKey.currentState?.validate() ?? false) {
-      File? savedFile;
       try {
-        savedFile = await _saveLocalDoc(data);
+        await _saveLocalDoc(data);
       } catch (error) {
         if (!mounted) return;
         _showErrorToast(context, 'Could not save local draft: $error');
@@ -155,34 +159,33 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       );
 
       try {
-        await HipLinkingWorkflowService.runRecordLinking(
+        final result = await HipLinkingWorkflowService.runRecordLinking(
           patientProfile: widget.patientProfile,
           selectedHiType: widget.hiType,
           formattedRecordText: _buildCareContextDisplay(),
         );
 
         if (mounted) {
-          progressNotifier.value = 'HIP linking completed.';
-          
-          // TEMPORARILY DISABLED M2 Automation for manual testing
-          /*
-          await M2AutomatedWorkflowService.runAutomatedDataTransfer(
-            patientProfile: widget.patientProfile,
-            hiType: widget.hiType,
-            onProgress: (message) {
-              progressNotifier.value = message;
-            },
-          );
-          */
-        }
-
-        if (mounted) {
           Navigator.pop(context); // Close loading dialog
-          _showToast(
-            context,
-            'Linking completed! Local draft: ${savedFile.path}',
-          );
-          Navigator.pop(context); // Return to home screen
+          if (result['status'] != 'completed') {
+            _showToast(context, 'Data push failed: status was ' + result['status'].toString(), isError: true);
+            Navigator.pop(context); // Return to home screen
+            return;
+          }
+          
+          _showToast(context, 'HIP Linking successful. Starting M2 Data Transfer...');
+          
+          // Use a post frame callback to ensure the route is pushed correctly
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => M2DataExchangeScreen(
+                  patientProfile: widget.patientProfile,
+                  autoStartHiType: widget.hiType,
+                ),
+              ),
+            );
+          });
         }
       } catch (e) {
         if (mounted) {
@@ -195,7 +198,7 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
     }
   }
 
-  Future<File> _saveLocalDoc(Map<String, dynamic> recordData) async {
+  Future<String> _saveLocalDoc(Map<String, dynamic> recordData) async {
     final patient = widget.patientProfile;
     final patientName = _firstText([
       patient['name'],
@@ -222,19 +225,23 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       'unknown_patient',
     ]);
 
-    final appFolder = _localRecordRoot();
-    final patientFolderName =
-        '${_sanitizePathSegment(abhaId)}_${_sanitizePathSegment(patientName)}';
-    final patientFolder = Directory('${appFolder.path}/$patientFolderName');
-    await patientFolder.create(recursive: true);
-
     final now = DateTime.now();
     final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
     final fileName =
         '${_sanitizePathSegment(widget.hiType)}_${_sanitizePathSegment(patientNumber)}_$timestamp.txt';
-    final file = File('${patientFolder.path}/$fileName');
-    await file.writeAsString(_buildTextDocument(recordData), flush: true);
-    return file;
+    
+    final patientFolderName = '${_sanitizePathSegment(abhaId)}_${_sanitizePathSegment(patientName)}';
+    String fullPath;
+    if (!kIsWeb) {
+      final appFolder = _localRecordRoot();
+      final patientFolder = Directory('${appFolder.path}/$patientFolderName');
+      await patientFolder.create(recursive: true);
+      fullPath = '${patientFolder.path}/$fileName';
+    } else {
+      fullPath = '$patientFolderName/$fileName';
+    }
+
+    return await saveDraft(abhaId, patientName, fullPath, _buildTextDocument(recordData));
   }
 
   String _buildTextDocument(Map<String, dynamic> recordData) {
@@ -393,13 +400,13 @@ String _textForValue(Object? value, int indent) {
 }
 
 // Custom animated sliding top toast
-void _showToast(BuildContext context, String message) {
+void _showToast(BuildContext context, String message, {bool isError = false}) {
   final overlayState = Overlay.of(context);
   late OverlayEntry overlayEntry;
   overlayEntry = OverlayEntry(
     builder: (context) => _SlideToast(
       message: message,
-      isError: false,
+      isError: isError,
       onDismiss: () => overlayEntry.remove(),
     ),
   );
@@ -4314,14 +4321,23 @@ class _HealthDocumentFormState extends State<_HealthDocumentForm> {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
+      withData: true,
     );
-    if (result != null && result.files.single.path != null) {
-      final file = File(result.files.single.path!);
-      final bytes = await file.readAsBytes();
-      setState(() {
-        _selectedFileName = result.files.single.name;
-        _base64Pdf = base64Encode(bytes);
-      });
+    if (result != null) {
+      final fileData = result.files.single.bytes;
+      if (fileData != null) {
+        setState(() {
+          _selectedFileName = result.files.single.name;
+          _base64Pdf = base64Encode(fileData);
+        });
+      } else if (result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final bytes = await file.readAsBytes();
+        setState(() {
+          _selectedFileName = result.files.single.name;
+          _base64Pdf = base64Encode(bytes);
+        });
+      }
     }
   }
 
@@ -4383,3 +4399,5 @@ class _HealthDocumentFormState extends State<_HealthDocumentForm> {
     );
   }
 }
+
+

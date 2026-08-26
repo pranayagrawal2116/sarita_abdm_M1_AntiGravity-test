@@ -672,6 +672,23 @@ exports.linkCareContext = async (req, res) => {
       { headers }
     );
 
+    // Automatically register the linked care context in M2 transaction store
+    try {
+      const M2ConsentManager = require("../m2/consent/M2ConsentManager");
+      await M2ConsentManager.registerHipLinkContext({
+        requestId: headers["REQUEST-ID"],
+        hipId: hipId,
+        linkToken: linkToken,
+        abhaAddress: payload.abhaAddress || (payload.patient && payload.patient[0] ? payload.patient[0].id : "") || "",
+        patient: payload.patient,
+        createdTime: new Date().toISOString(),
+        linkPayload: payload,
+        linkResponse: response.data || {}
+      });
+    } catch (m2Err) {
+      console.error("[HIP LINK TOKEN] Failed to auto-register M2 context:", m2Err);
+    }
+
     return res.json({
       requestId: headers["REQUEST-ID"],
       statusCode: response.status,

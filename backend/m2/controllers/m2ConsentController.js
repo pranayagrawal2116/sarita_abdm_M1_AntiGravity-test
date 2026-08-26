@@ -4,7 +4,7 @@
  * Responsibility: Forward requests to ABDM Gateway using TokenManager credentials.
  */
 
-const axios = require("axios");
+const axios = require("../helpers/axiosClient");
 const Logger = require("../logging/logger");
 const M2ConsentManager = require("../consent/M2ConsentManager");
 const M2HealthInformationRequestManager = require("../healthInformation/M2HealthInformationRequestManager");
@@ -108,11 +108,33 @@ const postHealthInformationRequestToAbdm = async ({ requestId, transactionId, hi
     "X-HIU-ID": toText(process.env.HIU_ID) || toText(hospitalConfig.hiuId),
   };
 
-  const response = await axios.post(
-    `${process.env.GATEWAY_BASE}/api/hiecm/data-flow/v3/health-information/request`,
-    payload,
-    { headers }
-  );
+  let response;
+  try {
+    response = await axios.post(
+      `${process.env.GATEWAY_BASE}/api/hiecm/data-flow/v3/health-information/request`,
+      payload,
+      { headers }
+    );
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      console.log("[ABDM] 401 Unauthorized encountered. Forcing token refresh and retrying...");
+      M2TokenManager.invalidate();
+      
+      const newToken = await M2TokenManager.getGatewayToken();
+      const retryHeaders = {
+        ...headers,
+        Authorization: `Bearer ${newToken}`,
+      };
+      
+      response = await axios.post(
+        `${process.env.GATEWAY_BASE}/api/hiecm/data-flow/v3/health-information/request`,
+        payload,
+        { headers: retryHeaders }
+      );
+    } else {
+      throw error;
+    }
+  }
 
   return {
     payload,
@@ -163,7 +185,7 @@ class M2ConsentController {
         linkToken: toText(body.linkToken || linkPayload.linkToken || linkPayload.linkingToken),
         abhaAddress: toText(body.abhaAddress || body.AbhaAddress || linkPayload.abhaAddress || linkPayload.AbhaAddress),
         careContextReference: toText(body.careContextReference),
-        patient: Array.isArray(body.patient) ? body.patient : linkPayload.patient,
+        patient: body.patient || linkPayload.patient,
         createdTime: toText(body.createdTime) || new Date().toISOString(),
         linkResponse,
         linkPayload

@@ -9,26 +9,14 @@ const path = require("path");
 
 class M3CallbackController {
   
-  static _deleteDataForConsent(consentId) {
+  static _deleteDataForConsent(patientId, consentId) {
     if (!consentId) return;
     try {
-      const rootDir = path.resolve(__dirname, "../../../");
-      if (!fs.existsSync(rootDir)) return;
-      
-      const dirs = fs.readdirSync(rootDir, { withFileTypes: true });
-      for (const dir of dirs) {
-        if (dir.isDirectory() && dir.name.includes("@sbx")) {
-          const patientDirPath = path.join(rootDir, dir.name);
-          const subDirs = fs.readdirSync(patientDirPath, { withFileTypes: true });
-          
-          for (const subDir of subDirs) {
-            if (subDir.isDirectory() && subDir.name.startsWith(`${consentId}_`)) {
-              const dirToDelete = path.join(patientDirPath, subDir.name);
-              Logger.info("M3Callback", `Deleting expired consent data directory: ${dirToDelete}`);
-              fs.rmSync(dirToDelete, { recursive: true, force: true });
-            }
-          }
-        }
+      const M3PatientStorageService = require("../services/m3PatientStorageService");
+      if (patientId) {
+        M3PatientStorageService.deleteConsentData(patientId, consentId);
+      } else {
+        Logger.warn("M3Callback", `Cannot delete data for consent ${consentId} because patientId is missing`);
       }
     } catch (e) {
       Logger.error("M3Callback", `Failed to delete data for consent ${consentId}`, { error: e.message });
@@ -67,18 +55,18 @@ class M3CallbackController {
       if (consentRequest.status === "EXPIRED" || consentRequest.status === "REVOKED") {
          const existingReq = M3ConsentStore.consents.find(c => c.consentRequestId === consentRequest.id);
          if (existingReq) {
-            if (existingReq.consentArtefacts) {
+             if (existingReq.consentArtefacts) {
                existingReq.consentArtefacts.forEach(artefact => {
-                  M3CallbackController._deleteDataForConsent(artefact.id);
+                  M3CallbackController._deleteDataForConsent(existingReq.patientId, artefact.id);
                });
             }
             if (existingReq.consentId) {
-               M3CallbackController._deleteDataForConsent(existingReq.consentId);
+               M3CallbackController._deleteDataForConsent(existingReq.patientId, existingReq.consentId);
             }
          }
          if (consentRequest.consentArtefacts) {
             consentRequest.consentArtefacts.forEach(artefact => {
-               M3CallbackController._deleteDataForConsent(artefact.id);
+               M3CallbackController._deleteDataForConsent(existingReq ? existingReq.patientId : null, artefact.id);
             });
          }
       }
@@ -140,16 +128,16 @@ class M3CallbackController {
             if (existingReq) {
                if (existingReq.consentArtefacts) {
                   existingReq.consentArtefacts.forEach(artefact => {
-                     M3CallbackController._deleteDataForConsent(artefact.id);
+                     M3CallbackController._deleteDataForConsent(existingReq.patientId, artefact.id);
                   });
                }
                if (existingReq.consentId) {
-                  M3CallbackController._deleteDataForConsent(existingReq.consentId);
+                  M3CallbackController._deleteDataForConsent(existingReq.patientId, existingReq.consentId);
                }
             }
             if (notification.consentArtefacts) {
                notification.consentArtefacts.forEach(artefact => {
-                  M3CallbackController._deleteDataForConsent(artefact.id);
+                  M3CallbackController._deleteDataForConsent(existingReq ? existingReq.patientId : null, artefact.id);
                });
             }
          }
@@ -231,14 +219,14 @@ class M3CallbackController {
     res.status(202).send();
 
     try {
-      const { hiRequest, response, error } = req.body;
-      if (response && response.requestId) {
+      const { hiRequest, resp, error } = req.body;
+      if (resp && resp.requestId) {
         const transactions = M3ConsentStore.transactions || {};
         let txn = null;
         let matchedOldTxnId = null;
 
         for (const [oldTransactionId, t] of Object.entries(transactions)) {
-          if (t.requestId === response.requestId) {
+          if (t.requestId === resp.requestId) {
             txn = t;
             matchedOldTxnId = oldTransactionId;
             break;
@@ -274,38 +262,31 @@ class M3CallbackController {
       // For now, let's extract it from the payload if possible, or fallback to unknown.
       
       let abhaId = "UnknownPatient";
-      // Try to find the ABHA ID in the store if we tracked transactionId (we didn't store transactionId yet in store, let's assume we can fetch it or just use a generic folder if missing)
-      
-      const rootDir = path.resolve(__dirname, "../../../");
-      const dirs = fs.readdirSync(rootDir);
-      let targetUserDir = dirs.find(d => d.includes("@sbx"));
+      let consentId = "UnknownConsent";
+      let hipName = "UnknownHIP";
+
       const transaction = M3ConsentStore.getTransaction(transactionId);
       if (transaction && transaction.consentId) {
+        consentId = transaction.consentId;
+        hipName = transaction.hipName || transaction.hipId || "UnknownHIP";
         const consentReq = M3ConsentStore.consents.find(c => c.artefactDetails && c.artefactDetails[transaction.consentId]);
         if (consentReq && consentReq.patientId) {
-          const found = dirs.find(d => d.startsWith(consentReq.patientId));
-          if (found) targetUserDir = found;
+          abhaId = consentReq.patientId;
         }
       }
-      
-      if (!targetUserDir) {
-        targetUserDir = `User_${new Date().getTime()}@sbx`;
-        fs.mkdirSync(path.join(rootDir, targetUserDir), { recursive: true });
-      }
 
-      let hospitalFolderName = "Other_hospital_data/HIP_Data";
-      if (transaction && transaction.consentId) {
-        const hName = (transaction.hipName || transaction.hipId || "UnknownHIP").replace(/[^a-zA-Z0-9_\-]/g, '_');
-        hospitalFolderName = `${transaction.consentId}_${hName}`;
-      }
-
-      const hospitalDir = path.join(rootDir, targetUserDir, hospitalFolderName);
-      fs.mkdirSync(hospitalDir, { recursive: true });
-
+      const M3PatientStorageService = require("../services/m3PatientStorageService");
       const fileName = `HealthData_${transactionId}_${new Date().getTime()}.json`;
-      fs.writeFileSync(path.join(hospitalDir, fileName), JSON.stringify(req.body, null, 2), "utf-8");
+      
+      const filePath = M3PatientStorageService.saveM3File(
+        abhaId,
+        consentId,
+        hipName,
+        fileName,
+        JSON.stringify(req.body, null, 2)
+      );
 
-      Logger.info("M3Callback", `Saved health data to ${hospitalDir}/${fileName}`);
+      Logger.info("M3Callback", `Saved health data to ${filePath}`);
 
       // Now notify ABDM that we received the data
       const M3ConsentService = require("../services/m3ConsentService");

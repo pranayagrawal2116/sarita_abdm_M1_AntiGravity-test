@@ -136,7 +136,7 @@ class M2DataTransferManager {
          requestedTypes.includes(item.meta?.hiType)
       );
 
-      const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/');
+      const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/'); // Enabled auto-push for M2 & M3
       
       if (!isDesktopApp) {
         // Sort descending by date to get newest first
@@ -239,7 +239,7 @@ class M2DataTransferManager {
 
       // Update local storage values
       await M2TransactionStore.updateTransaction(transactionId, {
-        encryptedPayload: encryptedEntries,
+        encryptedPayload: null, // removed for performance
         encryptionMetadata: { checksum: overallChecksum },
         receiverPublicKey,
         receiverNonce,
@@ -255,31 +255,6 @@ class M2DataTransferManager {
         statusCode: dataPushResult.statusCode
       });
       
-      // Track sent records in the patient's folder
-      try {
-        const fs = require('fs');
-        const path = require('path');
-        for (const payload of selectedPayloads) {
-          if (payload.meta && payload.meta.sourceTxtFile) {
-            const folderPath = path.dirname(payload.meta.sourceTxtFile);
-            const trackerFile = path.join(folderPath, "sent_records.json");
-            let sentRecords = [];
-            if (fs.existsSync(trackerFile)) {
-              try {
-                sentRecords = JSON.parse(fs.readFileSync(trackerFile, "utf-8"));
-              } catch(e) {}
-            }
-            const fileName = path.basename(payload.meta.sourceTxtFile);
-            if (!sentRecords.includes(fileName)) {
-              sentRecords.push(fileName);
-            }
-            fs.writeFileSync(trackerFile, JSON.stringify(sentRecords, null, 2));
-          }
-        }
-      } catch (err) {
-        Logger.error("M2DataTransferManager", "Failed to update sent_records.json", err);
-      }
-
       const currentTx = M2TransactionStore.getTransaction(transactionId);
       const notifyConsentId = this.resolveConsentArtifactId(currentTx, consentId);
       const notifyResult = await this.sendHealthInformationNotify(currentTx, {
@@ -744,7 +719,8 @@ class M2DataTransferManager {
     });
 
     // Automatically trigger data push in the background to prevent HIU timeouts
-    setTimeout(async () => {
+    if (true) { // Enabled auto-push for M2 & M3
+      setTimeout(async () => {
       try {
         Logger.info("M2DataTransferManager", "Initiating automatic data push to HIU.");
         await this.initiateTransfer(
@@ -761,6 +737,7 @@ class M2DataTransferManager {
         Logger.error("M2DataTransferManager", "Failed to perform automatic data push", err);
       }
     }, 1000);
+    }
 
     return {
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:intl/intl.dart';
 import '../services/hiu_api_service.dart';
 import 'hip_documents_screen.dart';
@@ -13,8 +14,10 @@ class ConsentDetailScreen extends StatefulWidget {
 }
 
 class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
+  Timer? _refreshTimer;
   bool _autoPullTriggered = false;
   bool _isRequestingAll = false;
+  DateTime? _lastRequestTime;
   String? _selectedHiTypeFilter;
   late Map<String, dynamic> _request;
 
@@ -22,10 +25,14 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
   void initState() {
     super.initState();
     _request = Map.from(widget.request);
+    _refreshTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!mounted) return;
+      _refreshRequestData(showToast: false);
+    });
     _scheduleAutoDataPull();
   }
 
-  Future<void> _refreshRequestData() async {
+  Future<void> _refreshRequestData({bool showToast = true}) async {
     try {
       final apiService = HiuApiService();
       final reqs = await apiService.fetchConsentRequests();
@@ -35,14 +42,14 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
         setState(() {
           _request = updatedReq;
         });
-        if (mounted) {
+        if (mounted && showToast) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Data refreshed successfully!')),
           );
         }
       }
     } catch (e) {
-      if (mounted) {
+      if (mounted && showToast) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to refresh data')),
         );
@@ -89,6 +96,7 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     if (_isRequestingAll) return;
     setState(() {
       _isRequestingAll = true;
+      _lastRequestTime = DateTime.now();
     });
 
     final apiService = HiuApiService();
@@ -166,6 +174,13 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
       'dateTo': dateTo,
       'dataEraseAt': dataEraseAt,
     };
+  }
+
+  @override
+    @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -706,7 +721,7 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
     }
 
     List<dynamic> filteredArtefacts = artefacts.where((art) {
-      if (_selectedHiTypeFilter == null) return true;
+      
       final hipId = art['id']?.toString() ?? '';
       dynamic artDetails;
       if (_request['artefactDetails'] != null &&
@@ -719,6 +734,38 @@ class _ConsentDetailScreenState extends State<ConsentDetailScreen> {
           artefacts.length == 1) {
         artDetails = details;
       }
+
+      final hasData = artDetails != null && artDetails['hasData'] == true;
+      
+      if (!hasData) {
+        final updatedAtStr = _request['updatedAt'] ?? _request['timestamp'] ?? _request['createdAt'];
+        bool isOldConsent = true;
+        
+        if (updatedAtStr != null && updatedAtStr.toString().isNotEmpty) {
+          try {
+            final updatedAt = DateTime.parse(updatedAtStr.toString());
+            if (DateTime.now().difference(updatedAt).inMinutes <= 5) {
+               isOldConsent = false;
+            }
+          } catch (e) {}
+        }
+        
+        if (!isOldConsent) {
+          // New consent, backend is auto-pulling. Show them for 5 mins, then hide if they fail.
+          return true;
+        } else {
+          // Old consent. We want to show all hospitals initially so the user can see them and retry.
+          if (_lastRequestTime == null) {
+            return true; // Show initially
+          } else if (DateTime.now().difference(_lastRequestTime!).inMinutes > 5) {
+            return false; // We requested data > 5 mins ago and it still failed to send. Hide it.
+          } else {
+            return true; // We requested data recently, wait for it.
+          }
+        }
+      }
+      
+      if (_selectedHiTypeFilter == null) return true;
 
       if (artDetails != null && artDetails['hiTypes'] != null) {
         final List<dynamic> hiTypes = artDetails['hiTypes'];

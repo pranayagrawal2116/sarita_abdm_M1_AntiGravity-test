@@ -24,16 +24,17 @@ class M3CallbackController {
   }
   static async onConsentInit(req, res) {
     Logger.info("M3Callback", "Received consent on-init", req.body);
-    const { consentRequest, error, response } = req.body;
+    const { consentRequest, error } = req.body;
+    const resp = req.body.resp || req.body.response;
     
     // We get consentRequest.id which is the actual consentRequestId from ABDM
-    if (consentRequest && consentRequest.id) {
-      M3ConsentStore.updateConsentByRequestId(response.requestId, {
+    if (consentRequest && consentRequest.id && resp) {
+      M3ConsentStore.updateConsentByRequestId(resp.requestId, {
         status: "INITIATED",
         consentRequestId: consentRequest.id,
       });
-    } else if (error) {
-      M3ConsentStore.updateConsentByRequestId(response.requestId, {
+    } else if (error && resp) {
+      M3ConsentStore.updateConsentByRequestId(resp.requestId, {
         status: "FAILED",
         error: error.message
       });
@@ -43,7 +44,8 @@ class M3CallbackController {
 
   static async onConsentStatus(req, res) {
     Logger.info("M3Callback", "Received consent status", req.body);
-    const { consentRequest, error, response } = req.body;
+    const { consentRequest, error } = req.body;
+    const resp = req.body.resp || req.body.response;
     
     if (consentRequest && consentRequest.id) {
       M3ConsentStore.updateConsentByConsentRequestId(consentRequest.id, {
@@ -94,7 +96,8 @@ class M3CallbackController {
           
         if (!updated) {
             Logger.warn("M3Callback", "consentRequestId not found, falling back to latest pending request");
-            const latestPending = M3ConsentStore.getConsents().find(c => c.status === "REQUESTED" || c.status === "INITIATED");
+            const consents = M3ConsentStore.getConsents();
+            const latestPending = [...consents].reverse().find(c => c.status === "REQUESTED" || c.status === "INITIATED");
             if (latestPending) {
               latestPending.consentRequestId = notification.consentRequestId;
               latestPending.status = "GRANTED";
@@ -105,8 +108,14 @@ class M3CallbackController {
         }
           
         for (const artefact of notification.consentArtefacts) {
-          // Optionally Auto-fetch the artefact
-          await M3ConsentService.fetchConsentArtefact(artefact.id);
+          try {
+             await M3ConsentService.fetchConsentArtefact(artefact.id);
+             // Add a 250ms delay to prevent ABDM Sandbox rate limiting / burst drops
+             await new Promise(r => setTimeout(r, 250));
+          } catch(e) {
+             const Logger = require("../logging/logger");
+             Logger.error("M3Callback", "Failed to fetch artefact in hiuNotify, continuing with others", { id: artefact.id, error: e.message });
+          }
         }
       } else {
          let updated = M3ConsentStore.updateConsentByConsentRequestId(notification.consentRequestId, {
@@ -114,7 +123,8 @@ class M3CallbackController {
             updatedAt: timestamp
           });
          if (!updated) {
-           const latestPending = M3ConsentStore.getConsents().find(c => c.status === "REQUESTED" || c.status === "INITIATED");
+           const consents = M3ConsentStore.getConsents();
+           const latestPending = [...consents].reverse().find(c => c.status === "REQUESTED" || c.status === "INITIATED");
            if (latestPending) {
               latestPending.consentRequestId = notification.consentRequestId;
               latestPending.status = notification.status;
@@ -203,12 +213,30 @@ class M3CallbackController {
         if (!consentReq.artefactDetails) consentReq.artefactDetails = {};
         consentReq.artefactDetails[consent.consentDetail.consentId] = consent.consentDetail;
         
-        Object.assign(consentReq, {
+                Object.assign(consentReq, {
           status: "FETCHED",
           artefactDetails: consentReq.artefactDetails,
           details: consent.consentDetail // keep backward compatibility for single artefact
         });
         M3ConsentStore.save();
+        
+        // Auto-trigger data pull for this HIP
+        try {
+          const M3ConsentService = require("../services/m3ConsentService");
+          setTimeout(async () => {
+             try {
+                const patientId = consentReq.patientId || consent.consentDetail.patient.id;
+                await M3ConsentService.requestHealthInformation(consent.consentDetail.consentId, patientId);
+                const Logger = require("../logging/logger");
+                Logger.info("M3Callback", "Auto-requested health info for HIP", { consentId: consent.consentDetail.consentId });
+             } catch(err) {
+                const Logger = require("../logging/logger");
+                Logger.error("M3Callback", "Auto data pull failed", { error: err.message });
+             }
+          }, 1000);
+        } catch (e) {
+        }
+
       }
     }
     res.status(202).send();
@@ -268,18 +296,35 @@ class M3CallbackController {
 
       let transaction = M3ConsentStore.getTransaction(transactionId);
       
+      // Wait for on-request webhook to arrive (up to 60 seconds) to avoid race conditions with multiple HIPs
+      // Since we already ACK'd the request above, we can safely wait here.
+      let retries = 0;
+      while (!transaction && retries < 120) {
+          await new Promise(r => setTimeout(r, 500));
+          M3ConsentStore.load();
+          transaction = M3ConsentStore.getTransaction(transactionId);
+          retries++;
+      }
+
       // Fallback for missing on-request webhook or race conditions
       if (!transaction) {
         M3ConsentStore.load();
         const transactions = M3ConsentStore.transactions || {};
-        const pendingTxns = Object.values(transactions).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
-        if (pendingTxns.length > 0) {
+        // Find transactions that haven't been mapped yet (their key is still the local UUID)
+        const pendingTxns = Object.entries(transactions)
+           .filter(([key, t]) => key.length > 30 && t.requestId && !t.error && !Object.keys(transactions).some(k => k !== key && transactions[k].requestId === t.requestId))
+           .map(([key, t]) => t)
+           .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+           
+        if (pendingTxns.length === 1) {
           transaction = pendingTxns[0];
           
           // Re-key it immediately so future chunks map correctly
           M3ConsentStore.transactions[transactionId] = transaction;
           M3ConsentStore.save();
           Logger.warn("M3Callback", "Fallback used: Mapped unmapped transaction to incoming health data", { transactionId });
+        } else if (pendingTxns.length > 1) {
+          Logger.error("M3Callback", "Ambiguous fallback: Multiple pending transactions found and on-request webhook is missing", { transactionId, count: pendingTxns.length });
         }
       }
 
@@ -287,8 +332,12 @@ class M3CallbackController {
         consentId = transaction.consentId;
         hipName = transaction.hipName || transaction.hipId || "UnknownHIP";
         const consentReq = M3ConsentStore.getConsents().find(c => c.artefactDetails && c.artefactDetails[transaction.consentId]);
-        if (consentReq && consentReq.patientId) {
+                if (consentReq && consentReq.patientId) {
           abhaId = consentReq.patientId;
+          if (entries && entries.length > 0 && consentReq.artefactDetails[transaction.consentId]) {
+              consentReq.artefactDetails[transaction.consentId].hasData = true;
+              M3ConsentStore.save();
+          }
         }
       }
 

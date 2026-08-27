@@ -23,6 +23,49 @@ class M3ConsentController {
   static async getConsentRequests(req, res) {
     try {
       const requests = M3ConsentStore.getAllConsents();
+      
+      // Dynamic computation of hasData for backward compatibility
+      const M3PatientStorageService = require("../services/m3PatientStorageService");
+      const patientConsentHasData = {}; // patientId -> Set of consentIds
+      
+      for (const reqObj of requests) {
+         if (reqObj.patientId && reqObj.artefactDetails) {
+            // Skip if all artefacts already have hasData=true
+            const needsCheck = Object.values(reqObj.artefactDetails).some(art => art && art.hasData !== true);
+            if (!needsCheck) continue;
+            
+            if (!patientConsentHasData[reqObj.patientId]) {
+               patientConsentHasData[reqObj.patientId] = new Set();
+               try {
+                  const files = M3PatientStorageService.getAllHealthDataFiles(reqObj.patientId);
+                  for (const filePath of files) {
+                     const file = path.basename(filePath);
+                     if (file.startsWith("HealthData_")) {
+                        const parts = file.split('_');
+                        if (parts.length >= 2) {
+                           const transactionId = parts[1];
+                           // Access transactions directly to avoid accidental this.load() trigger
+                           const transaction = M3ConsentStore.transactions && M3ConsentStore.transactions[transactionId];
+                           if (transaction && transaction.consentId) {
+                              patientConsentHasData[reqObj.patientId].add(transaction.consentId);
+                           }
+                        }
+                     }
+                  }
+               } catch (e) {
+                  // ignore errors
+               }
+            }
+
+            const validConsentIds = patientConsentHasData[reqObj.patientId];
+            for (const consentId of Object.keys(reqObj.artefactDetails)) {
+               if (validConsentIds.has(consentId)) {
+                  reqObj.artefactDetails[consentId].hasData = true;
+               }
+            }
+         }
+      }
+
       res.status(200).json({
         success: true,
         data: requests
@@ -135,7 +178,7 @@ class M3ConsentController {
         let transactionId = parts.length >= 2 ? parts[1] : "fallback";
         
         if (file.startsWith("HealthData_") && parts.length >= 2) {
-          const transaction = M3ConsentStore.getTransaction(transactionId);
+          const transaction = M3ConsentStore.transactions && M3ConsentStore.transactions[transactionId];
           if (hipId && transaction && transaction.hipId !== hipId && transaction.consentId !== hipId) continue;
         }
 

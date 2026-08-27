@@ -26,7 +26,11 @@ class FhirDataViewer extends StatelessWidget {
     String encounterType = '';
 
     List<Map<String, dynamic>> allergies = [];
-    List<Map<String, dynamic>> vitals = [];
+    List<Map<String, dynamic>> vitalSigns = [];
+    List<Map<String, dynamic>> bodyMeasurements = [];
+    List<Map<String, dynamic>> physicalActivity = [];
+    List<Map<String, dynamic>> generalAssessment = [];
+    List<Map<String, dynamic>> otherVitals = [];
     List<Map<String, dynamic>> diagnoses = [];
     List<Map<String, dynamic>> symptoms = [];
     List<Map<String, dynamic>> familyHistory = [];
@@ -35,13 +39,43 @@ class FhirDataViewer extends StatelessWidget {
     List<Map<String, dynamic>> followUps = [];
     List<Map<String, dynamic>> medications = [];
     List<Map<String, dynamic>> others = [];
+    List<Map<String, dynamic>> invoices = [];
+    List<Map<String, dynamic>> immunizations = [];
+
+    List<Map<String, dynamic>> diagnosticReports = [];
+    Set<String> diagObsIds = {};
+    Map<String, Map<String, dynamic>> allObsMap = {};
+
+    for (var entry in entries) {
+      final res = entry['resource'];
+      if (res == null) continue;
+      if (res['resourceType'] == 'DiagnosticReport') {
+        diagnosticReports.add(res);
+        if (res['result'] != null) {
+          for (var r in res['result']) {
+             if (r['reference'] != null) {
+                String ref = r['reference'].toString();
+                if (ref.startsWith('urn:uuid:')) ref = ref.substring(9);
+                diagObsIds.add(ref);
+             }
+          }
+        }
+      } else if (res['resourceType'] == 'Observation') {
+        if (res['id'] != null) {
+           allObsMap[res['id'].toString()] = res;
+        }
+      }
+    }
 
     // First pass: extract summary & categorize
     for (var entry in entries) {
       final res = entry['resource'];
       if (res == null) continue;
-
+      
       final type = res['resourceType'];
+      if (type == 'Observation' && res['id'] != null && diagObsIds.contains(res['id'].toString())) {
+         continue; // skip! rendered inside diagnostic report
+      }
 
       if (type == 'Composition') {
         docDate = res['date'] ?? docDate;
@@ -67,7 +101,6 @@ class FhirDataViewer extends StatelessWidget {
           encounterType = res['class']['display'] ?? res['class']['code'] ?? encounterType;
         }
       } else if (type == 'DiagnosticReport') {
-        investigations.add(res);
         if (docTitle == 'Health Document' && res['code'] != null && res['code']['text'] != null) docTitle = res['code']['text'];
         if (docType == 'CLINICAL DOCUMENT') docType = 'DIAGNOSTIC REPORT';
         if (docDate == '' && res['effectiveDateTime'] != null) docDate = res['effectiveDateTime'];
@@ -106,6 +139,17 @@ class FhirDataViewer extends StatelessWidget {
           obsName = res['code']['text'].toString().toLowerCase();
         }
         
+        bool isVital = false;
+        if (res['category'] != null) {
+           for(var cat in res['category']) {
+             if (cat['coding'] != null) {
+               for (var coding in cat['coding']) {
+                 if (coding['code'] == 'vital-signs') isVital = true;
+               }
+             }
+           }
+        }
+
         if (obsName.contains('chief complaint')) {
           symptoms.add(res);
         } else if (obsName.contains('medical history') || obsName.contains('diagnosis') || obsName.contains('condition')) {
@@ -116,21 +160,18 @@ class FhirDataViewer extends StatelessWidget {
           procedures.add(res);
         } else if (obsName.contains('medication')) {
           medications.add(res);
-        } else if (obsName.contains('physical examination') || obsName.contains('vital')) {
-          vitals.add(res);
         } else {
-          bool isVital = false;
-          if (res['category'] != null) {
-             for(var cat in res['category']) {
-               if (cat['coding'] != null) {
-                 for (var coding in cat['coding']) {
-                   if (coding['code'] == 'vital-signs') isVital = true;
-                 }
-               }
-             }
-          }
-          if (isVital) {
-            vitals.add(res);
+          // Wellness Record / Vitals Categorization
+          if (obsName.contains('height') || obsName.contains('weight') || obsName.contains('bmi') || obsName.contains('body mass')) {
+            bodyMeasurements.add(res);
+          } else if (obsName.contains('sleep') || obsName.contains('calories burned') || obsName.contains('step count') || obsName.contains('steps')) {
+            physicalActivity.add(res);
+          } else if (obsName.contains('calories intake') || obsName.contains('fluid intake') || obsName.contains('oral estimated')) {
+            generalAssessment.add(res);
+          } else if (obsName.contains('heart rate') || obsName.contains('respiratory rate') || obsName.contains('temperature') || obsName.contains('blood pressure') || obsName.contains('oxygen saturation') || obsName.contains('spo2') || obsName.contains('pulse') || obsName.contains('pain')) {
+            vitalSigns.add(res);
+          } else if (obsName.contains('physical examination') || obsName.contains('vital') || isVital) {
+            otherVitals.add(res);
           } else {
             others.add(res);
           }
@@ -145,6 +186,12 @@ class FhirDataViewer extends StatelessWidget {
         followUps.add(res);
       } else if (type == 'MedicationRequest') {
         medications.add(res);
+      } else if (type == 'Invoice') {
+        invoices.add(res);
+      } else if (type == 'ChargeItem') {
+        // Ignored, rendered inside Invoice
+      } else if (type == 'Immunization') {
+        immunizations.add(res);
       } else if (!['Patient', 'Practitioner', 'Organization', 'Composition', 'Encounter', 'DocumentReference'].contains(type)) {
         others.add(res);
       }
@@ -161,19 +208,26 @@ class FhirDataViewer extends StatelessWidget {
           _buildHeader(docType, docTitle, dateStr, doctorName, encounterType, patientName, patientInitials, patientGender, patientMrn),
           const SizedBox(height: 32),
           _buildSection("CHIEF COMPLAINTS", Icons.access_time, Colors.orange, symptoms, _buildFullWidthItem),
-          _buildSection("PHYSICAL EXAMINATION (VITALS)", Icons.monitor_heart, const Color(0xFF0C8A99), vitals, _buildFullWidthItem),
+          _buildSection("VITAL SIGNS", Icons.monitor_heart, const Color(0xFFE91E63), vitalSigns, _buildFullWidthItem),
+          _buildSection("BODY MEASUREMENT", Icons.accessibility_new, const Color(0xFF0C8A99), bodyMeasurements, _buildFullWidthItem),
+          _buildSection("PHYSICAL ACTIVITY", Icons.directions_run, const Color(0xFF4CAF50), physicalActivity, _buildFullWidthItem),
+          _buildSection("GENERAL ASSESSMENT", Icons.assignment_ind, const Color(0xFFFF9800), generalAssessment, _buildFullWidthItem),
+          _buildSection("OTHER VITALS / PHYSICAL EXAM", Icons.monitor_weight, const Color(0xFF0C8A99), otherVitals, _buildFullWidthItem),
           _buildSection("ALLERGIES", Icons.do_not_disturb_alt, Colors.red, allergies, _buildFullWidthItem),
           _buildSection("MEDICAL HISTORY", Icons.medical_information, const Color(0xFF673AB7), diagnoses, _buildFullWidthItem),
           _buildSection("PROCEDURE PERFORMED", Icons.medical_services, Colors.teal, procedures, _buildFullWidthItem),
           _buildSection("DIAGNOSTIC / LAB REPORTS", Icons.biotech, const Color(0xFF0C8A99), investigations, _buildFullWidthItem),
-          _buildSection("MEDICATION ADVICE", Icons.medication, const Color(0xFF0C8A99), medications, _buildFullWidthItem),
+          if (medications.isNotEmpty) _buildPrescriptionSection(medications),
           _buildSection("CARE PLAN", Icons.calendar_today, Colors.green, followUps, _buildFullWidthItem),
           _buildSection("FAMILY HISTORY", Icons.family_restroom, Colors.pink, familyHistory, _buildFullWidthItem),
+          if (diagnosticReports.isNotEmpty) _buildDiagnosticReportsSection(diagnosticReports, allObsMap),
+          if (immunizations.isNotEmpty) _buildImmunizationSection(immunizations),
+          if (invoices.isNotEmpty) _buildInvoiceSection(invoices),
           _buildSection("OTHER RECORDS", Icons.folder, const Color(0xFF0C8A99), others, _buildFullWidthItem),
           
-          if (allergies.isEmpty && vitals.isEmpty && diagnoses.isEmpty && symptoms.isEmpty && 
+          if (allergies.isEmpty && vitalSigns.isEmpty && bodyMeasurements.isEmpty && physicalActivity.isEmpty && generalAssessment.isEmpty && otherVitals.isEmpty && diagnoses.isEmpty && symptoms.isEmpty && 
               familyHistory.isEmpty && investigations.isEmpty && followUps.isEmpty && 
-              medications.isEmpty && others.isEmpty)
+              medications.isEmpty && others.isEmpty && invoices.isEmpty && diagnosticReports.isEmpty && immunizations.isEmpty)
              const Center(child: Text("No actionable records found in this document.", style: TextStyle(color: Color(0xFF7A8D9C)))),
         ],
       ),
@@ -314,6 +368,477 @@ class FhirDataViewer extends StatelessWidget {
         text,
         style: const TextStyle(color: Color(0xFF17324A), fontSize: 13, fontWeight: FontWeight.w600),
       ),
+    );
+  }
+
+  Widget _buildInvoiceSection(List<Map<String, dynamic>> invoices) {
+    if (invoices.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.receipt_long, color: Color(0xFF0C8A99), size: 16),
+            SizedBox(width: 8),
+            Text("INVOICE RECORD", style: TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
+          ]
+        ),
+        const SizedBox(height: 12),
+        ...invoices.map((inv) => _buildSingleInvoice(inv)),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildSingleInvoice(Map<String, dynamic> invoice) {
+    String invoiceNo = 'Unknown';
+    if (invoice['identifier'] != null && invoice['identifier'].isNotEmpty) {
+      invoiceNo = invoice['identifier'][0]['value']?.toString() ?? 'Unknown';
+    }
+    
+    final date = invoice['date']?.toString() ?? '';
+    final totalNet = invoice['totalNet']?['value']?.toString() ?? '0';
+    
+    final lineItems = invoice['lineItem'] as List<dynamic>? ?? [];
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD9E4EF)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x040E2233),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          )
+        ]
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF9FDFD),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+              border: Border(bottom: BorderSide(color: Color(0xFFD9E4EF))),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Invoice No', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 11, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(invoiceNo, style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text('Invoice Date', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 11, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    Text(date.length > 10 ? date.substring(0, 10) : date, style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          
+          // Items Table
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                  child: DataTable(
+                    headingRowHeight: 40,
+              dataRowMinHeight: 48,
+              dataRowMaxHeight: 48,
+              headingTextStyle: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 11, fontWeight: FontWeight.bold),
+              dataTextStyle: const TextStyle(color: Color(0xFF17324A), fontSize: 13, fontWeight: FontWeight.w500),
+              columns: const [
+                DataColumn(label: Text('Item Name')),
+                DataColumn(label: Text('MRP')),
+                DataColumn(label: Text('Qty')),
+                DataColumn(label: Text('Discount')),
+                DataColumn(label: Text('Rate')),
+                DataColumn(label: Text('GST')),
+                DataColumn(label: Text('Amount')),
+              ],
+              rows: lineItems.map((item) {
+                final itemName = item['chargeItemReference']?['display']?.toString() ?? 'Item';
+                final prices = item['priceComponent'] as List<dynamic>? ?? [];
+                
+                double mrp = 0;
+                double qty = 1;
+                double discount = 0;
+                double rate = 0;
+                double cgst = 0;
+                double sgst = 0;
+                
+                for (var p in prices) {
+                  final code = p['code']?['coding']?[0]?['display']?.toString().toLowerCase() ?? '';
+                  final valStr = p['amount']?['value']?.toString() ?? '0';
+                  final val = double.tryParse(valStr) ?? 0;
+                  
+                  if (code == 'mrp') {
+                    mrp = val;
+                    if (p['factor'] != null) {
+                      qty = double.tryParse(p['factor'].toString()) ?? 1;
+                    }
+                  }
+                  if (code == 'discount') discount = val;
+                  if (code == 'rate') rate = val;
+                  if (code == 'cgst') cgst = val;
+                  if (code == 'sgst') sgst = val;
+                }
+                
+                final double totalGst = cgst + sgst;
+                final double amount = rate + totalGst;
+                
+                return DataRow(
+                  cells: [
+                    DataCell(Text(itemName)),
+                    DataCell(Text('₹ ${mrp.toStringAsFixed(2)}')),
+                    DataCell(Text('${qty.toInt()}')),
+                    DataCell(Text('₹ ${discount.toStringAsFixed(2)}')),
+                    DataCell(Text('₹ ${rate.toStringAsFixed(2)}')),
+                    DataCell(Text('₹ ${totalGst.toStringAsFixed(2)}')),
+                    DataCell(Text('₹ ${amount.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold))),
+                  ]
+                );
+              }).toList(),
+                  ),
+                ),
+              );
+            },
+          ),
+          
+          // Footer / Total
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF9FDFD),
+              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(12), bottomRight: Radius.circular(12)),
+              border: Border(top: BorderSide(color: Color(0xFFD9E4EF))),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text('Total Net: ', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 13, fontWeight: FontWeight.w600)),
+                Text('₹ $totalNet', style: const TextStyle(color: Color(0xFF17324A), fontSize: 16, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDiagnosticReportsSection(List<Map<String, dynamic>> reports, Map<String, Map<String, dynamic>> allObsMap) {
+    if (reports.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.biotech, color: Color(0xFF0C8A99), size: 16),
+            SizedBox(width: 8),
+            Text("LAB REPORTS (DIAGNOSTIC)", style: TextStyle(color: Color(0xFF0C8A99), fontSize: 12, fontWeight: FontWeight.bold)),
+          ]
+        ),
+        const SizedBox(height: 12),
+        ...reports.map((report) => _buildSingleDiagnosticReport(report, allObsMap)),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildSingleDiagnosticReport(Map<String, dynamic> report, Map<String, Map<String, dynamic>> allObsMap) {
+    final reportName = report['code']?['text'] ?? report['code']?['coding']?[0]?['display'] ?? 'Diagnostic Report';
+    final results = report['result'] as List<dynamic>? ?? [];
+
+    List<Map<String, dynamic>> reportObs = [];
+    for (var r in results) {
+       if (r['reference'] != null) {
+          String ref = r['reference'].toString();
+          if (ref.startsWith('urn:uuid:')) ref = ref.substring(9);
+          if (allObsMap.containsKey(ref)) {
+             reportObs.add(allObsMap[ref]!);
+          }
+       }
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFD9E4EF)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x040E2233),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          )
+        ]
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Color(0xFFF9FDFD),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+              border: Border(bottom: BorderSide(color: Color(0xFFD9E4EF))),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Lab Report Name', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 11, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Text(reportName, style: const TextStyle(color: Color(0xFF17324A), fontSize: 14, fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+          
+          // Items Table
+          if (reportObs.isNotEmpty)
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                    child: DataTable(
+                      headingRowHeight: 40,
+                dataRowMinHeight: 48,
+                dataRowMaxHeight: 48,
+                headingTextStyle: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 11, fontWeight: FontWeight.bold),
+                dataTextStyle: const TextStyle(color: Color(0xFF17324A), fontSize: 13, fontWeight: FontWeight.w500),
+                columns: const [
+                  DataColumn(label: Text('Test Name / Display')),
+                  DataColumn(label: Text('Value')),
+                  DataColumn(label: Text('Unit')),
+                ],
+                rows: reportObs.map((obs) {
+                  final testName = obs['code']?['text'] ?? obs['code']?['coding']?[0]?['display'] ?? 'Unknown Test';
+                  
+                  String valueStr = '-';
+                  String unitStr = '';
+                  
+                  if (obs['valueQuantity'] != null) {
+                    valueStr = obs['valueQuantity']['value']?.toString() ?? '-';
+                    unitStr = obs['valueQuantity']['unit']?.toString() ?? '';
+                  } else if (obs['valueString'] != null) {
+                    valueStr = obs['valueString']?.toString() ?? '-';
+                  }
+                  
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(testName)),
+                      DataCell(Text(valueStr)),
+                      DataCell(Text(unitStr)),
+                    ]
+                  );
+                }).toList(),
+                    ),
+                  ),
+                );
+              },
+            ),
+          if (reportObs.isEmpty)
+             const Padding(
+               padding: EdgeInsets.all(16.0),
+               child: Text('No observation results available.', style: TextStyle(color: Color(0xFF7A8D9C), fontSize: 13, fontStyle: FontStyle.italic)),
+             )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPrescriptionSection(List<Map<String, dynamic>> medications) {
+    if (medications.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.medication, color: Colors.teal, size: 16),
+            SizedBox(width: 8),
+            Text("MEDICATION ADVICE", style: TextStyle(color: Colors.teal, fontSize: 12, fontWeight: FontWeight.bold)),
+          ]
+        ),
+        const SizedBox(height: 12),
+        Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFD9E4EF)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x040E2233),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              )
+            ]
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                  child: DataTable(
+                    headingRowHeight: 40,
+              dataRowMinHeight: 48,
+              dataRowMaxHeight: 48,
+              headingTextStyle: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 11, fontWeight: FontWeight.bold),
+              dataTextStyle: const TextStyle(color: Color(0xFF17324A), fontSize: 13, fontWeight: FontWeight.w500),
+              columns: const [
+                DataColumn(label: Text('Medicine Name')),
+                DataColumn(label: Text('Dose Pattern')),
+                DataColumn(label: Text('Route')),
+                DataColumn(label: Text('Timing / Method')),
+                DataColumn(label: Text('Instructions')),
+              ],
+              rows: medications.map((med) {
+                final name = med['medicationCodeableConcept']?['text'] ?? med['medicationCodeableConcept']?['coding']?[0]?['display'] ?? 'Unknown Medicine';
+                
+                String dose = '';
+                String route = '';
+                String timing = '';
+                
+                if (med['dosageInstruction'] != null && med['dosageInstruction'].isNotEmpty) {
+                  final dosage = med['dosageInstruction'][0];
+                  dose = dosage['text']?.toString() ?? '';
+                  if (dosage['route'] != null) {
+                     route = dosage['route']['text'] ?? dosage['route']['coding']?[0]?['display'] ?? '';
+                  }
+                  if (dosage['method'] != null) {
+                     timing = dosage['method']['text'] ?? dosage['method']['coding']?[0]?['display'] ?? '';
+                  }
+                }
+                
+                String instructions = '';
+                if (med['reasonCode'] != null && med['reasonCode'].isNotEmpty) {
+                  instructions = med['reasonCode'][0]['text'] ?? med['reasonCode'][0]['coding']?[0]?['display'] ?? '';
+                }
+                
+                return DataRow(
+                  cells: [
+                    DataCell(Text(name.toString())),
+                    DataCell(Text(dose.toString())),
+                    DataCell(Text(route.toString())),
+                    DataCell(Text(timing.toString())),
+                    DataCell(Text(instructions.toString())),
+                  ]
+                );
+              }).toList(),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildImmunizationSection(List<Map<String, dynamic>> immunizations) {
+    if (immunizations.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Row(
+          children: [
+            Icon(Icons.vaccines, color: Colors.blueAccent, size: 16),
+            SizedBox(width: 8),
+            Text("IMMUNIZATION TABLE", style: TextStyle(color: Colors.blueAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+          ]
+        ),
+        const SizedBox(height: 12),
+        Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFD9E4EF)),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x040E2233),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              )
+            ]
+          ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: constraints.maxWidth),
+                  child: DataTable(
+                    headingRowHeight: 40,
+                    dataRowMinHeight: 48,
+                    dataRowMaxHeight: 48,
+                    headingTextStyle: const TextStyle(color: Color(0xFF7A8D9C), fontSize: 11, fontWeight: FontWeight.bold),
+                    dataTextStyle: const TextStyle(color: Color(0xFF17324A), fontSize: 13, fontWeight: FontWeight.w500),
+                    columns: const [
+                      DataColumn(label: Text('Vaccine Name')),
+                      DataColumn(label: Text('Brand')),
+                      DataColumn(label: Text('Occurrence Date')),
+                      DataColumn(label: Text('Lot Number')),
+                      DataColumn(label: Text('Dose No.')),
+                    ],
+                    rows: immunizations.map((imm) {
+                      final name = imm['vaccineCode']?['text'] ?? imm['vaccineCode']?['coding']?[0]?['display'] ?? 'Vaccine';
+                      final brand = imm['manufacturer']?['display'] ?? imm['manufacturer']?['reference'] ?? '-';
+                      final date = imm['occurrenceDateTime'] ?? imm['occurrenceString'] ?? '-';
+                      final lot = imm['lotNumber'] ?? '-';
+                      
+                      String dose = '-';
+                      if (imm['protocolApplied'] != null && (imm['protocolApplied'] as List).isNotEmpty) {
+                        final p = imm['protocolApplied'][0];
+                        if (p['doseNumberPositiveInt'] != null) {
+                          dose = p['doseNumberPositiveInt'].toString();
+                        } else if (p['doseNumberString'] != null) {
+                          dose = p['doseNumberString'].toString();
+                        }
+                      }
+                      
+                      return DataRow(
+                        cells: [
+                          DataCell(Text(name.toString())),
+                          DataCell(Text(brand.toString())),
+                          DataCell(Text(date.toString().length > 10 ? date.toString().substring(0, 10) : date.toString())),
+                          DataCell(Text(lot.toString())),
+                          DataCell(Text(dose.toString())),
+                        ]
+                      );
+                    }).toList(),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 24),
+      ],
     );
   }
 }

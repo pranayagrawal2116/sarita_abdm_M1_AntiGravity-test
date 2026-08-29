@@ -296,10 +296,10 @@ class M3CallbackController {
 
       let transaction = M3ConsentStore.getTransaction(transactionId);
       
-      // Wait for on-request webhook to arrive (up to 60 seconds) to avoid race conditions with multiple HIPs
+      // Wait for on-request webhook to arrive (up to 4 seconds) to avoid race conditions with multiple HIPs
       // Since we already ACK'd the request above, we can safely wait here.
       let retries = 0;
-      while (!transaction && retries < 120) {
+      while (!transaction && retries < 8) {
           await new Promise(r => setTimeout(r, 500));
           M3ConsentStore.load();
           transaction = M3ConsentStore.getTransaction(transactionId);
@@ -312,19 +312,36 @@ class M3CallbackController {
         const transactions = M3ConsentStore.transactions || {};
         // Find transactions that haven't been mapped yet (their key is still the local UUID)
         const pendingTxns = Object.entries(transactions)
-           .filter(([key, t]) => key.length > 30 && t.requestId && !t.error && !Object.keys(transactions).some(k => k !== key && transactions[k].requestId === t.requestId))
+           .filter(([key, t]) => key && key.length > 30 && t && t.requestId && !t.error && !Object.keys(transactions).some(k => k !== key && transactions[k] && transactions[k].requestId === t.requestId))
            .map(([key, t]) => t)
            .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
            
         if (pendingTxns.length === 1) {
           transaction = pendingTxns[0];
-          
+        } else if (pendingTxns.length > 1) {
+          // Robust fallback: Match by careContextReference from the payload
+          if (entries && entries.length > 0 && entries[0].careContextReference) {
+             const ccRef = entries[0].careContextReference;
+             for (const t of pendingTxns) {
+                const consentReq = M3ConsentStore.getConsents().find(c => c.artefactDetails && c.artefactDetails[t.consentId]);
+                if (consentReq && consentReq.artefactDetails[t.consentId].careContexts) {
+                   const hasCC = consentReq.artefactDetails[t.consentId].careContexts.some(cc => cc.careContextReference === ccRef);
+                   if (hasCC) {
+                      transaction = t;
+                      break;
+                   }
+                }
+             }
+          }
+        }
+        
+        if (transaction) {
           // Re-key it immediately so future chunks map correctly
           M3ConsentStore.transactions[transactionId] = transaction;
           M3ConsentStore.save();
-          Logger.warn("M3Callback", "Fallback used: Mapped unmapped transaction to incoming health data", { transactionId });
-        } else if (pendingTxns.length > 1) {
-          Logger.error("M3Callback", "Ambiguous fallback: Multiple pending transactions found and on-request webhook is missing", { transactionId, count: pendingTxns.length });
+          Logger.warn("M3Callback", "Fallback used: Mapped unmapped transaction to incoming health data via careContext matching", { transactionId });
+        } else {
+          Logger.error("M3Callback", "Ambiguous fallback: Could not match transaction even with careContextReference", { transactionId, count: pendingTxns.length });
         }
       }
 

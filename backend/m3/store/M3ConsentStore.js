@@ -2,21 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Logger = require("../logging/logger");
 
-const storePath = path.join(__dirname, "../../data/m3_consents.json");
-const legacyStorePath = path.join(__dirname, "consents.json");
-
-// Migrate old data if it exists and new data doesn't
-if (!fs.existsSync(storePath) && fs.existsSync(legacyStorePath)) {
-  try {
-    if (!fs.existsSync(path.dirname(storePath))) {
-      fs.mkdirSync(path.dirname(storePath), { recursive: true });
-    }
-    fs.copyFileSync(legacyStorePath, storePath);
-    Logger.info("M3ConsentStore", "Migrated legacy consents.json to data/m3_consents.json");
-  } catch (err) {
-    Logger.error("M3ConsentStore", "Failed to migrate legacy consents.json", { error: err.message });
-  }
-}
+const storePath = path.join(__dirname, "consents.json");
 
 class M3ConsentStore {
   constructor() {

@@ -137,7 +137,7 @@ class M2ConsentManager {
     const firstCareContext = Array.isArray(firstPatient.careContexts) && firstPatient.careContexts[0]
       ? firstPatient.careContexts[0]
       : {};
-    const careContextReference = String(
+    const suppliedCareContextReference = String(
       linkData.careContextReference ||
       firstCareContext.careContextReference ||
       firstCareContext.referenceNumber ||
@@ -149,18 +149,28 @@ class M2ConsentManager {
     const linkToken = String(linkData.linkToken || "").trim();
     const tokenTransactionId = extractTransactionIdFromLinkToken(linkToken);
 
+    const existing = M2TransactionStore.getTransaction(requestId);
+    // The link token's transaction id is not a unique lifecycle key.  In the
+    // IIS logs it was reused by an older consent transaction, causing the new
+    // link to be silently attached to that old record.  Keep it as metadata,
+    // while using the gateway request id as this link workflow's stable key.
+    const careContextReference = this.preferAuthorizedCareContextReference(
+      suppliedCareContextReference,
+      existing?.careContextReference
+    );
+
     Logger.info("M2ConsentManager", "HIP Link Created.", {
       requestId,
       abhaAddress,
-      careContextReference
+      careContextReference,
+      linkTokenTransactionId: tokenTransactionId
     });
 
-    const existing = M2TransactionStore.getTransaction(requestId);
     let tx;
     if (existing) {
       tx = await M2TransactionStore.updateTransaction(requestId, {
         requestId,
-        transactionId: firstText(existing.transactionId, tokenTransactionId),
+        transactionId: firstText(existing.transactionId, requestId),
         gatewayRequestId: existing.gatewayRequestId || requestId,
         healthInformationRequestId: existing.healthInformationRequestId || "",
         patient: linkData.patient || existing.patient || {},
@@ -169,6 +179,7 @@ class M2ConsentManager {
         abhaNumber: abhaNumber || existing.abhaNumber || "",
         hipId: linkData.hipId || existing.hipId || "",
         linkToken: linkToken || existing.linkToken || "",
+        linkTokenTransactionId: tokenTransactionId || existing.linkTokenTransactionId || "",
         careContextReference: careContextReference || existing.careContextReference || "",
         careContexts: existing.careContexts?.length ? existing.careContexts : (firstPatient.careContexts || []),
         linkedAt: existing.linkedAt || createdTime,
@@ -180,7 +191,7 @@ class M2ConsentManager {
     } else {
       tx = await M2TransactionStore.createTransaction({
         requestId,
-        transactionId: tokenTransactionId,
+        transactionId: requestId,
         gatewayRequestId: requestId,
         patient: linkData.patient || {},
         patientId: abhaAddress,
@@ -188,6 +199,7 @@ class M2ConsentManager {
         abhaNumber,
         hipId: linkData.hipId || "",
         linkToken,
+        linkTokenTransactionId: tokenTransactionId,
         careContextReference,
         careContexts: firstPatient.careContexts || [],
         linkedAt: createdTime,
@@ -217,6 +229,26 @@ class M2ConsentManager {
     });
 
     return tx || M2TransactionStore.getTransaction(requestId);
+  }
+
+  preferAuthorizedCareContextReference(incomingReference, existingReference) {
+    const incoming = String(incomingReference || "").trim();
+    const existing = String(existingReference || "").trim();
+    if (!existing) return incoming;
+    if (!incoming || this.sameCareContextReference(incoming, existing)) {
+      // Preserve the gateway-authorized spelling (including its HI type
+      // suffix) when the frontend sends the legacy base reference again.
+      return existing;
+    }
+    return incoming;
+  }
+
+  sameCareContextReference(left, right) {
+    const normalize = (value) => String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/-(opconsultation|ipddischargesummary|diagnosticreport|prescription|wellnessrecord|immunizationrecord|healthdocumentrecord)$/i, "");
+    return normalize(left) === normalize(right);
   }
 
   async synchronizeConsentWorkflow() {

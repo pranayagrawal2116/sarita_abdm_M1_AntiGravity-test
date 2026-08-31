@@ -4,13 +4,13 @@ const storageService = require("../storage/PatientStorageService");
 
 router.post("/write", (req, res) => {
   try {
-    const { abhaId, patientName, hiType, fileName, content } = req.body;
+    const { abhaId, patientName, hiType, fileName, content, isLocalDraft } = req.body;
     
     if (!abhaId || !fileName || content === undefined) {
       return res.status(400).json({ error: "abhaId, fileName, and content are required" });
     }
 
-    const savedPath = storageService.savePatientFile(abhaId, patientName, fileName, content);
+    const savedPath = storageService.savePatientFile(abhaId, patientName, fileName, content, isLocalDraft);
     
     return res.json({ 
       success: true, 

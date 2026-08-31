@@ -126,34 +126,83 @@ class M2DataTransferManager {
       const requestedTypes = requestedTypesArray.length > 0 ? requestedTypesArray : ["OP Consultation"];
       const normalizedRequestedTypes = requestedTypes.map(r => this.normalizeHiType(r));
       const bundlePayloads = this.loadBundlePayloads(bundlesToSend);
-      
-      // Only send the ONE most recent bundle for each matching hiType
-      const selectedPayloads = [];
-      const seenTypes = new Set();
-      
-      const matchedPayloads = bundlePayloads.filter((item) => 
-         normalizedRequestedTypes.includes(this.normalizeHiType(item.meta?.hiType)) || 
-         requestedTypes.includes(item.meta?.hiType)
-      );
+      const currentTx = M2TransactionStore.getTransaction(transactionId) || {};
+      const allTxs = M2TransactionStore.listTransactions();
+      const contextCandidates = [
+        currentTx.consentDetails?.careContexts,
+        ...allTxs
+          .filter((tx) => tx.consentId === consentId || tx.consentDetails?.consentId === consentId)
+          .flatMap((tx) => [
+            tx.consentDetails?.careContexts,
+          ]),
+        currentTx.hiRequestPayload?.hiRequest?.consent?.careContexts,
+        currentTx.careContexts,
+        ...allTxs
+          .filter((tx) => tx.consentId === consentId || tx.consentDetails?.consentId === consentId)
+          .flatMap((tx) => [
+            tx.careContexts,
+            tx.hiRequestPayload?.hiRequest?.consent?.careContexts
+          ])
+      ];
+      const requestedCareContexts = contextCandidates.find(
+        (contexts) => Array.isArray(contexts) && contexts.length > 0
+      ) || [];
 
-      const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/'); // Enabled auto-push for M2 & M3
+      Logger.info("M2DataTransferManager", "Resolved consent care contexts for transfer.", {
+        transactionId,
+        consentId,
+        careContextReferences: requestedCareContexts.map(
+          (context) => context.careContextReference || context.referenceNumber || context.id || ""
+        )
+      });
       
-      if (!isDesktopApp) {
-        // Sort descending by date to get newest first
-        matchedPayloads.sort((a, b) => {
-          const timeA = new Date(a.meta?.updatedAt || a.meta?.createdAt || 0).getTime();
-          const timeB = new Date(b.meta?.updatedAt || b.meta?.createdAt || 0).getTime();
-          return timeB - timeA;
-        });
-      }
-      
-      for (const payload of matchedPayloads) {
-        if (!isDesktopApp) {
-          const hiType = this.normalizeHiType(payload.meta?.hiType);
-          if (seenTypes.has(hiType)) continue;
-          seenTypes.add(hiType);
+      const matchedPayloads = bundlePayloads.filter((item) => {
+         // Filter by HI Type first
+         const hiTypeMatches = normalizedRequestedTypes.includes(this.normalizeHiType(item.meta?.hiType)) || requestedTypes.includes(item.meta?.hiType);
+         if (!hiTypeMatches) return false;
+
+         // If the HIU selected care contexts, preserve its exact reference in
+         // the transfer. User-initiated links use the stable filename hash;
+         // automated links can use the generated reference persisted in the
+         // user-init state file.
+         if (requestedCareContexts.length > 0) {
+             const requestedRefs = requestedCareContexts
+               .map((cc) => cc.careContextReference || cc.referenceNumber || cc.id || "")
+               .filter(Boolean);
+             const matchedRef = requestedRefs.find((reference) =>
+               this.getCareContextReferencesForBundle(item).includes(reference)
+             );
+             if (matchedRef) {
+               item.matchedCareContextReference = matchedRef;
+               return true;
+             }
+             return false;
+         }
+         return true;
+      });
+
+      // Push all matched payloads
+      let selectedPayloads = [...matchedPayloads];
+
+      // Older automated-link registrations did not retain a document-to-care
+      // context mapping. When exactly one context is requested, retain the
+      // prior safe behaviour: send the newest bundle of the requested HI type
+      // and return the *requested* reference, never a synthesized one.
+      if (selectedPayloads.length === 0 && requestedCareContexts.length === 1) {
+        const requestedRef = requestedCareContexts[0].careContextReference || requestedCareContexts[0].referenceNumber || requestedCareContexts[0].id;
+        const linkedHiType = this.extractHiTypeFromCareContextReference(requestedRef);
+        const fallback = bundlePayloads
+          .filter((item) => {
+            const bundleHiType = this.normalizeHiType(item.meta?.hiType);
+            const isConsentAuthorized = normalizedRequestedTypes.includes(bundleHiType);
+            return isConsentAuthorized && (!linkedHiType || bundleHiType === linkedHiType);
+          })
+          .sort((left, right) => new Date(right.meta?.updatedAt || 0) - new Date(left.meta?.updatedAt || 0))[0];
+        if (fallback && requestedRef) {
+          fallback.matchedCareContextReference = requestedRef;
+          selectedPayloads = [fallback];
+          Logger.warn("M2DataTransferManager", "Using legacy single-context bundle mapping.", { transactionId, requestedRef });
         }
-        selectedPayloads.push(payload);
       }
 
       if (selectedPayloads.length === 0) {
@@ -239,7 +288,7 @@ class M2DataTransferManager {
 
       // Update local storage values
       await M2TransactionStore.updateTransaction(transactionId, {
-        encryptedPayload: null, // removed for performance
+        encryptedPayload: encryptedEntries,
         encryptionMetadata: { checksum: overallChecksum },
         receiverPublicKey,
         receiverNonce,
@@ -254,11 +303,32 @@ class M2DataTransferManager {
         reason: "Data package acknowledged by HIU receiver.",
         statusCode: dataPushResult.statusCode
       });
+
+      // Keep the legacy sent-record tracker in sync so automated discovery
+      // does not advertise a record that was already transferred.
+      try {
+        const fs = require("fs");
+        const path = require("path");
+        for (const payload of selectedPayloads) {
+          if (!payload.meta?.sourceTxtFile) continue;
+          const folderPath = path.dirname(payload.meta.sourceTxtFile);
+          const trackerFile = path.join(folderPath, "sent_records.json");
+          let sentRecords = [];
+          if (fs.existsSync(trackerFile)) {
+            try { sentRecords = JSON.parse(fs.readFileSync(trackerFile, "utf8")); } catch (_) {}
+          }
+          const fileName = path.basename(payload.meta.sourceTxtFile);
+          if (!sentRecords.includes(fileName)) sentRecords.push(fileName);
+          fs.writeFileSync(trackerFile, JSON.stringify(sentRecords, null, 2));
+        }
+      } catch (error) {
+        Logger.error("M2DataTransferManager", "Failed to update sent-record tracker.", error);
+      }
       
-      const currentTx = M2TransactionStore.getTransaction(transactionId);
-      const notifyConsentId = this.resolveConsentArtifactId(currentTx, consentId);
-      const notifyResult = await this.sendHealthInformationNotify(currentTx, {
-        requestId: currentTx.gatewayRequestId || currentTx.requestId || requestDetails?.requestId || transactionId,
+      const refreshedTx = M2TransactionStore.getTransaction(transactionId);
+      const notifyConsentId = this.resolveConsentArtifactId(refreshedTx, consentId);
+      const notifyResult = await this.sendHealthInformationNotify(refreshedTx, {
+        requestId: refreshedTx.gatewayRequestId || refreshedTx.requestId || requestDetails?.requestId || transactionId,
         consentId: notifyConsentId,
         transactionId,
         status: "TRANSFERRED",
@@ -374,22 +444,9 @@ class M2DataTransferManager {
       : this.maxRetries + 1;
     const retryDelayMs = Number(process.env.M2_DATA_PUSH_RETRY_DELAY_MS || 250);
 
-    // NAT Loopback Bypass for IIS/Windows Server deployments
-    let targetUrl = dataPushUrl;
-    try {
-      if (dataPushUrl && dataPushUrl.includes('abdmapi.saritainfotech.com')) {
-        const urlObj = new URL(dataPushUrl);
-        const port = process.env.PORT || 3000;
-        targetUrl = `http://127.0.0.1:${port}${urlObj.pathname}${urlObj.search}`;
-        Logger.info("M2DataTransferManager", "Rewrote dataPushUrl to localhost to bypass NAT loopback", { original: dataPushUrl, rewritten: targetUrl });
-      }
-    } catch (e) {
-      // Ignore URL parsing errors
-    }
-
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
       try {
-        const response = await axios.post(targetUrl, payload, {
+        const response = await axios.post(dataPushUrl, payload, {
           headers: { "Content-Type": "application/json" },
           timeout: Number(process.env.M2_DATA_PUSH_TIMEOUT_MS || 30000)
         });
@@ -676,36 +733,8 @@ class M2DataTransferManager {
     if (requestedHiTypes.length === 0) {
       requestedHiTypes = ["OP Consultation"];
     }
-    
-    // Enforce strictly one HI type at a time for Mobile App (M2), but send ALL for Desktop App (M3)
+
     const isDesktopApp = dataPushUrl && dataPushUrl.includes('/m3/');
-    if (!isDesktopApp && requestedHiTypes.length > 1) {
-      try {
-        const BundleRegistry = require("../fhir/BundleRegistry");
-        const abhaMatch = patientId.match(/^(.+?@sbx)/);
-        const searchId = abhaMatch ? abhaMatch[1] : patientId;
-        const patientBundles = BundleRegistry.getBundlesForPatient(searchId, {
-          abhaNumber: this.extractAbhaNumberFromTransaction(currentTx)
-        });
-        
-        const normalizedRequested = requestedHiTypes.map(r => this.normalizeHiType(r));
-        const matchedBundles = patientBundles.filter(b => normalizedRequested.includes(this.normalizeHiType(b.hiType)));
-        
-        if (matchedBundles.length > 0) {
-          matchedBundles.sort((a, b) => {
-            const timeA = new Date(a.updatedAt || a.createdAt || 0).getTime();
-            const timeB = new Date(b.updatedAt || b.createdAt || 0).getTime();
-            return timeB - timeA;
-          });
-          requestedHiTypes = [matchedBundles[0].hiType];
-        } else {
-          requestedHiTypes = [requestedHiTypes[0]];
-        }
-      } catch (e) {
-        console.error("Failed to automatically find the newest bundle for M2 push. Falling back.", e);
-        requestedHiTypes = [requestedHiTypes[0]];
-      }
-    }
     
     console.log(`Requested HI Types: ${requestedHiTypes.join(", ")}`);
     console.log(`Date Range: ${JSON.stringify(currentTx.consentDetails?.dateRange || {})}`);
@@ -973,45 +1002,45 @@ class M2DataTransferManager {
   }
 
   resolveCareContextReferenceForBundle(tx = {}, selectedPayload = {}, index = 0) {
+    if (selectedPayload.matchedCareContextReference) return selectedPayload.matchedCareContextReference;
     if (selectedPayload.meta?.careContextReference) return selectedPayload.meta.careContextReference;
 
-    const selectedBundle = selectedPayload.bundle || {};
-    
-    // Look at the original consent transaction
-    let requestedCareContexts = [];
-    if (tx.consentDetails?.careContexts) {
-      requestedCareContexts = tx.consentDetails.careContexts;
-    } else if (tx.hiRequestPayload?.hiRequest?.consent?.careContexts) {
-      requestedCareContexts = tx.hiRequestPayload.hiRequest.consent.careContexts;
+    const bundleFileName = selectedPayload.meta?.bundleFileName;
+    if (bundleFileName) {
+      const sourceTxtFile = bundleFileName.replace("_bundle.json", ".txt");
+      return require("crypto").createHash("md5").update(sourceTxtFile).digest("hex").substring(0, 8);
     }
 
-    const bundleHiType = this.normalizeHiType(selectedPayload.meta?.hiType || "");
+    // Fallbacks if no bundleFileName exists
+    return `UnknownRef-${index}`;
+  }
 
-    if (requestedCareContexts.length > 0) {
-      // Try to find a care context reference that matches this bundle's HI Type
-      const matchingContext = requestedCareContexts.find(cc => {
-        const refStr = (cc.careContextReference || cc.referenceNumber || cc.id || "").toLowerCase();
-        return refStr.includes(bundleHiType);
-      });
+  getCareContextReferencesForBundle(selectedPayload = {}) {
+    const bundleFileName = selectedPayload.meta?.bundleFileName || "";
+    const sourceTxtFile = bundleFileName.replace(/_bundle\.json$/i, ".txt");
+    const references = [
+      selectedPayload.meta?.careContextReference,
+      bundleFileName,
+      sourceTxtFile
+    ].filter(Boolean);
 
-      if (matchingContext) {
-        return matchingContext.careContextReference || matchingContext.referenceNumber || matchingContext.id;
+    if (sourceTxtFile) {
+      references.push(crypto.createHash("md5").update(sourceTxtFile).digest("hex").substring(0, 8));
+      try {
+        const UserInitState = require("../user_init/services/UserInitState");
+        const persistedReference = UserInitState.getCareContextReferenceForDocument(sourceTxtFile);
+        if (persistedReference) references.push(persistedReference);
+      } catch (_) {
+        // User-initiated module is optional for deployments that only use HIP linking.
       }
-
-      // If no explicit hiType match is found, just return the exact care context reference
-      // that the HIU requested. Appending a suffix breaks the linkage for User Initiated Linking
-      // because the HIU expects the exact reference it authorized.
-      const firstCc = requestedCareContexts[0];
-      return firstCc.careContextReference || firstCc.referenceNumber || firstCc.id;
     }
+    return references;
+  }
 
-    // Secondary fallback to legacy handling
-    if (Array.isArray(tx.careContexts) && tx.careContexts.length > 0) {
-      const idx = index % tx.careContexts.length;
-      return tx.careContexts[idx].careContextReference || tx.careContexts[idx].referenceNumber || tx.careContexts[idx].id || "";
-    }
-
-    return this.getCareContextReference(tx);
+  extractHiTypeFromCareContextReference(reference) {
+    const value = String(reference || "").trim();
+    const match = value.match(/-(OPConsultation|Prescription|DiagnosticReport|DischargeSummary|ImmunizationRecord|HealthDocumentRecord|WellnessRecord|Invoice)$/i);
+    return match ? this.normalizeHiType(match[1]) : "";
   }
 
   buildClinicalData(tx, patientId) {

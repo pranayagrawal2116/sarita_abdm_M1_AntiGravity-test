@@ -62,7 +62,7 @@ class PatientStorageService {
   /**
    * Saves a file in the patient's directory.
    */
-  savePatientFile(abhaId, patientName, fileName, content) {
+  savePatientFile(abhaId, patientName, fileName, content, isLocalDraft = false) {
     const dirPath = this.getPatientDirectory(abhaId, patientName);
     const safeFileName = this._sanitizePathSegment(fileName);
     
@@ -70,6 +70,30 @@ class PatientStorageService {
     
     // Optional: add concurrency lock or atomic write if necessary
     fs.writeFileSync(filePath, content, 'utf8');
+
+    // Phase 2: Local HI Document Registry
+    if (isLocalDraft) {
+      const localDataPath = path.join(dirPath, 'local data');
+      let existingFiles = [];
+      if (fs.existsSync(localDataPath)) {
+        try {
+          const fileContent = fs.readFileSync(localDataPath, 'utf8');
+          existingFiles = fileContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        } catch (e) {
+          console.error("Error reading local data file:", e);
+        }
+      }
+
+      if (!existingFiles.includes(safeFileName)) {
+        existingFiles.push(safeFileName);
+        try {
+          fs.writeFileSync(localDataPath, existingFiles.join('\n') + '\n', 'utf8');
+        } catch (e) {
+          console.error("Error writing to local data file:", e);
+        }
+      }
+    }
+
     return filePath;
   }
 

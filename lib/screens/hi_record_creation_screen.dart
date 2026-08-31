@@ -99,7 +99,7 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
   Future<void> _handleSave(Map<String, dynamic> data) async {
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        final savedPath = await _saveLocalDoc(data);
+        final savedPath = await _saveLocalDoc(data, isLocalDraft: true);
         if (!mounted) return;
         _showToast(context, 'Local draft saved: $savedPath');
         Navigator.pop(context);
@@ -115,7 +115,7 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
   void _handleLink(Map<String, dynamic> data) async {
     if (_formKey.currentState?.validate() ?? false) {
       try {
-        await _saveLocalDoc(data);
+        await _saveLocalDoc(data, isLocalDraft: false);
       } catch (error) {
         if (!mounted) return;
         _showErrorToast(context, 'Could not save local draft: $error');
@@ -198,7 +198,7 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
     }
   }
 
-  Future<String> _saveLocalDoc(Map<String, dynamic> recordData) async {
+  Future<String> _saveLocalDoc(Map<String, dynamic> recordData, {bool isLocalDraft = false}) async {
     final patient = widget.patientProfile;
     final patientName = _firstText([
       patient['name'],
@@ -241,7 +241,7 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       fullPath = '$patientFolderName/$fileName';
     }
 
-    return await saveDraft(abhaId, patientName, fullPath, _buildTextDocument(recordData));
+    return await saveDraft(abhaId, patientName, fullPath, _buildTextDocument(recordData), isLocalDraft: isLocalDraft);
   }
 
   String _buildTextDocument(Map<String, dynamic> recordData) {

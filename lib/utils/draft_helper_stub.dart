@@ -1,4 +1,4 @@
-Future<String> saveDraftImpl(String abhaId, String patientName, String fileName, String content) async {
+Future<String> saveDraftImpl(String abhaId, String patientName, String fileName, String content, {bool isLocalDraft = false}) async {
   throw UnsupportedError('Cannot save drafts on this platform');
 }
 

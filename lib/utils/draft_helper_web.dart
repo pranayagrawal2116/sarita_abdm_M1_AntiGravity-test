@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
 
-Future<String> saveDraftImpl(String abhaId, String patientName, String fileName, String content) async {
+Future<String> saveDraftImpl(String abhaId, String patientName, String fileName, String content, {bool isLocalDraft = false}) async {
   try {
     final response = await http.post(
       Uri.parse('${ApiConfig.baseUrl}/m2/patient-storage/write'),
@@ -12,6 +12,7 @@ Future<String> saveDraftImpl(String abhaId, String patientName, String fileName,
         'patientName': patientName,
         'fileName': fileName.contains('/') ? fileName.split('/').last : fileName,
         'content': content,
+        'isLocalDraft': isLocalDraft,
       }),
     );
     

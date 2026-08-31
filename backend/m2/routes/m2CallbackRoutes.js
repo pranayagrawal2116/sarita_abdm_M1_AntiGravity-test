@@ -19,18 +19,15 @@ router.post(
     "/api/v3/consents/hip/notify",
     "/v3/consents/hip/notify"
   ],
-  M2CallbackController.onHipConsentNotify
-);
+  M2CallbackController.onHipConsentNotify);
 
 router.post(
   ["/api/v3/consent/request/on-init", "/v3/consent/request/on-init"],
-  M2CallbackController.onConsentRequestInit
-);
+  M2CallbackController.onConsentRequestInit);
 
 router.post(
   ["/api/v3/consent/request/on-status", "/v3/consent/request/on-status"],
-  M2CallbackController.onConsentRequestStatus
-);
+  M2CallbackController.onConsentRequestStatus);
 
 // Health information HIP request callbacks
 router.post(
@@ -42,54 +39,38 @@ router.post(
     "/api/v3/health-information/hip/on-request",
     "/v3/health-information/hip/on-request"
   ],
-  M2CallbackController.handleHipRequest
-);
+  M2CallbackController.handleHipRequest);
 router.post(
   [
     "/api/v3/health-information/on-request",
     "/v3/health-information/on-request",
   ],
-  M2CallbackController.onHealthInformationOnRequest
-);
+  M2CallbackController.onHealthInformationOnRequest);
 
 router.post(
   [
     "/api/v3/health-information/notify",
     "/v3/health-information/notify",
   ],
-  M2CallbackController.onHealthInformationNotify
-);
+  M2CallbackController.onHealthInformationNotify);
 
-// User Initiated Linking (HIP) callbacks
+// Older automated HIP linking registrations use these callback URLs. Do not
+// add the /hip/... user-initiated URLs here: they are owned by user_init.
 router.post(
-  [
-    "/api/v3/care-contexts/discover",
-    "/v3/care-contexts/discover",
-    "/api/v3/hip/patient/care-context/discover",
-    "/v3/hip/patient/care-context/discover"
-  ],
+  ["/api/v3/care-contexts/discover", "/v3/care-contexts/discover"],
   M2CallbackController.handleDiscover
 );
 
 router.post(
-  [
-    "/api/v3/links/link/init",
-    "/v3/links/link/init",
-    "/api/v3/hip/link/care-context/init",
-    "/v3/hip/link/care-context/init"
-  ],
+  ["/api/v3/links/link/init", "/v3/links/link/init"],
   M2CallbackController.handleLinkInit
 );
 
 router.post(
-  [
-    "/api/v3/links/link/confirm",
-    "/v3/links/link/confirm",
-    "/api/v3/hip/link/care-context/confirm",
-    "/v3/hip/link/care-context/confirm"
-  ],
+  ["/api/v3/links/link/confirm", "/v3/links/link/confirm"],
   M2CallbackController.handleLinkConfirm
 );
+
 
 router.post("/api/m2/callbacks/:type", M2CallbackController.receive);
 router.post("/api/m2/callbacks", M2CallbackController.receive);

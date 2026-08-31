@@ -19,6 +19,29 @@ const toText = (value) => {
 };
 
 class M2CallbackController {
+  // Legacy automated HIP-linking callbacks are intentionally separate from
+  // the explicit /hip/... user-initiated callback routes.
+  static handleDiscover(req, res) {
+    const payload = req.body || {};
+    payload.requestId = payload.requestId || req.headers["request-id"] || req.headers.request_id;
+    res.status(202).json({});
+    setImmediate(() => M2HipLinkingController.processDiscovery(payload));
+  }
+
+  static handleLinkInit(req, res) {
+    const payload = req.body || {};
+    payload.requestId = payload.requestId || req.headers["request-id"] || req.headers.request_id;
+    res.status(202).json({});
+    setImmediate(() => M2HipLinkingController.processLinkInit(payload));
+  }
+
+  static handleLinkConfirm(req, res) {
+    const payload = req.body || {};
+    payload.requestId = payload.requestId || req.headers["request-id"] || req.headers.request_id;
+    res.status(202).json({});
+    setImmediate(() => M2HipLinkingController.processLinkConfirm(payload));
+  }
+
   /**
    * Webhook: POST /v3/consent/request/hip/notify and /v3/consent/request/hip/on-notify
    * @param {Object} req - Express request
@@ -264,63 +287,5 @@ class M2CallbackController {
    * @param {Object} req 
    * @param {Object} res 
    */
-  static async handleDiscover(req, res) {
-    Logger.info("M2CallbackController", "HIP handleDiscover webhook received.");
-    const payload = req.body || {};
-    if (!payload.requestId && (req.headers["request-id"] || req.headers["request_id"])) {
-      payload.requestId = req.headers["request-id"] || req.headers["request_id"];
-    }
-    
-    // ABDM expects immediate 202
-    res.status(202).json({});
-
-    // Process asynchronously
-    setImmediate(() => {
-      M2HipLinkingController.processDiscovery(payload);
-    });
-  }
-
-  /**
-   * Webhook: POST /v3/links/link/init
-   * @param {Object} req 
-   * @param {Object} res 
-   */
-  static async handleLinkInit(req, res) {
-    Logger.info("M2CallbackController", "HIP handleLinkInit webhook received.");
-    const payload = req.body || {};
-    if (!payload.requestId && (req.headers["request-id"] || req.headers["request_id"])) {
-      payload.requestId = req.headers["request-id"] || req.headers["request_id"];
-    }
-    
-    // ABDM expects immediate 202
-    res.status(202).json({});
-
-    // Process asynchronously
-    setImmediate(() => {
-      M2HipLinkingController.processLinkInit(payload);
-    });
-  }
-
-  /**
-   * Webhook: POST /v3/links/link/confirm
-   * @param {Object} req 
-   * @param {Object} res 
-   */
-  static async handleLinkConfirm(req, res) {
-    Logger.info("M2CallbackController", "HIP handleLinkConfirm webhook received.");
-    const payload = req.body || {};
-    if (!payload.requestId && (req.headers["request-id"] || req.headers["request_id"])) {
-      payload.requestId = req.headers["request-id"] || req.headers["request_id"];
-    }
-    
-    // ABDM expects immediate 202
-    res.status(202).json({});
-
-    // Process asynchronously
-    setImmediate(() => {
-      M2HipLinkingController.processLinkConfirm(payload);
-    });
-  }
 }
-
 module.exports = M2CallbackController;

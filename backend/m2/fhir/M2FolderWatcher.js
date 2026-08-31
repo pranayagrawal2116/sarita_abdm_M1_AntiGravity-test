@@ -35,10 +35,11 @@ const startWatcher = () => {
   log("Starting M2 Folder Watcher for FHIR Bundle Generation", { projectRoot: PROJECT_ROOT });
 
   // Watch for .txt files in directories matching the abhaId pattern
-  // MacOS desktop writes directly to PROJECT_ROOT, Web backend writes to backend/data/
+  // Match PatientStorageService.js dataRoot resolution
   const watchPatterns = [
-    path.join(PROJECT_ROOT, "*@sbx_*", "*.txt"),
-    path.join(PROJECT_ROOT, "backend", "data", "*@sbx_*", "*.txt")
+    path.join(__dirname, "../../../data", "*@sbx_*", "*.txt"),      // If inside backend/m2/fhir
+    path.join(__dirname, "../../data", "*@sbx_*", "*.txt"),         // If flattened to m2/fhir
+    path.join(PROJECT_ROOT, "*@sbx_*", "*.txt")                     // Desktop root fallback
   ];
   
   const watcher = chokidar.watch(watchPatterns, {

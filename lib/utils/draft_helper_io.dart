@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_config.dart';
 
-Future<String> saveDraftImpl(String abhaId, String patientName, String fileName, String content) async {
+Future<String> saveDraftImpl(String abhaId, String patientName, String fileName, String content, {bool isLocalDraft = false}) async {
   final file = File(fileName);
   await file.writeAsString(content, flush: true);
   
@@ -19,7 +19,7 @@ Future<String> saveDraftImpl(String abhaId, String patientName, String fileName,
         'abhaId': abhaId,
         'patientName': patientName,
         'fileName': baseName,
-        'content': content,
+        'content': content, 'isLocalDraft': isLocalDraft,
       }),
     );
   } catch (e) {

@@ -568,7 +568,9 @@ class M2CallbackManager {
 
     if (careContextReferences.length > 0) {
       const tx = waiting.find((item) => this.transactionCareContextReferences(item)
-        .some((ref) => careContextReferences.includes(ref)));
+        .some((ref) => careContextReferences.some((callbackRef) =>
+          this.sameCareContextReference(ref, callbackRef)
+        )));
       if (tx) {
         return { tx, reason: "Matched WAITING_FOR_CONSENT by CareContextReference", careContextReferences, patientId, hipId };
       }
@@ -643,6 +645,14 @@ class M2CallbackManager {
 
   sameText(left, right) {
     return String(left || "").trim().toLowerCase() === String(right || "").trim().toLowerCase();
+  }
+
+  sameCareContextReference(left, right) {
+    const normalize = (value) => String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/-(opconsultation|ipddischargesummary|diagnosticreport|prescription|wellnessrecord|immunizationrecord|healthdocumentrecord)$/i, "");
+    return normalize(left) === normalize(right);
   }
 }
 

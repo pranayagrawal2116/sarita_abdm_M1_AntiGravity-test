@@ -317,6 +317,8 @@ app.use("/api/m2/hip/transfer", require("./m2/routes/m2DataTransferRoutes"));
 app.use("/api/m2/patient-storage", require("./m2/routes/patientStorageRoutes"));
 app.use("/api/m2", require("./m2/routes/m2AuthRoutes"));
 app.use("/", require("./m2/routes/m2CallbackRoutes"));
+app.use("/", require("./m2/user_init/routes"));
+
 
 // Mount M3 module routes
 app.use("/api/m3/gateway", require("./m3/routes/m3AuthRoutes"));

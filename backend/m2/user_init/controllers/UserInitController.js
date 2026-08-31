@@ -59,7 +59,7 @@ class UserInitController {
     };
 
     if (requestedAbhaAddress) {
-      const documents = LocalDataRegistry.getAvailableDocumentsForAbha(requestedAbhaAddress);
+      const documents = await LocalDataRegistry.getAvailableDocumentsForAbha(requestedAbhaAddress);
       
       if (documents.length > 0) {
         const careContexts = documents.map(doc => {
@@ -203,10 +203,12 @@ class UserInitController {
           }
         };
 
-        const mappedContexts = requestedContexts.map(cc => {
-          const original = (tx.careContextsMap || []).find(m => m.referenceNumber === cc.referenceNumber);
-          return original ? original : cc;
-        });
+        const contextsByReference = new Map(
+          (tx.careContextsMap || []).map((context) => [context.referenceNumber, context])
+        );
+        const mappedContexts = requestedContexts.map((cc) =>
+          contextsByReference.get(cc.referenceNumber) || cc
+        );
 
         UserInitState.updateTransaction(transactionId, {
           linkRefNumber,

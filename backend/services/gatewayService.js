@@ -3,6 +3,7 @@ const { getHeaders } = require("../utils/headers");
 
 let cachedAccessToken = "";
 let cachedExpiryMs = 0;
+let tokenRequestPromise = null;
 
 const parseTokenExpiryMs = (token) => {
     try {
@@ -22,31 +23,54 @@ const parseTokenExpiryMs = (token) => {
     }
 };
 
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const isRetryable = (error) => {
+    const status = error?.response?.status;
+    return !status || status === 408 || status === 429 || status >= 500;
+};
+
+const requestGatewayToken = async () => {
+    const clientId = process.env.CLIENT_ID || process.env.ABDM_CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET || process.env.ABDM_CLIENT_SECRET;
+    let lastError;
+
+    // On a fresh IIS/PM2 restart the first TLS or gateway request can be
+    // transiently unavailable. Retry it here so the caller never has to make
+    // the same API request twice.
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+        try {
+            const res = await axios.post(
+                `${process.env.GATEWAY_BASE}/gateway/v0.5/sessions`,
+                { clientId, clientSecret, grantType: "client_credentials" },
+                { headers: getHeaders(), timeout: 20000 }
+            );
+            const accessToken = res.data.accessToken;
+            if (!accessToken) throw new Error("Gateway response did not contain accessToken.");
+            cachedAccessToken = accessToken;
+            cachedExpiryMs = parseTokenExpiryMs(accessToken) || Date.now() + 15 * 60 * 1000;
+            return accessToken;
+        } catch (error) {
+            lastError = error;
+            if (!isRetryable(error) || attempt === 2) break;
+            await wait(500 * (attempt + 1));
+        }
+    }
+    throw lastError;
+};
+
 exports.getGatewayToken = async () => {
     const now = Date.now();
     if (cachedAccessToken && cachedExpiryMs > now + 60 * 1000) {
         return cachedAccessToken;
     }
 
-    const clientId = process.env.CLIENT_ID || process.env.ABDM_CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET || process.env.ABDM_CLIENT_SECRET;
-
-    const res = await axios.post(
-        `${process.env.GATEWAY_BASE}/gateway/v0.5/sessions`,
-        {
-            clientId,
-            clientSecret,
-            grantType: "client_credentials",
-        },
-        { headers: getHeaders() }
-    );
-
-    const accessToken = res.data.accessToken;
-    cachedAccessToken = accessToken;
-    cachedExpiryMs =
-        parseTokenExpiryMs(accessToken) || Date.now() + 15 * 60 * 1000;
-
-    return accessToken;
+    if (!tokenRequestPromise) {
+        tokenRequestPromise = requestGatewayToken().finally(() => {
+            tokenRequestPromise = null;
+        });
+    }
+    return tokenRequestPromise;
 };
 
 exports.clearCache = () => {

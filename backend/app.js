@@ -392,7 +392,36 @@ app.post(
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
 
-app.listen(PORT, HOST, () => {
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function warmUpService(name, initialize) {
+  let lastError;
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      await initialize();
+      console.log(`✅ ${name} initialized before accepting requests.`);
+      return;
+    } catch (error) {
+      lastError = error;
+      console.error(`⚠️ ${name} startup attempt ${attempt}/3 failed:`, error.message);
+      if (attempt < 3) await delay(1000 * attempt);
+    }
+  }
+  throw lastError;
+}
+
+async function startServer() {
+  // Do not accept IIS/PM2 traffic until outbound ABDM authentication is ready.
+  // This removes the cold-start race where the first user action failed while
+  // token initialization was still running in the background.
+  const M2TokenManager = require("./m2/tokens/M2TokenManager");
+  const M3TokenManager = require("./m3/tokens/M3TokenManager");
+  await Promise.all([
+    warmUpService("ABDM M2 gateway/session tokens", () => M2TokenManager.initialize()),
+    warmUpService("ABDM M3 gateway token", () => M3TokenManager.initialize())
+  ]);
+
+  app.listen(PORT, HOST, () => {
   const localBaseUrl = `http://localhost:${PORT}`;
   const publicBaseUrl = String(process.env.PUBLIC_BASE_URL || "").trim();
   console.log(`✅ Server running on ${localBaseUrl}`);
@@ -412,25 +441,13 @@ app.listen(PORT, HOST, () => {
   }
   console.log("🛠 Callback config:", `${localBaseUrl}/api/config/callbacks`);
 
-  // Initialize M2 Token Manager (Gateway & Session tokens) on startup
-  const M2TokenManager = require("./m2/tokens/M2TokenManager");
-  M2TokenManager.initialize().then(() => {
-    console.log("✅ ABDM M2 Tokens (Gateway & Session) initialized on startup.");
-  }).catch(err => {
-    console.error("❌ Failed to initialize ABDM M2 Tokens on startup:", err.message);
   });
+}
 
-  // Initialize M3 Token Manager on startup
-  const M3TokenManager = require("./m3/tokens/M3TokenManager");
-  M3TokenManager.initialize().then(() => {
-    console.log("✅ ABDM M3 Token initialized on startup.");
-  }).catch(err => {
-    console.error("❌ Failed to initialize ABDM M3 Token on startup:", err.message);
-  });
-
-
+startServer().catch((error) => {
+  console.error("❌ Server startup aborted because ABDM authentication could not be initialized:", error.message);
+  process.exitCode = 1;
 });
-
 
 
 

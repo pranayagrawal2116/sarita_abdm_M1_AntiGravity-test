@@ -54,7 +54,8 @@ const fail = (stage, error) => {
       ],
     });
 
-    assert.strictEqual(linked.transactionId, transactionId, "link-token transactionId must be persisted");
+    assert.strictEqual(linked.transactionId, requestId, "link requestId must be the unique transaction key");
+    assert.strictEqual(linked.linkTokenTransactionId, transactionId, "link-token transactionId must be retained as metadata");
     assert.strictEqual(linked.currentState, "WAITING_FOR_CONSENT", "linked context should wait for consent");
 
     const callbackResult = await M2CallbackManager.receiveCallback({
@@ -79,22 +80,23 @@ const fail = (stage, error) => {
     });
 
     assert.strictEqual(callbackResult.status, "success", "consent notify callback should process");
-    assert.strictEqual(callbackResult.transactionId, transactionId, "callback result must retain ABDM transactionId");
+    assert.strictEqual(callbackResult.transactionId, requestId, "callback result must retain the link transaction key");
 
     const consentTx = M2TransactionStore.getTransaction(consentId);
     assert.ok(consentTx, "consent should be queryable by consentId");
-    assert.strictEqual(consentTx.transactionId, transactionId, "consent transactionId must remain ABDM id");
+    assert.strictEqual(consentTx.transactionId, requestId, "consent transactionId must remain the link request id");
+    assert.strictEqual(consentTx.linkTokenTransactionId, transactionId, "consent must retain link-token transaction metadata");
     assert.strictEqual(consentTx.consentDetails.status, "Active", "granted consent should become Active");
 
-    await M2TransactionStore.updateTransaction(transactionId, {
+    await M2TransactionStore.updateTransaction(requestId, {
       transactionId: "",
       requestId: "",
       consentId: "",
       healthInformationRequestId: "",
     });
 
-    const protectedTx = M2TransactionStore.getTransaction(transactionId);
-    assert.strictEqual(protectedTx.transactionId, transactionId, "empty transactionId update must be ignored");
+    const protectedTx = M2TransactionStore.getTransaction(requestId);
+    assert.strictEqual(protectedTx.transactionId, requestId, "empty transactionId update must be ignored");
     assert.strictEqual(protectedTx.requestId, requestId, "empty requestId update must be ignored");
     assert.strictEqual(protectedTx.consentId, consentId, "empty consentId update must be ignored");
     assert.ok(

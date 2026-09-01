@@ -15,9 +15,9 @@ const guessHiType = (fileName) => {
   if (normalized.includes("diagnosticreport")) return "DiagnosticReport";
   if (normalized.includes("prescription")) return "Prescription";
   if (normalized.includes("opconsultation")) return "OPConsultation";
-  if (normalized.includes("dischargesummary")) return "DischargeSummary";
+  if (normalized.includes("dischargesummary") || normalized.includes("ipddischargesummary")) return "DischargeSummary";
   if (normalized.includes("immunizationrecord")) return "ImmunizationRecord";
-  if (normalized.includes("healthdocumentrecord")) return "HealthDocumentRecord";
+  if (normalized.includes("healthdocumentrecord") || normalized.includes("healthdocument")) return "HealthDocumentRecord";
   if (normalized.includes("wellnessrecord")) return "WellnessRecord";
   if (normalized.includes("invoice")) return "Invoice";
   return "DocumentReference";

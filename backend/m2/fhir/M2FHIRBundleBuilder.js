@@ -57,9 +57,9 @@ const normalizeHiType = (raw) => {
   if (s === "diagnosticreport") return "DiagnosticReport";
   if (s === "prescription" || s === "prescriptionrecord") return "Prescription";
   if (s === "opconsultation" || s === "consultation") return "OPConsultation";
-  if (s === "dischargesummary" || s === "discharge") return "DischargeSummary";
+  if (s === "dischargesummary" || s === "ipddischargesummary" || s === "discharge") return "DischargeSummary";
   if (s === "immunizationrecord" || s === "immunization") return "ImmunizationRecord";
-  if (s === "healthdocumentrecord" || s === "healthdocument") return "HealthDocumentRecord";
+  if (s === "healthdocumentrecord" || s === "healthdocument" || s === "healthrecord") return "HealthDocumentRecord";
   if (s === "wellnessrecord" || s === "wellness") return "WellnessRecord";
   if (s === "invoice") return "Invoice";
   // Fallback: return the raw value unchanged so we don't silently discard it

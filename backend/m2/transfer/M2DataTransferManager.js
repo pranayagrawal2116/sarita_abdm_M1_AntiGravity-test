@@ -866,9 +866,9 @@ class M2DataTransferManager {
     if (s === "diagnosticreport") return "diagnosticreport";
     if (s === "prescription" || s === "prescriptionrecord") return "prescription";
     if (s === "opconsultation" || s === "consultation") return "opconsultation";
-    if (s === "dischargesummary" || s === "discharge") return "dischargesummary";
+    if (s === "dischargesummary" || s === "ipddischargesummary" || s === "discharge") return "dischargesummary";
     if (s === "immunizationrecord" || s === "immunization") return "immunizationrecord";
-    if (s === "healthdocumentrecord" || s === "healthdocument") return "healthdocumentrecord";
+    if (s === "healthdocumentrecord" || s === "healthdocument" || s === "healthrecord") return "healthdocumentrecord";
     if (s === "wellnessrecord" || s === "wellness") return "wellnessrecord";
     if (s === "invoice") return "invoice";
     return s;
@@ -1039,7 +1039,7 @@ class M2DataTransferManager {
 
   extractHiTypeFromCareContextReference(reference) {
     const value = String(reference || "").trim();
-    const match = value.match(/-(OPConsultation|Prescription|DiagnosticReport|DischargeSummary|ImmunizationRecord|HealthDocumentRecord|WellnessRecord|Invoice)$/i);
+    const match = value.match(/-(OPConsultation|Prescription|DiagnosticReport|DischargeSummary|IPDDischargeSummary|ImmunizationRecord|HealthDocumentRecord|HealthDocument|WellnessRecord|Invoice)$/i);
     return match ? this.normalizeHiType(match[1]) : "";
   }
 

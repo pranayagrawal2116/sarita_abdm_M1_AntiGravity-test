@@ -117,6 +117,22 @@ class M3PatientStorageService {
     return files;
   }
 
+  findPatientIdForStoredConsent(consentId) {
+    const target = this._sanitizeName(consentId);
+    const dataDir = path.join(this.rootDir, 'data');
+    if (!target || !fs.existsSync(dataDir)) return '';
+
+    for (const patient of fs.readdirSync(dataDir, { withFileTypes: true })) {
+      if (!patient.isDirectory()) continue;
+      const candidate = path.join(dataDir, patient.name, target);
+      if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+        const separator = patient.name.indexOf('_');
+        return separator > 0 ? patient.name.slice(0, separator) : patient.name;
+      }
+    }
+    return '';
+  }
+
   deleteConsentData(patientId, consentId) {
     if (!patientId || !consentId) return;
     const consentDir = this.resolveConsentFolder(patientId, consentId);

@@ -7,9 +7,6 @@ import '../utils/draft_helper.dart';
 
 import 'package:flutter/material.dart';
 import '../services/hip_linking_workflow_service.dart';
-import 'm2_data_exchange_screen.dart';
-
-import '../services/m2_automated_workflow_service.dart';
 
 double _maxNum(double a, double b) => a > b ? a : b;
 
@@ -123,8 +120,6 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       }
 
       if (!mounted) return;
-      final progressNotifier = ValueNotifier<String>('Running HIP linking API sequence (M1)...');
-
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -138,18 +133,13 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
                   const CircularProgressIndicator(),
                   const SizedBox(height: 16),
                   const Text(
-                    'Automating Data Exchange...',
+                    'Linking HIP...',
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  ValueListenableBuilder<String>(
-                    valueListenable: progressNotifier,
-                    builder: (context, value, child) {
-                      return Text(
-                        value,
-                        textAlign: TextAlign.center,
-                      );
-                    },
+                  const Text(
+                    'Please wait while the health record is linked.',
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -168,24 +158,27 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
         if (mounted) {
           Navigator.pop(context); // Close loading dialog
           if (result['status'] != 'completed') {
-            _showToast(context, 'Data push failed: status was ' + result['status'].toString(), isError: true);
-            Navigator.pop(context); // Return to home screen
+            _showToast(context, 'HIP linking could not be completed. Please try again.', isError: true);
             return;
           }
-          
-          _showToast(context, 'HIP Linking successful. Starting M2 Data Transfer...');
-          
-          // Use a post frame callback to ensure the route is pushed correctly
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => M2DataExchangeScreen(
-                  patientProfile: widget.patientProfile,
-                  autoStartHiType: widget.hiType,
+
+          await showDialog<void>(
+            context: context,
+            barrierDismissible: false,
+            builder: (dialogContext) => AlertDialog(
+              title: const Text('HIP Linking Complete'),
+              content: const Text('The health record has been linked successfully.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('Continue'),
                 ),
-              ),
-            );
-          });
+              ],
+            ),
+          );
+          if (mounted) {
+            Navigator.of(context).pop(); // Return to the patient workspace.
+          }
         }
       } catch (e) {
         if (mounted) {
@@ -4399,5 +4392,4 @@ class _HealthDocumentFormState extends State<_HealthDocumentForm> {
     );
   }
 }
-
 

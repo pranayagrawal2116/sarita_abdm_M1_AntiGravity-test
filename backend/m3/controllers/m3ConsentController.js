@@ -4,6 +4,34 @@ const Logger = require("../logging/logger");
 const fs = require('fs');
 const path = require('path');
 
+const normalizeHiType = (value) => {
+  const type = String(value || '').replace(/[^a-z]/gi, '').toLowerCase();
+  if (type === 'prescription' || type === 'prescriptionrecord') return 'prescription';
+  if (type === 'diagnosticreport' || type === 'diagnosticreportrecord') return 'diagnosticreport';
+  if (type === 'opconsultation' || type === 'consultation') return 'opconsultation';
+  if (type === 'dischargesummary' || type === 'ipddischargesummary') return 'dischargesummary';
+  if (type === 'immunization' || type === 'immunizationrecord') return 'immunizationrecord';
+  if (type === 'healthdocument' || type === 'healthdocumentrecord' || type === 'healthrecord') return 'healthdocumentrecord';
+  if (type === 'wellness' || type === 'wellnessrecord') return 'wellnessrecord';
+  if (type === 'invoice') return 'invoice';
+  return type;
+};
+
+const findConsentContext = (consents, identifier) => {
+  const id = String(identifier || '').trim();
+  for (const consent of consents) {
+    const artefacts = consent?.artefactDetails || {};
+    if (artefacts[id]) return { consent, artefact: artefacts[id], artefactId: id };
+    for (const [artefactId, artefact] of Object.entries(artefacts)) {
+      if (
+        artefactId === id || artefact?.consentId === id || artefact?.hip?.id === id ||
+        consent?.consentId === id || consent?.consentRequestId === id || consent?.requestId === id
+      ) return { consent, artefact, artefactId };
+    }
+  }
+  return null;
+};
+
 class M3ConsentController {
   static async initConsentRequest(req, res) {
     try {
@@ -141,26 +169,43 @@ class M3ConsentController {
     try {
       const { hipId } = req.query;
       const M3PatientStorageService = require("../services/m3PatientStorageService");
-      
-      const docIdVar = typeof docId !== 'undefined' ? docId : null;
-      const consentReq = typeof hipId !== 'undefined' ? M3ConsentStore.getConsents().find(c => c.artefactDetails && (c.artefactDetails[hipId] || Object.values(c.artefactDetails).some(art => art.hip && art.hip.id === hipId))) : null;
-      
+      const consents = M3ConsentStore.getConsents();
+      const context = findConsentContext(consents, hipId);
+      const consentReq = context?.consent || null;
+      const consentArtefact = context?.artefact || null;
+
       let allowedHiTypes = [];
       let targetPatientId = "UnknownPatient";
       if (consentReq) {
          if (consentReq.patientId) targetPatientId = consentReq.patientId;
-         let art = null;
-         if (consentReq.artefactDetails && consentReq.artefactDetails[hipId]) {
-             art = consentReq.artefactDetails[hipId];
-         } else if (consentReq.artefactDetails) {
-             art = Object.values(consentReq.artefactDetails).find(a => a.hip && a.hip.id === hipId) || Object.values(consentReq.artefactDetails)[0];
-         }
-         
-         if (art && art.hiTypes) {
-             allowedHiTypes = art.hiTypes.map(t => String(t || "").replace(/\s+/g, "").toLowerCase());
+         if (consentArtefact && consentArtefact.hiTypes) {
+             allowedHiTypes = consentArtefact.hiTypes.map(normalizeHiType).filter(Boolean);
          } else if (consentReq.hiTypes) {
-             allowedHiTypes = consentReq.hiTypes.map(t => String(t || "").replace(/\s+/g, "").toLowerCase());
+             allowedHiTypes = consentReq.hiTypes.map(normalizeHiType).filter(Boolean);
          }
+      }
+
+      // The UI identifies a hospital by its artefact consent ID, while M3
+      // stores received packets by transaction ID. Resolve either form before
+      // deciding that no records are available.
+      if (targetPatientId === "UnknownPatient") {
+        M3ConsentStore.load();
+        const transaction = Object.values(M3ConsentStore.transactions || {}).find((item) =>
+          item?.consentId === hipId || item?.hipId === hipId
+        );
+        if (transaction?.consentId) {
+          const transactionContext = findConsentContext(consents, transaction.consentId);
+          if (transactionContext?.consent?.patientId) targetPatientId = transactionContext.consent.patientId;
+          if (allowedHiTypes.length === 0) {
+            allowedHiTypes = (transactionContext?.artefact?.hiTypes || transactionContext?.consent?.hiTypes || [])
+              .map(normalizeHiType)
+              .filter(Boolean);
+          }
+        }
+      }
+
+      if (targetPatientId === "UnknownPatient") {
+        targetPatientId = M3PatientStorageService.findPatientIdForStoredConsent(hipId) || "UnknownPatient";
       }
 
       if (targetPatientId === "UnknownPatient") {
@@ -303,7 +348,7 @@ class M3ConsentController {
                }
              }
 
-             if (allowedHiTypes.length > 0 && !allowedHiTypes.includes(deducedType)) {
+             if (allowedHiTypes.length > 0 && !allowedHiTypes.includes(normalizeHiType(deducedType))) {
                  return; // Skip this document as it is not granted
              }
              

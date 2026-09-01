@@ -32,17 +32,24 @@ const guessHiType = (fileName) => {
   if (normalized.includes("diagnosticreport")) return "DiagnosticReport";
   if (normalized.includes("prescription")) return "Prescription";
   if (normalized.includes("opconsultation") || normalized.includes("clinicalconsultation")) return "OPConsultation";
-  if (normalized.includes("dischargesummary")) return "DischargeSummary";
+  if (normalized.includes("dischargesummary") || normalized.includes("ipddischargesummary")) return "DischargeSummary";
   if (normalized.includes("immunizationrecord")) return "ImmunizationRecord";
-  if (normalized.includes("healthdocumentrecord")) return "HealthDocumentRecord";
+  if (normalized.includes("healthdocumentrecord") || normalized.includes("healthdocument")) return "HealthDocumentRecord";
   if (normalized.includes("wellnessrecord")) return "WellnessRecord";
   if (normalized.includes("invoice")) return "Invoice";
   return "DocumentReference";
 };
 
+const canonicalHiType = (value) => {
+  const normalized = text(value).toLowerCase().replace(/[^a-z]/g, "");
+  if (normalized === "ipddischargesummary" || normalized === "dischargesummary" || normalized === "discharge") return "dischargesummary";
+  if (normalized === "healthdocument" || normalized === "healthdocumentrecord") return "healthdocumentrecord";
+  return normalized;
+};
+
 const sameHiType = (t1, t2) => {
   if (!t1 || !t2) return false;
-  return t1.toLowerCase().replace(/[^a-z]/g, "") === t2.toLowerCase().replace(/[^a-z]/g, "");
+  return canonicalHiType(t1) === canonicalHiType(t2);
 };
 
 class BundleRegistry {

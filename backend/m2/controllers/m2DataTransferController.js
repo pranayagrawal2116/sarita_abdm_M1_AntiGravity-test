@@ -52,16 +52,28 @@ class M2DataTransferController {
         "OP Consultation": "OPConsultation",
         "OPConsultation": "OPConsultation",
         "Discharge Summary": "DischargeSummary",
+        "IPD Discharge Summary": "DischargeSummary",
+        "IPDDischargeSummary": "DischargeSummary",
         "Immunization": "ImmunizationRecord",
         "Health Document": "HealthDocumentRecord",
+        "HealthDocument": "HealthDocumentRecord",
+        "HealthDocumentRecord": "HealthDocumentRecord",
         "Wellness": "WellnessRecord",
         "Invoice": "Invoice"
       };
 
       // Filter dashboard types by what's actually authorized
+      const normalizeHiType = (type) => {
+        const normalized = String(type || "").replace(/\s+/g, "").toLowerCase();
+        if (["dischargesummary", "ipddischargesummary", "discharge"].includes(normalized)) return "dischargesummary";
+        if (["healthdocument", "healthdocumentrecord", "healthrecord"].includes(normalized)) return "healthdocumentrecord";
+        return normalized;
+      };
       let recordType = dashboardTypes.filter(type => {
         const canonical = canonicalMap[type] || type.replace(/\s+/g, "");
-        return authorizedHiTypes.includes(canonical);
+        return authorizedHiTypes.some((authorizedType) =>
+          normalizeHiType(authorizedType) === normalizeHiType(canonical)
+        );
       });
 
       // Prioritize the actual HI request payload from the mobile app (Gateway) over any mock data

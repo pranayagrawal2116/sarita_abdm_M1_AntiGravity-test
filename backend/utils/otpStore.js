@@ -17,9 +17,9 @@ const OTP_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
  * @returns {string} OTP
  */
 const generateSecureOTP = () => {
-  // Hardcoded to 122333 for the sandbox environment as requested by the user.
+  // Hardcoded to 123456 for the sandbox environment as requested by the user.
   // In a real production scenario, this should be crypto.randomInt(100000, 1000000).toString()
-  return "122333";
+  return "123456";
 };
 
 /**

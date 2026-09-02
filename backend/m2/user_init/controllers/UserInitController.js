@@ -1,10 +1,12 @@
 const crypto = require('crypto');
 const axios = require('axios');
+const https = require('https');
 const { v4: uuidv4 } = require('uuid');
 const LocalDataRegistry = require('../services/LocalDataRegistry');
 const UserInitState = require('../services/UserInitState');
 const M2TransactionStore = require('../../transactions/M2TransactionStore');
 const M2AuthenticationManager = require('../../authentication/M2AuthenticationManager');
+const M2TokenManager = require('../../tokens/M2TokenManager');
 const Logger = require('../../logging/logger');
 
 // Generate ISO string without milliseconds as expected by ABDM sometimes
@@ -15,9 +17,14 @@ function nowIso() {
 // crypto.randomUUID is unavailable on older Node.js versions commonly used
 // with iisnode on Windows Server 2016. uuid is already a backend dependency.
 const newId = () => uuidv4();
-const CALLBACK_TIMEOUT_MS = Number(process.env.USER_INIT_CALLBACK_TIMEOUT_MS || 5000);
+const CALLBACK_TIMEOUT_MS = Number(process.env.USER_INIT_CALLBACK_TIMEOUT_MS || 12000);
 const CALLBACK_ATTEMPTS = 2;
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const gatewayHttpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 30000,
+  maxSockets: 8,
+});
 
 class UserInitController {
   /**
@@ -50,7 +57,11 @@ class UserInitController {
       hipId: process.env.HIP_ID || 'IN2410002480',
       careContexts,
       recordType: careContexts.map((context) => context.hiType),
-      userInitiatedLinking: true
+      userInitiatedLinking: true,
+      sourceStorageClass: tx.sourceStorageClass || '',
+      sourcePatientFolder: tx.sourcePatientFolder || '',
+      sourcePatientFolderName: tx.sourcePatientFolderName || '',
+      nonAbhaPatientIdentity: tx.nonAbhaPatientIdentity || null,
     };
     const existing = M2TransactionStore.getTransaction(transactionId);
     if (existing) {
@@ -69,6 +80,10 @@ class UserInitController {
     return !status || status === 408 || status === 429 || status >= 500;
   }
 
+  static isGatewayTokenRejection(error) {
+    return error?.response?.status === 401 || error?.response?.status === 403;
+  }
+
   /**
    * HIE-CM waits for these outbound callbacks after the inbound webhook has
    * already received its 202 acknowledgement.  Keep each delivery bounded
@@ -85,6 +100,7 @@ class UserInitController {
           url,
           data,
           timeout: CALLBACK_TIMEOUT_MS,
+          httpsAgent: gatewayHttpsAgent,
           headers: {
             "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
             "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
@@ -94,6 +110,15 @@ class UserInitController {
         });
       } catch (error) {
         lastError = error;
+        if (attempt === 1 && this.isGatewayTokenRejection(error)) {
+          Logger.warn("USER_INIT", "Gateway rejected the warm token; refreshing it before retrying the callback.", {
+            callbackName,
+            status: error.response.status,
+          });
+          M2TokenManager.invalidate();
+          await M2TokenManager.initialize();
+          continue;
+        }
         if (!this.isRetryableCallbackError(error) || attempt === CALLBACK_ATTEMPTS) break;
         Logger.warn("USER_INIT", "Retrying transient gateway callback failure.", {
           callbackName,
@@ -101,10 +126,26 @@ class UserInitController {
           timeoutMs: CALLBACK_TIMEOUT_MS,
           status: error?.response?.status || 0
         });
-        await wait(150);
+        await wait(250);
       }
     }
     throw lastError;
+  }
+
+  static mobileFromDiscovery(patientDetails = {}, identifiers = []) {
+    const candidates = [
+      patientDetails.mobile,
+      patientDetails.mobileNumber,
+      patientDetails.phoneNumber,
+      ...identifiers
+        .filter((identifier) => /mobile|phone/i.test(String(identifier?.type || '')))
+        .map((identifier) => identifier?.value),
+    ];
+    for (const candidate of candidates) {
+      const digits = String(candidate || '').replace(/\D/g, '');
+      if (digits.length === 10) return digits;
+    }
+    return '';
   }
   
   // Phase 6: HIE-CM callback to HIP - Discovery
@@ -150,7 +191,18 @@ class UserInitController {
     };
 
     if (requestedAbhaAddress) {
-      const documents = await LocalDataRegistry.getAvailableDocumentsForAbha(requestedAbhaAddress);
+      const identifiers = [
+        ...(Array.isArray(patientDetails.verifiedIdentifiers) ? patientDetails.verifiedIdentifiers : []),
+        ...(Array.isArray(patientDetails.unverifiedIdentifiers) ? patientDetails.unverifiedIdentifiers : []),
+        ...unverifiedIdentifiers,
+      ];
+      const discoveryResult = await LocalDataRegistry.getAvailableDocumentsForDiscovery({
+        abhaId: requestedAbhaAddress,
+        yearOfBirth: patientDetails.yearOfBirth || patientDetails.year_of_birth,
+        gender: patientDetails.gender,
+        mobile: UserInitController.mobileFromDiscovery(patientDetails, identifiers),
+      });
+      const documents = discoveryResult.documents;
       
       if (documents.length > 0) {
         const careContexts = documents.map(doc => {
@@ -164,6 +216,7 @@ class UserInitController {
             referenceNumber: ccRef,
             display: cleanName, 
             hiType: doc.documentType,
+            documentFileName: doc.documentFileName,
             // The hospital UI groups discovery results by the patient
             // reference. A distinct reference per document keeps each record
             // in its own card while retaining the stable care-context ID.
@@ -189,7 +242,11 @@ class UserInitController {
           discoveryRequestId: incomingRequestId,
           abhaAddress: requestedAbhaAddress,
           patientName: patientDetails.name || requestedAbhaAddress,
-          careContextsMap: careContexts // Store internal mapping
+          careContextsMap: careContexts, // Store internal mapping
+          sourceStorageClass: discoveryResult.storageClass,
+          sourcePatientFolder: discoveryResult.storageFolderPath,
+          sourcePatientFolderName: discoveryResult.storageFolderName,
+          nonAbhaPatientIdentity: discoveryResult.identity,
         });
 
         Logger.info("USER_INIT", "DISCOVERY_DOCUMENTS_READY", {
@@ -277,8 +334,8 @@ class UserInitController {
         const linkRefNumber = newId();
         // Generate a 6 digit OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        // Overriding OTP to 122333 for sandbox ease
-        const sandboxOtp = "122333";
+        // Overriding OTP to 123456 for sandbox ease
+        const sandboxOtp = "123456";
 
         Logger.info("USER_INIT", `[MOCK SMS] OTP to link care contexts is: ${sandboxOtp}`);
 
@@ -351,6 +408,7 @@ class UserInitController {
     let responsePayload = {
       response: { requestId: incomingRequestId }
     };
+    let confirmedCareContexts = [];
 
     if (!tx) {
       responsePayload.error = { code: "ABDM-1086", message: "Invalid link reference number" };
@@ -360,6 +418,7 @@ class UserInitController {
       // Success
       UserInitState.updateTransaction(txId, { status: "LINK_COMPLETED" });
       await UserInitController.persistUserInitiatedTransferContext(tx, incomingRequestId);
+      confirmedCareContexts = tx.selectedCareContexts || [];
       
       // M2 expects patient array in response
       // Populate with exact care contexts that were successfully linked, mapping each to its own block
@@ -393,6 +452,10 @@ class UserInitController {
     try {
       const url = `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/link/care-context/on-confirm`;
       await UserInitController.sendGatewayCallback(url, responsePayload, "on-confirm");
+      if (confirmedCareContexts.length > 0) {
+        await LocalDataRegistry.markDocumentsLinked(confirmedCareContexts);
+        UserInitState.updateTransaction(txId, { localRecordsLinkedAt: new Date().toISOString() });
+      }
       Logger.info("USER_INIT", "LINK_CONFIRM_RESPONSE_SENT", { linkRefNumber });
     } catch (e) {
       Logger.error("USER_INIT", "Failed to send on-confirm", e.response?.data || e.message);

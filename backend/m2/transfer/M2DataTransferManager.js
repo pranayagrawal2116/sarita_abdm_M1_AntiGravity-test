@@ -111,8 +111,13 @@ class M2DataTransferManager {
       const BundleRegistry = require("../fhir/BundleRegistry");
       const abhaMatch = patientId.match(/^(.+?@sbx)/);
       const searchId = abhaMatch ? abhaMatch[1] : patientId;
+      const transactionForBundles = M2TransactionStore.getTransaction(transactionId) || {};
       const existingBundles = BundleRegistry.getBundlesForPatient(searchId, {
-        abhaNumber: this.extractAbhaNumberFromTransaction(M2TransactionStore.getTransaction(transactionId) || {})
+        abhaNumber: this.extractAbhaNumberFromTransaction(transactionForBundles),
+        // Data-entry records are stored under year_gender_mobile until the
+        // user-initiated transfer completes. Keep that folder as a temporary
+        // alias so the normal transfer pipeline finds its FHIR bundles.
+        aliases: [transactionForBundles.sourcePatientFolderName].filter(Boolean),
       });
 
       const bundlesToSend = [];
@@ -338,6 +343,39 @@ class M2DataTransferManager {
 
       const duration = Date.now() - startTime;
       await this.finalizeTransfer(transactionId);
+      let localRecordPromotion = null;
+      const completedSourceTransaction = M2TransactionStore.getTransaction(transactionId) || {};
+      if (
+        completedSourceTransaction.userInitiatedLinking &&
+        completedSourceTransaction.sourceStorageClass === "NON_ABHA_VERIFIED" &&
+        completedSourceTransaction.sourcePatientFolder
+      ) {
+        try {
+          const LocalDataRegistry = require("../user_init/services/LocalDataRegistry");
+          localRecordPromotion = await LocalDataRegistry.promoteNonAbhaPatientRecords({
+            sourceFolderPath: completedSourceTransaction.sourcePatientFolder,
+            abhaAddress: completedSourceTransaction.abhaAddress || patientId,
+            patientName: completedSourceTransaction.patientName || patientId,
+          });
+          await M2TransactionStore.updateTransaction(transactionId, {
+            localRecordPromotion,
+            localRecordsPromotedAt: new Date().toISOString(),
+          });
+          Logger.info("M2DataTransferManager", "Promoted non-ABHA local records after completed user-initiated transfer.", {
+            transactionId,
+            sourcePath: localRecordPromotion.sourcePath,
+            destinationPath: localRecordPromotion.destinationPath,
+            fileCount: localRecordPromotion.files?.length || 0,
+          });
+        } catch (promotionError) {
+          // The transfer has already succeeded. Preserve that outcome and
+          // retain the source folder so promotion can be retried safely.
+          Logger.error("M2DataTransferManager", "Unable to promote completed non-ABHA local records.", {
+            transactionId,
+            error: promotionError.message,
+          });
+        }
+      }
       const completedAt = Date.now();
       const completedTx = M2TransactionStore.getTransaction(transactionId);
       const transferHistory = Array.isArray(completedTx.transferHistory)
@@ -362,7 +400,8 @@ class M2DataTransferManager {
           consentManagerNotifyStatusCode: notifyResult.statusCode,
           checksum: overallChecksum,
           encrypted: true,
-          gatewayNotified: true
+          gatewayNotified: true,
+          localRecordPromotion
         }
       };
       const result = await M2TransactionStore.updateTransaction(transactionId, {

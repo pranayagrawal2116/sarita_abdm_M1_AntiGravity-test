@@ -5,8 +5,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sarita_abdm/screens/Abha_home_screen.dart';
 import 'package:sarita_abdm/screens/Abha_login_screen.dart';
+import 'package:sarita_abdm/screens/basic_patient_registration_screen.dart';
 import 'package:sarita_abdm/screens/create_Abha_screen.dart';
-import 'package:sarita_abdm/screens/hip_linking_patient_screen.dart';
 import 'package:sarita_abdm/config/hospital_config.dart';
 import 'package:sarita_abdm/services/scan_share_api_service.dart';
 import 'package:sarita_abdm/widgets/abha_card_preview_dialog.dart';
@@ -234,7 +234,7 @@ class _StartScreenState extends State<StartScreen> {
                     ),
                     const SizedBox(height: 10),
                     const Text(
-                      'Create a new ABHA profile or verify an existing one. Patient-specific work opens after a patient is selected from the table below.',
+                      'Create a new ABHA profile, verify an existing ABHA, or register a patient who does not yet have ABHA details.',
                       style: TextStyle(
                         color: Color(0xFF5A6F82),
                         fontSize: 14,
@@ -261,6 +261,31 @@ class _StartScreenState extends State<StartScreen> {
                           ),
                         ),
                         child: const Text('Create ABHA'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 54,
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  const BasicPatientRegistrationScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.person_add_alt_1_rounded),
+                        label: const Text('Register Patient (No ABHA)'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF1B5E8C),
+                          side: const BorderSide(color: Color(0xFF9CC8E5)),
+                          backgroundColor: const Color(0xFFF7FBFF),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -318,7 +343,7 @@ class _StartScreenState extends State<StartScreen> {
                         border: Border.all(color: const Color(0xFFD9E7F2)),
                       ),
                       child: const Text(
-                        'Later actions like patient registration are kept in code and can be brought back when needed.',
+                        'Use ABHA Verification for patients who already have ABHA details. Use patient registration when those details are not yet available.',
                         style: TextStyle(
                           color: Color(0xFF607285),
                           fontSize: 13,
@@ -739,7 +764,7 @@ class _StartScreenState extends State<StartScreen> {
           Text(
             users.isEmpty
                 ? 'No users are available in this session yet. Create or register a patient to populate the table.'
-                : 'Use the eye icon to review editable ABHA-linked details. Use the notepad icon to open the current patient workspace. The ABHA Address dropdown keeps past addresses visible while the rest of the row shows the latest profile details.',
+                : 'Patients without ABHA details are listed as No ABHA and can be verified later. Use the eye icon to review details and the notepad icon to open the current patient workspace.',
             style: const TextStyle(color: Color(0xFF5F7280), height: 1.45),
           ),
           const SizedBox(height: 16),
@@ -776,6 +801,7 @@ class _StartScreenState extends State<StartScreen> {
       const DataColumn(label: Text("Name")),
       const DataColumn(label: Text("ABHA Address")),
       const DataColumn(label: Text("ABHA Number")),
+      const DataColumn(label: Text("Patient Type")),
       const DataColumn(label: Text("UHID")),
       const DataColumn(label: Text("Mobile")),
       const DataColumn(label: Text("Gender")),
@@ -793,6 +819,7 @@ class _StartScreenState extends State<StartScreen> {
               DataCell(Text(_cellValue(selectedProfile['name']))),
               DataCell(_abhaAddressDropdown(user)),
               DataCell(_abhaNumberDropdown(user)),
+              DataCell(Text(_patientTypeLabel(selectedProfile))),
               DataCell(Text(_cellValue(selectedProfile['uhid']))),
               DataCell(Text(_cellValue(selectedProfile['mobile']))),
               DataCell(Text(_cellValue(selectedProfile['gender']))),
@@ -871,6 +898,14 @@ class _StartScreenState extends State<StartScreen> {
         ),
       ),
     );
+  }
+
+  String _patientTypeLabel(Map<String, dynamic> profile) {
+    final abhaNumber = _cellValue(profile['AbhaNumber']);
+    final abhaAddress = _cellValue(profile['AbhaAddress']);
+    return abhaNumber != '-' || abhaAddress != '-'
+        ? 'ABHA available'
+        : 'No ABHA';
   }
 
   Widget _abhaAddressDropdown(Map<String, dynamic> user) {

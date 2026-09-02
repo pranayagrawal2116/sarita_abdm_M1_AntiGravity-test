@@ -1,13 +1,18 @@
 const fs = require("fs");
 const path = require("path");
 const Logger = require("../logging/logger");
+const config = require("../helpers/config");
 
 const REGISTRY_FILE = path.join(__dirname, "../../data/bundle_registry.json");
 
 // We need to check both backend/data and data/ depending on the deployment structure
 const getPossibleDataDirs = () => {
   const root = path.resolve(__dirname, "../../../");
-  return [
+  const runtimeDataDir = config.tokenStoreDir
+    ? path.dirname(config.tokenStoreDir)
+    : path.join(__dirname, "../../data");
+  return [...new Set([
+    runtimeDataDir,
     path.join(__dirname, "../../data"),
     path.join(__dirname, "../../../data"),
     path.join(root, "data"),
@@ -15,8 +20,8 @@ const getPossibleDataDirs = () => {
     // The desktop app stores patient folders directly beside backend/. This
     // location must be included for automated HIP transfers as well as the
     // folder watcher.
-    root
-  ];
+    root,
+  ])];
 };
 
 const text = (value) => String(value || "").trim();
@@ -117,17 +122,33 @@ class BundleRegistry {
       if (!fs.existsSync(dataDir)) continue;
 
       try {
-        const patientFolders = fs.readdirSync(dataDir);
-        for (const folder of patientFolders) {
-          const folderPath = path.join(dataDir, folder);
+        const directFolders = fs.readdirSync(dataDir, { withFileTypes: true });
+        const patientFolders = [];
+        for (const entry of directFolders) {
+          if (!entry.isDirectory()) continue;
+          const folderPath = path.join(dataDir, entry.name);
+          if (entry.name === "ABHA_Verified" || entry.name === "Non_ABHA_Verified") {
+            try {
+              fs.readdirSync(folderPath, { withFileTypes: true })
+                .filter((child) => child.isDirectory())
+                .forEach((child) => patientFolders.push(path.join(folderPath, child.name)));
+            } catch (_) {
+              // A partially-created storage root simply has no bundles yet.
+            }
+          } else {
+            patientFolders.push(folderPath);
+          }
+        }
+        for (const folderPath of patientFolders) {
           if (checkedFolders.has(folderPath)) continue;
           checkedFolders.add(folderPath);
 
           if (!fs.statSync(folderPath).isDirectory()) continue;
 
           // Parse abhaId from folder (e.g. pranay@sbx_Pranay_Anup_Agrawal)
-          const abhaMatch = folder.match(/^(.+?@sbx)/);
-          const patientId = abhaMatch ? abhaMatch[1] : folder;
+          const folderName = path.basename(folderPath);
+          const abhaMatch = folderName.match(/^(.+?@sbx)/);
+          const patientId = abhaMatch ? abhaMatch[1] : folderName;
 
           try {
             const files = fs.readdirSync(folderPath);
@@ -214,6 +235,20 @@ class BundleRegistry {
 
     Logger.info("BundleRegistry", "No exact patient bundles found.", { patientId });
     return [];
+  }
+
+  /**
+   * The folder watcher only needs to remove bundles it created in this
+   * process. Do not perform a live filesystem scan here: during startup that
+   * scan is repeated once per watched patient folder and can starve ABDM
+   * callback handling.
+   */
+  getKnownBundlesForPatient(patientId) {
+    const patientKey = normalize(patientId);
+    if (!patientKey) return [];
+    return this.registry.filter(
+      (bundle) => normalize(bundle?.patientId) === patientKey,
+    );
   }
 
   getBundleByHiType(patientId, hiType, options = {}) {

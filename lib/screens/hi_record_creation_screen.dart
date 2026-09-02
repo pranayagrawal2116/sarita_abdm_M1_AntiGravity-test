@@ -36,6 +36,8 @@ class HiRecordCreationScreen extends StatefulWidget {
 class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  bool get _canLinkToAbdm => _hasAbhaDetails(widget.patientProfile);
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -70,8 +72,13 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       case 'Prescription Record':
         return _PrescriptionForm(onSaved: _handleSave, onLink: _handleLink);
       case 'Wellness Record':
-        final gender = widget.patientProfile['gender']?.toString().toLowerCase() ?? '';
-        return _WellnessForm(onSaved: _handleSave, onLink: _handleLink, gender: gender);
+        final gender =
+            widget.patientProfile['gender']?.toString().toLowerCase() ?? '';
+        return _WellnessForm(
+          onSaved: _handleSave,
+          onLink: _handleLink,
+          gender: gender,
+        );
       case 'Diagnostic Report':
         return _DiagnosticReportForm(onSaved: _handleSave, onLink: _handleLink);
       case 'Immunization Record':
@@ -110,6 +117,13 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
   }
 
   void _handleLink(Map<String, dynamic> data) async {
+    if (!_canLinkToAbdm) {
+      _showErrorToast(
+        context,
+        'This patient has no ABHA details. Save the record as local data instead.',
+      );
+      return;
+    }
     if (_formKey.currentState?.validate() ?? false) {
       try {
         await _saveLocalDoc(data, isLocalDraft: false);
@@ -158,7 +172,11 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
         if (mounted) {
           Navigator.pop(context); // Close loading dialog
           if (result['status'] != 'completed') {
-            _showToast(context, 'HIP linking could not be completed. Please try again.', isError: true);
+            _showToast(
+              context,
+              'HIP linking could not be completed. Please try again.',
+              isError: true,
+            );
             return;
           }
 
@@ -167,7 +185,9 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
             barrierDismissible: false,
             builder: (dialogContext) => AlertDialog(
               title: const Text('HIP Linking Complete'),
-              content: const Text('The health record has been linked successfully.'),
+              content: const Text(
+                'The health record has been linked successfully.',
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(),
@@ -191,7 +211,10 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
     }
   }
 
-  Future<String> _saveLocalDoc(Map<String, dynamic> recordData, {bool isLocalDraft = false}) async {
+  Future<String> _saveLocalDoc(
+    Map<String, dynamic> recordData, {
+    bool isLocalDraft = false,
+  }) async {
     final patient = widget.patientProfile;
     final patientName = _firstText([
       patient['name'],
@@ -219,11 +242,13 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
     ]);
 
     final now = DateTime.now();
-    final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
+    final timestamp =
+        '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
     final fileName =
         '${_sanitizePathSegment(widget.hiType)}_${_sanitizePathSegment(patientNumber)}_$timestamp.txt';
-    
-    final patientFolderName = '${_sanitizePathSegment(abhaId)}_${_sanitizePathSegment(patientName)}';
+
+    final patientFolderName =
+        '${_sanitizePathSegment(abhaId)}_${_sanitizePathSegment(patientName)}';
     String fullPath;
     if (!kIsWeb) {
       final appFolder = _localRecordRoot();
@@ -234,7 +259,13 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       fullPath = '$patientFolderName/$fileName';
     }
 
-    return await saveDraft(abhaId, patientName, fullPath, _buildTextDocument(recordData), isLocalDraft: isLocalDraft);
+    return await saveDraft(
+      abhaId,
+      patientName,
+      fullPath,
+      _buildTextDocument(recordData),
+      isLocalDraft: isLocalDraft,
+    );
   }
 
   String _buildTextDocument(Map<String, dynamic> recordData) {
@@ -265,7 +296,7 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       'DOB / YOB': _firstText([patient['dob'], patient['yearOfBirth']]),
       'UHID': patient['uhid'],
     };
-    
+
     for (final entry in patientRows.entries) {
       buffer.writeln('${entry.key}: ${_valueText(entry.value)}');
     }
@@ -274,7 +305,7 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
       ..writeln()
       ..writeln('--- Record Data ---')
       ..writeln();
-      
+
     if (recordData.containsKey('PDF_BASE64')) {
       buffer.writeln('PDF_BASE64: ${recordData['PDF_BASE64']}');
       final copy = Map<String, dynamic>.from(recordData)..remove('PDF_BASE64');
@@ -297,6 +328,31 @@ class _HiRecordCreationScreenState extends State<HiRecordCreationScreen> {
     ].join('-');
     return _singleLineHyphenText('${widget.hiType}-$timestamp');
   }
+}
+
+bool _hasAbhaDetails(Map<String, dynamic> patientProfile) {
+  String clean(Object? value) => value?.toString().trim() ?? '';
+  String firstAvailable(List<Object?> values) {
+    for (final value in values) {
+      final text = clean(value);
+      if (text.isNotEmpty && text != '-') {
+        return text;
+      }
+    }
+    return '';
+  }
+
+  final abhaNumber = firstAvailable([
+    patientProfile['healthIdNumber'],
+    patientProfile['AbhaNumber'],
+    patientProfile['abhaNumber'],
+  ]);
+  final abhaAddress = firstAvailable([
+    patientProfile['preferredAbhaAddress'],
+    patientProfile['AbhaAddress'],
+    patientProfile['healthId'],
+  ]);
+  return abhaNumber.isNotEmpty || abhaAddress.isNotEmpty;
 }
 
 Directory _localRecordRoot() {
@@ -738,7 +794,7 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
   final _investigationInput = TextEditingController();
   final _procedureInput = TextEditingController();
   final _familyHistoryInput = TextEditingController();
-  
+
   // Follow Up
   final _followUpReasonController = TextEditingController();
   final _followUpDateController = TextEditingController();
@@ -751,8 +807,24 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
   String _selectedTiming = 'After Food';
   final _instructionsController = TextEditingController();
 
-  final List<String> _routes = ['Oral', 'Intravenous', 'Intramuscular', 'Subcutaneous', 'Topical', 'Inhalation', 'Ophthalmic', 'Nasal'];
-  final List<String> _timings = ['Before Food', 'After Food', 'With Food', 'Empty Stomach', 'As Needed', 'At Bedtime'];
+  final List<String> _routes = [
+    'Oral',
+    'Intravenous',
+    'Intramuscular',
+    'Subcutaneous',
+    'Topical',
+    'Inhalation',
+    'Ophthalmic',
+    'Nasal',
+  ];
+  final List<String> _timings = [
+    'Before Food',
+    'After Food',
+    'With Food',
+    'Empty Stomach',
+    'As Needed',
+    'At Bedtime',
+  ];
 
   void _addMedication() {
     final name = _medNameController.text.trim();
@@ -777,10 +849,12 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
     super.initState();
     _heightController.addListener(_calculateBmi);
     _weightController.addListener(_calculateBmi);
-    
+
     final now = DateTime.now();
-    _followUpDateController.text = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-    _followUpTimeController.text = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    _followUpDateController.text =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+    _followUpTimeController.text =
+        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
   }
 
   @override
@@ -794,18 +868,18 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
     _spo2Controller.dispose();
     _bpSysController.dispose();
     _bpDiaController.dispose();
-    
+
     _complaintInput.dispose();
     _allergyInput.dispose();
     _historyInput.dispose();
     _investigationInput.dispose();
     _procedureInput.dispose();
     _familyHistoryInput.dispose();
-    
+
     _followUpReasonController.dispose();
     _followUpDateController.dispose();
     _followUpTimeController.dispose();
-    
+
     _medNameController.dispose();
     _dosePatternController.dispose();
     _instructionsController.dispose();
@@ -865,8 +939,10 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
 
       final now = DateTime.now();
       _followUpReasonController.text = 'Review';
-      _followUpDateController.text = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-      _followUpTimeController.text = "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+      _followUpDateController.text =
+          "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      _followUpTimeController.text =
+          "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
     });
   }
 
@@ -881,7 +957,10 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
             onPressed: _autoFill,
             icon: const Icon(Icons.flash_on),
             label: const Text('Auto Fill'),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFDE047), foregroundColor: const Color(0xFF1E293B)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFDE047),
+              foregroundColor: const Color(0xFF1E293B),
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -897,7 +976,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     'Temperature (°F)',
                     TextFormField(
                       controller: _tempController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 98.6'),
                     ),
                   ),
@@ -905,7 +986,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     'Height (cm)',
                     TextFormField(
                       controller: _heightController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 170'),
                     ),
                   ),
@@ -913,7 +996,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     'Weight (kg)',
                     TextFormField(
                       controller: _weightController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 70'),
                     ),
                   ),
@@ -936,7 +1021,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     'BP Systolic',
                     TextFormField(
                       controller: _bpSysController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 120'),
                     ),
                   ),
@@ -944,7 +1031,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     'BP Diastolic',
                     TextFormField(
                       controller: _bpDiaController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 80'),
                     ),
                   ),
@@ -952,7 +1041,9 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     'Resp Rate (/min)',
                     TextFormField(
                       controller: _respRateController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 18'),
                     ),
                   ),
@@ -960,18 +1051,22 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     'Heart Rate (/min)',
                     TextFormField(
                       controller: _heartRateController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 72'),
                     ),
                   ),
                 ];
-                
+
                 final row3 = [
                   _buildFormTextColumn(
                     'SpO2 (%)',
                     TextFormField(
                       controller: _spo2Controller,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       decoration: const InputDecoration(hintText: 'e.g. 98'),
                     ),
                   ),
@@ -984,15 +1079,48 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                   return Column(
                     children: [
                       Row(
-                        children: row1.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList(),
+                        children: row1
+                            .map(
+                              (f) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: f,
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                       const SizedBox(height: 16),
                       Row(
-                        children: row2.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList(),
+                        children: row2
+                            .map(
+                              (f) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: f,
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                       const SizedBox(height: 16),
                       Row(
-                        children: row3.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList(),
+                        children: row3
+                            .map(
+                              (f) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: f,
+                                ),
+                              ),
+                            )
+                            .toList(),
                       ),
                     ],
                   );
@@ -1045,7 +1173,10 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Medications', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                const Text(
+                  'Medications',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                ),
                 const SizedBox(height: 16),
                 if (_medications.isNotEmpty)
                   ListView.separated(
@@ -1057,11 +1188,17 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                       final m = _medications[index];
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: Text('${m['name']} (${m['dose']})', style: const TextStyle(fontWeight: FontWeight.w600)),
-                        subtitle: Text('${m['route']} | ${m['timing']}\n${m['instructions']}'),
+                        title: Text(
+                          '${m['name']} (${m['dose']})',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        subtitle: Text(
+                          '${m['route']} | ${m['timing']}\n${m['instructions']}',
+                        ),
                         trailing: IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => setState(() => _medications.removeAt(index)),
+                          onPressed: () =>
+                              setState(() => _medications.removeAt(index)),
                         ),
                       );
                     },
@@ -1075,14 +1212,20 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                       width: 200,
                       child: TextFormField(
                         controller: _medNameController,
-                        decoration: const InputDecoration(labelText: 'Drug Name', hintText: 'e.g. Paracetamol'),
+                        decoration: const InputDecoration(
+                          labelText: 'Drug Name',
+                          hintText: 'e.g. Paracetamol',
+                        ),
                       ),
                     ),
                     SizedBox(
                       width: 120,
                       child: TextFormField(
                         controller: _dosePatternController,
-                        decoration: const InputDecoration(labelText: 'Dose', hintText: 'e.g. 1-0-1'),
+                        decoration: const InputDecoration(
+                          labelText: 'Dose',
+                          hintText: 'e.g. 1-0-1',
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -1091,7 +1234,11 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                         value: _selectedRoute,
                         isExpanded: true,
                         decoration: const InputDecoration(labelText: 'Route'),
-                        items: _routes.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+                        items: _routes
+                            .map(
+                              (r) => DropdownMenuItem(value: r, child: Text(r)),
+                            )
+                            .toList(),
                         onChanged: (v) => setState(() => _selectedRoute = v!),
                       ),
                     ),
@@ -1101,7 +1248,11 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                         value: _selectedTiming,
                         isExpanded: true,
                         decoration: const InputDecoration(labelText: 'Timing'),
-                        items: _timings.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
+                        items: _timings
+                            .map(
+                              (t) => DropdownMenuItem(value: t, child: Text(t)),
+                            )
+                            .toList(),
                         onChanged: (v) => setState(() => _selectedTiming = v!),
                       ),
                     ),
@@ -1109,7 +1260,10 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                       width: 200,
                       child: TextFormField(
                         controller: _instructionsController,
-                        decoration: const InputDecoration(labelText: 'Instructions', hintText: 'e.g. After Food'),
+                        decoration: const InputDecoration(
+                          labelText: 'Instructions',
+                          hintText: 'e.g. After Food',
+                        ),
                       ),
                     ),
                   ],
@@ -1121,7 +1275,10 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                     onPressed: _addMedication,
                     icon: const Icon(Icons.add),
                     label: const Text('Add Medication'),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFE3F2FD), foregroundColor: const Color(0xFF1976D2)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE3F2FD),
+                      foregroundColor: const Color(0xFF1976D2),
+                    ),
                   ),
                 ),
               ],
@@ -1145,21 +1302,30 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
                 Expanded(
                   child: TextFormField(
                     controller: _followUpReasonController,
-                    decoration: const InputDecoration(labelText: 'Reason for Follow Up', hintText: 'e.g. Review'),
+                    decoration: const InputDecoration(
+                      labelText: 'Reason for Follow Up',
+                      hintText: 'e.g. Review',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: TextFormField(
                     controller: _followUpDateController,
-                    decoration: const InputDecoration(labelText: 'Date', hintText: 'YYYY-MM-DD'),
+                    decoration: const InputDecoration(
+                      labelText: 'Date',
+                      hintText: 'YYYY-MM-DD',
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: TextFormField(
                     controller: _followUpTimeController,
-                    decoration: const InputDecoration(labelText: 'Time', hintText: 'HH:MM'),
+                    decoration: const InputDecoration(
+                      labelText: 'Time',
+                      hintText: 'HH:MM',
+                    ),
                   ),
                 ),
               ],
@@ -1205,7 +1371,7 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
         'reason': _followUpReasonController.text,
         'date': _followUpDateController.text,
         'time': _followUpTimeController.text,
-      }
+      },
     };
   }
 }
@@ -1517,7 +1683,11 @@ class _WellnessForm extends StatefulWidget {
   final Function(Map<String, dynamic>) onLink;
   final String gender;
 
-  const _WellnessForm({required this.onSaved, required this.onLink, this.gender = ''});
+  const _WellnessForm({
+    required this.onSaved,
+    required this.onLink,
+    this.gender = '',
+  });
 
   @override
   State<_WellnessForm> createState() => _WellnessFormState();
@@ -1592,19 +1762,44 @@ class _WellnessFormState extends State<_WellnessForm> {
                 final fields = [
                   _buildFormTextColumn(
                     'Respiratory Rate (/min)',
-                    TextFormField(controller: _respRate, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 16')),
+                    TextFormField(
+                      controller: _respRate,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 16'),
+                    ),
                   ),
                   _buildFormTextColumn(
                     'Heart Rate (/min)',
-                    TextFormField(controller: _heartRate, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 72')),
+                    TextFormField(
+                      controller: _heartRate,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 72'),
+                    ),
                   ),
                   _buildFormTextColumn(
                     'Body Surface Temp (°C)',
-                    TextFormField(controller: _temp, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 37')),
+                    TextFormField(
+                      controller: _temp,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 37'),
+                    ),
                   ),
                 ];
                 return isWide
-                    ? Row(children: fields.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList())
+                    ? Row(
+                        children: fields
+                            .map(
+                              (f) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: f,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
                     : Column(children: fields);
               },
             ),
@@ -1621,19 +1816,44 @@ class _WellnessFormState extends State<_WellnessForm> {
                 final fields = [
                   _buildFormTextColumn(
                     'Body Height (cm)',
-                    TextFormField(controller: _height, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 170')),
+                    TextFormField(
+                      controller: _height,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 170'),
+                    ),
                   ),
                   _buildFormTextColumn(
                     'Body Weight (kg)',
-                    TextFormField(controller: _weight, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 70')),
+                    TextFormField(
+                      controller: _weight,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 70'),
+                    ),
                   ),
                   _buildFormTextColumn(
                     'BMI (kg/m2)',
-                    TextFormField(controller: _bmi, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 24.2')),
+                    TextFormField(
+                      controller: _bmi,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 24.2'),
+                    ),
                   ),
                 ];
                 return isWide
-                    ? Row(children: fields.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList())
+                    ? Row(
+                        children: fields
+                            .map(
+                              (f) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: f,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
                     : Column(children: fields);
               },
             ),
@@ -1705,15 +1925,36 @@ class _WellnessFormState extends State<_WellnessForm> {
                 final fields = [
                   _buildFormTextColumn(
                     'Calories Intake (kcal)',
-                    TextFormField(controller: _calIntake, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 2500')),
+                    TextFormField(
+                      controller: _calIntake,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 2500'),
+                    ),
                   ),
                   _buildFormTextColumn(
                     'Fluid Intake Oral Estimated (L)',
-                    TextFormField(controller: _fluidIntake, keyboardType: TextInputType.number, decoration: const InputDecoration(hintText: 'e.g. 3')),
+                    TextFormField(
+                      controller: _fluidIntake,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(hintText: 'e.g. 3'),
+                    ),
                   ),
                 ];
                 return isWide
-                    ? Row(children: fields.map((f) => Expanded(child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8.0), child: f))).toList())
+                    ? Row(
+                        children: fields
+                            .map(
+                              (f) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8.0,
+                                  ),
+                                  child: f,
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
                     : Column(children: fields);
               },
             ),
@@ -3083,7 +3324,7 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
     setState(() {
       _complaints.clear();
       _complaints.add('Fever');
-      
+
       _systolicController.text = '110';
       _diastolicController.text = '90';
       _heartRateController.text = '110';
@@ -3093,47 +3334,47 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
       _heightController.text = '178';
       _weightController.text = '79';
       _calculateBmi();
-      
+
       _allergies.clear();
       _allergies.add('Dust');
-      
+
       _history.clear();
       _history.add('Discharge Diagnosis - Headache');
-      
+
       _procedures.clear();
       _procedures.add('Colonoscopy');
-      
+
       _labReports.clear();
       final labReport = _LabReportData();
       labReport.nameController.text = 'Blood Test';
-      
+
       labReport.observations[0].testNameController.text = 'WBC';
       labReport.observations[0].valueController.text = '6000';
       labReport.observations[0].unitController.text = 'uL';
-      
+
       labReport.observations.add(
         _ObservationData()
           ..testNameController.text = 'Platelet'
           ..valueController.text = '20000'
           ..unitController.text = 'uL',
       );
-      
+
       labReport.observations.add(
         _ObservationData()
           ..testNameController.text = 'MCV'
           ..valueController.text = '60'
           ..unitController.text = 'fL',
       );
-      
+
       labReport.observations.add(
         _ObservationData()
           ..testNameController.text = 'MCH'
           ..valueController.text = '30'
           ..unitController.text = 'pg',
       );
-      
+
       _labReports.add(labReport);
-      
+
       _medications.clear();
       _medications.add({
         'name': 'Paracetamole headache',
@@ -3142,19 +3383,18 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
         'timing': 'After Food',
         'instructions': '',
       });
-      
+
       _familyHistory.clear();
       _familyHistory.add({
         'condition': 'Diabetes',
         'relationship': 'Father',
         'notes': '',
       });
-      
+
       _carePlanTitle.text = 'plan';
       _carePlanDesc.text = 'Bed rest for 5 days';
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -4246,7 +4486,7 @@ Widget _buildListManagerCard(
   );
 }
 
-// Action Buttons: Save and Link to ABDM
+// Action button is selected from the registration type of the current patient.
 Widget _buildFormActionButtons({
   required VoidCallback onSave,
   required VoidCallback onLink,
@@ -4254,43 +4494,43 @@ Widget _buildFormActionButtons({
   return LayoutBuilder(
     builder: (context, constraints) {
       final isWide = constraints.maxWidth > 450;
-      final buttons = [
-        OutlinedButton(
-          onPressed: onSave,
-          child: const Text('Save Local Draft'),
-        ),
-        const SizedBox(width: 16, height: 12),
-        ElevatedButton(
-          onPressed: onLink,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF00A86B),
+      final recordScreenState = context
+          .findAncestorStateOfType<_HiRecordCreationScreenState>();
+      final canLinkToAbdm = recordScreenState?._canLinkToAbdm ?? false;
+      final buttons = <Widget>[
+        if (!canLinkToAbdm)
+          OutlinedButton.icon(
+            onPressed: onSave,
+            icon: const Icon(Icons.save_alt_outlined),
+            label: const Text('Save Local Data'),
+          )
+        else
+          ElevatedButton(
+            onPressed: onLink,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF00A86B),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.link, size: 18, color: Colors.white),
+                SizedBox(width: 8),
+                Text('Link to ABDM'),
+              ],
+            ),
           ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.link, size: 18, color: Colors.white),
-              SizedBox(width: 8),
-              Text('Link to ABDM'),
-            ],
-          ),
-        ),
       ];
 
       if (isWide) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: buttons
-              .map((b) => b is SizedBox ? b : Expanded(child: b))
-              .toList(),
-        );
-      } else {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: buttons
-              .map((b) => b is SizedBox ? const SizedBox(height: 12) : b)
-              .toList(),
+          children: buttons.map((button) => Expanded(child: button)).toList(),
         );
       }
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: buttons,
+      );
     },
   );
 }
@@ -4359,7 +4599,10 @@ class _HealthDocumentFormState extends State<_HealthDocumentForm> {
               padding: const EdgeInsets.only(top: 16.0),
               child: Text(
                 'Selected: $_selectedFileName',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
               ),
             )
           else
@@ -4374,14 +4617,18 @@ class _HealthDocumentFormState extends State<_HealthDocumentForm> {
           _buildFormActionButtons(
             onSave: () {
               if (_base64Pdf == null) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a PDF first.')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please select a PDF first.')),
+                );
                 return;
               }
               widget.onSaved({'PDF_BASE64': _base64Pdf});
             },
             onLink: () {
               if (_base64Pdf == null) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a PDF first.')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please select a PDF first.')),
+                );
                 return;
               }
               widget.onLink({'PDF_BASE64': _base64Pdf});
@@ -4392,4 +4639,3 @@ class _HealthDocumentFormState extends State<_HealthDocumentForm> {
     );
   }
 }
-

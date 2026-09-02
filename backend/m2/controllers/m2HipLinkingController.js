@@ -237,7 +237,7 @@ class M2HipLinkingController {
     
     Logger.info("M2HipLinkingController", "Processing Link Confirm for request:", { requestId });
 
-    // Validate the OTP against our store (which is hardcoded to 122333 for sandbox)
+    // Validate the OTP against our store (which is hardcoded to 123456 for sandbox)
     const session = otpStore.verifyOTP(referenceNumber, submittedOtp);
 
     let responsePayload = {

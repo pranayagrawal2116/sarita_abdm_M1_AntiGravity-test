@@ -12,11 +12,14 @@ class M3PatientStorageService {
       this.rootDir = path.resolve(__dirname, "../../");
     }
     
-    if (!fs.existsSync(this.rootDir)) {
+    this.dataDir = path.join(this.rootDir, 'data');
+    this.abhaVerifiedDataDir = path.join(this.dataDir, 'ABHA_Verified');
+
+    if (!fs.existsSync(this.abhaVerifiedDataDir)) {
       try {
-         fs.mkdirSync(this.rootDir, { recursive: true });
+         fs.mkdirSync(this.abhaVerifiedDataDir, { recursive: true });
       } catch (e) {
-         Logger.error("M3PatientStorageService", "Failed to create root directory", { error: e.message });
+         Logger.error("M3PatientStorageService", "Failed to create ABHA verified data directory", { error: e.message });
       }
     }
   }
@@ -26,39 +29,53 @@ class M3PatientStorageService {
     return name.replace(/[^a-zA-Z0-9_\-\.@]/g, '_');
   }
 
-  resolvePatientFolder(patientId) {
-    if (!patientId) throw new Error("patientId is required");
-    const safePatientId = this._sanitizeName(patientId);
-    const dataDir = path.join(this.rootDir, "data");
-    
-    // Find an existing folder that starts with the patientId (e.g., saurav_50505@sbx_Saurav_Kumar)
-    if (fs.existsSync(dataDir)) {
-      const items = fs.readdirSync(dataDir, { withFileTypes: true });
-      for (const item of items) {
-        if (item.isDirectory() && item.name.startsWith(safePatientId)) {
-           return path.join(dataDir, item.name);
-        }
-      }
-    }
-    
-    return path.join(dataDir, safePatientId);
+  _findPatientFolder(dataDir, safePatientId) {
+    if (!fs.existsSync(dataDir)) return null;
+
+    const patientFolder = fs.readdirSync(dataDir, { withFileTypes: true }).find(
+      (item) => item.isDirectory() && item.name.startsWith(safePatientId),
+    );
+    return patientFolder ? path.join(dataDir, patientFolder.name) : null;
   }
 
-  resolveConsentFolder(patientId, consentId) {
+  resolvePatientFolder(patientId, { allowLegacy = true } = {}) {
+    if (!patientId) throw new Error("patientId is required");
+    const safePatientId = this._sanitizeName(patientId);
+
+    // M3 data belongs with all other ABHA-verified patient records.
+    const verifiedPatientFolder = this._findPatientFolder(
+      this.abhaVerifiedDataDir,
+      safePatientId,
+    );
+    if (verifiedPatientFolder) return verifiedPatientFolder;
+
+    // Keep historical M3 transfers available after the path change, but do not
+    // use the legacy root for new writes.
+    if (allowLegacy) {
+      const legacyPatientFolder = this._findPatientFolder(this.dataDir, safePatientId);
+      if (legacyPatientFolder) return legacyPatientFolder;
+    }
+
+    return path.join(this.abhaVerifiedDataDir, safePatientId);
+  }
+
+  resolveConsentFolder(patientId, consentId, options) {
     if (!consentId) throw new Error("consentId is required");
-    const patientDir = this.resolvePatientFolder(patientId);
+    const patientDir = this.resolvePatientFolder(patientId, options);
     const safeConsentId = this._sanitizeName(consentId);
     return path.join(patientDir, safeConsentId);
   }
 
-  resolveHospitalFolder(patientId, consentId, hospitalName) {
-    const consentDir = this.resolveConsentFolder(patientId, consentId);
+  resolveHospitalFolder(patientId, consentId, hospitalName, options) {
+    const consentDir = this.resolveConsentFolder(patientId, consentId, options);
     const safeHospitalName = this._sanitizeName(hospitalName || "UnknownHIP");
     return path.join(consentDir, safeHospitalName);
   }
 
   saveM3File(patientId, consentId, hospitalName, fileName, dataStr) {
-    const hospitalDir = this.resolveHospitalFolder(patientId, consentId, hospitalName);
+    const hospitalDir = this.resolveHospitalFolder(patientId, consentId, hospitalName, {
+      allowLegacy: false,
+    });
     if (!fs.existsSync(hospitalDir)) {
       fs.mkdirSync(hospitalDir, { recursive: true });
     }
@@ -119,15 +136,16 @@ class M3PatientStorageService {
 
   findPatientIdForStoredConsent(consentId) {
     const target = this._sanitizeName(consentId);
-    const dataDir = path.join(this.rootDir, 'data');
-    if (!target || !fs.existsSync(dataDir)) return '';
+    if (!target) return '';
 
-    for (const patient of fs.readdirSync(dataDir, { withFileTypes: true })) {
-      if (!patient.isDirectory()) continue;
-      const candidate = path.join(dataDir, patient.name, target);
-      if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
-        const separator = patient.name.indexOf('_');
-        return separator > 0 ? patient.name.slice(0, separator) : patient.name;
+    for (const dataDir of [this.abhaVerifiedDataDir, this.dataDir]) {
+      if (!fs.existsSync(dataDir)) continue;
+      for (const patient of fs.readdirSync(dataDir, { withFileTypes: true })) {
+        if (!patient.isDirectory() || patient.name === 'ABHA_Verified') continue;
+        const candidate = path.join(dataDir, patient.name, target);
+        if (fs.existsSync(candidate) && fs.statSync(candidate).isDirectory()) {
+          return patient.name;
+        }
       }
     }
     return '';
@@ -135,7 +153,9 @@ class M3PatientStorageService {
 
   deleteConsentData(patientId, consentId) {
     if (!patientId || !consentId) return;
-    const consentDir = this.resolveConsentFolder(patientId, consentId);
+    const consentDir = this.resolveConsentFolder(patientId, consentId, {
+      allowLegacy: false,
+    });
     if (fs.existsSync(consentDir)) {
       Logger.info("M3PatientStorageService", `Deleting expired consent data directory: ${consentDir}`);
       fs.rmSync(consentDir, { recursive: true, force: true });

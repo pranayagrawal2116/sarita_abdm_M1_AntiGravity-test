@@ -3,12 +3,16 @@ const path = require("path");
 const fs = require("fs");
 const { buildBundleFromFiles } = require("./M2FHIRBundleBuilder");
 const BundleRegistry = require("./BundleRegistry");
+const config = require("../helpers/config");
 
 const log = (event, details = {}) => {
   console.log(JSON.stringify({ scope: "M2FolderWatcher", event, ...details }));
 };
 
 const PROJECT_ROOT = path.resolve(__dirname, "../../../");
+const RUNTIME_DATA_ROOT = config.tokenStoreDir
+  ? path.dirname(config.tokenStoreDir)
+  : path.join(PROJECT_ROOT, "backend", "data");
 
 const guessHiType = (fileName) => {
   const normalized = fileName.toLowerCase().replace(/[^a-z]/g, "");
@@ -28,15 +32,31 @@ const extractAbhaNumber = (value) => {
   return match ? match[0] : "";
 };
 
+const isHealthRecordFile = (fileName) => {
+  if (!/\.txt$/i.test(fileName)) return false;
+  const normalized = String(fileName).toLowerCase().replace(/[^a-z]/g, '');
+  return !(
+    normalized === 'localdata' ||
+    normalized === 'localdraftsindex' ||
+    normalized === 'linkedrecords' ||
+    normalized === 'sentrecords' ||
+    normalized === 'hiplinktoken'
+  );
+};
+
 // Simple debounce to prevent generating multiple times if many files change at once
 const debounceTimers = new Map();
+const pendingFolders = new Set();
+let queueIsRunning = false;
 
 const startWatcher = () => {
   log("Starting M2 Folder Watcher for FHIR Bundle Generation", { projectRoot: PROJECT_ROOT });
 
-  // Watch for .txt files in directories matching the abhaId pattern
-  // Match PatientStorageService.js dataRoot resolution
+  // Watch both patient storage roots. Legacy direct data folders remain in
+  // the list so existing ABHA flows keep working during deployment rollout.
   const watchPatterns = [
+    path.join(RUNTIME_DATA_ROOT, "ABHA_Verified", "*", "*.txt"),
+    path.join(RUNTIME_DATA_ROOT, "Non_ABHA_Verified", "*", "*.txt"),
     path.join(__dirname, "../../../data", "*@sbx_*", "*.txt"),      // If inside backend/m2/fhir
     path.join(__dirname, "../../data", "*@sbx_*", "*.txt"),         // If flattened to m2/fhir
     path.join(PROJECT_ROOT, "*@sbx_*", "*.txt")                     // Desktop root fallback
@@ -45,7 +65,10 @@ const startWatcher = () => {
   const watcher = chokidar.watch(watchPatterns, {
     ignored: /(^|[\/\\])\../,
     persistent: true,
-    ignoreInitial: false, 
+    // Existing bundles are read by BundleRegistry. Rebuilding every historic
+    // text file after a restart creates CPU and disk pressure that is not part
+    // of a live User-Initiated request. Only react to new/changed records.
+    ignoreInitial: true,
   });
 
   const processFolder = async (folderPath) => {
@@ -58,7 +81,7 @@ const startWatcher = () => {
 
       log("Processing folder for FHIR Bundle generation", { folderName, abhaId });
 
-      const txtFiles = fs.readdirSync(folderPath).filter((f) => f.endsWith(".txt") && f !== "hip_link_token.txt");
+      const txtFiles = fs.readdirSync(folderPath).filter(isHealthRecordFile);
       const currentTxtFilePaths = new Set(txtFiles.map(f => path.join(folderPath, f)));
       
       const fileData = txtFiles.map((fileName) => {
@@ -76,8 +99,12 @@ const startWatcher = () => {
         };
       });
 
-      // Find any bundles in the registry for this patient that no longer have a corresponding TXT file
-      const existingBundles = BundleRegistry.getBundlesForPatient(abhaId);
+      // This is cleanup for watcher-managed files only. A full filesystem
+      // scan here is expensive and used to run once for every initial folder,
+      // delaying User-Initiated callbacks. Runtime bundle lookup still uses
+      // BundleRegistry.getBundlesForPatient() where a cross-worker scan is
+      // actually needed.
+      const existingBundles = BundleRegistry.getKnownBundlesForPatient(abhaId);
       existingBundles.forEach((bundle) => {
         if (!currentTxtFilePaths.has(bundle.sourceTxtFile)) {
           // The TXT file was deleted, remove the bundle
@@ -144,9 +171,30 @@ const startWatcher = () => {
       folderPath,
       setTimeout(() => {
         debounceTimers.delete(folderPath);
-        processFolder(folderPath);
+        pendingFolders.add(folderPath);
+        void processNextFolder();
       }, 1000)
     );
+  };
+
+  // The initial watcher scan can find hundreds of existing files. Processing
+  // every folder at once blocks the Node event loop long enough for ABDM
+  // callbacks to time out. Keep the same bundle generation work, but run it
+  // one folder at a time and yield between folders so live callbacks win.
+  const processNextFolder = async () => {
+    if (queueIsRunning) return;
+    queueIsRunning = true;
+    try {
+      while (pendingFolders.size > 0) {
+        const [folderPath] = pendingFolders;
+        pendingFolders.delete(folderPath);
+        await processFolder(folderPath);
+        await new Promise((resolve) => setImmediate(resolve));
+      }
+    } finally {
+      queueIsRunning = false;
+      if (pendingFolders.size > 0) void processNextFolder();
+    }
   };
 
   watcher

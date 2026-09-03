@@ -353,7 +353,7 @@ class LocalDataRegistry {
     return targetPath;
   }
 
-  async promoteNonAbhaPatientRecords({ sourceFolderPath, abhaAddress, patientName } = {}) {
+  async promoteNonAbhaPatientRecords({ sourceFolderPath, abhaAddress, patientName, documentPaths = [] } = {}) {
     const sourceRoot = path.resolve(this.nonAbhaVerifiedRoot);
     const sourcePath = path.resolve(String(sourceFolderPath || ''));
     if (!sourcePath.startsWith(`${sourceRoot}${path.sep}`)) {
@@ -368,24 +368,81 @@ class LocalDataRegistry {
       this._abhaVerifiedFolderName(abhaAddress, patientName),
     );
     await fs.promises.mkdir(destinationPath, { recursive: true });
-    const entries = await fs.promises.readdir(sourcePath, { withFileTypes: true });
+
+    // A user can link any subset of their local records. Never promote the
+    // entire folder after a successful transfer: only the files that produced
+    // packets acknowledged by the HIU may become ABHA-verified records.
+    const sourceDocuments = [...new Set(documentPaths
+      .map((documentPath) => path.resolve(String(documentPath || '')))
+      .filter((documentPath) => (
+        documentPath.startsWith(`${sourcePath}${path.sep}`)
+        && path.extname(documentPath).toLowerCase() === '.txt'
+        && fs.existsSync(documentPath)
+      ))
+    )];
+    if (sourceDocuments.length === 0) {
+      return { promoted: false, reason: 'no-transferred-local-documents', sourcePath, destinationPath, files: [] };
+    }
+
+    const documentNames = new Set(sourceDocuments.map((documentPath) => path.basename(documentPath)));
     const movedFiles = [];
 
-    for (const entry of entries) {
-      if (!entry.isFile()) continue;
-      const sourceFile = path.join(sourcePath, entry.name);
-      if (entry.name === 'local data') {
-        await this._mergeTrackerFile(sourceFile, path.join(destinationPath, entry.name), { asJson: false });
-        movedFiles.push(entry.name);
-        continue;
-      }
-      if (entry.name === 'linked_records.json' || entry.name === 'sent_records.json') {
-        await this._mergeTrackerFile(sourceFile, path.join(destinationPath, entry.name), { asJson: true });
-        movedFiles.push(entry.name);
-        continue;
-      }
+    for (const sourceFile of sourceDocuments) {
       movedFiles.push(path.basename(await this._moveFile(sourceFile, destinationPath)));
+
+      // The FHIR bundle belongs to exactly the same local document and must
+      // travel with it. Other record bundles remain in the local folder.
+      const bundlePath = sourceFile.replace(/\.txt$/i, '_bundle.json');
+      if (fs.existsSync(bundlePath)) {
+        movedFiles.push(path.basename(await this._moveFile(bundlePath, destinationPath)));
+      }
     }
+
+    const updateTracker = async ({ fileName, asJson, destinationIncludesSelected }) => {
+      const sourceFile = path.join(sourcePath, fileName);
+      const destinationFile = path.join(destinationPath, fileName);
+      const readEntries = async (filePath) => {
+        try {
+          const content = await fs.promises.readFile(filePath, 'utf8');
+          if (asJson) {
+            const parsed = JSON.parse(content);
+            return Array.isArray(parsed) ? parsed.map((entry) => String(entry)) : [];
+          }
+          return content.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+        } catch (_) {
+          return [];
+        }
+      };
+      const [sourceEntries, destinationEntries] = await Promise.all([
+        readEntries(sourceFile),
+        readEntries(destinationFile),
+      ]);
+      const remainingSourceEntries = sourceEntries.filter((entry) => !documentNames.has(entry));
+      const nextDestinationEntries = destinationIncludesSelected
+        ? [...new Set([...destinationEntries, ...[...documentNames]])]
+        : destinationEntries;
+
+      if (fs.existsSync(sourceFile) || remainingSourceEntries.length > 0) {
+        await fs.promises.writeFile(
+          sourceFile,
+          asJson ? JSON.stringify(remainingSourceEntries, null, 2) : (remainingSourceEntries.length ? `${remainingSourceEntries.join('\n')}\n` : ''),
+          'utf8',
+        );
+      }
+      if (destinationIncludesSelected) {
+        await fs.promises.writeFile(
+          destinationFile,
+          asJson ? JSON.stringify(nextDestinationEntries, null, 2) : (nextDestinationEntries.length ? `${nextDestinationEntries.join('\n')}\n` : ''),
+          'utf8',
+        );
+      }
+    };
+
+    // Keep both folder indexes accurate: source retains unlinked records;
+    // destination receives only the transferred records.
+    await updateTracker({ fileName: 'local data', asJson: false, destinationIncludesSelected: true });
+    await updateTracker({ fileName: 'linked_records.json', asJson: true, destinationIncludesSelected: true });
+    await updateTracker({ fileName: 'sent_records.json', asJson: true, destinationIncludesSelected: true });
 
     try {
       const remainingEntries = await fs.promises.readdir(sourcePath);

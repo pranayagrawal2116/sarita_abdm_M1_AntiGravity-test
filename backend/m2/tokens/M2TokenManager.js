@@ -75,7 +75,13 @@ class M2TokenManager {
       return this.initPromise;
     }
 
-    this.initPromise = (async () => {
+    // Start initialization on the next microtask.  A cache-hit path contains no
+    // await before its finally block; starting it immediately would let that
+    // finally run before `this.initPromise` is assigned, leaving a fulfilled
+    // promise permanently stored as an "in progress" initialization.
+    // Subsequent token invalidations would then reuse the stale promise and
+    // attempt to send callbacks with a null token.
+    const initializationPromise = Promise.resolve().then(async () => {
       try {
         Logger.info("M2TokenManager", "Initializing TokenManager authentication state.", {
           configuration: configurationSnapshot(config)
@@ -183,11 +189,15 @@ class M2TokenManager {
         });
         throw err;
       } finally {
-        this.initPromise = null; // Clear single-flight promise reference when resolved/rejected
+        // Do not clear a newer initialization started after this one.
+        if (this.initPromise === initializationPromise) {
+          this.initPromise = null;
+        }
       }
-    })();
+    });
 
-    return this.initPromise;
+    this.initPromise = initializationPromise;
+    return initializationPromise;
   }
 
   /**
@@ -205,16 +215,15 @@ class M2TokenManager {
       })
     });
 
-    if (!this.cachedAuth) {
-      Logger.info("M2TokenManager", "No cached authentication object. Calling initialize().");
-      await this.initialize();
-    }
-
     if (!M2AuthenticationManager.validateAuthentication(this.cachedAuth)) {
       Logger.info("M2TokenManager", "Cached authentication expired or invalid. Re-initializing.", {
         authenticationStatus: M2AuthenticationManager.getAuthenticationStatus(this.cachedAuth)
       });
       await this.initialize();
+    }
+
+    if (!M2AuthenticationManager.validateAuthentication(this.cachedAuth) || !this.cachedAuth?.accessToken) {
+      throw new Error("Gateway authentication recovery did not produce a valid access token.");
     }
 
     Logger.info("M2TokenManager", "Token Reused: Reusing cached B2B auth token.", {
@@ -229,13 +238,13 @@ class M2TokenManager {
    * @returns {Promise<string>} Session Token
    */
   async getValidSession() {
-    if (!this.cachedSession) {
-      await this.initialize();
-    }
-
     if (!M2SessionManager.validateSession(this.cachedSession)) {
       Logger.info("M2TokenManager", "Cached session expired. Re-initializing.");
       await this.initialize();
+    }
+
+    if (!M2SessionManager.validateSession(this.cachedSession) || !this.cachedSession?.accessToken) {
+      throw new Error("Gateway session recovery did not produce a valid access token.");
     }
 
     Logger.info("M2TokenManager", "Token Reused: Reusing cached B2B session token.");

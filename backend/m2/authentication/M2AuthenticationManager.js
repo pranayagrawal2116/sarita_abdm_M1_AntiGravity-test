@@ -16,7 +16,7 @@ const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const Logger = require("../logging/logger");
 const config = require("../helpers/config");
-const { getGatewayToken } = require("../../services/gatewayService");
+const { getGatewayToken, clearCache: clearGatewayTokenCache } = require("../../services/gatewayService");
 const { getHeaders } = require("../../utils/headers");
 const {
   maskValue,
@@ -357,20 +357,38 @@ class M2AuthenticationManager {
       method: requestConfig?.method
     });
 
-    const token = await this.getGatewayToken();
-    if (!token) {
-      throw new Error("Unable to obtain Gateway B2B authentication token");
-    }
-
-    const finalConfig = {
-      ...requestConfig,
-      headers: {
-        ...requestConfig.headers,
-        "Authorization": `Bearer ${token}`
+    const send = async () => {
+      const token = await this.getGatewayToken();
+      if (!token) {
+        throw new Error("Unable to obtain Gateway B2B authentication token");
       }
+
+      return axios({
+        ...requestConfig,
+        headers: {
+          ...requestConfig.headers,
+          "Authorization": `Bearer ${token}`
+        }
+      });
     };
 
-    return axios(finalConfig);
+    try {
+      return await send();
+    } catch (error) {
+      // A gateway token can expire while the server is idle.  Clear the
+      // helper's in-memory token as well as the caller's cache, then retry
+      // the same callback once with newly issued credentials.
+      if (error?.response?.status !== 401 && error?.response?.status !== 403) {
+        throw error;
+      }
+
+      Logger.warn("M2AuthenticationManager", "Gateway rejected callback credentials; refreshing once.", {
+        url: requestConfig?.url,
+        status: error.response.status
+      });
+      clearGatewayTokenCache();
+      return send();
+    }
   }
 }
 

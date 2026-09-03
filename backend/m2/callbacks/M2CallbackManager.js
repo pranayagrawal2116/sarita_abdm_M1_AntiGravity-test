@@ -311,6 +311,11 @@ class M2CallbackManager {
         receiverPublicKey: payload.hiRequest?.keyMaterial?.dhPublicKey?.keyValue || "",
         receiverNonce: payload.hiRequest?.keyMaterial?.nonce || "",
         careContexts: payload.notification?.consentDetail?.careContexts || payload.notification?.careContexts || [],
+        // An unmatched consent must not be allowed to select a local bundle
+        // by HI type alone.  It may be a delayed callback from an older flow;
+        // retain it for acknowledgement/audit, but require an explicit local
+        // care-context match before any transfer can be started.
+        unmatchedConsentContext: type === "Consent Notification" && !matchMeta?.tx,
         currentState: "Created"
       });
     } else {

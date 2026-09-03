@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const { nowIso } = require("./dateUtils");
 
 const toText = (value) => {
@@ -8,7 +10,51 @@ const toText = (value) => {
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
+// ABDM sends the link token asynchronously to the public callback URL.  The
+// callback can be handled by a different PM2/IIS worker than the request that
+// initiated it, and a process restart must not make an accepted request
+// disappear.  Keep this small state store on disk so every worker sees the
+// same callback state.
+const storeFile = path.join(
+  process.env.ABDM_DATA_DIR || path.join(__dirname, "..", "data"),
+  "hip_link_token_callbacks.json"
+);
 const callbacks = new Map();
+
+const loadCallbacks = () => {
+  try {
+    if (!fs.existsSync(storeFile)) return;
+    const parsed = JSON.parse(fs.readFileSync(storeFile, "utf8"));
+    if (!Array.isArray(parsed)) return;
+
+    callbacks.clear();
+    for (const entry of parsed) {
+      const requestId = toText(entry?.requestId);
+      if (requestId) callbacks.set(requestId, entry);
+    }
+  } catch (error) {
+    // A corrupt cache must never prevent HIP linking. A later successful
+    // callback will replace the state with a valid file.
+    console.warn("[HIP LINK TOKEN] Unable to read callback state:", error.message);
+  }
+};
+
+const persistCallbacks = () => {
+  try {
+    fs.mkdirSync(path.dirname(storeFile), { recursive: true });
+    const temporaryFile = `${storeFile}.${process.pid}.tmp`;
+    fs.writeFileSync(
+      temporaryFile,
+      JSON.stringify([...callbacks.values()], null, 2),
+      "utf8"
+    );
+    fs.renameSync(temporaryFile, storeFile);
+  } catch (error) {
+    console.error("[HIP LINK TOKEN] Unable to persist callback state:", error.message);
+  }
+};
+
+loadCallbacks();
 
 const requestIdFromPayload = (payload = {}) =>
   toText(payload?.resp?.requestId) ||
@@ -25,6 +71,7 @@ const extractLinkToken = (payload = {}) =>
 
 const initializeRequest = (requestId, patient = {}) => {
   if (!requestId) return;
+  loadCallbacks();
   const entry = {
     requestId: toText(requestId),
     status: "PENDING",
@@ -33,9 +80,11 @@ const initializeRequest = (requestId, patient = {}) => {
     initializedAt: nowIso(),
   };
   callbacks.set(toText(requestId), entry);
+  persistCallbacks();
 };
 
 const getActiveRequest = (patient = {}) => {
+  loadCallbacks();
   const abhaAddress = toText(patient.abhaAddress || patient.AbhaAddress || "").toLowerCase();
   const abhaNumber = toText(patient.abhaNumber || patient.AbhaNumber || "").replace(/\D/g, "");
 
@@ -59,6 +108,7 @@ const saveCallback = (payload = {}) => {
   const requestId = requestIdFromPayload(payload);
   if (!requestId) return null;
 
+  loadCallbacks();
   const existing = callbacks.get(requestId) || {};
   let status = "SUCCESS";
   let error = null;
@@ -79,10 +129,12 @@ const saveCallback = (payload = {}) => {
   };
 
   callbacks.set(requestId, entry);
+  persistCallbacks();
   return clone(entry);
 };
 
 const getCallback = (requestId) => {
+  loadCallbacks();
   const entry = callbacks.get(toText(requestId));
   return entry ? clone(entry) : null;
 };

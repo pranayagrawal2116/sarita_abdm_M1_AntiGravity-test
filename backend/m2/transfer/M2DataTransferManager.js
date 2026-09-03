@@ -132,6 +132,9 @@ class M2DataTransferManager {
       const normalizedRequestedTypes = requestedTypes.map(r => this.normalizeHiType(r));
       const bundlePayloads = this.loadBundlePayloads(bundlesToSend);
       const currentTx = M2TransactionStore.getTransaction(transactionId) || {};
+      if (currentTx.unmatchedConsentContext) {
+        throw new Error("Automatic transfer blocked because the consent care context was not linked to a local record.");
+      }
       const allTxs = M2TransactionStore.listTransactions();
       const contextCandidates = [
         currentTx.consentDetails?.careContexts,
@@ -190,10 +193,15 @@ class M2DataTransferManager {
       let selectedPayloads = [...matchedPayloads];
 
       // Older automated-link registrations did not retain a document-to-care
-      // context mapping. When exactly one context is requested, retain the
-      // prior safe behaviour: send the newest bundle of the requested HI type
-      // and return the *requested* reference, never a synthesized one.
-      if (selectedPayloads.length === 0 && requestedCareContexts.length === 1) {
+      // context mapping. That compatibility fallback is never valid for User
+      // Initiated Linking: its care-context reference is the user's exact
+      // document choice, so a missing match must not substitute another local
+      // bundle merely because the consent permits the same HI type.
+      if (
+        !currentTx.userInitiatedLinking
+        && selectedPayloads.length === 0
+        && requestedCareContexts.length === 1
+      ) {
         const requestedRef = requestedCareContexts[0].careContextReference || requestedCareContexts[0].referenceNumber || requestedCareContexts[0].id;
         const linkedHiType = this.extractHiTypeFromCareContextReference(requestedRef);
         const fallback = bundlePayloads
@@ -356,6 +364,7 @@ class M2DataTransferManager {
             sourceFolderPath: completedSourceTransaction.sourcePatientFolder,
             abhaAddress: completedSourceTransaction.abhaAddress || patientId,
             patientName: completedSourceTransaction.patientName || patientId,
+            documentPaths: selectedPayloads.map((payload) => payload.meta?.sourceTxtFile).filter(Boolean),
           });
           await M2TransactionStore.updateTransaction(transactionId, {
             localRecordPromotion,
@@ -798,6 +807,26 @@ class M2DataTransferManager {
       requestId: gatewayRequestId,
       source: "Official HIP Health Information Response"
     });
+
+    if (currentTx.unmatchedConsentContext) {
+      await M2TransactionStore.updateTransaction(currentTx.transactionId, {
+        automaticTransferSuppressed: true,
+        automaticTransferSuppressedAt: new Date().toISOString(),
+        automaticTransferSuppressionReason: "Consent care context did not match a local HIP-link or User Init transaction."
+      });
+      Logger.warn("M2DataTransferManager", "Automatic transfer suppressed for unmatched consent context.", {
+        transactionId: currentTx.transactionId,
+        consentId,
+        careContexts: currentTx.careContexts || []
+      });
+      return {
+        success: true,
+        skipped: true,
+        reason: "UNMATCHED_CARE_CONTEXT",
+        requestId: gatewayRequestId,
+        hiResponse
+      };
+    }
 
     // Automatically trigger data push in the background to prevent HIU timeouts
     if (true) { // Enabled auto-push for M2 & M3

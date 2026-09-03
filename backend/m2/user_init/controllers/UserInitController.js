@@ -90,8 +90,12 @@ class UserInitController {
    * and reuse its request id on a transient retry so a slow gateway does not
    * turn a four-to-eight-record discovery into a mobile-app timeout.
    */
-  static async sendGatewayCallback(url, data, callbackName) {
-    const callbackRequestId = newId();
+  static async sendGatewayCallback(url, data, callbackName, correlationRequestId = '') {
+    // The response body already carries the original request id. Reuse it in
+    // the callback header as well when it is available, so the HIE-CM can
+    // associate the first Fetch record request with this response immediately.
+    // A generated id remains available for callbacks without a correlation id.
+    const callbackRequestId = String(correlationRequestId || '').trim() || newId();
     let lastError;
     for (let attempt = 1; attempt <= CALLBACK_ATTEMPTS; attempt += 1) {
       try {
@@ -115,8 +119,12 @@ class UserInitController {
             callbackName,
             status: error.response.status,
           });
+          // User-init callbacks obtain their credentials through
+          // M2AuthenticationManager/gatewayService.  Clear that helper's
+          // cache too; otherwise an idle-but-rejected token is reused on the
+          // retry and the mobile app needs to restart the whole flow.
+          require('../../../services/gatewayService').clearCache();
           M2TokenManager.invalidate();
-          await M2TokenManager.initialize();
           continue;
         }
         if (!this.isRetryableCallbackError(error) || attempt === CALLBACK_ATTEMPTS) break;
@@ -205,6 +213,11 @@ class UserInitController {
       const documents = discoveryResult.documents;
       
       if (documents.length > 0) {
+        // A care context is a record, but the patient reference must identify
+        // the one patient across every record. Sending a different patient
+        // reference per document lets the mobile UI display the list, yet the
+        // HIE-CM cannot reliably construct the subsequent link-init request.
+        const patientReference = requestedAbhaAddress;
         const careContexts = documents.map(doc => {
           // Internal mapping: store UUID -> local file mapping in state later
           const ccRef = require('crypto').createHash("md5").update(doc.documentFileName).digest("hex").substring(0,8);
@@ -217,22 +230,31 @@ class UserInitController {
             display: cleanName, 
             hiType: doc.documentType,
             documentFileName: doc.documentFileName,
-            // The hospital UI groups discovery results by the patient
-            // reference. A distinct reference per document keeps each record
-            // in its own card while retaining the stable care-context ID.
-            patientReference: `PAT-${ccRef}`,
+            patientReference,
             _localPath: doc.documentPath
           };
         });
 
-        // Send one patient block per document. The hospital record list uses
-        // referenceNumber as its card grouping key, so do not reuse it here.
-        responsePayload.patient = careContexts.map(cc => ({
-          referenceNumber: cc.patientReference,
+        // The ABDM User Initiated Linking contract groups care contexts by
+        // HI type but keeps the same patient reference in each group. The
+        // app can still select every record individually, and its Link
+        // records request remains associated with the correct patient.
+        const careContextsByHiType = new Map();
+        for (const careContext of careContexts) {
+          const hiType = careContext.hiType || "OPConsultation";
+          const group = careContextsByHiType.get(hiType) || [];
+          group.push({
+            referenceNumber: careContext.referenceNumber,
+            display: careContext.display,
+          });
+          careContextsByHiType.set(hiType, group);
+        }
+        responsePayload.patient = [...careContextsByHiType.entries()].map(([hiType, contexts]) => ({
+          referenceNumber: patientReference,
           display: patientDetails.name || requestedAbhaAddress,
-          careContexts: [{ referenceNumber: cc.referenceNumber, display: cc.display }],
-          hiType: cc.hiType || "OPConsultation",
-          count: 1
+          careContexts: contexts,
+          hiType,
+          count: contexts.length,
         }));
         responsePayload.matchedBy = ["HEALTH_ID"];
 
@@ -270,7 +292,12 @@ class UserInitController {
 
     try {
       const url = `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/patient/care-context/on-discover`;
-      await UserInitController.sendGatewayCallback(url, responsePayload, "on-discover");
+      await UserInitController.sendGatewayCallback(
+        url,
+        responsePayload,
+        "on-discover",
+        incomingRequestId,
+      );
       Logger.info("USER_INIT", "DISCOVERY_RESPONSE", {
         transactionId,
         documentCount: responsePayload.patient?.length || 0,
@@ -371,7 +398,12 @@ class UserInitController {
 
     try {
       const url = `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/link/care-context/on-init`;
-      await UserInitController.sendGatewayCallback(url, responsePayload, "on-init");
+      await UserInitController.sendGatewayCallback(
+        url,
+        responsePayload,
+        "on-init",
+        incomingRequestId,
+      );
       Logger.info("USER_INIT", "LINK_INIT_RESPONSE_SENT", { transactionId });
     } catch (e) {
       Logger.error("USER_INIT", "Failed to send on-init", e.response?.data || e.message);
@@ -451,7 +483,12 @@ class UserInitController {
 
     try {
       const url = `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/link/care-context/on-confirm`;
-      await UserInitController.sendGatewayCallback(url, responsePayload, "on-confirm");
+      await UserInitController.sendGatewayCallback(
+        url,
+        responsePayload,
+        "on-confirm",
+        incomingRequestId,
+      );
       if (confirmedCareContexts.length > 0) {
         await LocalDataRegistry.markDocumentsLinked(confirmedCareContexts);
         UserInitState.updateTransaction(txId, { localRecordsLinkedAt: new Date().toISOString() });

@@ -180,7 +180,8 @@ logApiDebug(
 );
 
 app.use(cors());
-app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "10mb" }));
+app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: process.env.JSON_BODY_LIMIT || "50mb" }));
 
 const shouldSkipInboundApiLog = (req) =>
   req.method === "GET" && req.path === "/api/scan-share/queue";
@@ -354,7 +355,16 @@ app.post(
 //   hipLinkingController.onHipConsentNotify
 // );
 app.post(
-  ["/api/v3/links/context/on-notify", "/v3/links/context/on-notify"],
+  [
+    "/api/v3/links/context/on-notify",
+    "/v3/links/context/on-notify",
+    "/api/v3/link/context/on-notify",
+    "/v3/link/context/on-notify",
+    "/api/v3/patients/sms/on-notify",
+    "/v3/patients/sms/on-notify",
+    "/api/v3/patient/links/sms/on-notify",
+    "/v3/patient/links/sms/on-notify"
+  ],
   hipLinkingController.onContextNotify
 );
 // Legacy M2 consent-manager callbacks are disconnected from app.js.

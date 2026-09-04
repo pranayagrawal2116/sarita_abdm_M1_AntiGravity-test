@@ -3,16 +3,11 @@ const path = require('path');
 const config = require('../helpers/config');
 const Logger = require('../logging/logger');
 
+const { dataRoot } = require('../../config/environment');
+
 class M3PatientStorageService {
   constructor() {
-    if (process.env.DATA_ROOT) {
-      this.rootDir = path.resolve(process.env.DATA_ROOT);
-    } else {
-      // Default to the backend folder
-      this.rootDir = path.resolve(__dirname, "../../");
-    }
-    
-    this.dataDir = path.join(this.rootDir, 'data');
+    this.dataDir = dataRoot;
     this.abhaVerifiedDataDir = path.join(this.dataDir, 'ABHA_Verified');
 
     if (!fs.existsSync(this.abhaVerifiedDataDir)) {

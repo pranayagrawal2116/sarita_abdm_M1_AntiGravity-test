@@ -1,0 +1,942 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-49678a79-cd42-4a8f-996d-58f601e979ef",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-09-04T15:28:07.618+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "f75b4da6-5a67-416a-a5c5-72ef5ba1e63e"
+  },
+  "type": "document",
+  "timestamp": "2026-09-04T15:28:07.618+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:52b06297-4e28-4a97-9cb8-5dc85748d7bc",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "52b06297-4e28-4a97-9cb8-5dc85748d7bc",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/WellnessRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Wellness Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:7e554f21-a1fe-46fa-9165-88864022ec33",
+          "display": "Ambulatory"
+        },
+        "date": "2026-09-04T15:28:07.618+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:be00ab5b-ccf4-4e49-a22e-6c54c5478c39",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Wellness Record",
+        "custodian": {
+          "reference": "urn:uuid:954cde93-d900-4213-9e11-c6c7e898540e",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Vital Signs",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "425044008",
+                  "display": "Physical findings of general status"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:9f08539a-4a53-4ad0-a665-f8c0611f0957",
+                "display": "Respiratory rate"
+              },
+              {
+                "reference": "urn:uuid:a07fc253-aebe-42a4-9aea-fd596cefc773",
+                "display": "Heart rate"
+              },
+              {
+                "reference": "urn:uuid:5577d083-049f-4f32-8935-21e501c86f75",
+                "display": "Body surface temperature"
+              }
+            ]
+          },
+          {
+            "title": "Body Measurement",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "425044008",
+                  "display": "Physical findings of general status"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:03b55120-dda2-4f6e-bd1b-e4a7a3ae0437",
+                "display": "Body height"
+              },
+              {
+                "reference": "urn:uuid:0b9be5e0-926d-4481-9308-41ac52768c16",
+                "display": "Body weight"
+              },
+              {
+                "reference": "urn:uuid:2e0c69ba-f8e7-47e5-b761-69cea9f0b2ad",
+                "display": "Body mass index (BMI) [Ratio]"
+              }
+            ]
+          },
+          {
+            "title": "Physical Activity",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "425044008",
+                  "display": "Physical findings of general status"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:ed9f93b6-a8b4-4fb6-84d2-73aa4b83f814",
+                "display": "Sleep Hours"
+              },
+              {
+                "reference": "urn:uuid:499a55be-5bd7-4289-98f4-fd73fa7b9996",
+                "display": "Calories Burned"
+              },
+              {
+                "reference": "urn:uuid:4358bd57-ac87-4088-bad1-60a677e385fd",
+                "display": "Step Count"
+              }
+            ]
+          },
+          {
+            "title": "General Assessment",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "425044008",
+                  "display": "Physical findings of general status"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:33d61a12-d04a-4b45-9163-1f60aa5cf0ab",
+                "display": "Calorie intake"
+              },
+              {
+                "reference": "urn:uuid:a9788267-a9cf-4ee5-8145-d1782e3517e7",
+                "display": "Fluid intake"
+              }
+            ]
+          },
+          {
+            "title": "Lifestyle",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "425044008",
+                  "display": "Physical findings of general status"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:000a45d9-8d5a-4f88-b6d0-6917ed33d7c3",
+                "display": "Smoking status"
+              },
+              {
+                "reference": "urn:uuid:e1bd5803-2b87-4e48-b827-07a071cacebe",
+                "display": "Diet type"
+              }
+            ]
+          },
+          {
+            "title": "Document Reference",
+            "code": {
+              "text": "Document Reference"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:c66ac4b4-4ce6-403e-92be-68020bab1173",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "5194ac71-d51a-4794-a136-47b7618646d5",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-04T15:28:07.618+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranay_1012006@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:be00ab5b-ccf4-4e49-a22e-6c54c5478c39",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "be00ab5b-ccf4-4e49-a22e-6c54c5478c39",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-04T15:28:07.618+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:954cde93-d900-4213-9e11-c6c7e898540e",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "954cde93-d900-4213-9e11-c6c7e898540e",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7e554f21-a1fe-46fa-9165-88864022ec33",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "7e554f21-a1fe-46fa-9165-88864022ec33",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "a54e16a6-7bbb-4606-a835-3861ae58728a"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-09-04T15:28:07.618+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9f08539a-4a53-4ad0-a665-f8c0611f0957",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "9f08539a-4a53-4ad0-a665-f8c0611f0957",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "display": "Respiratory rate"
+            }
+          ],
+          "text": "Respiratory rate"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a07fc253-aebe-42a4-9aea-fd596cefc773",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "a07fc253-aebe-42a4-9aea-fd596cefc773",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "display": "Heart rate"
+            }
+          ],
+          "text": "Heart rate"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:5577d083-049f-4f32-8935-21e501c86f75",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "5577d083-049f-4f32-8935-21e501c86f75",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "display": "Body surface temperature"
+            }
+          ],
+          "text": "Body surface temperature"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "Cel",
+          "system": "http://unitsofmeasure.org",
+          "code": "Cel"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:03b55120-dda2-4f6e-bd1b-e4a7a3ae0437",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "03b55120-dda2-4f6e-bd1b-e4a7a3ae0437",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "survey",
+                "display": "Survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2",
+              "display": "Body height"
+            }
+          ],
+          "text": "Body height"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "cm",
+          "system": "http://unitsofmeasure.org",
+          "code": "cm"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0b9be5e0-926d-4481-9308-41ac52768c16",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "0b9be5e0-926d-4481-9308-41ac52768c16",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "survey",
+                "display": "Survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7",
+              "display": "Body weight"
+            }
+          ],
+          "text": "Body weight"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "kg",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2e0c69ba-f8e7-47e5-b761-69cea9f0b2ad",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "2e0c69ba-f8e7-47e5-b761-69cea9f0b2ad",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "survey",
+                "display": "Survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "39156-5",
+              "display": "Body mass index (BMI) [Ratio]"
+            }
+          ],
+          "text": "Body mass index (BMI) [Ratio]"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "kg/m2",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg/m2"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ed9f93b6-a8b4-4fb6-84d2-73aa4b83f814",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "ed9f93b6-a8b4-4fb6-84d2-73aa4b83f814",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "activity",
+                "display": "Activity"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "248263006",
+              "display": "Sleep Hours"
+            }
+          ],
+          "text": "Sleep Hours"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 5,
+          "unit": "h",
+          "system": "http://unitsofmeasure.org",
+          "code": "h"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:499a55be-5bd7-4289-98f4-fd73fa7b9996",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "499a55be-5bd7-4289-98f4-fd73fa7b9996",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "activity",
+                "display": "Activity"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "41981-2",
+              "display": "Calories Burned"
+            }
+          ],
+          "text": "Calories Burned"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 656,
+          "unit": "kcal",
+          "system": "http://unitsofmeasure.org",
+          "code": "kcal"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4358bd57-ac87-4088-bad1-60a677e385fd",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "4358bd57-ac87-4088-bad1-60a677e385fd",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "activity",
+                "display": "Activity"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "55423-8",
+              "display": "Step Count"
+            }
+          ],
+          "text": "Step Count"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "steps",
+          "system": "http://unitsofmeasure.org",
+          "code": "steps"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:33d61a12-d04a-4b45-9163-1f60aa5cf0ab",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "33d61a12-d04a-4b45-9163-1f60aa5cf0ab",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "survey",
+                "display": "Survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8981-3",
+              "display": "Calorie intake"
+            }
+          ],
+          "text": "Calorie intake"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "kcal",
+          "system": "http://unitsofmeasure.org",
+          "code": "kcal"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a9788267-a9cf-4ee5-8145-d1782e3517e7",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "a9788267-a9cf-4ee5-8145-d1782e3517e7",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "survey",
+                "display": "Survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8982-1",
+              "display": "Fluid intake"
+            }
+          ],
+          "text": "Fluid intake"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueQuantity": {
+          "value": 56,
+          "unit": "L",
+          "system": "http://unitsofmeasure.org",
+          "code": "L"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:000a45d9-8d5a-4f88-b6d0-6917ed33d7c3",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "000a45d9-8d5a-4f88-b6d0-6917ed33d7c3",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "survey",
+                "display": "Survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "72166-2",
+              "display": "Smoking status"
+            }
+          ],
+          "text": "Smoking status"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "266919005",
+              "display": "Never smoked"
+            }
+          ],
+          "text": "Never smoked"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e1bd5803-2b87-4e48-b827-07a071cacebe",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "e1bd5803-2b87-4e48-b827-07a071cacebe",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                "code": "survey",
+                "display": "Survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8983-9",
+              "display": "Diet type"
+            }
+          ],
+          "text": "Diet type"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "effectiveDateTime": "2026-09-04T09:58:07.618Z",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "765021002",
+              "display": "Vegetarian diet"
+            }
+          ],
+          "text": "Vegetarian"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c66ac4b4-4ce6-403e-92be-68020bab1173",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "c66ac4b4-4ce6-403e-92be-68020bab1173",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Wellness Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:5194ac71-d51a-4794-a136-47b7618646d5"
+        },
+        "date": "2026-09-04T09:58:07.618Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "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L0hlbHZldGljYQovU3VidHlwZSAvVHlwZTEKL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcKPj4KZW5kb2JqCjQgMCBvYmoKPDwKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL0NhdGFsb2cKL1BhZ2VzIDEgMCBSCi9OYW1lcyAyIDAgUgo+PgplbmRvYmoKMSAwIG9iago8PAovVHlwZSAvUGFnZXMKL0NvdW50IDEKL0tpZHMgWzcgMCBSXQo+PgplbmRvYmoKMiAwIG9iago8PAovRGVzdHMgPDwKICAvTmFtZXMgWwpdCj4+Cj4+CmVuZG9iagp4cmVmCjAgMTcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAzNzQ3IDAwMDAwIG4gCjAwMDAwMDM4MDQgMDAwMDAgbiAKMDAwMDAwMzY4NSAwMDAwMCBuIAowMDAwMDAzNjY0IDAwMDAwIG4gCjAwMDAwMDA0NDYgMDAwMDAgbiAKMDAwMDAwMDI3NiAwMDAwMCBuIAowMDAwMDAwMTU0IDAwMDAwIG4gCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDA1OSAwMDAwMCBuIAowMDAwMDAzNDYzIDAwMDAwIG4gCjAwMDAwMDM1NjYgMDAwMDAgbiAKMDAwMDAwMDEwOSAwMDAwMCBuIAowMDAwMDAzMzg3IDAwMDAwIG4gCjAwMDAwMDMyOTkgMDAwMDAgbiAKMDAwMDAwMzMyNSAwMDAwMCBuIAowMDAwMDAzMzUxIDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgMTcKL1Jvb3QgMyAwIFIKL0luZm8gMTMgMCBSCi9JRCBbPDIyN2IzNDVmYzk0NTM1OGYxZmYyNzZhNjQ1YzVmMjg1PiA8MjI3YjM0NWZjOTQ1MzU4ZjFmZjI3NmE2NDVjNWYyODU+XQo+PgpzdGFydHhyZWYKMzg1MQolJUVPRgo=",
+              "title": "Wellness Document",
+              "creation": "2026-09-04T09:58:07.618Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

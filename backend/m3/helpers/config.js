@@ -8,14 +8,14 @@
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 
-const runtimeDataDir = process.env.RUNTIME_DATA_DIR
-  ? path.resolve(process.env.RUNTIME_DATA_DIR)
-  : path.join(__dirname, "../../data");
+const envConfig = require("../../config/environment");
+
+const runtimeDataDir = envConfig.dataRoot;
 
 module.exports = {
   // Gateway and CM details
-  baseHost: process.env.PUBLIC_BASE_URL || process.env.BASE_HOST,
-  gatewayBaseUrl: process.env.GATEWAY_BASE || "https://dev.abdm.gov.in",
+  baseHost: envConfig.publicBaseUrl || process.env.BASE_HOST || "",
+  gatewayBaseUrl: envConfig.gatewayBase,
   clientId: process.env.CLIENT_ID || process.env.ABDM_CLIENT_ID || "",
   clientSecret: process.env.CLIENT_SECRET || process.env.ABDM_CLIENT_SECRET || "",
   xCmId: process.env.X_CM_ID || "sbx",

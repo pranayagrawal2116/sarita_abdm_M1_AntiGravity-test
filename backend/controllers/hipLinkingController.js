@@ -264,6 +264,8 @@
 //     linkTokenPresent: Boolean(entry.linkToken),
 //   });
 // };
+const fs = require("fs");
+const path = require("path");
 const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const { getGatewayToken } = require("../services/gatewayService");
@@ -272,6 +274,7 @@ const { initializeRequest, getActiveRequest, saveCallback, getCallback } = requi
 const hospitalConfig = require("../config/hospitalConfig");
 const { toIsoTimestamp, nowIso } = require("../utils/dateUtils");
 const transactionStore = require("../utils/transactionStore");
+const { dataRoot } = require("../config/environment");
 
 const careContextCallbacks = [];
 const hipConsentNotifications = [];
@@ -700,6 +703,103 @@ exports.linkCareContext = async (req, res) => {
   }
 };
 
+const findPatientMobileOnDisk = (patientId) => {
+  if (!patientId) return "";
+  const normalizedId = toText(patientId).toLowerCase();
+  const searchRoots = [
+    path.join(dataRoot, "ABHA_Verified"),
+    path.join(dataRoot, "Non_ABHA_Verified"),
+    dataRoot,
+  ];
+
+  for (const root of searchRoots) {
+    if (!fs.existsSync(root)) continue;
+    try {
+      const entries = fs.readdirSync(root, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+        const dirName = entry.name.toLowerCase();
+        if (dirName.includes(normalizedId) || dirName.split("@")[0] === normalizedId.split("@")[0]) {
+          const folderPath = path.join(root, entry.name);
+          const files = fs.readdirSync(folderPath);
+          for (const file of files) {
+            if (file.endsWith(".txt") && file !== "local_data.txt" && file !== "hip_link_token.txt") {
+              const content = fs.readFileSync(path.join(folderPath, file), "utf8");
+              const match = content.match(/Mobile:\s*(\d{10})/i);
+              if (match && match[1]) {
+                return match[1];
+              }
+            }
+          }
+        }
+      }
+    } catch (_) {}
+  }
+  return "";
+};
+
+const dispatchSmsNotify = async ({ phoneNo, hipId, hipName }) => {
+  const cleanPhone = toText(phoneNo).replace(/\D/g, "").slice(-10);
+  if (!cleanPhone) throw new Error("Invalid phone number for SMS notification");
+
+  const requestId = uuidv4();
+  const timestamp = nowIso();
+  const resolvedHipId = hipId || process.env.HIP_ID || hospitalConfig.hipId;
+  const resolvedHipName = hipName || hospitalConfig.hipName || "Sarita Health Care";
+
+  const payload = {
+    requestId,
+    timestamp,
+    notification: {
+      phoneNo: cleanPhone,
+      hip: {
+        name: resolvedHipName,
+        id: resolvedHipId,
+      },
+    },
+  };
+
+  const gatewayToken = await getGatewayToken();
+  const headers = {
+    "Content-Type": "application/json",
+    "REQUEST-ID": requestId,
+    "TIMESTAMP": timestamp,
+    "X-CM-ID": process.env.X_CM_ID || "sbx",
+    Authorization: `Bearer ${gatewayToken}`,
+  };
+
+  console.log("=========================================");
+  console.log("[HIP SMS NOTIFY] Sending SMS Notification to ABDM Gateway");
+  console.log("URL:", `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/patient/links/sms/notify2`);
+  console.log("Phone:", cleanPhone);
+  console.log("Payload:", JSON.stringify(payload, null, 2));
+
+  const response = await axios.post(
+    `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/patient/links/sms/notify2`,
+    payload,
+    { headers }
+  );
+
+  console.log("[HIP SMS NOTIFY] ABDM Gateway Response Status:", response.status);
+  console.log("=========================================");
+
+  try {
+    const responsesLogPath = path.join(dataRoot, "api_responses.txt");
+    const logEntry = `[OUTBOUND REQUEST] POST ${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/patient/links/sms/notify2\n${JSON.stringify({ headers, data: payload }, null, 2)}\n[RESPONSE] Status: ${response.status}\n\n`;
+    fs.appendFileSync(responsesLogPath, logEntry);
+  } catch (_) {}
+
+  return {
+    ok: true,
+    requestId,
+    statusCode: response.status,
+    response: response.data || {},
+  };
+};
+
+exports.dispatchSmsNotify = dispatchSmsNotify;
+exports.findPatientMobileOnDisk = findPatientMobileOnDisk;
+
 exports.notifyContext = async (req, res) => {
   try {
     const raw = toObject(req.body);
@@ -763,6 +863,11 @@ exports.notifyContext = async (req, res) => {
       }
     }
 
+    // Match the exact patientReference that was registered during linkCareContext
+    const matchedPatientRef =
+      normalizePatientReferenceForLinking(patientReference) ||
+      patientReference;
+
     const payload = {
       notification: {
         ...notification,
@@ -773,7 +878,7 @@ exports.notifyContext = async (req, res) => {
         },
         careContext: {
           ...toObject(notification.careContext),
-          patientReference: stripPatientReferenceForNotify(patientReference),
+          patientReference: matchedPatientRef,
           careContextReference: finalCareContextRef,
         },
         hip: notification.hip || { id: hipId },
@@ -785,19 +890,70 @@ exports.notifyContext = async (req, res) => {
       "X-LINK-TOKEN": linkToken,
     });
 
+    console.log("=========================================");
+    console.log("[HIP NOTIFY CONTEXT] Sending Care Context Notification to ABDM Gateway");
+    console.log("URL:", `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/context/notify`);
+    console.log("REQUEST-ID:", headers["REQUEST-ID"]);
+    console.log("Patient ID (ABHA):", patientId);
+    console.log("Patient Reference:", matchedPatientRef);
+    console.log("Care Context Reference:", finalCareContextRef);
+    console.log("Headers:", JSON.stringify(headers, null, 2));
+    console.log("Payload:", JSON.stringify(payload, null, 2));
+
     const response = await axios.post(
       `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/context/notify`,
       payload,
       { headers }
     );
 
+    console.log("[HIP NOTIFY CONTEXT] ABDM Gateway Immediate Response Status:", response.status);
+    console.log("Data:", JSON.stringify(response.data || {}, null, 2));
+    console.log("ℹ️ NOTE: HTTP 202 means ABDM accepted the notification for async processing. ABDM will call back on /v3/links/context/on-notify with delivery status.");
+    console.log("=========================================");
+
+    try {
+      const responsesLogPath = path.join(dataRoot, "api_responses.txt");
+      const logEntry = `[OUTBOUND REQUEST] POST ${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/context/notify\n${JSON.stringify({ headers, data: payload }, null, 2)}\n[RESPONSE] Status: ${response.status}\n\n`;
+      fs.appendFileSync(responsesLogPath, logEntry);
+    } catch (_) {}
+
+    // Automatic Companion SMS Notification: Deep link to patient mobile
+    let smsResult = null;
+    let patientMobile =
+      toText(raw.phoneNo) ||
+      toText(raw.mobile) ||
+      toText(notification.phoneNo) ||
+      toText(notification.patient?.phoneNo) ||
+      toText(notification.patient?.mobile);
+
+    if (!patientMobile) {
+      patientMobile = findPatientMobileOnDisk(patientId);
+    }
+
+    if (patientMobile) {
+      try {
+        console.log(`[HIP NOTIFY CONTEXT] Automatically dispatching companion SMS notification to ${patientMobile}...`);
+        smsResult = await dispatchSmsNotify({
+          phoneNo: patientMobile,
+          hipId,
+          hipName: toText(raw.hipName) || hospitalConfig.hipName || "Sarita Health Care",
+        });
+        console.log(`[HIP NOTIFY CONTEXT] Automatic companion SMS Notification status:`, smsResult?.statusCode || 202);
+      } catch (smsErr) {
+        console.warn(`[HIP NOTIFY CONTEXT] Automatic SMS Notification warning:`, smsErr.message);
+        smsResult = { ok: false, error: smsErr.message };
+      }
+    }
+
     return res.json({
       requestId: headers["REQUEST-ID"],
       statusCode: response.status,
       response: response.data || {},
+      smsNotification: smsResult,
     });
   } catch (err) {
     const { status, body } = getErrorPayload(err);
+    console.error("❌ [HIP NOTIFY CONTEXT ERROR] Failed to send notification to ABDM. Status:", status, "Body:", body);
     return res.status(status).json(body);
   }
 };
@@ -827,27 +983,120 @@ exports.onGenerateToken = async (req, res) => {
   });
 };
 
+const contextNotifyStoreFile = path.join(dataRoot, "hip_context_notify_callbacks.json");
 const contextNotifyCallbacks = [];
 
+const loadContextNotifyCallbacks = () => {
+  try {
+    if (fs.existsSync(contextNotifyStoreFile)) {
+      const data = JSON.parse(fs.readFileSync(contextNotifyStoreFile, "utf8"));
+      if (Array.isArray(data)) {
+        contextNotifyCallbacks.length = 0;
+        contextNotifyCallbacks.push(...data);
+      }
+    }
+  } catch (e) {
+    console.warn("[HIP NOTIFY] Failed to load persisted callbacks:", e.message);
+  }
+};
+
+const persistContextNotifyCallbacks = () => {
+  try {
+    fs.mkdirSync(path.dirname(contextNotifyStoreFile), { recursive: true });
+    fs.writeFileSync(contextNotifyStoreFile, JSON.stringify(contextNotifyCallbacks, null, 2), "utf8");
+  } catch (e) {
+    console.error("[HIP NOTIFY] Failed to persist callbacks:", e.message);
+  }
+};
+
+loadContextNotifyCallbacks();
+
 exports.onContextNotify = async (req, res) => {
+  const body = req.body || {};
   console.log("=========================================");
-  console.log("[HIP LINK CONTEXT NOTIFY] Callback Received");
-  console.log("Body:", JSON.stringify(req.body || {}, null, 2));
+  console.log("[HIP LINK CONTEXT NOTIFY] Webhook Callback Received from ABDM");
+  console.log("Path:", req.originalUrl || req.url);
+  console.log("Headers:", JSON.stringify(req.headers, null, 2));
+  console.log("Body:", JSON.stringify(body, null, 2));
+
+  if (body.error) {
+    console.error("❌ [HIP LINK CONTEXT NOTIFY] ABDM reported an ERROR:", JSON.stringify(body.error, null, 2));
+  } else if (body.acknowledgement?.status === "SUCCESS") {
+    console.log("✅ [HIP LINK CONTEXT NOTIFY] ABDM confirmed SUCCESS for requestId:", body.resp?.requestId);
+  }
   console.log("=========================================");
 
-  contextNotifyCallbacks.push({
+  const entry = {
     receivedAt: nowIso(),
-    payload: req.body || {},
-  });
+    path: req.originalUrl || req.url,
+    requestId: body.response?.requestId || body.resp?.requestId || body.requestId || "",
+    status: body.acknowledgement?.status || (body.error ? "FAILED" : "RECEIVED"),
+    error: body.error || null,
+    payload: body,
+  };
+
+  contextNotifyCallbacks.push(entry);
+  persistContextNotifyCallbacks();
 
   return res.status(202).json({ ok: true });
 };
 
-exports.listContextNotifyCallbacks = () =>
-  contextNotifyCallbacks
+exports.getContextNotifyCallback = async (req, res) => {
+  const requestId = toText(req.params?.requestId);
+  if (!requestId) {
+    return res.status(400).json({ error: "requestId is required" });
+  }
+  loadContextNotifyCallbacks();
+  const entry = contextNotifyCallbacks.find(
+    (c) => c.requestId === requestId || c.payload?.response?.requestId === requestId || c.payload?.resp?.requestId === requestId
+  );
+  if (!entry) {
+    return res.status(404).json({ error: "Context notify callback not found for requestId", requestId });
+  }
+  return res.json(entry);
+};
+
+exports.notifyMobile = async (req, res) => {
+  try {
+    const raw = toObject(req.body);
+    const hipId =
+      toText(raw.hipId) ||
+      toText(raw.notification?.hip?.id) ||
+      toText(req.header("X-HIP-ID")) ||
+      toText(process.env.HIP_ID) ||
+      hospitalConfig.hipId;
+
+    const phoneNo =
+      toText(raw.phoneNo) ||
+      toText(raw.notification?.phoneNo) ||
+      toText(raw.mobile);
+
+    if (!phoneNo) {
+      return res.status(400).json({ error: "phoneNo (mobile number) is required for SMS notification" });
+    }
+
+    const hipName =
+      toText(raw.hipName) ||
+      toText(raw.notification?.hip?.name) ||
+      hospitalConfig.hipName ||
+      "Sarita Health Care";
+
+    const result = await dispatchSmsNotify({ phoneNo, hipId, hipName });
+    return res.json(result);
+  } catch (err) {
+    const { status, body } = getErrorPayload(err);
+    console.error("❌ [HIP SMS NOTIFY ERROR] Status:", status, "Body:", body);
+    return res.status(status).json(body);
+  }
+};
+
+exports.listContextNotifyCallbacks = () => {
+  loadContextNotifyCallbacks();
+  return contextNotifyCallbacks
     .slice()
     .reverse()
     .map((item) => JSON.parse(JSON.stringify(item)));
+};
 
 exports.onCareContext = async (req, res) => {
   careContextCallbacks.push({

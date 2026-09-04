@@ -4,15 +4,13 @@ const fs = require("fs");
 const { buildBundleFromFiles } = require("./M2FHIRBundleBuilder");
 const BundleRegistry = require("./BundleRegistry");
 const config = require("../helpers/config");
+const { dataRoot, backendRoot } = require("../../config/environment");
 
 const log = (event, details = {}) => {
   console.log(JSON.stringify({ scope: "M2FolderWatcher", event, ...details }));
 };
 
-const PROJECT_ROOT = path.resolve(__dirname, "../../../");
-const RUNTIME_DATA_ROOT = config.tokenStoreDir
-  ? path.dirname(config.tokenStoreDir)
-  : path.join(PROJECT_ROOT, "backend", "data");
+const RUNTIME_DATA_ROOT = dataRoot;
 
 const guessHiType = (fileName) => {
   const normalized = fileName.toLowerCase().replace(/[^a-z]/g, "");
@@ -50,16 +48,13 @@ const pendingFolders = new Set();
 let queueIsRunning = false;
 
 const startWatcher = () => {
-  log("Starting M2 Folder Watcher for FHIR Bundle Generation", { projectRoot: PROJECT_ROOT });
+  log("Starting M2 Folder Watcher for FHIR Bundle Generation", { dataRoot: RUNTIME_DATA_ROOT });
 
-  // Watch both patient storage roots. Legacy direct data folders remain in
-  // the list so existing ABHA flows keep working during deployment rollout.
+  // Watch both patient storage roots and canonical data directory
   const watchPatterns = [
     path.join(RUNTIME_DATA_ROOT, "ABHA_Verified", "*", "*.txt"),
     path.join(RUNTIME_DATA_ROOT, "Non_ABHA_Verified", "*", "*.txt"),
-    path.join(__dirname, "../../../data", "*@sbx_*", "*.txt"),      // If inside backend/m2/fhir
-    path.join(__dirname, "../../data", "*@sbx_*", "*.txt"),         // If flattened to m2/fhir
-    path.join(PROJECT_ROOT, "*@sbx_*", "*.txt")                     // Desktop root fallback
+    path.join(RUNTIME_DATA_ROOT, "*@sbx_*", "*.txt"),
   ];
   
   const watcher = chokidar.watch(watchPatterns, {

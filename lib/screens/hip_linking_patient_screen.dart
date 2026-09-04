@@ -285,16 +285,34 @@ class _HipLinkingPatientScreenState extends State<HipLinkingPatientScreen> {
             ),
             const SizedBox(height: 10),
             _actionButton(
-              '3. Link Care Context',
+              '3. Link Care Context & Auto-Notify',
               enabled: patient != null && _linkTokenController.text.isNotEmpty,
               onTap: _linkCareContext,
             ),
-            const SizedBox(height: 10),
-            _actionButton(
-              '4. Notify Linked Context',
-              enabled: patient != null && _linkTokenController.text.isNotEmpty,
-              onTap: _notifyContext,
-              outlined: true,
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFC8E6C9)),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.check_circle_outline, color: Color(0xFF2E7D32), size: 20),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Automated Flow: ABDM Care Context Notify & Patient SMS are triggered automatically upon linking.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF1B5E20),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 18),
             Text(
@@ -432,21 +450,7 @@ class _HipLinkingPatientScreenState extends State<HipLinkingPatientScreen> {
     final patient = _requirePatient();
     final abhaAddress = _resolvedAbhaAddress(patient);
     final abhaNumber = _normalizedAbhaNumber(patient);
-    final response = await HipLinkingApiService.linkCareContext({
-      'hipId': HospitalConfig.hipId,
-      'linkToken': _required(_linkTokenController, 'Link Token'),
-      'abhaNumber': abhaNumber,
-      'abhaAddress': abhaAddress,
-      'AbhaNumber': abhaNumber,
-      'AbhaAddress': abhaAddress,
-      'patient': [_careContextPayload()],
-    });
-    _showResponse('Link Care Context', response);
-  }
-
-  Future<void> _notifyContext() async {
-    final patient = _requirePatient();
-    final abhaAddress = _resolvedAbhaAddress(patient);
+    final linkToken = _required(_linkTokenController, 'Link Token');
     final patientReference = _required(
       _patientReferenceController,
       'Patient Reference Number',
@@ -455,21 +459,79 @@ class _HipLinkingPatientScreenState extends State<HipLinkingPatientScreen> {
       _careContextReferenceController,
       'Care Context Reference Number',
     );
-    final response = await HipLinkingApiService.notifyContext({
+    final mobile = _text(patient['mobile']).replaceAll(RegExp(r'\D'), '').trim();
+
+    // Step 1: Link Care Context
+    final linkResponse = await HipLinkingApiService.linkCareContext({
       'hipId': HospitalConfig.hipId,
-      'linkToken': _required(_linkTokenController, 'Link Token'),
-      'notification': {
-        'patient': {'id': abhaAddress},
-        'careContext': {
-          'patientReference': patientReference,
-          'careContextReference': careContextRef,
-        },
-        'hiTypes': [_selectedHiType],
-        'date': DateTime.now().toUtc().toIso8601String(),
-        'hip': {'id': HospitalConfig.hipId},
-      },
+      'linkToken': linkToken,
+      'abhaNumber': abhaNumber,
+      'abhaAddress': abhaAddress,
+      'AbhaNumber': abhaNumber,
+      'AbhaAddress': abhaAddress,
+      'patient': [_careContextPayload()],
     });
-    _showResponse('Notify Linked Context', response);
+
+    final linkOk = linkResponse['ok'] == true ||
+        linkResponse['statusCode'] == 200 ||
+        linkResponse['statusCode'] == 202;
+
+    if (!linkOk) {
+      _showResponse('Link Care Context (Failed)', linkResponse);
+      return;
+    }
+
+    final combinedResults = <String, dynamic>{
+      '1_linkCareContext': linkResponse,
+    };
+
+    // Step 2: Automatically Notify ABDM Care Context
+    try {
+      final notifyResponse = await HipLinkingApiService.notifyContext({
+        'hipId': HospitalConfig.hipId,
+        'linkToken': linkToken,
+        'mobile': mobile,
+        'phoneNo': mobile,
+        'notification': {
+          'patient': {
+            'id': abhaAddress,
+            'mobile': mobile,
+            'phoneNo': mobile,
+          },
+          'careContext': {
+            'patientReference': patientReference,
+            'careContextReference': careContextRef,
+          },
+          'hiTypes': [_selectedHiType],
+          'date': DateTime.now().toUtc().toIso8601String(),
+          'hip': {'id': HospitalConfig.hipId},
+        },
+      });
+      combinedResults['2_notifyContext'] = notifyResponse;
+    } catch (e) {
+      combinedResults['2_notifyContext'] = {'ok': false, 'error': e.toString()};
+    }
+
+    // Step 3: Automatically Send SMS Notification (Deep Link)
+    if (mobile.isNotEmpty) {
+      try {
+        final smsResponse = await HipLinkingApiService.notifySms({
+          'hipId': HospitalConfig.hipId,
+          'hipName': HospitalConfig.hospitalName,
+          'phoneNo': mobile,
+        });
+        combinedResults['3_smsNotify'] = smsResponse;
+      } catch (e) {
+        combinedResults['3_smsNotify'] = {'ok': false, 'error': e.toString()};
+      }
+    } else {
+      combinedResults['3_smsNotify'] = {
+        'skipped': true,
+        'reason': 'Patient mobile number not available for SMS notification',
+      };
+    }
+
+    _showResponse('Link Care Context & Auto-Notify (Completed)', combinedResults);
   }
 
   Map<String, dynamic> _patientPayload(Map<String, dynamic> patient) {

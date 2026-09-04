@@ -8,8 +8,6 @@ import '../services/hip_linking_api_service.dart';
 import '../utils/app_runtime_store.dart';
 import '../utils/draft_helper.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
-import '../utils/api_config.dart';
 
 typedef HipLinkingStepListener = void Function(Map<String, dynamic> run);
 
@@ -282,6 +280,10 @@ class HipLinkingWorkflowService {
             '4. Notify Linked Context',
             'Generate Link Token failed after retry attempts. Exiting process.',
           );
+          addSkippedStep(
+            '5. Send SMS Notification (Deep Link)',
+            'Generate Link Token failed after retry attempts. Exiting process.',
+          );
           return _completeRun(run, publish);
         }
 
@@ -304,6 +306,10 @@ class HipLinkingWorkflowService {
             );
             addSkippedStep(
               '4. Notify Linked Context',
+              'ABDM link token callback was not received. Exiting process.',
+            );
+            addSkippedStep(
+              '5. Send SMS Notification (Deep Link)',
               'ABDM link token callback was not received. Exiting process.',
             );
             return _completeRun(run, publish);
@@ -375,15 +381,25 @@ class HipLinkingWorkflowService {
             '4. Notify Linked Context',
             'Link Care Context failed after retry attempts. Exiting process.',
           );
+          addSkippedStep(
+            '5. Send SMS Notification (Deep Link)',
+            'Link Care Context failed after retry attempts. Exiting process.',
+          );
           return _completeRun(run, publish);
         }
       }
 
       await Future<void>.delayed(stepDelay);
 
+      final mobile = _text(patientProfile['mobile']).replaceAll(RegExp(r'\D'), '').trim();
+
       if (linkToken.isEmpty) {
         addSkippedStep(
           '4. Notify Linked Context',
+          'Link token was not available from the callback response.',
+        );
+        addSkippedStep(
+          '5. Send SMS Notification (Deep Link)',
           'Link token was not available from the callback response.',
         );
       } else {
@@ -392,8 +408,14 @@ class HipLinkingWorkflowService {
           () => HipLinkingApiService.notifyContext({
             'hipId': HospitalConfig.hipId,
             'linkToken': linkToken,
+            'mobile': mobile,
+            'phoneNo': mobile,
             'notification': {
-              'patient': {'id': abhaAddress},
+              'patient': {
+                'id': abhaAddress,
+                'mobile': mobile,
+                'phoneNo': mobile,
+              },
               'careContext': {
                 'patientReference': patientReference,
                 'careContextReference': careContextReference,
@@ -404,6 +426,23 @@ class HipLinkingWorkflowService {
             },
           }),
         );
+
+        if (mobile.isNotEmpty) {
+          await Future<void>.delayed(const Duration(seconds: 1));
+          await callStep(
+            '5. Send SMS Notification (Deep Link)',
+            () => HipLinkingApiService.notifySms({
+              'hipId': HospitalConfig.hipId,
+              'hipName': HospitalConfig.hospitalName,
+              'phoneNo': mobile,
+            }),
+          );
+        } else {
+          addSkippedStep(
+            '5. Send SMS Notification (Deep Link)',
+            'Patient mobile number not available for SMS notification.',
+          );
+        }
       }
 
       return _completeRun(run, publish);

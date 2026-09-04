@@ -1,0 +1,246 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-05b2ac93-611f-47be-bf34-ceaf2823ccb6",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-09-04T17:04:40.629+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "18b8882a-3f30-4ee3-9ebe-622d16bb653e"
+  },
+  "type": "document",
+  "timestamp": "2026-09-04T17:04:40.629+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:253c73ae-825b-4f4b-b249-43ee519389e0",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "253c73ae-825b-4f4b-b249-43ee519389e0",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/HealthDocumentRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Health Document Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1a06a57-86f4-42e3-9fb6-48ac44ceac97",
+          "display": "Saurav Kumar"
+        },
+        "encounter": {
+          "reference": "urn:uuid:88000f9d-5d90-43b4-8f0e-a0d31cffc553",
+          "display": "Ambulatory"
+        },
+        "date": "2026-09-04T17:04:40.629+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:3ffc8e55-0af0-4fef-9e2c-3021e56c91b8",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Health Document Record",
+        "custodian": {
+          "reference": "urn:uuid:ea55a39c-e4af-40d2-bc4e-3727f6080902",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Record artifact",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "419891008",
+                  "display": "Record artifact"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:8bb6c678-bb61-49f9-abd6-c98f078b5652",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e1a06a57-86f4-42e3-9fb6-48ac44ceac97",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "e1a06a57-86f4-42e3-9fb6-48ac44ceac97",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-04T17:04:40.629+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "saurav_50505@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Saurav Kumar"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "8298540343",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2000-01-01"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:3ffc8e55-0af0-4fef-9e2c-3021e56c91b8",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "3ffc8e55-0af0-4fef-9e2c-3021e56c91b8",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-04T17:04:40.629+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ea55a39c-e4af-40d2-bc4e-3727f6080902",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "ea55a39c-e4af-40d2-bc4e-3727f6080902",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:88000f9d-5d90-43b4-8f0e-a0d31cffc553",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "88000f9d-5d90-43b4-8f0e-a0d31cffc553",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "e7e64692-4445-4458-9dad-667eb16711a1"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1a06a57-86f4-42e3-9fb6-48ac44ceac97",
+          "display": "Saurav Kumar"
+        },
+        "period": {
+          "start": "2026-09-04T17:04:40.629+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:8bb6c678-bb61-49f9-abd6-c98f078b5652",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "8bb6c678-bb61-49f9-abd6-c98f078b5652",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Health Document Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:e1a06a57-86f4-42e3-9fb6-48ac44ceac97"
+        },
+        "date": "2026-09-04T11:34:40.629Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+IGVuZG9iago1IDAgb2JqIDw8IC9MZW5ndGggNDk1ID4+IHN0cmVhbQpCVAovRjEgMTQgVGYKNzIgNzYwIFRkCihEb2N1bWVudFJlZmVyZW5jZSkgVGoKMCAtMjQgVGQKL0YxIDEwIFRmCihQYXRpZW50IFVISUQ6IFNIQzAyMDkyNjAxKSBUagowIC0xNCBUZAooQUJIQSBOdW1iZXI6IDkxNTA1NDI4MzYyNDUxKSBUagowIC0xNCBUZAooQUJIQSBBZGRyZXNzOiBzYXVyYXZfNTA1MDVAc2J4KSBUagowIC0xNCBUZAooU2F2ZWQgQXQ6IDIwMjYtMDgtMjVUMjM6MDU6MDcuOTE0KSBUagowIC0xNCBUZAooQUJIQSBBZGRyZXNzOiBzYXVyYXZfNTA1MDVAc2J4KSBUagowIC0xNCBUZAooQUJIQSBOdW1iZXI6IDkxNTA1NDI4MzYyNDUxKSBUagowIC0xNCBUZAooTGluayBUb2tlbjopIFRqCjAgLTE0IFRkCihleUpoYkdjaU9pSlNVelV4TWlKOS5leUpvYVhCSlpDSTZJa2xPTWpReE1EQXdNalE0TUNJc0ltRmlhR0ZPZFcxaVpYSWlPamt4TlRBMU5ESTRNell5TkRVeExDSjBjbUZ1YzJGamRHbHZia2xrSSkgVGoKMCAtMTQgVGQKKCkgVGoKMCAtMTQgVGQKRVQKZW5kc3RyZWFtIGVuZG9iagp0cmFpbGVyIDw8IC9Sb290IDEgMCBSID4+CiUlRU9G",
+              "title": "hip_link_token",
+              "creation": "2026-09-04T11:34:40.629Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

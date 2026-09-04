@@ -300,6 +300,8 @@ const createAppointment = ({
   practitionerId,
   reason,
   status = "booked",
+  start,
+  end,
   timestamp = formatTimestamp()
 }) => {
   return {
@@ -316,14 +318,42 @@ const createAppointment = ({
         { actor: { reference: patientId }, status: "accepted" },
         { actor: { reference: practitionerId }, status: "accepted" }
       ],
-      start: timestamp,
-      end: timestamp
+      start: start || timestamp,
+      end: end || start || timestamp
     }
   };
 };
 
+const formatAppointmentTime = (dateStr, timeStr, defaultTime = "13:00") => {
+  if (!dateStr) return null;
+  const cleanDate = String(dateStr).trim();
+  let cleanTime = (timeStr && String(timeStr).trim() !== "-") ? String(timeStr).trim() : defaultTime;
+  if (/^\d{1,2}:\d{2}$/.test(cleanTime)) {
+    const parts = cleanTime.split(":");
+    cleanTime = `${parts[0].padStart(2, '0')}:${parts[1]}:00`;
+  } else if (/^\d{1,2}:\d{2}:\d{2}$/.test(cleanTime)) {
+    const parts = cleanTime.split(":");
+    cleanTime = `${parts[0].padStart(2, '0')}:${parts[1]}:${parts[2]}`;
+  } else {
+    cleanTime = defaultTime.length === 5 ? `${defaultTime}:00` : defaultTime;
+  }
+  return `${cleanDate}T${cleanTime}+05:30`;
+};
+
+const addMinutesToTime = (timeStr, minsToAdd = 15) => {
+  if (!timeStr || !/^\d{1,2}:\d{2}/.test(String(timeStr).trim())) return null;
+  const parts = String(timeStr).trim().split(":");
+  let h = parseInt(parts[0], 10);
+  let m = parseInt(parts[1], 10) + minsToAdd;
+  h = (h + Math.floor(m / 60)) % 24;
+  m = m % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+};
+
 module.exports = {
   formatTimestamp,
+  formatAppointmentTime,
+  addMinutesToTime,
   createObservation,
   createCondition,
   createDocumentReference,

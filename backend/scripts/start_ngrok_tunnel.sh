@@ -35,6 +35,10 @@ if [[ -z "${NGROK_DOMAIN:-}" ]]; then
   exit 1
 fi
 
+# Strip any leading http:// or https:// and trailing slashes to prevent https://https://
+CLEAN_DOMAIN=$(echo "${NGROK_DOMAIN}" | sed -E 's|^https?://||' | sed 's|/.*||' | tr -d '[:space:]')
+PUBLIC_URL="https://${CLEAN_DOMAIN}"
+
 mkdir -p "$STATE_DIR"
 
 if [[ -f "$PID_FILE" ]]; then
@@ -47,12 +51,11 @@ fi
 
 : > "$LOG_FILE"
 
-echo "Starting ngrok on port ${PORT_VALUE} with domain ${NGROK_DOMAIN}..."
-nohup "$NGROK_BIN" http --url="https://${NGROK_DOMAIN}" "${PORT_VALUE}" >"$LOG_FILE" 2>&1 &
+echo "Starting ngrok on port ${PORT_VALUE} with domain ${CLEAN_DOMAIN}..."
+nohup "$NGROK_BIN" http --url="${PUBLIC_URL}" "${PORT_VALUE}" >"$LOG_FILE" 2>&1 &
 PID=$!
 echo "$PID" > "$PID_FILE"
 
-PUBLIC_URL="https://${NGROK_DOMAIN}"
 echo "$PUBLIC_URL" > "$URL_FILE"
 
 # Wait a second to ensure it doesn't crash immediately (e.g. invalid auth token or domain)

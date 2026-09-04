@@ -22,7 +22,7 @@ const DATA_POINT_MAPPING = {
   "Body mass index (BMI) [Ratio]": { kind: "NUMERIC", loinc: "39156-5", unit: "kg/m2", category: "survey", categoryDisplay: "Survey" },
 
   // Physical Activity
-  "Step Count": { kind: "NUMERIC", loinc: "55423-8", unit: "{steps}", category: "activity", categoryDisplay: "Activity" },
+  "Step Count": { kind: "NUMERIC", loinc: "55423-8", unit: "steps", category: "activity", categoryDisplay: "Activity" },
   "Calories Burned": { kind: "NUMERIC", loinc: "41981-2", unit: "kcal", category: "activity", categoryDisplay: "Activity" },
   "Sleep Hours": { kind: "NUMERIC", loinc: "248263006", unit: "h", category: "activity", categoryDisplay: "Activity" },
 

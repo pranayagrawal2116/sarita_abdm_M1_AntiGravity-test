@@ -2,12 +2,11 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const config = require('../../../m2/helpers/config');
+const { dataRoot } = require('../../../config/environment');
 
 class LocalDataRegistry {
   constructor() {
-    this.dataRoot = config.tokenStoreDir
-      ? path.dirname(config.tokenStoreDir)
-      : path.join(__dirname, '../../../data');
+    this.dataRoot = dataRoot;
     this.abhaVerifiedRoot = path.join(this.dataRoot, 'ABHA_Verified');
     this.nonAbhaVerifiedRoot = path.join(this.dataRoot, 'Non_ABHA_Verified');
     this.documentCache = new Map();
@@ -456,15 +455,39 @@ class LocalDataRegistry {
     return targetPath;
   }
 
-  async promoteNonAbhaPatientRecords({ sourceFolderPath, abhaAddress, patientName, documentPaths = [] } = {}) {
+  async promoteNonAbhaPatientRecords({ sourceFolderPath, sourceFolderName, abhaAddress, patientName, documentPaths = [] } = {}) {
     const sourceRoot = path.resolve(this.nonAbhaVerifiedRoot);
-    const sourcePath = path.resolve(String(sourceFolderPath || ''));
-    if (!sourcePath.startsWith(`${sourceRoot}${path.sep}`)) {
-      throw new Error('Promotion source must be inside Non_ABHA_Verified.');
+    let resolvedSource = null;
+
+    // 1. If explicit folder name provided, resolve against canonical root
+    if (sourceFolderName) {
+      const safeName = this._sanitizePathSegment(sourceFolderName);
+      const candidate = path.join(sourceRoot, safeName);
+      if (candidate.startsWith(`${sourceRoot}${path.sep}`) && fs.existsSync(candidate)) {
+        resolvedSource = candidate;
+      }
     }
-    if (!fs.existsSync(sourcePath)) {
+
+    // 2. If sourceFolderPath provided, check if it directly points into sourceRoot
+    if (!resolvedSource && sourceFolderPath) {
+      const candidate = path.resolve(String(sourceFolderPath));
+      if (candidate.startsWith(`${sourceRoot}${path.sep}`) && fs.existsSync(candidate)) {
+        resolvedSource = candidate;
+      } else {
+        // 3. Backward compatibility for legacy absolute path from another OS/machine
+        const extractedBase = path.basename(String(sourceFolderPath).replace(/\\/g, '/'));
+        const safeBase = this._sanitizePathSegment(extractedBase);
+        const candidateFromBase = path.join(sourceRoot, safeBase);
+        if (candidateFromBase.startsWith(`${sourceRoot}${path.sep}`) && fs.existsSync(candidateFromBase)) {
+          resolvedSource = candidateFromBase;
+        }
+      }
+    }
+
+    if (!resolvedSource) {
       return { promoted: false, reason: 'source-folder-not-found', files: [] };
     }
+    const sourcePath = resolvedSource;
 
     const destinationPath = path.join(
       this.abhaVerifiedRoot,
@@ -498,9 +521,21 @@ class LocalDataRegistry {
     // entire folder after a successful transfer: only the files that produced
     // packets acknowledged by the HIU may become ABHA-verified records.
     const sourceDocuments = [...new Set(documentPaths
-      .map((documentPath) => path.resolve(String(documentPath || '')))
+      .map((documentPath) => {
+        const raw = String(documentPath || '');
+        const direct = path.resolve(raw);
+        if (direct.startsWith(`${sourcePath}${path.sep}`) && fs.existsSync(direct)) {
+          return direct;
+        }
+        const base = path.basename(raw.replace(/\\/g, '/'));
+        const remapped = path.join(sourcePath, base);
+        if (remapped.startsWith(`${sourcePath}${path.sep}`) && fs.existsSync(remapped)) {
+          return remapped;
+        }
+        return '';
+      })
       .filter((documentPath) => (
-        documentPath.startsWith(`${sourcePath}${path.sep}`)
+        Boolean(documentPath)
         && path.extname(documentPath).toLowerCase() === '.txt'
         && fs.existsSync(documentPath)
       ))

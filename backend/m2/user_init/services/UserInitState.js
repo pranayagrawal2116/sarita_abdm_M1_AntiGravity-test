@@ -1,10 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const { dataRoot } = require('../../../config/environment');
 
 class UserInitState {
   constructor() {
-    this.storePath = path.join(__dirname, '../../../data', 'user_init_state.json');
+    this.storePath = path.join(dataRoot, 'user_init_state.json');
     this._ensureStore();
   }
 

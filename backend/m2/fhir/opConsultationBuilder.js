@@ -5,7 +5,16 @@
  */
 
 const { v4: uuidv4 } = require("uuid");
-const { createObservation, createCondition, createMedicationRequest, createProcedure, createFamilyMemberHistory, createAppointment } = require("./fhirHelpers");
+const {
+  createObservation,
+  createCondition,
+  createMedicationRequest,
+  createProcedure,
+  createFamilyMemberHistory,
+  createAppointment,
+  formatAppointmentTime,
+  addMinutesToTime
+} = require("./fhirHelpers");
 
 class OpConsultationBuilder {
   /**
@@ -205,11 +214,19 @@ class OpConsultationBuilder {
     // 7b. Follow Up
     if (params.followUp) {
       const sectionEntries = [];
+      const startTimeStr = params.followUp.startTime || params.followUp.time || "13:00";
+      const fallbackEnd = addMinutesToTime(startTimeStr, 15) || "13:15";
+      const endTimeStr = params.followUp.endTime || fallbackEnd;
+      const startIso = formatAppointmentTime(params.followUp.date, startTimeStr, "13:00") || params.timestamp;
+      const endIso = formatAppointmentTime(params.followUp.date, endTimeStr, fallbackEnd) || startIso;
+
       const item = createAppointment({
         patientId: ids.patientId,
         practitionerId: ids.practitionerId,
         reason: params.followUp.reason || "Review",
-        timestamp: params.followUp.date ? `${params.followUp.date}T${params.followUp.time || "00:00"}:00.000Z` : params.timestamp
+        start: startIso,
+        end: endIso,
+        timestamp: startIso
       });
       entries.push(item);
       sectionEntries.push({ reference: item.fullUrl, display: "Follow Up Appointment" });

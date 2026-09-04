@@ -364,12 +364,13 @@ class M2DataTransferManager {
       if (
         completedSourceTransaction.userInitiatedLinking &&
         completedSourceTransaction.sourceStorageClass === "NON_ABHA_VERIFIED" &&
-        completedSourceTransaction.sourcePatientFolder
+        (completedSourceTransaction.sourcePatientFolder || completedSourceTransaction.sourcePatientFolderName)
       ) {
         try {
           const LocalDataRegistry = require("../user_init/services/LocalDataRegistry");
           localRecordPromotion = await LocalDataRegistry.promoteNonAbhaPatientRecords({
             sourceFolderPath: completedSourceTransaction.sourcePatientFolder,
+            sourceFolderName: completedSourceTransaction.sourcePatientFolderName,
             abhaAddress: completedSourceTransaction.abhaAddress || patientId,
             patientName: completedSourceTransaction.patientName || patientId,
             documentPaths: selectedPayloads.map((payload) => payload.meta?.sourceTxtFile).filter(Boolean),
@@ -1085,6 +1086,15 @@ class M2DataTransferManager {
       body,
       { headers }
     );
+
+    try {
+      const envConfig = require("../../config/environment");
+      const fs = require("fs");
+      const path = require("path");
+      const apiLogPath = path.join(envConfig.dataRoot, "api_responses.txt");
+      const logEntry = `[OUTBOUND REQUEST] POST ${config.gatewayBaseUrl}${config.gatewayHiNotifyPath}\n${JSON.stringify({ headers, data: body }, null, 2)}\n[RESPONSE] Status: ${response.status}\n\n`;
+      fs.appendFileSync(apiLogPath, logEntry);
+    } catch (_) {}
 
     await M2TransactionStore.transitionState(transactionId, "Notify Sent", {
       requestId,

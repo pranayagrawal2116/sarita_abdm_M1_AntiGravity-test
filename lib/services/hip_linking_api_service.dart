@@ -130,4 +130,16 @@ class HipLinkingApiService {
   ) {
     return _post('/hip/link/context/notify', payload);
   }
+
+  static Future<Map<String, dynamic>> notifySms(
+    Map<String, dynamic> payload,
+  ) {
+    return _post('/hip/link/patient/links/sms/notify2', payload);
+  }
+
+  static Future<Map<String, dynamic>> getContextNotifyCallback(
+    String requestId,
+  ) {
+    return _get('/hip/link/context/notify/callback/$requestId');
+  }
 }

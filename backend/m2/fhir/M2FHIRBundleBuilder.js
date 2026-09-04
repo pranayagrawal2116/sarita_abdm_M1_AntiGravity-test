@@ -389,13 +389,13 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     }
   }
 
-  const temperature = extractIndentedValue(lines, /^Vitals:/i, /^\s*Temperature:\s*(.+)$/i);
-  const height = extractIndentedValue(lines, /^Measurements:/i, /^\s*Height:\s*(.+)$/i);
-  const weight = extractIndentedValue(lines, /^Measurements:/i, /^\s*Weight:\s*(.+)$/i);
-  const bmi = extractIndentedValue(lines, /^Measurements:/i, /^\s*Bmi:\s*(.+)$/i);
+  const temperature = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Temperature|Temp):\s*(.+)$/i);
+  const height = extractIndentedValue(lines, /^Measurements:/i, /^\s*Height:\s*(.+)$/i) || extractIndentedValue(lines, /^Vitals:/i, /^\s*Height:\s*(.+)$/i);
+  const weight = extractIndentedValue(lines, /^Measurements:/i, /^\s*Weight:\s*(.+)$/i) || extractIndentedValue(lines, /^Vitals:/i, /^\s*Weight:\s*(.+)$/i);
+  const bmi = extractIndentedValue(lines, /^Measurements:/i, /^\s*Bmi:\s*(.+)$/i) || extractIndentedValue(lines, /^Vitals:/i, /^\s*Bmi:\s*(.+)$/i);
   const respRate = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Respiratory rate|Resp Rate):\s*(.+)$/i);
   const heartRate = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Heart rate|Pulse):\s*(.+)$/i);
-  const spo2 = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Oxygen|SpO2):\s*(.+)$/i);
+  const spo2 = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Oxygen|Sp\s*O2|SpO2):\s*(.+)$/i);
   const bpSys = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Bp Systolic|BP Systolic):\s*(.+)$/i);
   const bpDia = extractIndentedValue(lines, /^Vitals:/i, /^\s*(?:Bp Diastolic|BP Diastolic):\s*(.+)$/i);
 
@@ -424,13 +424,13 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   const physicalActivity = [];
   if (sleepHours) physicalActivity.push({ code: "248263006", display: "Sleep Hours", value: Number(sleepHours), unit: "h" });
   if (caloriesBurned) physicalActivity.push({ code: "41981-2", display: "Calories Burned", value: Number(caloriesBurned), unit: "kcal" });
-  if (stepCount) physicalActivity.push({ code: "55423-8", display: "Step Count", value: Number(stepCount), unit: "/d" });
+  if (stepCount) physicalActivity.push({ code: "55423-8", display: "Step Count", value: Number(stepCount), unit: "steps" });
 
   const calIntake = extractIndentedValue(lines, /^General Assessment:/i, /^\s*Calories Intake:\s*(.+)$/i);
   const fluidIntake = extractIndentedValue(lines, /^General Assessment:/i, /^\s*Fluid Intake:\s*(.+)$/i);
   const generalAssessment = [];
-  if (calIntake) generalAssessment.push({ display: "Calorie intake", value: Number(calIntake) });
-  if (fluidIntake) generalAssessment.push({ display: "Fluid intake", value: Number(fluidIntake) });
+  if (calIntake) generalAssessment.push({ display: "Calorie intake", value: Number(calIntake), unit: "kcal" });
+  if (fluidIntake) generalAssessment.push({ display: "Fluid intake", value: Number(fluidIntake), unit: "L" });
 
   const ageAtMenarche = extractIndentedValue(lines, /^Women Health:/i, /^\s*Age At Menarche:\s*(.+)$/i);
   const lmd = extractIndentedValue(lines, /^Women Health:/i, /^\s*Last Menstrual Date:\s*(.+)$/i);
@@ -450,9 +450,21 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   
   const allergies = allergiesList.map(a => ({ code: "256349002", display: a }));
   
-  const history = historyList.length > 0
-    ? historyList.map(h => ({ code: "16100001", display: h }))
-    : [{ code: "16100001", display: "Medical history noted" }];
+  // Extract Discharge Diagnosis specifically
+  const dischargeDiagnosisList = extractIndentedList(lines, /^Discharge Diagnosis:/i);
+  const historyDiagnosis = historyList
+    .filter(h => /^Discharge Diagnosis\s*[-–:]\s*/i.test(h))
+    .map(h => h.replace(/^Discharge Diagnosis\s*[-–:]\s*/i, "").trim());
+
+  const allDischargeDiagnoses = [...dischargeDiagnosisList, ...historyDiagnosis];
+  const dischargeDiagnosis = allDischargeDiagnoses.length > 0
+    ? allDischargeDiagnoses.map(d => ({ code: "18842-5", display: d, conclusion: d }))
+    : null;
+
+  const generalHistory = historyList.filter(h => !/^Discharge Diagnosis\s*[-–:]\s*/i.test(h));
+  const history = generalHistory.length > 0
+    ? generalHistory.map(h => ({ code: "16100001", display: h }))
+    : (allDischargeDiagnoses.length > 0 ? [] : [{ code: "16100001", display: "Medical history noted" }]);
 
   const invoiceItems = [];
   const itemsStart = lines.findIndex((line) => /^Items:/i.test(line));
@@ -594,21 +606,74 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   }
 
   // --- Extract Family History ---
-  const familyHistoryList = extractIndentedList(lines, /^Family History:/i);
-  const familyHistory = familyHistoryList.map(fh => ({ display: fh }));
+  const familyHistory = [];
+  const famStart = lines.findIndex((line) => /^Family History:/i.test(line));
+  if (famStart >= 0) {
+    for (let i = famStart + 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^[A-Za-z].*:\s*$/.test(line) || /^[A-Za-z].*:\s*.+$/.test(line)) {
+        if (!/^\s*(?:Draft Family History|- Item|Condition|Relationship|Notes)/i.test(line)) {
+          break;
+        }
+      }
+      if (/^Draft Family History:/i.test(line)) break;
+      const cMatch = line.match(/^\s*Condition:\s*(.+)$/i);
+      if (cMatch && text(cMatch[1]) && text(cMatch[1]) !== "-") {
+        let condition = text(cMatch[1]);
+        let relationship = "";
+        let notes = "";
+        for (let j = i + 1; j < Math.min(lines.length, i + 4); j++) {
+          if (/^\s*-\s*Item/i.test(lines[j])) break;
+          const rMatch = lines[j].match(/^\s*Relationship:\s*(.+)$/i);
+          if (rMatch && text(rMatch[1]) !== "-") relationship = text(rMatch[1]);
+          const nMatch = lines[j].match(/^\s*Notes:\s*(.+)$/i);
+          if (nMatch && text(nMatch[1]) !== "-") notes = text(nMatch[1]);
+        }
+        const display = relationship ? `${relationship}: ${condition}` : condition;
+        familyHistory.push({
+          condition,
+          relationship,
+          notes,
+          display
+        });
+      }
+    }
+  }
+  if (familyHistory.length === 0) {
+    const rawFhList = extractIndentedList(lines, /^Family History:/i);
+    for (const item of rawFhList) {
+      if (!/^Item \d+:/i.test(item)) {
+        familyHistory.push({
+          condition: item,
+          relationship: "",
+          notes: "",
+          display: item
+        });
+      }
+    }
+  }
 
   // --- Extract Follow Up ---
   const followUpReason = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Reason:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*Reason:\s*(.+)$/i);
   const followUpDate = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Date:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*Follow Up Date:\s*(.+)$/i);
-  const followUpTime = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Time:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*Follow Up Time:\s*(.+)$/i);
-  const followUp = (followUpReason || followUpDate) ? { reason: followUpReason, date: followUpDate, time: followUpTime } : null;
+  const followUpStartTime = extractIndentedValue(lines, /^Follow Up:/i, /^\s*Start Time:\s*(.+)$/i) || extractIndentedValue(lines, /^Follow Up:/i, /^\s*Time:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*(?:Follow Up Start Time|Follow Up Time|Start Time):\s*(.+)$/i);
+  const followUpEndTime = extractIndentedValue(lines, /^Follow Up:/i, /^\s*End Time:\s*(.+)$/i) || extractIndentedValue(lines, /^Care Plan:/i, /^\s*(?:Follow Up End Time|End Time):\s*(.+)$/i);
+  const cleanDate = (followUpDate && followUpDate !== "-") ? followUpDate : null;
+  const cleanReason = (followUpReason && followUpReason !== "-") ? followUpReason : "Review";
+  const followUp = (cleanDate || (followUpReason && followUpReason !== "-")) ? {
+    reason: cleanReason,
+    date: cleanDate,
+    time: (followUpStartTime && followUpStartTime !== "-") ? followUpStartTime : "13:00",
+    startTime: (followUpStartTime && followUpStartTime !== "-") ? followUpStartTime : "13:00",
+    endTime: (followUpEndTime && followUpEndTime !== "-") ? followUpEndTime : "13:15"
+  } : null;
 
   // --- Extract Care Plan ---
   const carePlanTitle = extractIndentedValue(lines, /^Care Plan:/i, /^\s*Title:\s*(.+)$/i);
   const carePlanDesc = extractIndentedValue(lines, /^Care Plan:/i, /^\s*Description:\s*(.+)$/i);
   let carePlan = null;
   if (carePlanTitle || carePlanDesc) {
-    carePlan = { title: carePlanTitle, description: carePlanDesc };
+    carePlan = { title: carePlanTitle || "Discharge Care Plan", description: carePlanDesc || "Follow up as directed" };
   } else if (followUp) {
     carePlan = { title: "Discharge Care Plan", description: "Follow up as directed" };
   }
@@ -648,6 +713,7 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
     lifestyle,
     allergies,
     history,
+    dischargeDiagnosis,
     investigations,
     invoiceItems,
     procedures,

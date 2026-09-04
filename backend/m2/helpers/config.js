@@ -6,10 +6,9 @@
  */
 
 const path = require("path");
+const envConfig = require("../../config/environment");
 
-const runtimeDataDir = process.env.RUNTIME_DATA_DIR
-  ? path.resolve(process.env.RUNTIME_DATA_DIR)
-  : path.join(__dirname, "../../data");
+const runtimeDataDir = envConfig.dataRoot;
 
 module.exports = {
   // Gateway and CM details

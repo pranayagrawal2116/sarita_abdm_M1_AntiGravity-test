@@ -1,0 +1,413 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-9585c3aa-674e-497d-8924-abbe722a977e",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-09-04T16:32:29.833+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "ef377e2f-b58c-4ab6-89fa-b9200b5c18b8"
+  },
+  "type": "document",
+  "timestamp": "2026-09-04T16:32:29.833+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:894c2dd9-6c9b-4b7a-b746-6da4bc1dbe63",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "894c2dd9-6c9b-4b7a-b746-6da4bc1dbe63",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/InvoiceRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Invoice Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:6b5c685d-98d2-4494-867a-02bf54824845",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:a8e254b6-443d-4ca4-b48d-7b81309c1328",
+          "display": "Ambulatory"
+        },
+        "date": "2026-09-04T16:32:29.833+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:237cfe94-90b2-4e01-bc56-669ea6098ba1",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Invoice Record",
+        "custodian": {
+          "reference": "urn:uuid:4102356e-970d-4828-9b3c-c214246d476b",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Invoice Details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "419891008",
+                  "display": "Record artifact"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:f87c7244-ea95-4871-a9a8-d2173040e9d7",
+                "display": "Invoice"
+              },
+              {
+                "reference": "urn:uuid:a0ef5979-b7e3-4d54-9ece-2efed12a0e9a",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6b5c685d-98d2-4494-867a-02bf54824845",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "6b5c685d-98d2-4494-867a-02bf54824845",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-04T16:32:29.833+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranay_1012006@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:237cfe94-90b2-4e01-bc56-669ea6098ba1",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "237cfe94-90b2-4e01-bc56-669ea6098ba1",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-04T16:32:29.833+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4102356e-970d-4828-9b3c-c214246d476b",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "4102356e-970d-4828-9b3c-c214246d476b",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a8e254b6-443d-4ca4-b48d-7b81309c1328",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "a8e254b6-443d-4ca4-b48d-7b81309c1328",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "e7e74ea7-348a-492e-b008-660e0fb25b34"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:6b5c685d-98d2-4494-867a-02bf54824845",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-09-04T16:32:29.833+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:30e7cc0f-2dff-419c-bc26-e4b898c5afac",
+      "resource": {
+        "resourceType": "ChargeItem",
+        "id": "30e7cc0f-2dff-419c-bc26-e4b898c5afac",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/ChargeItem"
+          ]
+        },
+        "status": "billable",
+        "code": {
+          "coding": [
+            {
+              "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-billing-codes",
+              "code": "01",
+              "display": "COnsultaiton"
+            }
+          ],
+          "text": "COnsultaiton"
+        },
+        "productCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "X-0001",
+              "display": "COnsultaiton"
+            }
+          ],
+          "text": "COnsultaiton"
+        },
+        "subject": {
+          "reference": "urn:uuid:6b5c685d-98d2-4494-867a-02bf54824845",
+          "display": "Pranay Anup Agrawal"
+        },
+        "quantity": {
+          "value": 50
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f87c7244-ea95-4871-a9a8-d2173040e9d7",
+      "resource": {
+        "resourceType": "Invoice",
+        "id": "f87c7244-ea95-4871-a9a8-d2173040e9d7",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Invoice"
+          ]
+        },
+        "status": "issued",
+        "subject": {
+          "reference": "urn:uuid:6b5c685d-98d2-4494-867a-02bf54824845",
+          "display": "Pranay Anup Agrawal"
+        },
+        "date": "2026-09-04T11:02:29.833Z",
+        "identifier": [
+          {
+            "value": "urn:uuid:a8e254b6-443d-4ca4-b48d-7b81309c1328"
+          }
+        ],
+        "totalNet": {
+          "value": 37499996250,
+          "currency": "INR"
+        },
+        "totalGross": {
+          "value": 24999997500,
+          "currency": "INR"
+        },
+        "lineItem": [
+          {
+            "sequence": 1,
+            "chargeItemReference": {
+              "reference": "urn:uuid:30e7cc0f-2dff-419c-bc26-e4b898c5afac",
+              "display": "COnsultaiton"
+            },
+            "priceComponent": [
+              {
+                "type": "informational",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                      "code": "00",
+                      "display": "MRP"
+                    }
+                  ]
+                },
+                "factor": 50,
+                "amount": {
+                  "value": 500000000,
+                  "currency": "INR"
+                }
+              },
+              {
+                "type": "discount",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                      "code": "02",
+                      "display": "Discount"
+                    }
+                  ]
+                },
+                "amount": {
+                  "value": 50,
+                  "currency": "INR"
+                }
+              },
+              {
+                "type": "base",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                      "code": "01",
+                      "display": "Rate"
+                    }
+                  ]
+                },
+                "amount": {
+                  "value": 499999950,
+                  "currency": "INR"
+                }
+              },
+              {
+                "type": "tax",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                      "code": "03",
+                      "display": "CGST"
+                    }
+                  ]
+                },
+                "amount": {
+                  "value": 6249999375,
+                  "currency": "INR"
+                }
+              },
+              {
+                "type": "tax",
+                "code": {
+                  "coding": [
+                    {
+                      "system": "https://nrces.in/ndhm/fhir/r4/CodeSystem/ndhm-price-components",
+                      "code": "04",
+                      "display": "SGST"
+                    }
+                  ]
+                },
+                "amount": {
+                  "value": 6249999375,
+                  "currency": "INR"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:a0ef5979-b7e3-4d54-9ece-2efed12a0e9a",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "a0ef5979-b7e3-4d54-9ece-2efed12a0e9a",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Invoice Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:6b5c685d-98d2-4494-867a-02bf54824845"
+        },
+        "date": "2026-09-04T11:02:29.833Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+IGVuZG9iago1IDAgb2JqIDw8IC9MZW5ndGggMTUwMSA+PiBzdHJlYW0KQlQKL0YxIDE0IFRmCjcyIDc2MCBUZAooSW52b2ljZSkgVGoKMCAtMjQgVGQKL0YxIDEwIFRmCihQYXRpZW50IFVISUQ6IFNIQzA0MDkyNjAxKSBUagowIC0xNCBUZAooQUJIQSBOdW1iZXI6IDkxLTE3MjItMDQwMC0wODI5KSBUagowIC0xNCBUZAooQUJIQSBBZGRyZXNzOiBwcmFuYXlfMTAxMjAwNkBzYngpIFRqCjAgLTE0IFRkCihIZWFsdGggSW5mb3JtYXRpb24gUmVjb3JkKSBUagowIC0xNCBUZAooPT09PT09PT09PT09PT09PT09PT09PT09PSkgVGoKMCAtMTQgVGQKKFR5cGU6IEludm9pY2UgUmVjb3JkKSBUagowIC0xNCBUZAooU2F2ZWQgQXQ6IDIwMjYtMDktMDQgMTY6MzI6MjgpIFRqCjAgLTE0IFRkCigpIFRqCjAgLTE0IFRkCigtLS0gUGF0aWVudCBEZXRhaWxzIC0tLSkgVGoKMCAtMTQgVGQKKE5hbWU6IFByYW5heSBBbnVwIEFncmF3YWwpIFRqCjAgLTE0IFRkCihBQkhBIEFkZHJlc3M6IHByYW5heV8xMDEyMDA2QHNieCkgVGoKMCAtMTQgVGQKKEFCSEEgTnVtYmVyOiA5MS0xNzIyLTA0MDAtMDgyOSkgVGoKMCAtMTQgVGQKKE1vYmlsZTogOTUxMDAyOTU3NSkgVGoKMCAtMTQgVGQKKEdlbmRlcjogTSkgVGoKMCAtMTQgVGQKKERPQiAvIFlPQjogMjEtMS0yMDA2KSBUagowIC0xNCBUZAooVUhJRDogU0hDMDQwOTI2MDEpIFRqCjAgLTE0IFRkCigpIFRqCjAgLTE0IFRkCigtLS0gUmVjb3JkIERhdGEgLS0tKSBUagowIC0xNCBUZAooKSBUagowIC0xNCBUZAooSGVhZGVyOikgVGoKMCAtMTQgVGQKKERhdGU6IDA0LTA5LTIwMjYpIFRqCjAgLTE0IFRkCihJbnZvaWNlIE5vOiBJTlYwMzg0KSBUagowIC0xNCBUZAooUGF5bWVudCBUeXBlOiBDYXNoKSBUagowIC0xNCBUZAooSXRlbXM6KSBUagowIC0xNCBUZAooLSBJdGVtIDE6KSBUagowIC0xNCBUZAooTmFtZTogQ09uc3VsdGFpdG9uKSBUagowIC0xNCBUZAooVHlwZTogQ29uc3VsdGF0aW9uKSBUagowIC0xNCBUZAooTXJwOiA1MDAwMDAwMDApIFRqCjAgLTE0IFRkCihEaXNjb3VudDogNTApIFRqCjAgLTE0IFRkCihSYXRlOiA0OTk5OTk5NTApIFRqCjAgLTE0IFRkCihRdHk6IDUwKSBUagowIC0xNCBUZAooR3N0IFBjdDogNTApIFRqCjAgLTE0IFRkCihHc3QgQW10OiAxMjQ5OTk5ODc1MCkgVGoKMCAtMTQgVGQKKFRvdGFsOiAzNzQ5OTk5NjI1MCkgVGoKMCAtMTQgVGQKKERyYWZ0IEl0ZW06KSBUagowIC0xNCBUZAooTmFtZTogLSkgVGoKMCAtMTQgVGQKKFR5cGU6IENvbnN1bHRhdGlvbikgVGoKMCAtMTQgVGQKKE1ycDogLSkgVGoKMCAtMTQgVGQKKERpc2NvdW50OiAtKSBUagowIC0xNCBUZAooUmF0ZTogLSkgVGoKMCAtMTQgVGQKKFF1YW50aXR5OiAtKSBUagowIC0xNCBUZAooR3N0IFBlcmNlbnQ6IC0pIFRqCjAgLTE0IFRkCihTdW1tYXJ5OikgVGoKMCAtMTQgVGQKKFRvdGFsIFF0eTogNTApIFRqCjAgLTE0IFRkCihUb3RhbCBHc3Q6IDEyNDk5OTk4NzUwKSBUagowIC0xNCBUZAooR3JhbmQgVG90YWw6IDM3NDk5OTk2MjUwKSBUagowIC0xNCBUZAooKSBUagowIC0xNCBUZApFVAplbmRzdHJlYW0gZW5kb2JqCnRyYWlsZXIgPDwgL1Jvb3QgMSAwIFIgPj4KJSVFT0Y=",
+              "title": "Invoice_Record_91-1722-0400-0829_20260904_163228",
+              "creation": "2026-09-04T11:02:29.833Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

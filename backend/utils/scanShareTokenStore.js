@@ -1,10 +1,14 @@
+const fs = require("fs");
+const path = require("path");
 const { nowIso } = require("./dateUtils");
+const { dataRoot } = require("../config/environment");
+
+const storeFile = path.join(dataRoot, "scan_share_queue.json");
+const DEFAULT_EXPIRY_SECONDS = 1800; // 30 minutes
 
 let currentTokenNumber = 0;
 let latestRecord = null;
 let queue = [];
-
-const DEFAULT_EXPIRY_SECONDS = 1800;
 
 const clone = (value) =>
   value == null ? value : JSON.parse(JSON.stringify(value));
@@ -33,6 +37,58 @@ const isCoolingPeriodActive = (record) => {
   return Date.now() < issuedAtMs + expirySeconds * 1000;
 };
 
+const loadQueue = () => {
+  try {
+    if (!fs.existsSync(storeFile)) return;
+    const raw = fs.readFileSync(storeFile, "utf8");
+    const parsed = JSON.parse(raw || "{}");
+    
+    if (Array.isArray(parsed.queue)) {
+      queue = parsed.queue;
+    }
+    
+    currentTokenNumber = Number(parsed.currentTokenNumber) || 0;
+    
+    // Determine maximum token number from queue to prevent collisions
+    for (const item of queue) {
+      const num = parseInt(item.tokenNumber, 10);
+      if (Number.isFinite(num) && num > currentTokenNumber) {
+        currentTokenNumber = num;
+      }
+    }
+
+    if (parsed.latestRecord) {
+      latestRecord = parsed.latestRecord;
+    } else if (queue.length > 0) {
+      latestRecord = queue[queue.length - 1];
+    }
+  } catch (error) {
+    console.warn("[SCAN SHARE TOKEN STORE] Unable to read queue file:", error.message);
+  }
+};
+
+const persistQueue = () => {
+  try {
+    if (!fs.existsSync(dataRoot)) {
+      fs.mkdirSync(dataRoot, { recursive: true });
+    }
+    const temporaryFile = `${storeFile}.${process.pid}.tmp`;
+    const data = {
+      currentTokenNumber,
+      latestRecord,
+      queue,
+      updatedAt: nowIso(),
+    };
+    fs.writeFileSync(temporaryFile, JSON.stringify(data, null, 2), "utf8");
+    fs.renameSync(temporaryFile, storeFile);
+  } catch (error) {
+    console.error("[SCAN SHARE TOKEN STORE] Unable to persist queue:", error.message);
+  }
+};
+
+// Initial load
+loadQueue();
+
 const nextTokenNumber = () => {
   currentTokenNumber += 1;
   return String(currentTokenNumber);
@@ -56,6 +112,7 @@ const recordIssuedToken = (payload = {}) => {
         acknowledgementStatus: payload.acknowledgementStatus || "pending",
         duplicateScan: true,
       });
+      persistQueue();
       return clone(existing);
     }
   }
@@ -75,6 +132,7 @@ const recordIssuedToken = (payload = {}) => {
     ...payload,
   };
   queue.push(latestRecord);
+  persistQueue();
   return clone(latestRecord);
 };
 
@@ -100,6 +158,7 @@ const updateIssuedTokenStatus = (tokenNumber, status) => {
     record.registeredAt = nowIso();
   }
   latestRecord = record;
+  persistQueue();
   return clone(record);
 };
 
@@ -112,6 +171,7 @@ const updateIssuedToken = (tokenNumber, patch = {}) => {
 
   Object.assign(record, patch, { updatedAt: nowIso() });
   latestRecord = record;
+  persistQueue();
   return clone(record);
 };
 

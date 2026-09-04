@@ -4,7 +4,16 @@
  * Responsibility: Maps business datasets to Condition, Observation, CarePlan and DocumentReference resources.
  */
 
-const { createObservation, createCondition, createDocumentReference, createProcedure, createMedicationRequest, createAppointment } = require("./fhirHelpers");
+const {
+  createObservation,
+  createCondition,
+  createDocumentReference,
+  createProcedure,
+  createMedicationRequest,
+  createAppointment,
+  formatAppointmentTime,
+  addMinutesToTime
+} = require("./fhirHelpers");
 const { v4: uuidv4 } = require("uuid");
 
 class DischargeSummaryBuilder {
@@ -194,11 +203,19 @@ class DischargeSummaryBuilder {
       secEntries.push({ reference: cpItem.fullUrl, display: "Care Plan" });
       
       if (params.followUp) {
+        const startTimeStr = params.followUp.startTime || params.followUp.time || "13:00";
+        const fallbackEnd = addMinutesToTime(startTimeStr, 15) || "13:15";
+        const endTimeStr = params.followUp.endTime || fallbackEnd;
+        const startIso = formatAppointmentTime(params.followUp.date, startTimeStr, "13:00") || params.timestamp;
+        const endIso = formatAppointmentTime(params.followUp.date, endTimeStr, fallbackEnd) || startIso;
+
         const aptItem = createAppointment({
           patientId: ids.patientId,
           practitionerId: ids.practitionerId,
           reason: params.followUp.reason || "Review",
-          timestamp: params.followUp.date ? `${params.followUp.date}T${params.followUp.time || "00:00"}:00.000Z` : params.timestamp
+          start: startIso,
+          end: endIso,
+          timestamp: startIso
         });
         entries.push(aptItem);
         secEntries.push({ reference: aptItem.fullUrl, display: "Follow Up Appointment" });

@@ -798,7 +798,8 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
   // Follow Up
   final _followUpReasonController = TextEditingController();
   final _followUpDateController = TextEditingController();
-  final _followUpTimeController = TextEditingController();
+  final _followUpStartTimeController = TextEditingController();
+  final _followUpEndTimeController = TextEditingController();
 
   // Medication Form
   final _medNameController = TextEditingController();
@@ -850,11 +851,11 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
     _heightController.addListener(_calculateBmi);
     _weightController.addListener(_calculateBmi);
 
-    final now = DateTime.now();
+    final nextWeek = DateTime.now().add(const Duration(days: 7));
     _followUpDateController.text =
-        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-    _followUpTimeController.text =
-        "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+        "${nextWeek.year}-${nextWeek.month.toString().padLeft(2, '0')}-${nextWeek.day.toString().padLeft(2, '0')}";
+    _followUpStartTimeController.text = "13:00";
+    _followUpEndTimeController.text = "13:15";
   }
 
   @override
@@ -878,7 +879,8 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
 
     _followUpReasonController.dispose();
     _followUpDateController.dispose();
-    _followUpTimeController.dispose();
+    _followUpStartTimeController.dispose();
+    _followUpEndTimeController.dispose();
 
     _medNameController.dispose();
     _dosePatternController.dispose();
@@ -937,12 +939,12 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
       _familyHistory.clear();
       _familyHistory.add('Diabetes');
 
-      final now = DateTime.now();
+      final nextWeek = DateTime.now().add(const Duration(days: 7));
       _followUpReasonController.text = 'Review';
       _followUpDateController.text =
-          "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
-      _followUpTimeController.text =
-          "${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+          "${nextWeek.year}-${nextWeek.month.toString().padLeft(2, '0')}-${nextWeek.day.toString().padLeft(2, '0')}";
+      _followUpStartTimeController.text = "13:00";
+      _followUpEndTimeController.text = "13:15";
     });
   }
 
@@ -1297,38 +1299,102 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
         Card(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _followUpReasonController,
-                    decoration: const InputDecoration(
-                      labelText: 'Reason for Follow Up',
-                      hintText: 'e.g. Review',
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isWide = constraints.maxWidth > 700;
+                final fields = [
+                  Expanded(
+                    flex: 3,
+                    child: TextFormField(
+                      controller: _followUpReasonController,
+                      decoration: const InputDecoration(
+                        labelText: 'Reason for Follow Up',
+                        hintText: 'e.g. Review',
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextFormField(
-                    controller: _followUpDateController,
-                    decoration: const InputDecoration(
-                      labelText: 'Date',
-                      hintText: 'YYYY-MM-DD',
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 3,
+                    child: TextFormField(
+                      controller: _followUpDateController,
+                      decoration: const InputDecoration(
+                        labelText: 'Date',
+                        hintText: 'YYYY-MM-DD',
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextFormField(
-                    controller: _followUpTimeController,
-                    decoration: const InputDecoration(
-                      labelText: 'Time',
-                      hintText: 'HH:MM',
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: TextFormField(
+                      controller: _followUpStartTimeController,
+                      decoration: const InputDecoration(
+                        labelText: 'Start Time',
+                        hintText: '13:00',
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: TextFormField(
+                      controller: _followUpEndTimeController,
+                      decoration: const InputDecoration(
+                        labelText: 'End Time',
+                        hintText: '13:15',
+                      ),
+                    ),
+                  ),
+                ];
+                if (isWide) {
+                  return Row(children: fields);
+                } else {
+                  return Column(
+                    children: [
+                      TextFormField(
+                        controller: _followUpReasonController,
+                        decoration: const InputDecoration(
+                          labelText: 'Reason for Follow Up',
+                          hintText: 'e.g. Review',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextFormField(
+                        controller: _followUpDateController,
+                        decoration: const InputDecoration(
+                          labelText: 'Date',
+                          hintText: 'YYYY-MM-DD',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _followUpStartTimeController,
+                              decoration: const InputDecoration(
+                                labelText: 'Start Time',
+                                hintText: '13:00',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _followUpEndTimeController,
+                              decoration: const InputDecoration(
+                                labelText: 'End Time',
+                                hintText: '13:15',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ),
         ),
@@ -1368,9 +1434,11 @@ class _OpConsultationFormState extends State<_OpConsultationForm> {
       'familyHistory': _familyHistory,
       'draftFamilyHistory': _familyHistoryInput.text,
       'followUp': {
-        'reason': _followUpReasonController.text,
-        'date': _followUpDateController.text,
-        'time': _followUpTimeController.text,
+        'reason': _followUpReasonController.text.trim(),
+        'date': _followUpDateController.text.trim(),
+        'startTime': _followUpStartTimeController.text.trim(),
+        'endTime': _followUpEndTimeController.text.trim(),
+        'time': _followUpStartTimeController.text.trim(),
       },
     };
   }
@@ -1715,22 +1783,30 @@ class _WellnessFormState extends State<_WellnessForm> {
   final _calIntake = TextEditingController();
   final _fluidIntake = TextEditingController();
 
-  final List<String> _smokingOptions = [
-    'Never smoked',
-    'Former smoker',
-    'Current smoker',
-  ];
 
-  final List<String> _dietOptions = [
-    'Vegetarian',
-    'Non-vegetarian',
-    'Vegan',
-    'Eggetarian',
-    'Other',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _height.addListener(_calculateBmi);
+    _weight.addListener(_calculateBmi);
+    _calculateBmi();
+  }
+
+  void _calculateBmi() {
+    final h = double.tryParse(_height.text);
+    final w = double.tryParse(_weight.text);
+    if (h != null && w != null && h > 0) {
+      final bmi = w / ((h / 100) * (h / 100));
+      _bmi.text = bmi.toStringAsFixed(1);
+    } else {
+      _bmi.text = '';
+    }
+  }
 
   @override
   void dispose() {
+    _height.removeListener(_calculateBmi);
+    _weight.removeListener(_calculateBmi);
     _sleepHours.dispose();
     _calories.dispose();
     _steps.dispose();
@@ -1831,11 +1907,15 @@ class _WellnessFormState extends State<_WellnessForm> {
                     ),
                   ),
                   _buildFormTextColumn(
-                    'BMI (kg/m2)',
+                    'BMI (kg/m2) (auto)',
                     TextFormField(
                       controller: _bmi,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(hintText: 'e.g. 24.2'),
+                      readOnly: true,
+                      enabled: false,
+                      decoration: InputDecoration(
+                        hintText: '--',
+                        fillColor: Colors.grey.shade100,
+                      ),
                     ),
                   ),
                 ];
@@ -3221,6 +3301,7 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
   final _carePlanDesc = TextEditingController();
   final _followUpDate = TextEditingController();
   final _followUpTime = TextEditingController();
+  final _followUpEndTime = TextEditingController();
   final _followUpReason = TextEditingController();
 
   // Family History
@@ -3245,6 +3326,15 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
     super.initState();
     _heightController.addListener(_calculateBmi);
     _weightController.addListener(_calculateBmi);
+
+    final nextWeek = DateTime.now().add(const Duration(days: 7));
+    _followUpDate.text =
+        '${nextWeek.year}-${nextWeek.month.toString().padLeft(2, '0')}-${nextWeek.day.toString().padLeft(2, '0')}';
+    _followUpTime.text = '13:00';
+    _followUpEndTime.text = '13:15';
+    _followUpReason.text = 'Review';
+    _carePlanTitle.text = 'Discharge Care Plan';
+    _carePlanDesc.text = 'Follow up as directed';
   }
 
   void _calculateBmi() {
@@ -3314,6 +3404,7 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
     _carePlanDesc.dispose();
     _followUpDate.dispose();
     _followUpTime.dispose();
+    _followUpEndTime.dispose();
     _followUpReason.dispose();
     _famCondition.dispose();
     _famNotes.dispose();
@@ -3391,8 +3482,14 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
         'notes': '',
       });
 
-      _carePlanTitle.text = 'plan';
+      _carePlanTitle.text = 'Discharge Care Plan';
       _carePlanDesc.text = 'Bed rest for 5 days';
+      final nextWeek = DateTime.now().add(const Duration(days: 7));
+      _followUpDate.text =
+          '${nextWeek.year}-${nextWeek.month.toString().padLeft(2, '0')}-${nextWeek.day.toString().padLeft(2, '0')}';
+      _followUpTime.text = '13:00';
+      _followUpEndTime.text = '13:15';
+      _followUpReason.text = 'Review';
     });
   }
 
@@ -4076,7 +4173,7 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
                           controller: _followUpDate,
                           readOnly: true,
                           decoration: const InputDecoration(
-                            hintText: 'Select Date',
+                            hintText: 'YYYY-MM-DD',
                             suffixIcon: Icon(Icons.calendar_today_outlined),
                           ),
                           onTap: () async {
@@ -4092,7 +4189,7 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
                             );
                             if (d != null) {
                               _followUpDate.text =
-                                  '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}';
+                                  '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
                             }
                           },
                         ),
@@ -4103,16 +4200,37 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
                           controller: _followUpTime,
                           readOnly: true,
                           decoration: const InputDecoration(
-                            hintText: 'Select Time',
+                            hintText: '13:00',
                             suffixIcon: Icon(Icons.access_time),
                           ),
                           onTap: () async {
                             final t = await showTimePicker(
                               context: context,
-                              initialTime: TimeOfDay.now(),
+                              initialTime: const TimeOfDay(hour: 13, minute: 0),
                             );
                             if (t != null) {
                               _followUpTime.text =
+                                  '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+                            }
+                          },
+                        ),
+                      ),
+                      _buildFormTextColumn(
+                        'End Time',
+                        TextFormField(
+                          controller: _followUpEndTime,
+                          readOnly: true,
+                          decoration: const InputDecoration(
+                            hintText: '13:15',
+                            suffixIcon: Icon(Icons.access_time),
+                          ),
+                          onTap: () async {
+                            final t = await showTimePicker(
+                              context: context,
+                              initialTime: const TimeOfDay(hour: 13, minute: 15),
+                            );
+                            if (t != null) {
+                              _followUpEndTime.text =
                                   '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
                             }
                           },
@@ -4340,6 +4458,8 @@ class _DischargeSummaryFormState extends State<_DischargeSummaryForm> {
         'title': _carePlanTitle.text,
         'description': _carePlanDesc.text,
         'followUpDate': _followUpDate.text,
+        'followUpStartTime': _followUpTime.text,
+        'followUpEndTime': _followUpEndTime.text,
         'followUpTime': _followUpTime.text,
         'reason': _followUpReason.text,
       },

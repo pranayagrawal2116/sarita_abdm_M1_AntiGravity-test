@@ -222,6 +222,14 @@ class M2DataTransferManager {
          throw new Error(`No matching FHIR bundles found for requested types: ${requestedTypes.join(", ")}`);
       }
 
+      // Discovery can provide ABHA information after a data-entry document was
+      // originally created. Rebuild only the records selected by the user so
+      // their existing clinical content is preserved while every PDF gains the
+      // discovered ABHA details and the patient's stable local UHID.
+      if (currentTx.userInitiatedLinking) {
+        await this.refreshUserInitiatedPdfIdentity(selectedPayloads, currentTx);
+      }
+
       await M2TransactionStore.transitionState(transactionId, "FHIR Generated", {
         reason: "FHIR R4 bundle compiled from existing files."
       });
@@ -971,6 +979,41 @@ class M2DataTransferManager {
       throw new Error("No readable FHIR bundle files were available for transfer.");
     }
     return payloads;
+  }
+
+  async refreshUserInitiatedPdfIdentity(selectedPayloads = [], transaction = {}) {
+    const fs = require("fs");
+    const path = require("path");
+    const { buildBundleFromFiles } = require("../fhir/M2FHIRBundleBuilder");
+
+    await Promise.all(selectedPayloads.map(async (payload) => {
+      const sourceTxtFile = payload.meta?.sourceTxtFile;
+      const bundlePath = payload.meta?.bundlePath;
+      if (!sourceTxtFile || !bundlePath || !fs.existsSync(sourceTxtFile)) {
+        throw new Error("Cannot refresh User Initiated PDF identity: selected local record is unavailable.");
+      }
+      const stats = fs.statSync(sourceTxtFile);
+      const bundle = await buildBundleFromFiles({
+        abhaId: transaction.abhaAddress || payload.meta?.patientId,
+        folderName: path.basename(path.dirname(sourceTxtFile)),
+        files: [{
+          fileName: path.basename(sourceTxtFile),
+          filePath: sourceTxtFile,
+          content: fs.readFileSync(sourceTxtFile, "utf8"),
+          hiType: payload.meta?.hiType,
+          createdAt: stats.birthtime.toISOString(),
+          updatedAt: stats.mtime.toISOString(),
+        }],
+      });
+      fs.writeFileSync(bundlePath, JSON.stringify(bundle, null, 2));
+      payload.bundle = bundle;
+      payload.rawSize = JSON.stringify(bundle).length;
+    }));
+
+    Logger.info("M2DataTransferManager", "Refreshed selected User Initiated PDFs with persisted patient identity.", {
+      transactionId: transaction.transactionId,
+      bundleCount: selectedPayloads.length,
+    });
   }
 
   selectTransferBundlePayload(bundlePayloads = [], preferredHiTypes = []) {

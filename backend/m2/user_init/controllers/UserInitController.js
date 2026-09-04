@@ -53,6 +53,7 @@ class UserInitController {
       gatewayRequestId: requestId || '',
       patientId: tx.abhaAddress || '',
       abhaAddress: tx.abhaAddress || '',
+      abhaNumber: tx.abhaNumber || '',
       patientName: tx.patientName || '',
       hipId: process.env.HIP_ID || 'IN2410002480',
       careContexts,
@@ -155,6 +156,14 @@ class UserInitController {
     }
     return '';
   }
+
+  static abhaNumberFromDiscovery(identifiers = []) {
+    for (const identifier of identifiers) {
+      const value = String(identifier?.value || '').trim();
+      if (/^\d{2}-\d{4}-\d{4}-\d{4}$/.test(value)) return value;
+    }
+    return '';
+  }
   
   // Phase 6: HIE-CM callback to HIP - Discovery
   static async handleDiscover(req, res) {
@@ -210,6 +219,19 @@ class UserInitController {
         gender: patientDetails.gender,
         mobile: UserInitController.mobileFromDiscovery(patientDetails, identifiers),
       });
+      const abhaNumber = UserInitController.abhaNumberFromDiscovery(identifiers);
+
+      if (discoveryResult.storageFolderPath) {
+        await LocalDataRegistry.persistPatientDocumentIdentity({
+          folderPath: discoveryResult.storageFolderPath,
+          folderName: discoveryResult.storageFolderName,
+          storageClass: discoveryResult.storageClass,
+          identity: discoveryResult.identity,
+          patientName: patientDetails.name || requestedAbhaAddress,
+          abhaAddress: requestedAbhaAddress,
+          abhaNumber,
+        });
+      }
       const documents = discoveryResult.documents;
       
       if (documents.length > 0) {
@@ -263,6 +285,7 @@ class UserInitController {
           transactionId,
           discoveryRequestId: incomingRequestId,
           abhaAddress: requestedAbhaAddress,
+          abhaNumber,
           patientName: patientDetails.name || requestedAbhaAddress,
           careContextsMap: careContexts, // Store internal mapping
           sourceStorageClass: discoveryResult.storageClass,

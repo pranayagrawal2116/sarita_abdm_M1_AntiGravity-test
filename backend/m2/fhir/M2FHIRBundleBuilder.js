@@ -13,7 +13,9 @@
  * The bundle type is "document" per ABDM M2 spec.
  */
 
-const { randomUUID } = require("crypto");
+const { randomUUID, createHash } = require("crypto");
+const fs = require("fs");
+const path = require("path");
 const hospitalConfig = require("../../config/hospitalConfig");
 const M2FHIRBuilder = require("./M2FHIRBuilder");
 const { generatePrescriptionBundle } = require("./prescriptionRecordGenerator");
@@ -71,9 +73,17 @@ const escapePdfText = (value) => text(value)
   .replace(/\(/g, "\\(")
   .replace(/\)/g, "\\)");
 
-const createPdfBase64 = (title, content) => {
+const createPdfBase64 = (title, content, patientIdentity = {}) => {
   const safeTitle = escapePdfText(title || "Health Record").replace(/[\r\n]+/g, " ");
-  const rawContent = (content || "Clinical record generated for ABDM transfer.").split(/\r?\n/);
+  const identityLines = [
+    patientIdentity.patientUhid && `Patient UHID: ${patientIdentity.patientUhid}`,
+    patientIdentity.abhaNumber && `ABHA Number: ${patientIdentity.abhaNumber}`,
+    patientIdentity.abhaAddress && `ABHA Address: ${patientIdentity.abhaAddress}`,
+  ].filter(Boolean);
+  const rawContent = [
+    ...identityLines,
+    ...(content || "Clinical record generated for ABDM transfer.").split(/\r?\n/),
+  ];
   
   const lines = [
     "BT",
@@ -128,6 +138,22 @@ const patientNameFromFolder = (folderName, abhaId) => {
     .trim();
   return suffix || abhaId;
 };
+
+const readPatientDocumentIdentity = (file = {}) => {
+  const filePath = text(file.filePath);
+  if (!filePath) return {};
+  try {
+    const identityPath = path.join(path.dirname(filePath), "patient_identity.json");
+    return JSON.parse(fs.readFileSync(identityPath, "utf8")) || {};
+  } catch (_) {
+    return {};
+  }
+};
+
+const isNonAbhaFolderName = (folderName) => /^\d{4}_[MFO]_\d{10}$/i.test(text(folderName));
+
+const stableNonAbhaUhid = (folderName) =>
+  `UHID-${createHash("sha256").update(text(folderName)).digest("hex").slice(0, 12).toUpperCase()}`;
 
 const matchField = (content, label) => {
   const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -257,6 +283,8 @@ const buildPrescriptionInput = (businessData) => {
   return {
     patient: {
       abhaAddress: businessData.abhaAddress,
+      abhaNumber: businessData.abhaNumber,
+      patientUhid: businessData.patientUhid,
       fullName: businessData.patientName,
       phone: businessData.mobile,
       gender: businessData.gender === "unknown" ? "other" : businessData.gender,
@@ -289,22 +317,30 @@ const buildPrescriptionInput = (businessData) => {
 
 const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   const lines = contentLines(file.content);
+  const persistedIdentity = readPatientDocumentIdentity(file);
   const summary = lines.slice(0, 8).join("; ") || `${file.hiType} generated for ABDM transfer`;
   const primaryLine = lines[0] || "Clinical record review";
-  const patientName = matchField(file.content, "Name") || patientNameFromFolder(folderName, abhaId);
-  const abhaAddress = matchField(file.content, "ABHA Address") || abhaId;
+  const patientName = matchField(file.content, "Name") || persistedIdentity.patientName || patientNameFromFolder(folderName, abhaId);
+  const abhaAddress = matchField(file.content, "ABHA Address") || persistedIdentity.abhaAddress || abhaId;
   const abhaNumber =
     matchField(file.content, "ABHA Number") ||
+    persistedIdentity.abhaNumber ||
     extractAbhaNumber(file.fileName) ||
     extractAbhaNumber(file.filePath);
-  const mobile = matchField(file.content, "Mobile");
-  const gender = normalizeGenderValue(matchField(file.content, "Gender") || matchField(file.content, "Sex"));
+  const mobile = matchField(file.content, "Mobile") || persistedIdentity.mobile;
+  const gender = normalizeGenderValue(matchField(file.content, "Gender") || matchField(file.content, "Sex") || persistedIdentity.gender);
   const birthDate = normalizeBirthDateValue(
     matchField(file.content, "DOB / YOB") ||
     matchField(file.content, "DOB") ||
-    matchField(file.content, "Date of Birth")
+    matchField(file.content, "Date of Birth") ||
+    persistedIdentity.yearOfBirth
   );
-  const patientUhid = matchField(file.content, "UHID") || matchField(file.content, "Patient UHID") || matchField(file.content, "Patient ID");
+  const patientUhid =
+    matchField(file.content, "UHID") ||
+    matchField(file.content, "Patient UHID") ||
+    matchField(file.content, "Patient ID") ||
+    persistedIdentity.patientUhid ||
+    (isNonAbhaFolderName(folderName) ? stableNonAbhaUhid(folderName) : "");
   const medicationName =
     extractIndentedValue(lines, /^Medications:/i, /^\s*Name:\s*(.+)$/i) ||
     extractIndentedValue(lines, /^Draft Medication:/i, /^\s*Name:\s*(.+)$/i) ||
@@ -653,7 +689,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       businessData.pdfBase64 = await generateWellnessRecordPDF(businessData);
     } catch (e) {
       console.error("Failed to generate Wellness PDF", e);
-      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
     }
   } else if (recordType === "Diagnostic Report") {
     const { generateDiagnosticReportPDF } = require("./pdfGenerator");
@@ -661,7 +697,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       businessData.pdfBase64 = await generateDiagnosticReportPDF(businessData);
     } catch (e) {
       console.error("Failed to generate Diagnostic Report PDF", e);
-      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
     }
   } else if (recordType === "Immunization") {
     const { generateImmunizationRecordPDF } = require("./pdfGenerator");
@@ -669,7 +705,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       businessData.pdfBase64 = await generateImmunizationRecordPDF(businessData);
     } catch (e) {
       console.error("Failed to generate Immunization PDF", e);
-      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
     }
   } else if (recordType === "Discharge Summary") {
     const { generateDischargeSummaryPDF } = require("./pdfGenerator");
@@ -677,10 +713,10 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       businessData.pdfBase64 = await generateDischargeSummaryPDF(businessData);
     } catch (e) {
       console.error("Failed to generate Discharge Summary PDF", e);
-      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+      businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
     }
   } else {
-    businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record");
+    businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
   }
   businessData.dataBase64 = businessData.pdfBase64;
   businessData.contentType = "application/pdf";

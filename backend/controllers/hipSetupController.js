@@ -1,7 +1,9 @@
 const axios = require("axios");
 const hospitalConfig = require("../config/hospitalConfig");
-const { getGatewayToken } = require("../services/gatewayService");
+const { getGatewayToken: getM1GatewayToken } = require("../services/gatewayService");
+const M3TokenManager = require("../m3/tokens/M3TokenManager");
 const { getHeaders } = require("../utils/headers");
+const { v4: uuidv4 } = require("uuid");
 
 const toText = (value) => {
   if (value === null || value === undefined) return "";
@@ -34,14 +36,18 @@ const getFacilityBase = () =>
   toText(process.env.FACILITY_BASE) || "https://apihspsbx.abdm.gov.in/v4/int";
 
 const withGatewayHeaders = async () => {
-  const gatewayToken = await getGatewayToken();
+  const token = await M3TokenManager.getGatewayToken();
   return {
-    ...getHeaders(gatewayToken),
+    "Authorization": `Bearer ${token}`,
+    "X-CM-ID": process.env.X_CM_ID || "sbx",
+    "REQUEST-ID": uuidv4(),
+    "TIMESTAMP": new Date().toISOString(),
+    "Content-Type": "application/json"
   };
 };
 
 const withFacilityHeaders = async () => {
-  const gatewayToken = await getGatewayToken();
+  const gatewayToken = await getM1GatewayToken();
   return {
     accept: "application/json",
     "Content-Type": "application/json",
@@ -120,7 +126,7 @@ const isDuplicateBridgePatchError = (step) => {
 
 exports.checkSession = async (_req, res) => {
   try {
-    const accessToken = await getGatewayToken();
+    const accessToken = await M3TokenManager.getGatewayToken();
     return res.json({
       ok: true,
       accessTokenPresent: Boolean(toText(accessToken)),
@@ -158,7 +164,7 @@ exports.runScanShareSetup = async (req, res) => {
 
   steps.push(
     await runStep("session", async () => {
-      const accessToken = await getGatewayToken();
+      const accessToken = await M3TokenManager.getGatewayToken();
       return {
         status: 200,
         accessTokenPresent: Boolean(toText(accessToken)),
@@ -255,7 +261,7 @@ exports.runScanShareSetup = async (req, res) => {
       "findServicesByBridgeId",
       async () => {
         const response = await axios.get(
-          `${getGatewayBase()}/api/hiecm/gateway/v3/bridge-services/${encodeURIComponent(values.bridgeId)}`,
+          `${getGatewayBase()}/api/hiecm/gateway/v3/bridge-services`,
           { headers: gatewayHeaders }
         );
         return {
@@ -441,7 +447,7 @@ exports.findServicesByBridgeId = async (req, res) => {
 
     const headers = await withGatewayHeaders();
     const response = await axios.get(
-      `${getGatewayBase()}/api/hiecm/gateway/v3/bridge-services/${encodeURIComponent(bridgeId)}`,
+      `${getGatewayBase()}/api/hiecm/gateway/v3/bridge-services`,
       { headers }
     );
 

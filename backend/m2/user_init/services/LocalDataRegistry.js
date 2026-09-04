@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 const config = require('../../../m2/helpers/config');
 
 class LocalDataRegistry {
@@ -68,6 +69,54 @@ class LocalDataRegistry {
       throw new Error('Missing non-ABHA patient identity.');
     }
     return `${this._sanitizePathSegment(identity.yearOfBirth)}_${this._sanitizePathSegment(identity.gender)}_${this._sanitizePathSegment(identity.mobile)}`;
+  }
+
+  // Keep generated-PDF identity outside the clinical source documents. A
+  // data-entry patient has no ABHA details until discovery, but their UHID
+  // must stay the same in every PDF created from this folder.
+  async persistPatientDocumentIdentity({
+    folderPath,
+    folderName,
+    storageClass,
+    identity,
+    patientName,
+    abhaAddress,
+    abhaNumber,
+  } = {}) {
+    const resolvedFolderPath = path.resolve(String(folderPath || ''));
+    const resolvedDataRoot = path.resolve(this.dataRoot);
+    if (!resolvedFolderPath.startsWith(`${resolvedDataRoot}${path.sep}`)) {
+      throw new Error('Patient document identity must be stored inside the data directory.');
+    }
+
+    await fs.promises.mkdir(resolvedFolderPath, { recursive: true });
+    const identityPath = path.join(resolvedFolderPath, 'patient_identity.json');
+    let existing = {};
+    try {
+      existing = JSON.parse(await fs.promises.readFile(identityPath, 'utf8')) || {};
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+
+    const normalizedFolderName = String(folderName || path.basename(resolvedFolderPath));
+    const generatedUhid = storageClass === 'NON_ABHA_VERIFIED'
+      ? `UHID-${crypto.createHash('sha256').update(normalizedFolderName).digest('hex').slice(0, 12).toUpperCase()}`
+      : '';
+    const next = {
+      ...existing,
+      folderName: normalizedFolderName,
+      storageClass: storageClass || existing.storageClass || '',
+      patientUhid: existing.patientUhid || generatedUhid || '',
+      patientName: patientName || existing.patientName || '',
+      abhaAddress: abhaAddress || existing.abhaAddress || '',
+      abhaNumber: abhaNumber || existing.abhaNumber || '',
+      mobile: identity?.mobile || existing.mobile || '',
+      gender: identity?.gender || existing.gender || '',
+      yearOfBirth: identity?.yearOfBirth || existing.yearOfBirth || '',
+      updatedAt: new Date().toISOString(),
+    };
+    await fs.promises.writeFile(identityPath, JSON.stringify(next, null, 2), 'utf8');
+    return next;
   }
 
   _abhaVerifiedFolderName(abhaId, patientName) {
@@ -368,6 +417,27 @@ class LocalDataRegistry {
       this._abhaVerifiedFolderName(abhaAddress, patientName),
     );
     await fs.promises.mkdir(destinationPath, { recursive: true });
+
+    // Keep the same discovery identity with the promoted records. The source
+    // folder can retain unlinked documents, so copy rather than move it.
+    const sourceIdentityPath = path.join(sourcePath, 'patient_identity.json');
+    const destinationIdentityPath = path.join(destinationPath, 'patient_identity.json');
+    try {
+      const sourceIdentity = JSON.parse(await fs.promises.readFile(sourceIdentityPath, 'utf8')) || {};
+      let destinationIdentity = {};
+      try {
+        destinationIdentity = JSON.parse(await fs.promises.readFile(destinationIdentityPath, 'utf8')) || {};
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+      await fs.promises.writeFile(
+        destinationIdentityPath,
+        JSON.stringify({ ...sourceIdentity, ...destinationIdentity, updatedAt: new Date().toISOString() }, null, 2),
+        'utf8',
+      );
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
 
     // A user can link any subset of their local records. Never promote the
     // entire folder after a successful transfer: only the files that produced

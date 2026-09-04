@@ -214,6 +214,8 @@ const escapePdfText = (value) => text(value)
 const renderPrescriptionPdf = (input) => {
   const lines = [
     `Patient: ${input.patient.fullName}`,
+    `Patient UHID: ${input.patient.patientUhid || ""}`,
+    `ABHA Number: ${input.patient.abhaNumber || ""}`,
     `ABHA: ${input.patient.abhaAddress}`,
     `DOB/Gender: ${input.patient.birthDate} / ${input.patient.gender}`,
     `Facility: ${input.organization.name}`,

@@ -410,3 +410,278 @@
   }
 }
 
+[REQUEST] POST https://dev.abdm.gov.in/gateway/v0.5/sessions
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "8bfceb1e-4da9-45be-8892-5a23be0f0f20",
+    "TIMESTAMP": "2026-09-04T04:49:18.720Z",
+    "X-CM-ID": "sbx"
+  },
+  "data": {
+    "clientId": "SBXID_010086",
+    "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+    "grantType": "client_credentials"
+  }
+}
+
+[REQUEST] POST https://dev.abdm.gov.in/api/hiecm/gateway/v3/sessions
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "13983bc0-b45e-4720-9e2c-773800a7cb34",
+    "TIMESTAMP": "2026-09-04T04:49:18.721Z",
+    "X-CM-ID": "sbx"
+  },
+  "data": {
+    "clientId": "SBXID_010086",
+    "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+    "grantType": "client_credentials"
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/gateway/v3/sessions
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 04 Sep 2026 04:49:19 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "30",
+    "access-control-allow-origin": "*",
+    "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+    "correlation-id": "289094ff-c5b5-4e11-8560-22f506541276",
+    "pragma": "no-cache",
+    "activityid": "59df8815-3a1c-46eb-bc2d-cf507fbc7ea9",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 0298f468fb8a5be020d6f3e7ff839738.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "Yd2u9TbC9bX7Rr19mR2LL4b6y7hp0c_fwGv_FqDMkWsJaW_lsR7vgQ==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": {
+    "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODg0OTg1NTksImlhdCI6MTc4ODQ5NzM1OSwianRpIjoiNDI4YTZmMDYtYjA2Yi00MWNmLWJiZjctNzNhZjIxMjhlMzkyIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiIzMTQyYjUyZC04ZWM2LTRiYTctYmU0Ni01YzFkNmQzNTVlZTUiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS43Ni4xMjciLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuNzYuMTI3In0.CNNTXQWjJWhQ99uZZrr7v560091Tmm9KTqw_t3tgseR3bI0cVhaQUDpmH7QUzhBSF5y-PZ33n7y4-mpFPM_PqDAYy3NZPqC58S7dsW1JK9K0XxKqlXiyU0KKbt0Kbg23OZG6PBVDi5ZMop0YSD1Bt62mWg6_5TcaMwMhUStnp-2VHxKRE_mVEHeLhwYlbh2Iup7xoGUtY6ETwCkqNmKPDy2mt04RLXLEII_ExpH1dWKglY_ghTJbohEK-ZDkiHRmqAEvo111fy5-6JUO2qikzxQWpcUJTDEnR-u4U-GCDhavTKo1Czl6t5ItDw5BVoj26phViWZy3CNq8O_z_qsAeA",
+    "expiresIn": 1200,
+    "refreshExpiresIn": 1800,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyMWU5NzA4OS00ZTcxLTQyNGEtOTAzYS1jOTAyMWM1NmFlNWYifQ.eyJleHAiOjE3ODg0OTkxNTksImlhdCI6MTc4ODQ5NzM1OSwianRpIjoiZmQwMGM0MzEtZjU0NS00ZGYxLThhMTUtZTZjMzQxODdiM2ZlIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6Imh0dHBzOi8vZGV2LmFiZG0uZ292LmluL2F1dGgvcmVhbG1zL2NlbnRyYWwtcmVnaXN0cnkiLCJzdWIiOiIxMDM4ZDIzNy02ZDhjLTRkMzUtOGE3Mi1iZDA4ZTY5M2I4OTYiLCJ0eXAiOiJSZWZyZXNoIiwiYXpwIjoiU0JYSURfMDEwMDg2Iiwic2Vzc2lvbl9zdGF0ZSI6IjMxNDJiNTJkLThlYzYtNGJhNy1iZTQ2LTVjMWQ2ZDM1NWVlNSIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUifQ.CnuaFvUAlMBzfOVKTd0LQ__39BvjjlZYiNl4ljSPl7M",
+    "tokenType": "bearer"
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/gateway/v0.5/sessions
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 04 Sep 2026 04:49:20 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "44",
+    "access-control-allow-origin": "*",
+    "correlation-id": "8e3a53d6-266b-4a65-a92b-5c57f8ec1238",
+    "pragma": "no-cache",
+    "activityid": "ce2baddc-c7cb-4eeb-8927-70f156ca2a89",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 a8ca4aee08b2f5c8f93f1ff2ca028ece.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "MxP4Bc1NqaD5L9R1BrN-evR5kZdTXwbai3TyFxG9B6vcOmBpFdVKJw==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": {
+    "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODg0OTg1NjAsImlhdCI6MTc4ODQ5NzM2MCwianRpIjoiYzQ4ZDVjNTYtMThiOC00OTA1LTkwNGEtMGY0MzJmZTkwOTNjIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJhNGI0NTZmMS02ZWRhLTQzYmYtOTA5NS0xMjYzODM4ZDUyZGMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44MS4xMDEiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODEuMTAxIn0.BsO7Tg7mCj_Ee5VkAE8CRoLBOAng6MENQRRx5xBllZwUlSbgWYaj5Qsu9Fyns6Z1cU4KaebxXSvKDAo4PK4leygEcgXvVlDwm7V7n3yDRyJ_dAjLrtN-WK21nkf72qJ1AAVhVvXGWcTd4J75ZGFNRwht8ySNHoEyHKWa26h8ekkH1VBsD9s-Y9xb4C_Ebct1UL3tD3JgBFHVEAKQrrOnbwicKFL8afbDdVjIF-9XP1yaNEERY3DVoTjdtw_0d87yErg-3DVZxVdtn4fa2zhFfHD1RTpiV3PQre1MmSQD4z76EK8BuBEN4WtVny51Y5qEarSxSomEaQPBhXM94mGueQ",
+    "expiresIn": 1200,
+    "refreshExpiresIn": 1800,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyMWU5NzA4OS00ZTcxLTQyNGEtOTAzYS1jOTAyMWM1NmFlNWYifQ.eyJleHAiOjE3ODg0OTkxNjAsImlhdCI6MTc4ODQ5NzM2MCwianRpIjoiMjI0YWViNDAtM2ZiNi00NzhhLTg0NWUtNGJlY2MwYTE0YmRlIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6Imh0dHBzOi8vZGV2LmFiZG0uZ292LmluL2F1dGgvcmVhbG1zL2NlbnRyYWwtcmVnaXN0cnkiLCJzdWIiOiIxMDM4ZDIzNy02ZDhjLTRkMzUtOGE3Mi1iZDA4ZTY5M2I4OTYiLCJ0eXAiOiJSZWZyZXNoIiwiYXpwIjoiU0JYSURfMDEwMDg2Iiwic2Vzc2lvbl9zdGF0ZSI6ImE0YjQ1NmYxLTZlZGEtNDNiZi05MDk1LTEyNjM4MzhkNTJkYyIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUifQ.UM2TfONqslzK_PPw8-MJJVXS9WSAhCnRzcM1BicvWiE",
+    "tokenType": "bearer"
+  }
+}
+
+[INBOUND REQUEST] POST /api/hip/setup/scan-share/run
+{
+  "headers": {
+    "user-agent": "Dart/3.12 (dart:io)",
+    "content-type": "application/json",
+    "accept-encoding": "gzip",
+    "content-length": "2",
+    "host": "localhost:3000"
+  },
+  "query": {},
+  "body": {}
+}
+
+[REQUEST] PATCH https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge/url
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "12a7b7e2-79fa-4562-b877-cdb821642b08",
+    "TIMESTAMP": "2026-09-04T04:51:04.313Z",
+    "X-CM-ID": "sbx",
+    "Authorization": "Bear***GueQ"
+  },
+  "data": {
+    "url": "https://isolation-pouncing-ecard.ngrok-free.dev"
+  }
+}
+
+[OUTBOUND RESPONSE] PATCH https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge/url
+{
+  "status": 202,
+  "headers": {
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 04 Sep 2026 04:51:04 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "139",
+    "access-control-allow-origin": "*",
+    "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+    "correlation-id": "69d61f03-0a10-421d-9d92-65e21da7cf34",
+    "pragma": "no-cache",
+    "activityid": "e683fd1c-5fe1-4a4a-b19e-0cc3110947aa",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 a0838461b155b8a203cfdebe06846846.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "g_pjHfF5Yc4zKMEAcH0CAa8IhcAgqvmrkjwbvdNFoHMDA3tRpbNW4w==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": ""
+}
+
+[REQUEST] POST https://apihspsbx.abdm.gov.in/v4/int/v1/bridges/MutipleHRPAddUpdateServices
+{
+  "headers": {
+    "Accept": "application/json",
+    "Content-Type": "application/json",
+    "Authorization": "Bear***GueQ"
+  },
+  "data": {
+    "facilityId": "IN2410002480",
+    "facilityName": "Yashfeen Group of Hospitals",
+    "HRP": [
+      {
+        "bridgeId": "SBXID_010086",
+        "hipName": "Yashfeen Group of Hospitals",
+        "type": "HIP",
+        "active": true
+      }
+    ]
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://apihspsbx.abdm.gov.in/v4/int/v1/bridges/MutipleHRPAddUpdateServices
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 04 Sep 2026 04:51:05 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "activityid": "c1646b71-7643-45fe-a456-d768184d903b",
+    "x-envoy-upstream-service-time": "21",
+    "access-control-allow-origin": "*",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 8f1942595ba631b82c2ab2e25ec56dc6.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "FIv55FEHJhVVQT9qsg_4dhvG97T6Pk65amQF1kgrXtDAKsXzNSBQOQ==",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "x-content-type-options": "nosniff",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": [
+    {
+      "error": {
+        "code": "2500",
+        "message": "Bridge-Id=SBXID_010086 is already associated with Hfr-Id=IN2410002480 for Service-Id=IN2410002480, Service-Name=Yashfeen Group of Hospitals"
+      }
+    }
+  ]
+}
+
+[REQUEST] GET https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge-service/serviceId/IN2410002480
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "12a7b7e2-79fa-4562-b877-cdb821642b08",
+    "TIMESTAMP": "2026-09-04T04:51:04.313Z",
+    "X-CM-ID": "sbx",
+    "Authorization": "Bear***GueQ"
+  }
+}
+
+[REQUEST] GET https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge-services/SBXID_010086
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "12a7b7e2-79fa-4562-b877-cdb821642b08",
+    "TIMESTAMP": "2026-09-04T04:51:04.313Z",
+    "X-CM-ID": "sbx",
+    "Authorization": "Bear***GueQ"
+  }
+}
+
+[INBOUND RESPONSE] POST /api/hip/setup/scan-share/run
+{
+  "status": 200,
+  "body": "{\"ok\":true,\"values\":{\"bridgeId\":\"SBXID_010086\",\"publicBaseUrl\":\"https://isolation-pouncing-ecard.ngrok-free.dev\",\"facilityId\":\"IN2410002480\",\"facilityName\":\"Yashfeen Group of Hospitals\",\"serviceName\":\"Yashfeen Group of Hospitals\",\"serviceId\":\"IN2410002480\"},\"callbackUrl\":\"https://isolation-pouncing-ecard.ngrok-free.dev/api/hiecm/patient-share/v3/share\",\"steps\":[{\"name\":\"session\",\"ok\":true,\"required\":true,\"status\":200,\"accessTokenPresent\":true},{\"name\":\"updateBridgeUrl\",\"ok\":true,\"required\":true,\"status\":202,\"payload\":{\"url\":\"https://isolation-pouncing-ecard.ngrok-free.dev\"}},{\"name\":\"registerBridgeServices\",\"ok\":true,\"required\":false,\"status\":200,\"payload\":{\"facilityId\":\"IN2410002480\",\"facilityName\":\"Yashfeen Group of Hospitals\",\"HRP\":[{\"bridgeId\":\"SBXID_010086\",\"hipName\":\"Yashfeen Group of Hospitals\",\"type\":\"HIP\",\"active\":true}]},\"data\":[{\"error\":{\"code\":\"2500\",\"message\":\"Bridge-Id=SBXID_010086 is already associated with Hfr-Id=IN2410002480 for Service-Id=IN2410002480, Service-Name=Yashfeen Group of Hospitals\"}}]},{\"name\":\"findBridgeServiceByServiceId\",\"ok\":false,\"required\":false,\"status\":401,\"error\":{\"error\":\"\"}},{\"name\":\"findServicesByBridgeId\",\"ok\":false,\"required\":false,\"status\":404,\"error\":{\"code\":\"404\",\"type\":\"Status report\",\"message\":\"Runtime Error\",\"description\":\"No matching resource found for given API Request\"}}]}"
+}
+

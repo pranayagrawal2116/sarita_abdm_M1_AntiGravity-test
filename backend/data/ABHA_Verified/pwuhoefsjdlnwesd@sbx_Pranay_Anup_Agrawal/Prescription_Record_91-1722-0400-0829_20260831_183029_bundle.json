@@ -1,0 +1,323 @@
+{
+  "resourceType": "Bundle",
+  "id": "prescription-record-687688c4-99c5-45cc-a29b-ab587ab193c5",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-08-31T18:30:31.349+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "d3c6c7a9-4b5d-453f-a1af-e07bb62d29b8"
+  },
+  "type": "document",
+  "timestamp": "2026-08-31T18:30:31.349+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:7150c2c1-77a0-45fa-8a27-dbaf99d0a322",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "7150c2c1-77a0-45fa-8a27-dbaf99d0a322",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "440545006",
+              "display": "Prescription record"
+            }
+          ],
+          "text": "Prescription record"
+        },
+        "subject": {
+          "reference": "urn:uuid:36a0810c-8db7-4184-9c7f-751f5ecc104b",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:342cb8e6-9ff7-4947-8a72-bda1deb557b7",
+          "display": "Ambulatory"
+        },
+        "date": "2026-08-31T18:30:31.349+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:2a4c09ab-1464-4313-b294-9da630a06cac",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Prescription record",
+        "custodian": {
+          "reference": "urn:uuid:b102effc-d956-479d-ab3e-fb90e73228f0",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:36a0810c-8db7-4184-9c7f-751f5ecc104b",
+                "display": "Pranay Anup Agrawal"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "721912009",
+                  "display": "Medication summary document"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:6bbf73d6-136b-4cc2-91c0-83c8d2965803",
+                "display": "dolo 650mg"
+              }
+            ]
+          },
+          {
+            "title": "Prescription Record",
+            "entry": [
+              {
+                "reference": "urn:uuid:c169796e-5594-4c15-9096-faee95507aa4",
+                "display": "Binary"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:36a0810c-8db7-4184-9c7f-751f5ecc104b",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "36a0810c-8db7-4184-9c7f-751f5ecc104b",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-31T18:30:31.349+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pwuhoefsjdlnwesd@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "7016397906",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2a4c09ab-1464-4313-b294-9da630a06cac",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "2a4c09ab-1464-4313-b294-9da630a06cac",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-31T18:30:31.349+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:b102effc-d956-479d-ab3e-fb90e73228f0",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "b102effc-d956-479d-ab3e-fb90e73228f0",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:342cb8e6-9ff7-4947-8a72-bda1deb557b7",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "342cb8e6-9ff7-4947-8a72-bda1deb557b7",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "ec566c9e-954d-481d-91d6-b43f011c44f8"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:36a0810c-8db7-4184-9c7f-751f5ecc104b",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-08-31T13:00:31.318Z"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6bbf73d6-136b-4cc2-91c0-83c8d2965803",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "6bbf73d6-136b-4cc2-91c0-83c8d2965803",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387517004",
+              "display": "dolo 650mg"
+            }
+          ],
+          "text": "dolo 650mg"
+        },
+        "subject": {
+          "reference": "urn:uuid:36a0810c-8db7-4184-9c7f-751f5ecc104b",
+          "display": "Pranay Anup Agrawal"
+        },
+        "authoredOn": "2026-08-31T13:00:31.318Z",
+        "requester": {
+          "reference": "urn:uuid:2a4c09ab-1464-4313-b294-9da630a06cac",
+          "display": "Dr. Sarita"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386661006",
+                "display": "Fever"
+              }
+            ],
+            "text": "Fever"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "• 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c169796e-5594-4c15-9096-faee95507aa4",
+      "resource": {
+        "resourceType": "Binary",
+        "id": "c169796e-5594-4c15-9096-faee95507aa4",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Binary"
+          ]
+        },
+        "contentType": "application/pdf",
+        "data": "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ag1ZO1CH1zV3ETPjPRrjcOwnfdmgJ6Mcjh2iLxz28SiHY8/ny4Y9GeUw9HC+bNBHYxzGnswX+urRIMeC7RmDnitHoLlqniTGVjliFk5Z97rRfYscQRF5aZZKQkm3HqZbZYkF83rV43vgdmlhFpj3k2ueTbvUMA8OqlbPUhv4mahEXIbW4Qphr/t1vVjfkou+Dj25WEWpe0tslpvmV9l4u3xk8Br6Y+pZjt+8nNqtP3uXB8G6dl5Lb5o35NM8cR26atZenjbvRUsUk81z/eYulOakqf7Dxbwynt230pytUswLZIdGl9dBVJBiKQtaSLe+GD1M2Kvhy6X+/8sc35Pk+R/pd95ACmVuZHN0cmVhbQplbmRvYmoKMTQgMCBvYmoKKHBkZm1ha2UpCmVuZG9iagoxNSAwIG9iagoocGRmbWFrZSkKZW5kb2JqCjE2IDAgb2JqCihEOjIwMjYwODMxMTMwMDMxWikKZW5kb2JqCjEzIDAgb2JqCjw8Ci9Qcm9kdWNlciAxNCAwIFIKL0NyZWF0b3IgMTUgMCBSCi9DcmVhdGlvbkRhdGUgMTYgMCBSCj4+CmVuZG9iagoxMCAwIG9iago8PAovVHlwZSAvRm9udAovQmFzZUZvbnQgL0hlbHZldGljYS1Cb2xkCi9TdWJ0eXBlIC9UeXBlMQovRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZwo+PgplbmRvYmoKMTEgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL0Jhc2VGb250IC9IZWx2ZXRpY2EKL1N1YnR5cGUgL1R5cGUxCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iago0IDAgb2JqCjw8Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9DYXRhbG9nCi9QYWdlcyAxIDAgUgovTmFtZXMgMiAwIFIKPj4KZW5kb2JqCjEgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9Db3VudCAxCi9LaWRzIFs3IDAgUl0KPj4KZW5kb2JqCjIgMCBvYmoKPDwKL0Rlc3RzIDw8CiAgL05hbWVzIFsKXQo+Pgo+PgplbmRvYmoKeHJlZgowIDE3CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMjUyNyAwMDAwMCBuIAowMDAwMDAyNTg0IDAwMDAwIG4gCjAwMDAwMDI0NjUgMDAwMDAgbiAKMDAwMDAwMjQ0NCAwMDAwMCBuIAowMDAwMDAwNDQ2IDAwMDAwIG4gCjAwMDAwMDAyNzYgMDAwMDAgbiAKMDAwMDAwMDE1NCAwMDAwMCBuIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDAwNTkgMDAwMDAgbiAKMDAwMDAwMjI0MyAwMDAwMCBuIAowMDAwMDAyMzQ2IDAwMDAwIG4gCjAwMDAwMDAxMDkgMDAwMDAgbiAKMDAwMDAwMjE2NyAwMDAwMCBuIAowMDAwMDAyMDc5IDAwMDAwIG4gCjAwMDAwMDIxMDUgMDAwMDAgbiAKMDAwMDAwMjEzMSAwMDAwMCBuIAp0cmFpbGVyCjw8Ci9TaXplIDE3Ci9Sb290IDMgMCBSCi9JbmZvIDEzIDAgUgovSUQgWzw3ZjJmYmJiMDMwODU4MDg1YTA0ODUwM2U0YmFkZmUwNj4gPDdmMmZiYmIwMzA4NTgwODVhMDQ4NTAzZTRiYWRmZTA2Pl0KPj4Kc3RhcnR4cmVmCjI2MzEKJSVFT0YK"
+      }
+    }
+  ]
+}

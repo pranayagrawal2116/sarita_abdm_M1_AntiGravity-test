@@ -1,0 +1,788 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-79183087-631d-49ea-823e-97bf3bcff305",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-08-31T18:32:53.702+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "f3365163-ca38-4776-81f6-c683b831b73f"
+  },
+  "type": "document",
+  "timestamp": "2026-08-31T18:32:53.702+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:c9259d8b-3a4e-44dc-b459-729b73a2daca",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "c9259d8b-3a4e-44dc-b459-729b73a2daca",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/OPConsultRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "371530004",
+              "display": "Clinical consultation report"
+            }
+          ],
+          "text": "Clinical consultation report"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:46346e2c-eaa6-4879-9ef1-6efbb1d10114",
+          "display": "Ambulatory"
+        },
+        "date": "2026-08-31T18:32:53.702+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:b5df7635-2611-42c8-8d64-c8d340a72d27",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "OpConsult record",
+        "custodian": {
+          "reference": "urn:uuid:326fa946-584a-4d48-b3f8-8bf6f72a15a4",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400",
+                "display": "Pranay Anup Agrawal"
+              }
+            ]
+          },
+          {
+            "title": "Chief Complaints",
+            "entry": [
+              {
+                "reference": "urn:uuid:0a77fe75-3e1c-4596-9588-8719f33225e2",
+                "display": "Cold"
+              }
+            ]
+          },
+          {
+            "title": "Vital Signs",
+            "entry": [
+              {
+                "reference": "urn:uuid:14a4b7dd-4f7b-43b5-8f67-4afdc68cea18",
+                "display": "Respiratory rate"
+              },
+              {
+                "reference": "urn:uuid:109aea60-1367-4d0e-a69a-5376964b7eb8",
+                "display": "Heart rate"
+              },
+              {
+                "reference": "urn:uuid:05d267b4-dd43-4d81-bce6-bfc168c3a183",
+                "display": "Body surface temperature"
+              },
+              {
+                "reference": "urn:uuid:37602898-baeb-4426-85db-130b349106dd",
+                "display": "Systolic blood pressure"
+              },
+              {
+                "reference": "urn:uuid:1dbd4197-85dc-488c-a0cb-7f5d6eb5e7a4",
+                "display": "Diastolic blood pressure"
+              }
+            ]
+          },
+          {
+            "title": "Allergies",
+            "entry": [
+              {
+                "reference": "urn:uuid:7fd866dd-8129-42aa-bc33-9d245c64e978",
+                "display": "Dust"
+              }
+            ]
+          },
+          {
+            "title": "Medical History",
+            "entry": [
+              {
+                "reference": "urn:uuid:4041b075-cb35-4efe-a9e8-92c20d3275f2",
+                "display": "Diabetes"
+              }
+            ]
+          },
+          {
+            "title": "Investigations",
+            "entry": [
+              {
+                "reference": "urn:uuid:6f05a86c-47d4-479b-9df5-effb2f7d777f",
+                "display": "CBC"
+              }
+            ]
+          },
+          {
+            "title": "Procedures",
+            "entry": [
+              {
+                "reference": "urn:uuid:35115cc7-71cd-4293-8ced-863552bbef00",
+                "display": "Test"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "entry": [
+              {
+                "reference": "urn:uuid:3408ed4f-1f64-4fd2-8183-3afc403fb777",
+                "display": "Dolo"
+              }
+            ]
+          },
+          {
+            "title": "Family History",
+            "entry": [
+              {
+                "reference": "urn:uuid:cc2f3fe6-4937-49ee-afbd-2b73d56964a9",
+                "display": "Diabetes"
+              }
+            ]
+          },
+          {
+            "title": "Follow Up",
+            "entry": [
+              {
+                "reference": "urn:uuid:74be3086-e5cf-4096-9663-7a13687535a3",
+                "display": "Follow Up Appointment"
+              }
+            ]
+          },
+          {
+            "title": "Document Reference",
+            "entry": [
+              {
+                "reference": "urn:uuid:f1bfc9c5-aaba-4b66-804d-72b649b2d813",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:04c16550-a216-497b-960d-c762df66d400",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "04c16550-a216-497b-960d-c762df66d400",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-31T18:32:53.702+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pwuhoefsjdlnwesd@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "7016397906",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:b5df7635-2611-42c8-8d64-c8d340a72d27",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "b5df7635-2611-42c8-8d64-c8d340a72d27",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-08-31T18:32:53.702+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:326fa946-584a-4d48-b3f8-8bf6f72a15a4",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "326fa946-584a-4d48-b3f8-8bf6f72a15a4",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:46346e2c-eaa6-4879-9ef1-6efbb1d10114",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "46346e2c-eaa6-4879-9ef1-6efbb1d10114",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "a91dcad9-7fb6-41fe-8f15-65918cf87275"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-08-31T18:32:53.702+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0a77fe75-3e1c-4596-9588-8719f33225e2",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "0a77fe75-3e1c-4596-9588-8719f33225e2",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "active"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "386661006",
+              "display": "Cold"
+            }
+          ],
+          "text": "Cold"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "recordedDate": "2026-08-31T13:02:53.702Z"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:14a4b7dd-4f7b-43b5-8f67-4afdc68cea18",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "14a4b7dd-4f7b-43b5-8f67-4afdc68cea18",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "9279-1",
+              "display": "Respiratory rate"
+            }
+          ],
+          "text": "Respiratory rate"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "effectiveDateTime": "2026-08-31T13:02:53.702Z",
+        "valueQuantity": {
+          "value": 38,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:109aea60-1367-4d0e-a69a-5376964b7eb8",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "109aea60-1367-4d0e-a69a-5376964b7eb8",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8867-4",
+              "display": "Heart rate"
+            }
+          ],
+          "text": "Heart rate"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "effectiveDateTime": "2026-08-31T13:02:53.702Z",
+        "valueQuantity": {
+          "value": 110,
+          "unit": "/min",
+          "system": "http://unitsofmeasure.org",
+          "code": "/min"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:05d267b4-dd43-4d81-bce6-bfc168c3a183",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "05d267b4-dd43-4d81-bce6-bfc168c3a183",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8310-5",
+              "display": "Body surface temperature"
+            }
+          ],
+          "text": "Body surface temperature"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "effectiveDateTime": "2026-08-31T13:02:53.702Z",
+        "valueQuantity": {
+          "value": 99,
+          "unit": "degF",
+          "system": "http://unitsofmeasure.org",
+          "code": "degF"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:37602898-baeb-4426-85db-130b349106dd",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "37602898-baeb-4426-85db-130b349106dd",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8480-6",
+              "display": "Systolic blood pressure"
+            }
+          ],
+          "text": "Systolic blood pressure"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "effectiveDateTime": "2026-08-31T13:02:53.702Z",
+        "valueQuantity": {
+          "value": 110,
+          "unit": "mmHg",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmHg"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:1dbd4197-85dc-488c-a0cb-7f5d6eb5e7a4",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "1dbd4197-85dc-488c-a0cb-7f5d6eb5e7a4",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8462-4",
+              "display": "Diastolic blood pressure"
+            }
+          ],
+          "text": "Diastolic blood pressure"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "effectiveDateTime": "2026-08-31T13:02:53.702Z",
+        "valueQuantity": {
+          "value": 80,
+          "unit": "mmHg",
+          "system": "http://unitsofmeasure.org",
+          "code": "mmHg"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:7fd866dd-8129-42aa-bc33-9d245c64e978",
+      "resource": {
+        "resourceType": "AllergyIntolerance",
+        "id": "7fd866dd-8129-42aa-bc33-9d245c64e978",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/AllergyIntolerance"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+              "code": "active",
+              "display": "Active"
+            }
+          ]
+        },
+        "verificationStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification",
+              "code": "confirmed",
+              "display": "Confirmed"
+            }
+          ]
+        },
+        "recordedDate": "2026-08-31T13:02:53.702Z",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "256349002",
+              "display": "Dust"
+            }
+          ],
+          "text": "Dust"
+        },
+        "patient": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4041b075-cb35-4efe-a9e8-92c20d3275f2",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "4041b075-cb35-4efe-a9e8-92c20d3275f2",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "active"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "16100001",
+              "display": "Diabetes"
+            }
+          ],
+          "text": "Diabetes"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "recordedDate": "2026-08-31T13:02:53.702Z"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6f05a86c-47d4-479b-9df5-effb2f7d777f",
+      "resource": {
+        "resourceType": "Observation",
+        "id": "6f05a86c-47d4-479b-9df5-effb2f7d777f",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "718-7",
+              "display": "CBC"
+            }
+          ],
+          "text": "CBC"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "effectiveDateTime": "2026-08-31T13:02:53.702Z",
+        "valueString": "Advised"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:35115cc7-71cd-4293-8ced-863552bbef00",
+      "resource": {
+        "resourceType": "Procedure",
+        "id": "35115cc7-71cd-4293-8ced-863552bbef00",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Procedure"
+          ]
+        },
+        "status": "completed",
+        "code": {
+          "text": "Test"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "performedDateTime": "2026-08-31T13:02:53.702Z"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:3408ed4f-1f64-4fd2-8183-3afc403fb777",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "3408ed4f-1f64-4fd2-8183-3afc403fb777",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387517004",
+              "display": "Dolo"
+            }
+          ],
+          "text": "Dolo"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "authoredOn": "2026-08-31T13:02:53.702Z",
+        "requester": {
+          "reference": "urn:uuid:b5df7635-2611-42c8-8d64-c8d340a72d27"
+        },
+        "dosageInstruction": [
+          {
+            "text": "1-0-1",
+            "route": {
+              "text": "Oral"
+            },
+            "method": {
+              "text": "After Food"
+            }
+          }
+        ],
+        "reasonCode": [
+          {
+            "text": "Fever"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:cc2f3fe6-4937-49ee-afbd-2b73d56964a9",
+      "resource": {
+        "resourceType": "Condition",
+        "id": "cc2f3fe6-4937-49ee-afbd-2b73d56964a9",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition"
+          ]
+        },
+        "clinicalStatus": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              "code": "active",
+              "display": "active"
+            }
+          ]
+        },
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "display": "Diabetes"
+            }
+          ],
+          "text": "Diabetes"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "recordedDate": "2026-08-31T13:02:53.702Z"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:74be3086-e5cf-4096-9663-7a13687535a3",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "74be3086-e5cf-4096-9663-7a13687535a3",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Appointment"
+          ]
+        },
+        "status": "booked",
+        "description": "Review",
+        "participant": [
+          {
+            "actor": {
+              "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+            },
+            "status": "accepted"
+          },
+          {
+            "actor": {
+              "reference": "urn:uuid:b5df7635-2611-42c8-8d64-c8d340a72d27"
+            },
+            "status": "accepted"
+          }
+        ],
+        "start": "2026-08-31T18:32:00.000Z",
+        "end": "2026-08-31T18:32:00.000Z"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:f1bfc9c5-aaba-4b66-804d-72b649b2d813",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "f1bfc9c5-aaba-4b66-804d-72b649b2d813",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "OP Consultation Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:04c16550-a216-497b-960d-c762df66d400"
+        },
+        "date": "2026-08-31T13:02:53.702Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "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YmoKMTEgMCBvYmoKPDwKL1R5cGUgL0ZvbnQKL0Jhc2VGb250IC9IZWx2ZXRpY2EKL1N1YnR5cGUgL1R5cGUxCi9FbmNvZGluZyAvV2luQW5zaUVuY29kaW5nCj4+CmVuZG9iago0IDAgb2JqCjw8Cj4+CmVuZG9iagozIDAgb2JqCjw8Ci9UeXBlIC9DYXRhbG9nCi9QYWdlcyAxIDAgUgovTmFtZXMgMiAwIFIKPj4KZW5kb2JqCjEgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9Db3VudCAyCi9LaWRzIFs3IDAgUiAxNSAwIFJdCj4+CmVuZG9iagoyIDAgb2JqCjw8Ci9EZXN0cyA8PAogIC9OYW1lcyBbCl0KPj4KPj4KZW5kb2JqCnhyZWYKMCAyMAowMDAwMDAwMDAwIDY1NTM1IGYgCjAwMDAwMDQ2ODQgMDAwMDAgbiAKMDAwMDAwNDc0OCAwMDAwMCBuIAowMDAwMDA0NjIyIDAwMDAwIG4gCjAwMDAwMDQ2MDEgMDAwMDAgbiAKMDAwMDAwMDQ0NiAwMDAwMCBuIAowMDAwMDAwMjc2IDAwMDAwIG4gCjAwMDAwMDAxNTQgMDAwMDAgbiAKMDAwMDAwMDAxNSAwMDAwMCBuIAowMDAwMDAwMDU5IDAwMDAwIG4gCjAwMDAwMDQ0MDAgMDAwMDAgbiAKMDAwMDAwNDUwMyAwMDAwMCBuIAowMDAwMDAwMTA5IDAwMDAwIG4gCjAwMDAwMDM2MDIgMDAwMDAgbiAKMDAwMDAwMzQzMSAwMDAwMCBuIAowMDAwMDAzMzA2IDAwMDAwIG4gCjAwMDAwMDQzMjQgMDAwMDAgbiAKMDAwMDAwNDIzNiAwMDAwMCBuIAowMDAwMDA0MjYyIDAwMDAwIG4gCjAwMDAwMDQyODggMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSAyMAovUm9vdCAzIDAgUgovSW5mbyAxNiAwIFIKL0lEIFs8ZTRkNWJlNGIzMjY3MGZhN2RhNWI5NWVmYjg1MDFhZWE+IDxlNGQ1YmU0YjMyNjcwZmE3ZGE1Yjk1ZWZiODUwMWFlYT5dCj4+CnN0YXJ0eHJlZgo0Nzk1CiUlRU9GCg==",
+              "title": "Clinical notes",
+              "creation": "2026-08-31T13:02:53.702Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

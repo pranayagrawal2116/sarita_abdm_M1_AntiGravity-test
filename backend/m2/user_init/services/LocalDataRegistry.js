@@ -71,6 +71,56 @@ class LocalDataRegistry {
     return `${this._sanitizePathSegment(identity.yearOfBirth)}_${this._sanitizePathSegment(identity.gender)}_${this._sanitizePathSegment(identity.mobile)}`;
   }
 
+  _validUhid(value) {
+    const normalized = String(value || '').trim();
+    return normalized && normalized !== '-' ? normalized : '';
+  }
+
+  _uhidInText(content) {
+    const match = String(content || '').match(/^\s*(?:Patient\s+)?UHID\s*:\s*(.+?)\s*$/im);
+    return this._validUhid(match?.[1]);
+  }
+
+  async _establishedUhid({ folderPath, abhaAddress } = {}) {
+    const candidateFolders = new Set();
+    if (folderPath) candidateFolders.add(path.resolve(folderPath));
+
+    if (abhaAddress) {
+      for (const folder of await this._matchingAbhaFolders(abhaAddress)) {
+        candidateFolders.add(path.resolve(folder.folderPath));
+      }
+    }
+
+    const documentUhids = [];
+    const sidecarUhids = [];
+    for (const candidateFolder of candidateFolders) {
+      try {
+        const entries = await fs.promises.readdir(candidateFolder, { withFileTypes: true });
+        const textFiles = entries
+          .filter((entry) => entry.isFile() && /\.txt$/i.test(entry.name))
+          .map((entry) => entry.name)
+          .sort();
+        for (const fileName of textFiles) {
+          const value = this._uhidInText(await fs.promises.readFile(path.join(candidateFolder, fileName), 'utf8'));
+          if (value) documentUhids.push(value);
+        }
+        try {
+          const identity = JSON.parse(await fs.promises.readFile(path.join(candidateFolder, 'patient_identity.json'), 'utf8')) || {};
+          const value = this._validUhid(identity.patientUhid);
+          if (value) sidecarUhids.push(value);
+        } catch (error) {
+          if (error.code !== 'ENOENT') throw error;
+        }
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+    }
+
+    // A UHID printed on a prior clinical record is the authoritative hospital
+    // identifier. Sidecars are only a fallback for patients with no records.
+    return documentUhids[0] || sidecarUhids[0] || '';
+  }
+
   // Keep generated-PDF identity outside the clinical source documents. A
   // data-entry patient has no ABHA details until discovery, but their UHID
   // must stay the same in every PDF created from this folder.
@@ -99,6 +149,10 @@ class LocalDataRegistry {
     }
 
     const normalizedFolderName = String(folderName || path.basename(resolvedFolderPath));
+    const establishedUhid = await this._establishedUhid({
+      folderPath: resolvedFolderPath,
+      abhaAddress,
+    });
     const generatedUhid = storageClass === 'NON_ABHA_VERIFIED'
       ? `UHID-${crypto.createHash('sha256').update(normalizedFolderName).digest('hex').slice(0, 12).toUpperCase()}`
       : '';
@@ -106,7 +160,7 @@ class LocalDataRegistry {
       ...existing,
       folderName: normalizedFolderName,
       storageClass: storageClass || existing.storageClass || '',
-      patientUhid: existing.patientUhid || generatedUhid || '',
+      patientUhid: establishedUhid || existing.patientUhid || generatedUhid || '',
       patientName: patientName || existing.patientName || '',
       abhaAddress: abhaAddress || existing.abhaAddress || '',
       abhaNumber: abhaNumber || existing.abhaNumber || '',
@@ -430,11 +484,12 @@ class LocalDataRegistry {
       } catch (error) {
         if (error.code !== 'ENOENT') throw error;
       }
-      await fs.promises.writeFile(
-        destinationIdentityPath,
-        JSON.stringify({ ...sourceIdentity, ...destinationIdentity, updatedAt: new Date().toISOString() }, null, 2),
-        'utf8',
-      );
+      const mergedIdentity = { ...sourceIdentity, ...destinationIdentity };
+      // Do not let a previously generated placeholder replace the genuine UHID
+      // discovered in the source patient's earlier clinical records.
+      mergedIdentity.patientUhid = sourceIdentity.patientUhid || destinationIdentity.patientUhid || '';
+      mergedIdentity.updatedAt = new Date().toISOString();
+      await fs.promises.writeFile(destinationIdentityPath, JSON.stringify(mergedIdentity, null, 2), 'utf8');
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
     }

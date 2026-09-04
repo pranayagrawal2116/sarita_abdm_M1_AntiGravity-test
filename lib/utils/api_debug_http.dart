@@ -15,6 +15,7 @@ class ApiDebugHttp {
     Uri url, {
     Map<String, String>? headers,
   }) async {
+    headers = {...?headers, 'ngrok-skip-browser-warning': 'true'};
     final cacheBustedUrl = url.replace(
       queryParameters: {
         ...url.queryParameters,
@@ -38,6 +39,7 @@ class ApiDebugHttp {
     Object? body,
     Encoding? encoding,
   }) async {
+    headers = {...?headers, 'ngrok-skip-browser-warning': 'true'};
     _logRequest('POST', url, headers: headers, body: body);
     try {
       final response = await http.post(
@@ -60,6 +62,7 @@ class ApiDebugHttp {
     Object? body,
     Encoding? encoding,
   }) async {
+    headers = {...?headers, 'ngrok-skip-browser-warning': 'true'};
     _logRequest('PATCH', url, headers: headers, body: body);
     try {
       final response = await http.patch(

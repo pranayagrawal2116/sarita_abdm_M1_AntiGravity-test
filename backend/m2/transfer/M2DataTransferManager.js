@@ -1004,6 +1004,9 @@ class M2DataTransferManager {
           createdAt: stats.birthtime.toISOString(),
           updatedAt: stats.mtime.toISOString(),
         }],
+        // User Initiated discovery supplies the current ABHA identity. Rebuild
+        // the selected record rather than forwarding an old PDF_BASE64 payload.
+        forceGeneratedPdf: true,
       });
       fs.writeFileSync(bundlePath, JSON.stringify(bundle, null, 2));
       payload.bundle = bundle;

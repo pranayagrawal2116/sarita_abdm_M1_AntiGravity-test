@@ -160,7 +160,12 @@ class UserInitController {
   static abhaNumberFromDiscovery(identifiers = []) {
     for (const identifier of identifiers) {
       const value = String(identifier?.value || '').trim();
-      if (/^\d{2}-\d{4}-\d{4}-\d{4}$/.test(value)) return value;
+      // Gateways may return the ABHA number with or without separators. Store a
+      // single display-safe form so downstream PDF builders never lose it.
+      const digits = value.replace(/\D/g, '');
+      if (digits.length === 14) {
+        return `${digits.slice(0, 2)}-${digits.slice(2, 6)}-${digits.slice(6, 10)}-${digits.slice(10)}`;
+      }
     }
     return '';
   }

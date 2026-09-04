@@ -161,6 +161,12 @@ const matchField = (content, label) => {
   return match ? text(match[1]) : "";
 };
 
+// Local records created before ABHA linking use "-" as a placeholder. Those
+// placeholders must never override the identity returned by User Init
+// discovery and persisted in patient_identity.json.
+const firstRecordedValue = (...values) =>
+  values.map(text).find((value) => value && value !== "-") || "";
+
 const normalizeGenderValue = (value) => {
   const raw = text(value).toLowerCase();
   if (raw === "m" || raw === "male") return "male";
@@ -320,27 +326,32 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   const persistedIdentity = readPatientDocumentIdentity(file);
   const summary = lines.slice(0, 8).join("; ") || `${file.hiType} generated for ABDM transfer`;
   const primaryLine = lines[0] || "Clinical record review";
-  const patientName = matchField(file.content, "Name") || persistedIdentity.patientName || patientNameFromFolder(folderName, abhaId);
-  const abhaAddress = matchField(file.content, "ABHA Address") || persistedIdentity.abhaAddress || abhaId;
-  const abhaNumber =
-    matchField(file.content, "ABHA Number") ||
+  const patientName = firstRecordedValue(matchField(file.content, "Name"), persistedIdentity.patientName, patientNameFromFolder(folderName, abhaId));
+  const abhaAddress = firstRecordedValue(matchField(file.content, "ABHA Address"), persistedIdentity.abhaAddress, abhaId);
+  const abhaNumber = firstRecordedValue(
+    matchField(file.content, "ABHA Number"),
     persistedIdentity.abhaNumber ||
     extractAbhaNumber(file.fileName) ||
-    extractAbhaNumber(file.filePath);
-  const mobile = matchField(file.content, "Mobile") || persistedIdentity.mobile;
-  const gender = normalizeGenderValue(matchField(file.content, "Gender") || matchField(file.content, "Sex") || persistedIdentity.gender);
+    extractAbhaNumber(file.filePath)
+  );
+  const mobile = firstRecordedValue(matchField(file.content, "Mobile"), persistedIdentity.mobile);
+  const gender = normalizeGenderValue(firstRecordedValue(matchField(file.content, "Gender"), matchField(file.content, "Sex"), persistedIdentity.gender));
   const birthDate = normalizeBirthDateValue(
-    matchField(file.content, "DOB / YOB") ||
-    matchField(file.content, "DOB") ||
-    matchField(file.content, "Date of Birth") ||
+    firstRecordedValue(
+      matchField(file.content, "DOB / YOB"),
+      matchField(file.content, "DOB"),
+      matchField(file.content, "Date of Birth"),
+      persistedIdentity.yearOfBirth
+    ) ||
     persistedIdentity.yearOfBirth
   );
-  const patientUhid =
-    matchField(file.content, "UHID") ||
-    matchField(file.content, "Patient UHID") ||
-    matchField(file.content, "Patient ID") ||
+  const patientUhid = firstRecordedValue(
+    matchField(file.content, "UHID"),
+    matchField(file.content, "Patient UHID"),
+    matchField(file.content, "Patient ID"),
     persistedIdentity.patientUhid ||
-    (isNonAbhaFolderName(folderName) ? stableNonAbhaUhid(folderName) : "");
+    (isNonAbhaFolderName(folderName) ? stableNonAbhaUhid(folderName) : "")
+  );
   const medicationName =
     extractIndentedValue(lines, /^Medications:/i, /^\s*Name:\s*(.+)$/i) ||
     extractIndentedValue(lines, /^Draft Medication:/i, /^\s*Name:\s*(.+)$/i) ||
@@ -669,10 +680,10 @@ const buildBusinessDataFromTextFile = ({ abhaId, folderName, file }) => {
   };
 };
 
-const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiType, recordType }) => {
+const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiType, recordType, forceGeneratedPdf = false }) => {
   const businessData = buildBusinessDataFromTextFile({ abhaId, folderName, file });
   
-  if (businessData.pdfBase64) {
+  if (businessData.pdfBase64 && !forceGeneratedPdf) {
     // Explicitly provided via PDF_BASE64 in the text file
     log("Using explicit PDF_BASE64 from text document for", { recordType });
   } else if (recordType === "OP Consultation") {
@@ -1175,7 +1186,7 @@ const buildBundle = (transaction) => {
   };
 };
 
-const buildBundleFromFiles = async ({ abhaId, folderName, files }) => {
+const buildBundleFromFiles = async ({ abhaId, folderName, files, forceGeneratedPdf = false }) => {
   const firstFile = Array.isArray(files) ? files[0] : null;
   if (!firstFile) {
     throw new Error("Cannot build bundle from files: at least one source text file is required.");
@@ -1184,7 +1195,7 @@ const buildBundleFromFiles = async ({ abhaId, folderName, files }) => {
   const canonicalHiType = normalizeHiType(firstFile?.hiType);
 
   // If the text file is actually a pre-built JSON bundle, return it directly
-  if (firstFile.content && firstFile.content.trim().startsWith("{")) {
+  if (!forceGeneratedPdf && firstFile.content && firstFile.content.trim().startsWith("{")) {
     try {
       const parsedJSON = JSON.parse(firstFile.content);
       if (parsedJSON.resourceType === "Bundle") {
@@ -1197,7 +1208,7 @@ const buildBundleFromFiles = async ({ abhaId, folderName, files }) => {
   }
 
   const generator = FILE_BUNDLE_GENERATORS[canonicalHiType] || generateHealthDocumentRecordBundle;
-  return await generator({ abhaId, folderName, file: firstFile, canonicalHiType });
+  return await generator({ abhaId, folderName, file: firstFile, canonicalHiType, forceGeneratedPdf });
 };
 
 module.exports = { buildBundle, buildBundleFromFiles, normalizeHiType, HI_TYPE_TO_FHIR_RESOURCE };

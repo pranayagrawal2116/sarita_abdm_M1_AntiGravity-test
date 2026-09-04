@@ -325,7 +325,8 @@ class M2HipLinkingController {
             // 3. Initiate Data Transfer
             const receiverPublicKey = "BCpsBW37KgfLyjxJK0zHHG26hDjxzK368DEO4PapzFhQM0cghZziKuvJh5/anTnHitVHKMn0Owr1HvcH1fm0DpA=";
             const receiverNonce = "0ka0stPfqmXWhX+ODC/iOFMO0PXFdRjBdcEGbv55qqc=";
-            const dataPushUrl = `${process.env.APP_BASE_URL || 'https://abdmapi.saritainfotech.com'}/api/m2/patient-storage/hiu/data-push`;
+            // const dataPushUrl = `${process.env.APP_BASE_URL || 'https://abdmapi.saritainfotech.com'}/api/m2/patient-storage/hiu/data-push`;
+            const dataPushUrl = `${process.env.APP_BASE_URL || 'https://isolation-pouncing-ecard.ngrok-free.dev'}/api/m2/patient-storage/hiu/data-push`;
 
             M2DataTransferManager.getInstance().initiateTransfer(
               consentObj.consentId,

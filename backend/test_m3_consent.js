@@ -5,8 +5,8 @@ async function testConsentInit() {
   try {
     // 1. Fetch token
     const tokenRes = await axios.post('https://dev.abdm.gov.in/gateway/v0.5/sessions', {
-      clientId: "SBXID_010086",
-      clientSecret: "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+      clientId: process.env.ABDM_CLIENT_ID || "REPLACE_ME_CLIENT_ID",
+      clientSecret: process.env.ABDM_CLIENT_SECRET || "REPLACE_ME_CLIENT_SECRET",
       grantType: "client_credentials"
     }, {
       headers: {
@@ -31,7 +31,7 @@ async function testConsentInit() {
             id: "pranay_1200621@sbx"
           },
           hiu: {
-            id: "SBXID_010086"
+            id: process.env.ABDM_CLIENT_ID || "REPLACE_ME_CLIENT_ID"
           },
           // Adding these explicitly as per Postman
           hip: null,

@@ -157,7 +157,7 @@ const acknowledgeInBackground = async ({
     });
     console.error(
       "[ScanShare] Failed to send on-share acknowledgement",
-      error.response?.data || error.message || error
+      "<omitted for security>"
     );
   }
 };

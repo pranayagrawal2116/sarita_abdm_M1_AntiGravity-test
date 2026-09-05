@@ -156,11 +156,25 @@ class LocalDataRegistry {
 
     await fs.promises.mkdir(resolvedFolderPath, { recursive: true });
     const identityPath = path.join(resolvedFolderPath, 'patient_identity.json');
-    let existing = {};
+    
+    // First read to see if it already exists and check ownership
+    let existing = null;
     try {
       existing = JSON.parse(await fs.promises.readFile(identityPath, 'utf8')) || {};
     } catch (error) {
       if (error.code !== 'ENOENT') throw error;
+    }
+
+    if (existing && abhaAddress) {
+      const existingAbha = String(existing.abhaAddress || '').trim();
+      const newAbha = String(abhaAddress).trim();
+      if (existingAbha && newAbha && existingAbha !== newAbha) {
+        throw new Error('Folder is already bound to a different ABHA identity');
+      }
+    }
+    
+    if (!existing) {
+      existing = {};
     }
 
     const normalizedFolderName = String(folderName || path.basename(resolvedFolderPath));
@@ -188,7 +202,29 @@ class LocalDataRegistry {
       yearOfBirth: identity?.yearOfBirth || existing.yearOfBirth || '',
       updatedAt: new Date().toISOString(),
     };
-    await fs.promises.writeFile(identityPath, JSON.stringify(next, null, 2), 'utf8');
+
+    const nextJson = JSON.stringify(next, null, 2);
+
+    try {
+      // Attempt atomic creation
+      await fs.promises.writeFile(identityPath, nextJson, { flag: 'wx', encoding: 'utf8' });
+    } catch (error) {
+      if (error.code === 'EEXIST') {
+        // File was created concurrently! Read it to ensure it belongs to the same ABHA
+        const concurrent = JSON.parse(await fs.promises.readFile(identityPath, 'utf8')) || {};
+        const concurrentAbha = String(concurrent.abhaAddress || '').trim();
+        const newAbha = String(abhaAddress).trim();
+        if (concurrentAbha && newAbha && concurrentAbha !== newAbha) {
+          throw new Error('Folder is already bound to a different ABHA identity');
+        }
+        // It's the same ABHA (idempotent), we can safely overwrite/update it if needed,
+        // but typically for concurrent claims by the same ABHA we can just rewrite or leave it.
+        await fs.promises.writeFile(identityPath, nextJson, 'utf8');
+      } else {
+        throw error;
+      }
+    }
+    
     return next;
   }
 
@@ -383,67 +419,80 @@ class LocalDataRegistry {
     }
   }
 
-  /**
-   * User-initiated linking for a data-entry patient is keyed by the patient
-   * attributes that ABDM sends in its discovery webhook. Discovery is read
-   * only: it must never create a patient directory or use another storage
-   * class as a fallback when a Non-ABHA identity was supplied.
-   */
   async getAvailableDocumentsForDiscovery({ abhaId, yearOfBirth, gender, mobile } = {}) {
+    const abhaProvided = Boolean(String(abhaId || '').trim());
     const identity = this._normalizeNonAbhaIdentity({ yearOfBirth, gender, mobile });
-    const nonAbhaIdentityWasSupplied = [yearOfBirth, gender, mobile]
-      .some((value) => String(value ?? '').trim() !== '');
+    const nonAbhaIdentityWasSupplied = Boolean(identity);
 
-    if (nonAbhaIdentityWasSupplied) {
-      // A partial or invalid identity is not eligible for ABHA fallback. It
-      // is an explicit request to locate a data-entry patient, and fail-closed
-      // behavior prevents a malformed request from exposing ABHA records.
-      if (!identity) {
-        return { documents: [], identity: null, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+    // CASE A: Prefer ABHA_Verified if a valid ABHA identity is supplied.
+    if (abhaProvided) {
+      const abhaDocuments = await this.getAvailableDocumentsForAbha(abhaId);
+      if (abhaDocuments.length > 0) {
+        const firstDocument = abhaDocuments[0];
+        return {
+          documents: abhaDocuments,
+          identity, // Keep the provided identity even if we returned ABHA records
+          storageClass: firstDocument?.storageClass || 'ABHA_VERIFIED',
+          storageFolderName: firstDocument?.storageFolderName || '',
+          storageFolderPath: firstDocument?.storageFolderPath || '',
+        };
       }
 
-      const folderName = this.getNonAbhaFolderName(identity);
-      const folderPath = path.join(this.nonAbhaVerifiedRoot, folderName);
-      // Folder construction is deterministic, but its existence is the proof
-      // that this exact patient is known. Do not create missing folders while
-      // processing discovery.
+      // If ABHA identity was provided but NO documents exist in ABHA_Verified,
+      // and NO usable demographic identity was provided, we fail closed.
+      if (!nonAbhaIdentityWasSupplied) {
+        return { documents: [], identity: null, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+      }
+    }
+
+    // CASE B / C (Fallback) / D: Non-ABHA Discovery using EXACT demographic identity.
+    // If no demographics were provided (or they are incomplete/invalid), fail closed.
+    if (!nonAbhaIdentityWasSupplied) {
+      return { documents: [], identity: null, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+    }
+
+    const folderName = this.getNonAbhaFolderName(identity);
+    const folderPath = path.join(this.nonAbhaVerifiedRoot, folderName);
+
+    try {
+      const folderStat = await fs.promises.stat(folderPath);
+      if (!folderStat.isDirectory()) {
+        return { documents: [], identity, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+      }
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return { documents: [], identity, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+      }
+      throw error;
+    }
+
+    // Prevent cross-patient leakage: If this folder already belongs to a DIFFERENT ABHA address,
+    // we MUST NOT return it to the requested abhaId.
+    if (abhaProvided) {
       try {
-        const folderStat = await fs.promises.stat(folderPath);
-        if (!folderStat.isDirectory()) {
+        const existingIdentity = JSON.parse(await fs.promises.readFile(path.join(folderPath, 'patient_identity.json'), 'utf8')) || {};
+        const existingAbha = String(existingIdentity.abhaAddress || '').trim();
+        if (existingAbha && existingAbha !== String(abhaId).trim()) {
           return { documents: [], identity, storageClass: '', storageFolderName: '', storageFolderPath: '' };
         }
       } catch (error) {
-        if (error.code === 'ENOENT') {
-          return { documents: [], identity, storageClass: '', storageFolderName: '', storageFolderPath: '' };
-        }
-        throw error;
+        if (error.code !== 'ENOENT') throw error;
       }
-
-      const result = await this._readPatientFolder({
-        folderPath,
-        folderName,
-        userId: abhaId || folderName,
-        storageClass: 'NON_ABHA_VERIFIED',
-      });
-      return {
-        documents: result.documents,
-        identity,
-        storageClass: 'NON_ABHA_VERIFIED',
-        storageFolderName: folderName,
-        storageFolderPath: folderPath,
-      };
     }
 
-    // Preserve the existing ABHA-verified lookup only when the discovery
-    // request did not contain a Non-ABHA identity at all.
-    const documents = await this.getAvailableDocumentsForAbha(abhaId);
-    const firstDocument = documents[0];
+    const result = await this._readPatientFolder({
+      folderPath,
+      folderName,
+      userId: abhaId || folderName,
+      storageClass: 'NON_ABHA_VERIFIED',
+    });
+    
     return {
-      documents,
+      documents: result.documents,
       identity,
-      storageClass: firstDocument?.storageClass || 'ABHA_VERIFIED',
-      storageFolderName: firstDocument?.storageFolderName || '',
-      storageFolderPath: firstDocument?.storageFolderPath || '',
+      storageClass: 'NON_ABHA_VERIFIED',
+      storageFolderName: folderName,
+      storageFolderPath: folderPath,
     };
   }
 

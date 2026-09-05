@@ -576,11 +576,11 @@ exports.generateToken = async (req, res) => {
 
     console.log("=========================================");
     console.log("[HIP LINK TOKEN] Generate Token Request Received");
-    console.log("Payload:", JSON.stringify(req.body, null, 2));
+    console.log("Payload:", "<omitted for security>");
     console.log("[HIP LINK TOKEN] Outgoing Request Payload");
     console.log("URL:", `${process.env.GATEWAY_BASE}/api/hiecm/v3/token/generate-token`);
-    console.log("Headers:", JSON.stringify(headers, null, 2));
-    console.log("Body:", JSON.stringify(payload, null, 2));
+    console.log("Headers:", "<omitted for security>");
+    console.log("Body:", "<omitted for security>");
 
     const response = await axios.post(
       `${process.env.GATEWAY_BASE}/api/hiecm/v3/token/generate-token`,
@@ -590,7 +590,7 @@ exports.generateToken = async (req, res) => {
 
     console.log("[HIP LINK TOKEN] ABDM Immediate Response");
     console.log("Status:", response.status);
-    console.log("Data:", JSON.stringify(response.data || {}, null, 2));
+    console.log("Data:", "<omitted for security>");
     console.log("=========================================");
 
     return res.json({
@@ -608,7 +608,7 @@ exports.generateToken = async (req, res) => {
     const { status, body } = getErrorPayload(err);
     console.log("[HIP LINK TOKEN] ABDM Immediate Error Response");
     console.log("Status:", status);
-    console.log("Body:", JSON.stringify(body, null, 2));
+    console.log("Body:", "<omitted for security>");
     console.log("=========================================");
     return res.status(status).json(body);
   }
@@ -771,8 +771,8 @@ const dispatchSmsNotify = async ({ phoneNo, hipId, hipName }) => {
   console.log("=========================================");
   console.log("[HIP SMS NOTIFY] Sending SMS Notification to ABDM Gateway");
   console.log("URL:", `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/patient/links/sms/notify2`);
-  console.log("Phone:", cleanPhone);
-  console.log("Payload:", JSON.stringify(payload, null, 2));
+  console.log("Phone:", "<omitted for security>");
+  console.log("Payload:", "<omitted for security>");
 
   const response = await axios.post(
     `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/patient/links/sms/notify2`,
@@ -895,10 +895,10 @@ exports.notifyContext = async (req, res) => {
     console.log("URL:", `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/context/notify`);
     console.log("REQUEST-ID:", headers["REQUEST-ID"]);
     console.log("Patient ID (ABHA):", patientId);
-    console.log("Patient Reference:", matchedPatientRef);
+    console.log("Patient Reference:", "<omitted for security>");
     console.log("Care Context Reference:", finalCareContextRef);
-    console.log("Headers:", JSON.stringify(headers, null, 2));
-    console.log("Payload:", JSON.stringify(payload, null, 2));
+    console.log("Headers:", "<omitted for security>");
+    console.log("Payload:", "<omitted for security>");
 
     const response = await axios.post(
       `${process.env.GATEWAY_BASE}/api/hiecm/hip/v3/link/context/notify`,
@@ -907,7 +907,7 @@ exports.notifyContext = async (req, res) => {
     );
 
     console.log("[HIP NOTIFY CONTEXT] ABDM Gateway Immediate Response Status:", response.status);
-    console.log("Data:", JSON.stringify(response.data || {}, null, 2));
+    console.log("Data:", "<omitted for security>");
     console.log("ℹ️ NOTE: HTTP 202 means ABDM accepted the notification for async processing. ABDM will call back on /v3/links/context/on-notify with delivery status.");
     console.log("=========================================");
 
@@ -953,7 +953,7 @@ exports.notifyContext = async (req, res) => {
     });
   } catch (err) {
     const { status, body } = getErrorPayload(err);
-    console.error("❌ [HIP NOTIFY CONTEXT ERROR] Failed to send notification to ABDM. Status:", status, "Body:", body);
+    console.error("❌ [HIP NOTIFY CONTEXT ERROR] Failed to send notification to ABDM. Status:", status, "Body:", "<omitted>");
     return res.status(status).json(body);
   }
 };
@@ -961,8 +961,8 @@ exports.notifyContext = async (req, res) => {
 exports.onGenerateToken = async (req, res) => {
   console.log("=========================================");
   console.log("[HIP LINK TOKEN] Incoming Callback Received");
-  console.log("Headers:", JSON.stringify(req.headers, null, 2));
-  console.log("Body:", JSON.stringify(req.body, null, 2));
+  console.log("Headers:", "<omitted for security>");
+  console.log("Body:", "<omitted for security>");
 
   const entry = saveCallback(req.body || {});
 
@@ -1016,8 +1016,8 @@ exports.onContextNotify = async (req, res) => {
   console.log("=========================================");
   console.log("[HIP LINK CONTEXT NOTIFY] Webhook Callback Received from ABDM");
   console.log("Path:", req.originalUrl || req.url);
-  console.log("Headers:", JSON.stringify(req.headers, null, 2));
-  console.log("Body:", JSON.stringify(body, null, 2));
+  console.log("Headers:", "<omitted for security>");
+  console.log("Body:", "<omitted for security>");
 
   if (body.error) {
     console.error("❌ [HIP LINK CONTEXT NOTIFY] ABDM reported an ERROR:", JSON.stringify(body.error, null, 2));
@@ -1085,7 +1085,7 @@ exports.notifyMobile = async (req, res) => {
     return res.json(result);
   } catch (err) {
     const { status, body } = getErrorPayload(err);
-    console.error("❌ [HIP SMS NOTIFY ERROR] Status:", status, "Body:", body);
+    console.error("❌ [HIP SMS NOTIFY ERROR] Status:", status, "Body:", "<omitted>");
     return res.status(status).json(body);
   }
 };

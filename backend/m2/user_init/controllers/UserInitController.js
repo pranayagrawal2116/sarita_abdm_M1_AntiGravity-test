@@ -226,17 +226,7 @@ class UserInitController {
       });
       const abhaNumber = UserInitController.abhaNumberFromDiscovery(identifiers);
 
-      if (discoveryResult.storageFolderPath) {
-        await LocalDataRegistry.persistPatientDocumentIdentity({
-          folderPath: discoveryResult.storageFolderPath,
-          folderName: discoveryResult.storageFolderName,
-          storageClass: discoveryResult.storageClass,
-          identity: discoveryResult.identity,
-          patientName: patientDetails.name || requestedAbhaAddress,
-          abhaAddress: requestedAbhaAddress,
-          abhaNumber,
-        });
-      }
+
       const documents = discoveryResult.documents;
       
       if (documents.length > 0) {
@@ -476,6 +466,34 @@ class UserInitController {
       responsePayload.error = { code: "ABDM-1100", message: "Invalid or expired OTP" };
     } else {
       // Success
+      
+      // Ownership is persisted ONLY after successful confirmation.
+      // This establishes the durable binding between the folder and the ABHA.
+      if (tx.sourceStorageClass === 'NON_ABHA_VERIFIED' && tx.sourcePatientFolder) {
+        try {
+          await LocalDataRegistry.persistPatientDocumentIdentity({
+            folderPath: tx.sourcePatientFolder,
+            folderName: tx.sourcePatientFolderName,
+            storageClass: tx.sourceStorageClass,
+            identity: tx.nonAbhaPatientIdentity,
+            patientName: tx.patientName,
+            abhaAddress: tx.abhaAddress,
+            abhaNumber: tx.abhaNumber,
+          });
+        } catch (error) {
+          responsePayload.error = { code: "ABDM-1086", message: error.message };
+          try {
+            await UserInitController.sendGatewayCallback(
+              `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/link/care-context/on-confirm`,
+              responsePayload,
+              "on-confirm",
+              incomingRequestId
+            );
+          } catch (_) {}
+          return;
+        }
+      }
+
       UserInitState.updateTransaction(txId, { status: "LINK_COMPLETED" });
       await UserInitController.persistUserInitiatedTransferContext(tx, incomingRequestId);
       confirmedCareContexts = tx.selectedCareContexts || [];

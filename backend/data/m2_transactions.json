@@ -325947,5 +325947,131 @@
     "automaticTransferSuppressed": true,
     "automaticTransferSuppressedAt": "2026-09-05T08:25:49.212Z",
     "automaticTransferSuppressionReason": "Consent care context did not match a local HIP-link or User Init transaction."
+  },
+  "tx-test-1": {
+    "transactionId": "tx-test-1",
+    "requestId": "req-3",
+    "consentId": "",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "req-3",
+    "hiRequestId": "",
+    "patientId": "test-user@sbx",
+    "patient": {},
+    "abhaAddress": "test-user@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [
+      {
+        "patientReference": "PAT-dummy",
+        "careContextReference": "dummy",
+        "referenceNumber": "dummy",
+        "display": "Linked Record",
+        "hiType": "OPConsultation"
+      }
+    ],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "WAITING_FOR_CONSENT",
+    "previousState": "",
+    "createdTimestamp": 1788633838643,
+    "updatedTimestamp": 1788634498736,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1788633838643,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      }
+    ],
+    "abhaNumber": "",
+    "patientName": "Test User",
+    "recordType": [
+      "OPConsultation"
+    ],
+    "userInitiatedLinking": true,
+    "sourceStorageClass": "NON_ABHA_VERIFIED",
+    "sourcePatientFolder": "/var/folders/t7/d8wgky5j0yq4rbgd45031zl40000gn/T/abdm-user-init-discovery-CcbqEq/Non_ABHA_Verified/2005_M_5555555555",
+    "sourcePatientFolderName": "2005_M_5555555555",
+    "nonAbhaPatientIdentity": {
+      "yearOfBirth": "2005",
+      "gender": "M",
+      "mobile": "5555555555"
+    }
+  },
+  "tx-test-6a": {
+    "transactionId": "tx-test-6a",
+    "requestId": "req-12a",
+    "consentId": "",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "req-13a",
+    "hiRequestId": "",
+    "patientId": "concurrent-a@sbx",
+    "patient": {},
+    "abhaAddress": "concurrent-a@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [
+      {
+        "patientReference": "PAT-dummy",
+        "careContextReference": "dummy",
+        "referenceNumber": "dummy",
+        "display": "Linked Record",
+        "hiType": "OPConsultation"
+      }
+    ],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "WAITING_FOR_CONSENT",
+    "previousState": "",
+    "createdTimestamp": 1788633860118,
+    "updatedTimestamp": 1788634499194,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1788633860118,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      }
+    ],
+    "abhaNumber": "",
+    "patientName": "concurrent-a@sbx",
+    "recordType": [
+      "OPConsultation"
+    ],
+    "userInitiatedLinking": true,
+    "sourceStorageClass": "NON_ABHA_VERIFIED",
+    "sourcePatientFolder": "/var/folders/t7/d8wgky5j0yq4rbgd45031zl40000gn/T/abdm-user-init-discovery-CcbqEq/Non_ABHA_Verified/2007_M_7777777777",
+    "sourcePatientFolderName": "2007_M_7777777777",
+    "nonAbhaPatientIdentity": {
+      "yearOfBirth": "2007",
+      "gender": "M",
+      "mobile": "7777777777"
+    }
   }
 }

@@ -153,7 +153,7 @@ axios.interceptors.request.use((config) => {
   logApiDebug(`[API OUTBOUND] ${String(config.method || "GET").toUpperCase()} ${config.url || ""}`, {
     headers: sanitizeHeaders(config.headers || {}),
     params: config.params,
-    data: config.data,
+    data: "<omitted for security>"
   });
 
   return config;
@@ -166,7 +166,7 @@ logApiDebug(
   {
     status: response.status,
     headers: sanitizeHeaders(response.headers || {}),
-    data: response.data,
+    data: "<omitted for security>"
   }
 );
 
@@ -178,7 +178,7 @@ logApiDebug(
       {
         status: error.response?.status,
         headers: sanitizeHeaders(error.response?.headers || {}),
-        data: error.response?.data || error.message,
+        data: error.response ? "<omitted for security>" : error.message,
       }
     );
     return Promise.reject(error);
@@ -204,7 +204,7 @@ app.use((req, res, next) => {
   logApiDebug(`[API INBOUND] ${req.method} ${req.originalUrl}`, {
     headers: sanitizeHeaders(req.headers),
     query: req.query,
-    body: req.body,
+    body: "<omitted for security>"
   });
 
   const oldWrite = res.write;
@@ -222,7 +222,7 @@ app.use((req, res, next) => {
     
     logApiDebug(`[API INBOUND RESPONSE] ${req.method} ${req.originalUrl}`, {
       status: res.statusCode,
-      body: body.length > 2000 ? `<body ${body.length} bytes>` : body,
+      body: "<omitted for security>"
     });
     
     return oldEnd.apply(res, args);

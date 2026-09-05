@@ -60,7 +60,7 @@ const generateOPConsultationPDF = (params) => {
               widths: ["auto", "*", "auto"],
               body: [
                 [
-                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  { text: "S", fillColor: "#0b5c71", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
                   {
                     stack: [
                       { text: params.pdfTitle || "OP Consultation Record", fontSize: 16, bold: true },
@@ -70,8 +70,8 @@ const generateOPConsultationPDF = (params) => {
                   },
                   {
                     stack: [
-                      { text: "5eCare", bold: true },
-                      { text: `Practitioner: ${text(params.practitionerName || "Dev")}`, color: "gray", margin: [0, 4, 0, 0] }
+                      { text: "SaritaHealthCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || params.doctorName || "Dr. Sarita")}`, color: "gray", margin: [0, 4, 0, 0] }
                     ],
                     margin: [10, 5, 0, 0]
                   }
@@ -90,8 +90,8 @@ const generateOPConsultationPDF = (params) => {
               headerRows: 0,
               widths: [120, "*"],
               body: [
-                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
-                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Dev")],
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "SaritaHealthCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || params.doctorName || "Dr. Sarita")],
                 [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
                 [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId)],
                 [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
@@ -364,7 +364,7 @@ const generateWellnessRecordPDF = (params) => {
               widths: ["auto", "*", "auto"],
               body: [
                 [
-                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  { text: "S", fillColor: "#0b5c71", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
                   {
                     stack: [
                       { text: "Wellness Record", fontSize: 16, bold: true },
@@ -374,8 +374,8 @@ const generateWellnessRecordPDF = (params) => {
                   },
                   {
                     stack: [
-                      { text: "5eCare", bold: true },
-                      { text: `Practitioner: ${text(params.practitionerName || "Dev")}`, color: "gray", margin: [0, 4, 0, 0] }
+                      { text: "SaritaHealthCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || params.doctorName || "Dr. Sarita")}`, color: "gray", margin: [0, 4, 0, 0] }
                     ],
                     margin: [10, 5, 0, 0]
                   }
@@ -394,8 +394,8 @@ const generateWellnessRecordPDF = (params) => {
               headerRows: 0,
               widths: [120, "*"],
               body: [
-                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
-                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Dev")],
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "SaritaHealthCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || params.doctorName || "Dr. Sarita")],
                 [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
                 [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
                 [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
@@ -519,7 +519,7 @@ const generateDiagnosticReportPDF = (params) => {
               widths: ["auto", "*", "auto"],
               body: [
                 [
-                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  { text: "S", fillColor: "#0b5c71", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
                   {
                     stack: [
                       { text: "Diagnostic Report", fontSize: 16, bold: true },
@@ -529,8 +529,8 @@ const generateDiagnosticReportPDF = (params) => {
                   },
                   {
                     stack: [
-                      { text: "5eCare", bold: true },
-                      { text: `Practitioner: ${text(params.practitionerName || "Pankaj")}`, color: "gray", margin: [0, 4, 0, 0] }
+                      { text: "SaritaHealthCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || params.doctorName || "Dr. Sarita")}`, color: "gray", margin: [0, 4, 0, 0] }
                     ],
                     margin: [10, 5, 0, 0]
                   }
@@ -549,8 +549,8 @@ const generateDiagnosticReportPDF = (params) => {
               headerRows: 0,
               widths: [120, "*"],
               body: [
-                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
-                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Pankaj")],
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "SaritaHealthCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || params.doctorName || "Dr. Sarita")],
                 [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
                 [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
                 [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
@@ -644,7 +644,7 @@ const generateImmunizationRecordPDF = (params) => {
               widths: ["auto", "*", "auto"],
               body: [
                 [
-                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  { text: "S", fillColor: "#0b5c71", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
                   {
                     stack: [
                       { text: "Immunization Record", fontSize: 16, bold: true },
@@ -654,8 +654,8 @@ const generateImmunizationRecordPDF = (params) => {
                   },
                   {
                     stack: [
-                      { text: "5eCare", bold: true },
-                      { text: `Practitioner: ${text(params.practitionerName || "Pankaj")}`, color: "gray", margin: [0, 4, 0, 0] }
+                      { text: "SaritaHealthCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || params.doctorName || "Dr. Sarita")}`, color: "gray", margin: [0, 4, 0, 0] }
                     ],
                     margin: [10, 5, 0, 0]
                   }
@@ -674,8 +674,8 @@ const generateImmunizationRecordPDF = (params) => {
               headerRows: 0,
               widths: [120, "*"],
               body: [
-                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
-                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Pankaj")],
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "SaritaHealthCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || params.doctorName || "Dr. Sarita")],
                 [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
                 [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
                 [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],
@@ -790,7 +790,7 @@ const generateDischargeSummaryPDF = (params) => {
                   },
                   {
                     stack: [
-                      { text: text(params.facilityName || "Sarita Health Care"), bold: true },
+                      { text: "SaritaHealthCare", bold: true },
                       { text: `Practitioner: ${text(params.doctorName || params.practitionerName || "Dr. Sarita")}`, color: "gray", margin: [0, 4, 0, 0] }
                     ],
                     margin: [10, 5, 0, 0]
@@ -810,7 +810,7 @@ const generateDischargeSummaryPDF = (params) => {
               headerRows: 0,
               widths: [120, "*"],
               body: [
-                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "Sarita Health Care")],
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "SaritaHealthCare")],
                 [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.doctorName || params.practitionerName || "Dr. Sarita")],
                 [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
                 [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId || params.abhaNumber || params.abhaId)],
@@ -1173,7 +1173,7 @@ const generatePrescriptionPDF = (params) => {
               widths: ["auto", "*", "auto"],
               body: [
                 [
-                  { text: "5", fillColor: "#194a9d", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
+                  { text: "S", fillColor: "#0b5c71", color: "white", fontSize: 24, bold: true, alignment: "center", margin: [10, 10, 10, 10] },
                   {
                     stack: [
                       { text: "Prescription Record", fontSize: 16, bold: true },
@@ -1183,8 +1183,8 @@ const generatePrescriptionPDF = (params) => {
                   },
                   {
                     stack: [
-                      { text: "5eCare", bold: true },
-                      { text: `Practitioner: ${text(params.practitionerName || "Dev")}`, color: "gray", margin: [0, 4, 0, 0] }
+                      { text: "SaritaHealthCare", bold: true },
+                      { text: `Practitioner: ${text(params.practitionerName || params.doctorName || "Dr. Sarita")}`, color: "gray", margin: [0, 4, 0, 0] }
                     ],
                     margin: [10, 5, 0, 0]
                   }
@@ -1203,8 +1203,8 @@ const generatePrescriptionPDF = (params) => {
               headerRows: 0,
               widths: [120, "*"],
               body: [
-                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "5eCare")],
-                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || "Dev")],
+                [{ text: "Facility:", bold: true, fillColor: "#eeeeee" }, text(params.facilityName || "SaritaHealthCare")],
+                [{ text: "Practitioner:", bold: true, fillColor: "#eeeeee" }, text(params.practitionerName || params.doctorName || "Dr. Sarita")],
                 [{ text: "Patient:", bold: true, fillColor: "#eeeeee" }, text(params.patientName)],
                 [{ text: "Patient UHID:", bold: true, fillColor: "#eeeeee" }, text(params.patientUhid || params.patientId)],
                 [{ text: "Gender:", bold: true, fillColor: "#eeeeee" }, text(params.gender)],

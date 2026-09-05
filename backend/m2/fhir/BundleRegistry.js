@@ -217,7 +217,6 @@ class BundleRegistry {
     Logger.info("BundleRegistry", "Scanned filesystem for bundles.", { count: bundles.length });
 
     const patientKey = normalize(patientId);
-    const abhaNumber = text(options.abhaNumber) || extractAbhaNumber(patientId);
     const hiType = text(options.hiType);
     const aliases = Array.isArray(options.aliases) ? options.aliases.map(normalize).filter(Boolean) : [];
 
@@ -230,9 +229,10 @@ class BundleRegistry {
 
     if (exactMatches.length > 0) return exactMatches;
 
-    const abhaMatches = eligible.filter((bundle) => abhaNumber && bundle.abhaNumber === abhaNumber);
-    if (abhaMatches.length > 0) return abhaMatches;
-
+    // An ABHA number in a file name is not proof that a bundle belongs to the
+    // requested patient. Registry lookup must not become a patient-discovery
+    // mechanism: callers resolve the patient folder/identity first, then use
+    // its exact id (or a trusted, persisted folder-name alias).
     Logger.info("BundleRegistry", "No exact patient bundles found.", { patientId });
     return [];
   }

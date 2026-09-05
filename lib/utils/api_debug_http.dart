@@ -11,6 +11,24 @@ class ApiDebugHttp {
         url.path.endsWith('/scan-share/queue');
   }
 
+  static Uri? _alternateUrl(Uri url) {
+    if (url.host.contains('ngrok')) {
+      return url.replace(
+        scheme: 'http',
+        host: 'localhost',
+        port: 3000,
+      );
+    }
+    if ((url.host == 'localhost' || url.host == '127.0.0.1') && url.port == 3000) {
+      return url.replace(
+        scheme: 'https',
+        host: 'isolation-pouncing-ecard.ngrok-free.dev',
+        port: null,
+      );
+    }
+    return null;
+  }
+
   static Future<http.Response> get(
     Uri url, {
     Map<String, String>? headers,
@@ -25,9 +43,42 @@ class ApiDebugHttp {
     _logRequest('GET', cacheBustedUrl, headers: headers);
     try {
       final response = await http.get(cacheBustedUrl, headers: headers);
+      if ((response.statusCode >= 502 && response.statusCode <= 504) ||
+          response.body.contains('ERR_NGROK_')) {
+        final alt = _alternateUrl(url);
+        if (alt != null) {
+          final altBusted = alt.replace(
+            queryParameters: {
+              ...alt.queryParameters,
+              '_t': DateTime.now().millisecondsSinceEpoch.toString(),
+            },
+          );
+          _logRequest('GET (fallback)', altBusted, headers: headers);
+          final altResp = await http.get(altBusted, headers: headers);
+          if (altResp.statusCode == 200 || altResp.statusCode == 202) {
+            _logResponse('GET (fallback)', altBusted, altResp);
+            return altResp;
+          }
+        }
+      }
       _logResponse('GET', cacheBustedUrl, response);
       return response;
     } catch (error, stackTrace) {
+      final alt = _alternateUrl(url);
+      if (alt != null) {
+        try {
+          final altBusted = alt.replace(
+            queryParameters: {
+              ...alt.queryParameters,
+              '_t': DateTime.now().millisecondsSinceEpoch.toString(),
+            },
+          );
+          _logRequest('GET (fallback)', altBusted, headers: headers);
+          final altResp = await http.get(altBusted, headers: headers);
+          _logResponse('GET (fallback)', altBusted, altResp);
+          return altResp;
+        } catch (_) {}
+      }
       _logError('GET', cacheBustedUrl, error, stackTrace);
       rethrow;
     }
@@ -48,9 +99,30 @@ class ApiDebugHttp {
         body: body,
         encoding: encoding,
       );
+      if ((response.statusCode >= 502 && response.statusCode <= 504) ||
+          response.body.contains('ERR_NGROK_')) {
+        final alt = _alternateUrl(url);
+        if (alt != null) {
+          _logRequest('POST (fallback)', alt, headers: headers, body: body);
+          final altResp = await http.post(alt, headers: headers, body: body, encoding: encoding);
+          if (altResp.statusCode == 200 || altResp.statusCode == 201 || altResp.statusCode == 202) {
+            _logResponse('POST (fallback)', alt, altResp);
+            return altResp;
+          }
+        }
+      }
       _logResponse('POST', url, response);
       return response;
     } catch (error, stackTrace) {
+      final alt = _alternateUrl(url);
+      if (alt != null) {
+        try {
+          _logRequest('POST (fallback)', alt, headers: headers, body: body);
+          final altResp = await http.post(alt, headers: headers, body: body, encoding: encoding);
+          _logResponse('POST (fallback)', alt, altResp);
+          return altResp;
+        } catch (_) {}
+      }
       _logError('POST', url, error, stackTrace);
       rethrow;
     }
@@ -74,6 +146,15 @@ class ApiDebugHttp {
       _logResponse('PATCH', url, response);
       return response;
     } catch (error, stackTrace) {
+      final alt = _alternateUrl(url);
+      if (alt != null) {
+        try {
+          _logRequest('PATCH (fallback)', alt, headers: headers, body: body);
+          final altResp = await http.patch(alt, headers: headers, body: body, encoding: encoding);
+          _logResponse('PATCH (fallback)', alt, altResp);
+          return altResp;
+        } catch (_) {}
+      }
       _logError('PATCH', url, error, stackTrace);
       rethrow;
     }

@@ -1,9 +1,19 @@
 const axios = require("axios");
+const http = require("http");
+const https = require("https");
 const { getHeaders } = require("../utils/headers");
 
 let cachedAccessToken = "";
 let cachedExpiryMs = 0;
 let tokenRequestPromise = null;
+
+// Reuse outbound sockets.  Windows Server otherwise pays a fresh DNS/TLS
+// setup cost after the API has been idle, precisely when the mobile callback
+// has the smallest timeout budget.
+const httpAgent = new http.Agent({ keepAlive: true, keepAliveMsecs: 30000, maxSockets: 32 });
+const httpsAgent = new https.Agent({ keepAlive: true, keepAliveMsecs: 30000, maxSockets: 32 });
+const TOKEN_TIMEOUT_MS = Number(process.env.GATEWAY_TOKEN_TIMEOUT_MS || 8000);
+const TOKEN_ATTEMPTS = Number(process.env.GATEWAY_TOKEN_ATTEMPTS || 2);
 
 const parseTokenExpiryMs = (token) => {
     try {
@@ -38,12 +48,17 @@ const requestGatewayToken = async () => {
     // On a fresh IIS/PM2 restart the first TLS or gateway request can be
     // transiently unavailable. Retry it here so the caller never has to make
     // the same API request twice.
-    for (let attempt = 0; attempt < 3; attempt += 1) {
+    for (let attempt = 0; attempt < TOKEN_ATTEMPTS; attempt += 1) {
         try {
             const res = await axios.post(
                 `${process.env.GATEWAY_BASE}/gateway/v0.5/sessions`,
                 { clientId, clientSecret, grantType: "client_credentials" },
-                { headers: getHeaders(), timeout: 20000 }
+                {
+                    headers: getHeaders(),
+                    timeout: TOKEN_TIMEOUT_MS,
+                    httpAgent,
+                    httpsAgent,
+                }
             );
             const accessToken = res.data.accessToken;
             if (!accessToken) throw new Error("Gateway response did not contain accessToken.");
@@ -52,7 +67,7 @@ const requestGatewayToken = async () => {
             return accessToken;
         } catch (error) {
             lastError = error;
-            if (!isRetryable(error) || attempt === 2) break;
+            if (!isRetryable(error) || attempt === TOKEN_ATTEMPTS - 1) break;
             await wait(500 * (attempt + 1));
         }
     }
@@ -76,4 +91,18 @@ exports.getGatewayToken = async () => {
 exports.clearCache = () => {
     cachedAccessToken = "";
     cachedExpiryMs = 0;
+};
+
+exports.startTokenMaintenance = () => {
+    const intervalMs = Number(process.env.GATEWAY_TOKEN_WARM_INTERVAL_MS || 60000);
+    if (!Number.isFinite(intervalMs) || intervalMs < 15000) return;
+
+    const warm = () => {
+        exports.getGatewayToken().catch((error) => {
+            console.warn("[Gateway] Background token refresh failed:", error.message);
+        });
+    };
+    warm();
+    const timer = setInterval(warm, intervalMs);
+    timer.unref();
 };

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../services/hiu_api_service.dart';
 import '../widgets/fhir_data_viewer.dart';
-import 'package:http/http.dart' as http;
+import '../../utils/api_debug_http.dart';
 import 'dart:convert';
 
 class HipDocumentsScreen extends StatefulWidget {
@@ -377,7 +377,7 @@ class _HipDocumentsScreenState extends State<HipDocumentsScreen> {
             final url = forceJson 
               ? '${HiuApiService.baseUrl}/documents/${doc['id']}/pdf?format=json'
               : '${HiuApiService.baseUrl}/documents/${doc['id']}/pdf';
-            final response = await http.get(Uri.parse(url));
+            final response = await ApiDebugHttp.get(Uri.parse(url));
             if (response.statusCode == 200) {
               final contentType = response.headers['content-type']?.toLowerCase() ?? '';
               setState(() {

@@ -1,12 +1,12 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import '../../utils/api_config.dart';
+import '../../utils/api_debug_http.dart';
 
 class HiuApiService {
   static const String baseUrl = '${ApiConfig.baseUrl}/m3/consent';
 
   Future<Map<String, dynamic>> initConsentRequest(Map<String, dynamic> payload) async {
-    final response = await http.post(
+    final response = await ApiDebugHttp.post(
       Uri.parse('$baseUrl/init'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -20,7 +20,7 @@ class HiuApiService {
   }
 
   Future<List<dynamic>> fetchConsentRequests() async {
-    final response = await http.get(
+    final response = await ApiDebugHttp.get(
       Uri.parse('$baseUrl/requests'),
       headers: {'Content-Type': 'application/json'},
     );
@@ -34,7 +34,7 @@ class HiuApiService {
   }
 
   Future<void> requestHealthData(Map<String, dynamic> payload) async {
-    final response = await http.post(
+    final response = await ApiDebugHttp.post(
       Uri.parse('$baseUrl/data/request'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(payload),
@@ -46,7 +46,7 @@ class HiuApiService {
   }
 
   Future<List<dynamic>> fetchHealthDocuments(String hipId) async {
-    final response = await http.get(
+    final response = await ApiDebugHttp.get(
       Uri.parse('$baseUrl/documents?hipId=$hipId'),
       headers: {'Content-Type': 'application/json'},
     );

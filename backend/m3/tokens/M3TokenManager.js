@@ -5,9 +5,16 @@
  */
 
 const axios = require("axios");
+const https = require("https");
 const { v4: uuidv4 } = require("uuid");
 const config = require("../helpers/config");
 const Logger = require("../logging/logger");
+
+const gatewayHttpsAgent = new https.Agent({
+  keepAlive: true,
+  keepAliveMsecs: 30000,
+  maxSockets: 16,
+});
 
 class M3TokenManager {
   constructor() {
@@ -81,7 +88,11 @@ class M3TokenManager {
     Logger.info("M3TokenManager", "Fetching new gateway session token for M3", { endpoint, requestId });
 
     try {
-      const response = await axios.post(endpoint, payload, { headers, timeout: 30000 });
+      const response = await axios.post(endpoint, payload, {
+        headers,
+        httpsAgent: gatewayHttpsAgent,
+        timeout: Number(process.env.M3_GATEWAY_TOKEN_TIMEOUT_MS || 8000),
+      });
       const data = response.data;
       
       this.sessionToken = data.accessToken;

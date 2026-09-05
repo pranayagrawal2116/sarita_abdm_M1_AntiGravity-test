@@ -11,7 +11,13 @@ const M2AuthenticationManager = require("./m2/authentication/M2AuthenticationMan
 
 const app = express();
 
-const API_DEBUG_ENABLED = process.env.API_DEBUG !== "false";
+// Full request/response logging is useful on a developer machine, but it is
+// expensive in IIS/PM2: every callback body (including large FHIR/PDF
+// payloads) is serialised and written to the process log.  Keep it opt-in in
+// production so a slow disk/log pipe cannot delay ABDM callbacks.
+const API_DEBUG_ENABLED = process.env.API_DEBUG === "true" || (
+  process.env.NODE_ENV !== "production" && process.env.API_DEBUG !== "false"
+);
 const MAX_LOG_LENGTH = 4000;
 
 const maskValue = (value) => {
@@ -191,14 +197,15 @@ app.use((req, res, next) => {
   const pathUrl = req.path || "";
   const isApiOrGateway = pathUrl.startsWith("/api") || pathUrl.startsWith("/v3") || pathUrl.startsWith("/hiecm");
 
-  if (isApiOrGateway && !skipInboundApiLog) {
-logApiDebug(`[API INBOUND] ${req.method} ${req.originalUrl}`, {
-  headers: sanitizeHeaders(req.headers),
-  query: req.query,
-  body: req.body,
-});
-
+  if (!API_DEBUG_ENABLED || !isApiOrGateway || skipInboundApiLog) {
+    return next();
   }
+
+  logApiDebug(`[API INBOUND] ${req.method} ${req.originalUrl}`, {
+    headers: sanitizeHeaders(req.headers),
+    query: req.query,
+    body: req.body,
+  });
 
   const oldWrite = res.write;
   const oldEnd = res.end;
@@ -213,12 +220,10 @@ logApiDebug(`[API INBOUND] ${req.method} ${req.originalUrl}`, {
     if (args[0]) chunks.push(Buffer.from(args[0]));
     const body = Buffer.concat(chunks).toString("utf8");
     
-    if (isApiOrGateway && !skipInboundApiLog) {
-      logApiDebug(`[API INBOUND RESPONSE] ${req.method} ${req.originalUrl}`, {
-        status: res.statusCode,
-        body: body.length > 2000 ? `<body ${body.length} bytes>` : body,
-      });
-    }
+    logApiDebug(`[API INBOUND RESPONSE] ${req.method} ${req.originalUrl}`, {
+      status: res.statusCode,
+      body: body.length > 2000 ? `<body ${body.length} bytes>` : body,
+    });
     
     return oldEnd.apply(res, args);
   };
@@ -451,6 +456,26 @@ async function startServer() {
   }
   console.log("🛠 Callback config:", `${localBaseUrl}/api/config/callbacks`);
 
+  // Keep authentication warm while PM2 is alive.  This prevents a token
+  // expiry during an idle period from becoming part of a user-initiated or
+  // Scan & Share callback's response time.
+  require("./services/gatewayService").startTokenMaintenance();
+  const tokenMaintenanceMs = Number(process.env.ABDM_TOKEN_WARM_INTERVAL_MS || 60000);
+  const refreshAbdmTokens = () => {
+    Promise.allSettled([
+      M2TokenManager.refreshIfRequired(),
+      M3TokenManager.getGatewayToken(),
+    ]).then((results) => {
+      for (const result of results) {
+        if (result.status === "rejected") {
+          console.warn("[ABDM] Background token refresh failed:", result.reason?.message || result.reason);
+        }
+      }
+    });
+  };
+  const tokenTimer = setInterval(refreshAbdmTokens, tokenMaintenanceMs);
+  tokenTimer.unref();
+
   });
 }
 
@@ -458,6 +483,4 @@ startServer().catch((error) => {
   console.error("❌ Server startup aborted because ABDM authentication could not be initialized:", error.message);
   process.exitCode = 1;
 });
-
-
 

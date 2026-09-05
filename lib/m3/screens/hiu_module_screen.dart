@@ -43,6 +43,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
   DateTime? _dataEraseAt = DateTime.now().add(const Duration(days: 365));
 
   bool _isLoading = false;
+  String? _fetchError;
   List<dynamic> _requests = [];
 
   // Filter State for MyRequests Tab
@@ -66,17 +67,21 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
   }
 
   Future<void> _fetchRequests() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _fetchError = null;
+    });
     try {
       final data = await _apiService.fetchConsentRequests();
       setState(() {
         _requests = data;
-        // Stats removed as per new UI
-
+        _fetchError = null;
       });
     } catch (e) {
-      // Fallback or leave as default
       debugPrint('Error fetching requests: $e');
+      setState(() {
+        _fetchError = e.toString();
+      });
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -219,7 +224,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: _selectedPurpose,
+                    initialValue: _selectedPurpose,
                     decoration: _buildInputDeco('Purpose'),
               items: _purposes.map((p) {
                 return DropdownMenuItem(value: p, child: Text(p));
@@ -343,7 +348,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
   }
 
   Widget _buildMyRequestsTab() {
-    String _mapStatus(String rawStatus) {
+    String mapStatus(String rawStatus) {
       final s = rawStatus.toUpperCase();
       if (s == 'FETCHED' || s == 'GRANTED') return 'GRANTED';
       if (s == 'INITIATED' || s == 'REQUESTED') return 'REQUESTED';
@@ -362,7 +367,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
       bool matchStatus = true;
       if (_filterStatus != 'All Status') {
          final rawStatus = req['status']?.toString() ?? 'UNKNOWN';
-         matchStatus = _mapStatus(rawStatus) == _filterStatus.toUpperCase();
+         matchStatus = mapStatus(rawStatus) == _filterStatus.toUpperCase();
       }
       bool matchDateFrom = true;
       if (_filterDateFrom != null) {
@@ -569,6 +574,39 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
         
         if (_isLoading)
           const Padding(padding: EdgeInsets.all(48.0), child: Center(child: CircularProgressIndicator(color: Color(0xFF0C8A99))))
+        else if (_fetchError != null && _requests.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.cloud_off_rounded, color: Colors.orange, size: 48),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Unable to load consent requests from server',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF17324A)),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _fetchError!,
+                    style: const TextStyle(color: Color(0xFF577086), fontSize: 13),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    onPressed: _fetchRequests,
+                    icon: const Icon(Icons.refresh, size: 18),
+                    label: const Text('Retry Connection'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF0C8A99),
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
         else if (filteredRequests.isEmpty)
           const Padding(padding: EdgeInsets.all(48.0), child: Center(child: Text('No requests found', style: TextStyle(color: Color(0xFF577086), fontSize: 16))))
         else
@@ -582,7 +620,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
               scrollDirection: Axis.horizontal,
               child: DataTable(
                 showCheckboxColumn: false,
-                headingRowColor: MaterialStateProperty.all(const Color(0xFFF4FBFF)),
+                headingRowColor: WidgetStateProperty.all(const Color(0xFFF4FBFF)),
                 dataRowMinHeight: 120,
                 dataRowMaxHeight: double.infinity,
                 columnSpacing: 32,
@@ -601,7 +639,7 @@ class _HiuModuleScreenState extends State<HiuModuleScreen> {
                   final index = entry.key;
                   final req = entry.value;
                   final rawStatus = req['status']?.toString() ?? 'UNKNOWN';
-                  String displayStatus = _mapStatus(rawStatus);
+                  String displayStatus = mapStatus(rawStatus);
                   final patientId = req['patientId']?.toString() ?? 'Unknown';
                   final hiTypes = (req['hiTypes'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
                   

@@ -75,6 +75,10 @@ class LocalDataRegistry {
     return normalized && normalized !== '-' ? normalized : '';
   }
 
+  _isGeneratedUhid(value) {
+    return /^UHID-[A-F0-9]{12}$/i.test(this._validUhid(value));
+  }
+
   _uhidInText(content) {
     const match = String(content || '').match(/^\s*(?:Patient\s+)?UHID\s*:\s*(.+?)\s*$/im);
     return this._validUhid(match?.[1]);
@@ -92,6 +96,25 @@ class LocalDataRegistry {
 
     const documentUhids = [];
     const sidecarUhids = [];
+
+    // Once a clinical UHID has been resolved, it is persisted in the sidecar.
+    // Reuse it immediately on future discovery callbacks instead of scanning
+    // every historic PDF/text record on a slow IIS volume.
+    for (const candidateFolder of candidateFolders) {
+      try {
+        const identity = JSON.parse(await fs.promises.readFile(path.join(candidateFolder, 'patient_identity.json'), 'utf8')) || {};
+        const value = this._validUhid(identity.patientUhid);
+        if (value) {
+          if (identity.patientUhidSource === 'clinical_record' || !this._isGeneratedUhid(value)) {
+            return value;
+          }
+          sidecarUhids.push(value);
+        }
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
+    }
+
     for (const candidateFolder of candidateFolders) {
       try {
         const entries = await fs.promises.readdir(candidateFolder, { withFileTypes: true });
@@ -102,13 +125,6 @@ class LocalDataRegistry {
         for (const fileName of textFiles) {
           const value = this._uhidInText(await fs.promises.readFile(path.join(candidateFolder, fileName), 'utf8'));
           if (value) documentUhids.push(value);
-        }
-        try {
-          const identity = JSON.parse(await fs.promises.readFile(path.join(candidateFolder, 'patient_identity.json'), 'utf8')) || {};
-          const value = this._validUhid(identity.patientUhid);
-          if (value) sidecarUhids.push(value);
-        } catch (error) {
-          if (error.code !== 'ENOENT') throw error;
         }
       } catch (error) {
         if (error.code !== 'ENOENT') throw error;
@@ -155,11 +171,15 @@ class LocalDataRegistry {
     const generatedUhid = storageClass === 'NON_ABHA_VERIFIED'
       ? `UHID-${crypto.createHash('sha256').update(normalizedFolderName).digest('hex').slice(0, 12).toUpperCase()}`
       : '';
+    const patientUhid = establishedUhid || existing.patientUhid || generatedUhid || '';
     const next = {
       ...existing,
       folderName: normalizedFolderName,
       storageClass: storageClass || existing.storageClass || '',
-      patientUhid: establishedUhid || existing.patientUhid || generatedUhid || '',
+      patientUhid,
+      patientUhidSource: establishedUhid
+        ? 'clinical_record'
+        : (existing.patientUhidSource || (this._isGeneratedUhid(patientUhid) ? 'generated' : 'existing')),
       patientName: patientName || existing.patientName || '',
       abhaAddress: abhaAddress || existing.abhaAddress || '',
       abhaNumber: abhaNumber || existing.abhaNumber || '',
@@ -365,33 +385,57 @@ class LocalDataRegistry {
 
   /**
    * User-initiated linking for a data-entry patient is keyed by the patient
-   * attributes that ABDM sends in its discovery webhook. The directory is
-   * created even when empty, as requested, so later local saves use the same
-   * stable identity.
+   * attributes that ABDM sends in its discovery webhook. Discovery is read
+   * only: it must never create a patient directory or use another storage
+   * class as a fallback when a Non-ABHA identity was supplied.
    */
   async getAvailableDocumentsForDiscovery({ abhaId, yearOfBirth, gender, mobile } = {}) {
     const identity = this._normalizeNonAbhaIdentity({ yearOfBirth, gender, mobile });
-    if (identity) {
+    const nonAbhaIdentityWasSupplied = [yearOfBirth, gender, mobile]
+      .some((value) => String(value ?? '').trim() !== '');
+
+    if (nonAbhaIdentityWasSupplied) {
+      // A partial or invalid identity is not eligible for ABHA fallback. It
+      // is an explicit request to locate a data-entry patient, and fail-closed
+      // behavior prevents a malformed request from exposing ABHA records.
+      if (!identity) {
+        return { documents: [], identity: null, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+      }
+
       const folderName = this.getNonAbhaFolderName(identity);
       const folderPath = path.join(this.nonAbhaVerifiedRoot, folderName);
-      await fs.promises.mkdir(folderPath, { recursive: true });
+      // Folder construction is deterministic, but its existence is the proof
+      // that this exact patient is known. Do not create missing folders while
+      // processing discovery.
+      try {
+        const folderStat = await fs.promises.stat(folderPath);
+        if (!folderStat.isDirectory()) {
+          return { documents: [], identity, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+        }
+      } catch (error) {
+        if (error.code === 'ENOENT') {
+          return { documents: [], identity, storageClass: '', storageFolderName: '', storageFolderPath: '' };
+        }
+        throw error;
+      }
+
       const result = await this._readPatientFolder({
         folderPath,
         folderName,
         userId: abhaId || folderName,
         storageClass: 'NON_ABHA_VERIFIED',
       });
-      if (result.documents.length > 0) {
-        return {
-          documents: result.documents,
-          identity,
-          storageClass: 'NON_ABHA_VERIFIED',
-          storageFolderName: folderName,
-          storageFolderPath: folderPath,
-        };
-      }
+      return {
+        documents: result.documents,
+        identity,
+        storageClass: 'NON_ABHA_VERIFIED',
+        storageFolderName: folderName,
+        storageFolderPath: folderPath,
+      };
     }
 
+    // Preserve the existing ABHA-verified lookup only when the discovery
+    // request did not contain a Non-ABHA identity at all.
     const documents = await this.getAvailableDocumentsForAbha(abhaId);
     const firstDocument = documents[0];
     return {

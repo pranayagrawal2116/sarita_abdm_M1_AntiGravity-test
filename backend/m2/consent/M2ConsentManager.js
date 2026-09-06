@@ -267,11 +267,11 @@ class M2ConsentManager {
         currentState: tx.currentState
       });
 
-      if (tx.consentDetails && tx.currentState !== "CONSENT_GRANTED") {
+      if (tx.consentStatus === "GRANTED" && tx.currentState !== "CONSENT_GRANTED") {
         await M2TransactionStore.transitionState(txKey, "CONSENT_GRANTED", {
           requestId: tx.requestId,
           consentId: tx.consentId,
-          reason: "Consent Stored"
+          reason: "Consent Granted"
         });
       } else if (!tx.consentDetails && tx.currentState === "LINKED") {
         await M2TransactionStore.transitionState(txKey, "WAITING_FOR_CONSENT", {
@@ -371,7 +371,7 @@ class M2ConsentManager {
     }
 
     const consent = tx.consentDetails;
-    const currentStatus = consent.status;
+    const currentStatus = consent.status || "Requested";
     if (currentStatus === nextStatus) {
       Logger.info("M2ConsentManager", "Consent status already at requested state.", {
         consentId,
@@ -457,6 +457,11 @@ class M2ConsentManager {
    * @returns {Promise<Object>} Result coordinates.
    */
   async registerConsentNotification(payload, tx) {
+    if (!tx) {
+      Logger.error("M2ConsentManager", "Unmatched consent callback received.", { payload });
+      return { success: false, error: "Unmatched consent transaction" };
+    }
+    
     Logger.info("M2ConsentManager", "registerConsentNotification callback handler triggered.", {
       consentId: tx.consentId
     });
@@ -465,6 +470,7 @@ class M2ConsentManager {
     const workflowRequestId = tx.requestId || tx.gatewayRequestId || "";
     const consentDetail = payload.notification?.consentDetail || payload.notification || {};
     const incomingConsentId = firstText(
+      payload.notification?.consentArtefacts?.[0]?.id,
       payload.notification?.consentId,
       consentDetail.consentId
     );
@@ -476,8 +482,10 @@ class M2ConsentManager {
       tx.abhaAddress
     );
     const careContexts = consentDetail.careContexts || payload.notification?.careContexts || tx.careContexts || [];
-    const notificationStatus = payload.notification?.status || "GRANTED";
-    const statusMapping = notificationStatus === "DENIED" || notificationStatus === "REVOKED" ? "Rejected" : "Active";
+    const notificationStatus = payload.notification?.status || "UNKNOWN";
+    let statusMapping = "Requested";
+    if (notificationStatus === "GRANTED") statusMapping = "Active";
+    else if (notificationStatus === "DENIED" || notificationStatus === "REVOKED" || notificationStatus === "EXPIRED") statusMapping = "Rejected";
     const permission = consentDetail.permission || payload.notification?.permission || {};
     const hiTypes = consentDetail.hiTypes || payload.notification?.hiTypes || [];
     const receivedTime = new Date().toISOString();
@@ -522,7 +530,6 @@ class M2ConsentManager {
         consentId,
         consentRequestId: tx.consentRequestId || tx.consentId || "",
         consentArtifactId: incomingConsentId || tx.consentDetails?.consentArtifactId || "",
-        status: "Requested",
         patientId,
         patient: consentDetail.patient || payload.notification?.patient || {},
         hip: consentDetail.hip || payload.notification?.hip || {},
@@ -686,7 +693,11 @@ class M2ConsentManager {
   static async registerConsentNotification(payload, tx) {
     // If called statically, get instance and run
     // Since callback manager invokes the resolved method, it will bind properly
-    const txContext = tx || M2TransactionStore.getTransaction(payload.notification?.consentId || payload.consentId);
+    const txContext = tx || M2TransactionStore.getTransaction(
+      payload.notification?.consentRequestId || 
+      payload.notification?.consentId || 
+      payload.consentId
+    );
     return this.getInstance().registerConsentNotification(payload, txContext);
   }
 

@@ -56,24 +56,25 @@ const getHipId = (payload = {}) =>
   );
 
 
-const buildAcknowledgementPayload = ({ requestId, abhaAddress, tokenNumber }) => ({
-  timestamp: nowIso(),
-  acknowledgement: {
-    status: "SUCCESS",
-    abhaAddress,
-    profile: {
-      context: "5",
-      tokenNumber,
+const buildAcknowledgementPayload = ({ requestId, abhaAddress, tokenNumber, intent }) => {
+  let ackData = { status: "SUCCESS", abhaAddress };
+  if (intent === "PAYMENT_SHARE") {
+    ackData.payment = { paymentReference: String(tokenNumber) };
+  } else if (intent === "RECORD_SHARE") {
+    ackData.healthInformation = { healthInformationReference: String(tokenNumber) };
+  } else {
+    ackData.profile = {
+      context: String(hospitalConfig.scanShareCounterId || "5"),
+      tokenNumber: String(tokenNumber),
       expiry: "1800",
-    },
-  },
-  resp: {
-    requestId,
-  },
-  response: {
-    requestId,
-  },
-});
+    };
+  }
+  
+  return {
+    acknowledgement: ackData,
+    response: { requestId }
+  };
+};
 
 const buildOpenOrderAcknowledgementPayload = ({
   requestId,
@@ -198,10 +199,6 @@ const handlePatientShare = async (req, res, { openOrder = false } = {}) => {
           tokenNumber: issued.tokenNumber,
           duplicateScan: issued.duplicateScan === true,
           scanCount: issued.scanCount,
-          name: patient.name,
-          abhaAddress: patient.abhaAddress,
-          abhaNumber: patient.abhaNumber,
-          mobile: patient.mobile,
           hipId,
           flow: issued.flow,
         },
@@ -219,7 +216,7 @@ const handlePatientShare = async (req, res, { openOrder = false } = {}) => {
       : buildAcknowledgementPayload({
           requestId,
           abhaAddress: patient.abhaAddress,
-          tokenNumber: issued.tokenNumber,
+          tokenNumber: issued.tokenNumber, intent: toText(payload.intent).toUpperCase()
         });
 
     acknowledgeInBackground({

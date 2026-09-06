@@ -43,8 +43,8 @@ class M3ConsentService {
             name: payload.requesterName,
             identifier: {
               type: "REGNO",
-              value: "MH1001",
-              system: "https://www.mciindia.org"
+              value: hospitalConfig.requesterIdentifier || payload.requesterIdentifier || "MH1001",
+              system: hospitalConfig.requesterSystem || payload.requesterSystem || "https://www.mciindia.org"
             }
           },
           hiTypes: payload.hiTypes,

@@ -1,0 +1,22 @@
+--- backend/m2/transactions/M2TransactionStore.js	2026-09-06
++++ backend/m2/transactions/M2TransactionStore.js	2026-09-06
+@@ -253,8 +253,8 @@
+   /**
+    * Performs properties update under lock serialization.
+    * @param {string} id - Identifiers lookup.
+-   * @param {Object} updates - Fields mapping to update.
++   * @param {Object|Function} updates - Fields mapping to update, or an update function receiving the current transaction state and returning fields to update.
+    * @returns {Promise<Object>} Updated transaction model.
+    */
+   async updateTransaction(id, updates) {
+     const dbBefore = this.storageProvider.read();
+@@ -273,7 +273,8 @@
+         throw new Error(`Transaction with ID ${id} (canonical: ${canonicalId}) not found.`);
+       }
+ 
+-      const tx = this._applySafeUpdates(db[canonicalId], updates);
++      const updatesToApply = typeof updates === "function" ? updates(db[canonicalId]) : updates;
++      const tx = this._applySafeUpdates(db[canonicalId], updatesToApply);
+ 
+       tx.updatedTimestamp = Date.now();
+       db[canonicalId] = tx;

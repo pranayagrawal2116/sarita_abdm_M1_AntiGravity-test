@@ -95,18 +95,16 @@ const nextTokenNumber = () => {
 };
 
 const recordIssuedToken = (payload = {}) => {
+  loadQueue();
   const fingerprint = patientFingerprint(payload);
-  if (fingerprint) {
-    const existing = queue.find(
-      (record) =>
-        record.patientFingerprint === fingerprint && isCoolingPeriodActive(record)
-    );
-
+  
+  if (payload.requestId) {
+    const existing = queue.find((record) => record.requestId === payload.requestId);
     if (existing) {
       latestRecord = existing;
       Object.assign(existing, {
-        requestId: payload.requestId || existing.requestId,
         patient: payload.patient || existing.patient,
+        patientFingerprint: fingerprint || existing.patientFingerprint,
         lastSeenAt: nowIso(),
         scanCount: Number(existing.scanCount || 1) + 1,
         acknowledgementStatus: payload.acknowledgementStatus || "pending",
@@ -139,6 +137,7 @@ const recordIssuedToken = (payload = {}) => {
 const getLatestIssuedToken = () => clone(latestRecord);
 
 const listIssuedTokens = ({ status } = {}) => {
+  loadQueue();
   const normalizedStatus = String(status || "").trim().toLowerCase();
   const records = normalizedStatus
     ? queue.filter((record) => record.status === normalizedStatus)
@@ -147,6 +146,7 @@ const listIssuedTokens = ({ status } = {}) => {
 };
 
 const updateIssuedTokenStatus = (tokenNumber, status) => {
+  loadQueue();
   const normalizedToken = String(tokenNumber || "").trim();
   const record = queue.find((item) => item.tokenNumber === normalizedToken);
   if (!record) {
@@ -163,6 +163,7 @@ const updateIssuedTokenStatus = (tokenNumber, status) => {
 };
 
 const updateIssuedToken = (tokenNumber, patch = {}) => {
+  loadQueue();
   const normalizedToken = String(tokenNumber || "").trim();
   const record = queue.find((item) => item.tokenNumber === normalizedToken);
   if (!record) {

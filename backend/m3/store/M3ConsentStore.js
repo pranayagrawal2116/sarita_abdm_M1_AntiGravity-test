@@ -32,10 +32,12 @@ class M3ConsentStore {
 
   save() {
     try {
-      fs.writeFileSync(storePath, JSON.stringify({
+      const tempPath = storePath + ".tmp";
+      fs.writeFileSync(tempPath, JSON.stringify({
         consents: this.consents,
         transactions: this.transactions || {}
       }, null, 2), "utf-8");
+      fs.renameSync(tempPath, storePath);
     } catch (err) {
       Logger.error("M3ConsentStore", "Failed to save consents", { error: err.message });
     }

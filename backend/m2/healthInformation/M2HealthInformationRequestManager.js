@@ -207,13 +207,9 @@ class M2HealthInformationRequestManager {
       reason: "User initiated cancellation."
     });
 
-    const details = tx.hiRequestDetails;
-    details.status = "Cancelled";
-    details.updatedAt = Date.now();
-
-    await M2TransactionStore.updateTransaction(tx.transactionId, {
-      hiRequestDetails: details
-    });
+    await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
+      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Cancelled", updatedAt: Date.now() }
+    }));
 
     await M2TransactionStore.appendAuditEvent(tx.transactionId, "HI_REQUEST_CANCELLED", "Request cancelled by user.", {
       requestId
@@ -238,13 +234,9 @@ class M2HealthInformationRequestManager {
       reason: "Request lifespan expired."
     });
 
-    const details = tx.hiRequestDetails;
-    details.status = "Expired";
-    details.updatedAt = Date.now();
-
-    await M2TransactionStore.updateTransaction(tx.transactionId, {
-      hiRequestDetails: details
-    });
+    await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
+      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Expired", updatedAt: Date.now() }
+    }));
 
     await M2TransactionStore.appendAuditEvent(tx.transactionId, "HI_REQUEST_EXPIRED", "Request marked as expired.", {
       requestId
@@ -290,24 +282,17 @@ class M2HealthInformationRequestManager {
           reason: `Gateway Error: ${payload.error.message}`
         });
 
-        details.status = "Failed";
-        details.error = payload.error;
-        details.updatedAt = Date.now();
-
-        await M2TransactionStore.updateTransaction(tx.transactionId, {
-          hiRequestDetails: details
-        });
+        await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
+      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Failed", error: payload.error, updatedAt: Date.now() }
+    }));
 
         return { success: false, status: "Failed", error: payload.error };
       }
 
       // If callback classification transitioned state to Acknowledged, update local payload details
-      details.status = "Acknowledged";
-      details.updatedAt = Date.now();
-
-      await M2TransactionStore.updateTransaction(tx.transactionId, {
-        hiRequestDetails: details
-      });
+      await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
+      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Acknowledged", updatedAt: Date.now() }
+    }));
 
       return { success: true, status: "Acknowledged" };
     } catch (err) {

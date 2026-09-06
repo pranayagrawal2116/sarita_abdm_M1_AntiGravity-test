@@ -270,7 +270,7 @@ const axios = require("axios");
 const { v4: uuidv4 } = require("uuid");
 const { getGatewayToken } = require("../services/gatewayService");
 const { getHeaders } = require("../utils/headers");
-const { initializeRequest, getActiveRequest, saveCallback, getCallback } = require("../utils/hipLinkTokenStore");
+const M2TransactionStore = require("../m2/transactions/M2TransactionStore");
 const hospitalConfig = require("../config/hospitalConfig");
 const { toIsoTimestamp, nowIso } = require("../utils/dateUtils");
 const transactionStore = require("../utils/transactionStore");
@@ -402,12 +402,7 @@ const normalizePatientReferenceForLinking = (value, fallbackName = "") => {
 
 const normalizeCareContextReferenceForLinking = (value) => {
   const text = toText(value);
-  if (!text || /^cc-/i.test(text) || isLinkingAbhaAddress(text)) {
-    return uuidv4();
-  }
-  if (isUuid(text)) {
-    return text.toLowerCase();
-  }
+  if (!text) return require("uuid").v4(); // Only if completely empty
   return text;
 };
 
@@ -447,23 +442,16 @@ const normalizePatientEntriesForLinking = (patient = [], abhaAddress = "") =>
         fallbackName
       ),
       careContexts: Array.isArray(entry.careContexts)
-        ? entry.careContexts.flatMap((careContext) => {
+        ? entry.careContexts.map((careContext) => {
             if (!careContext || typeof careContext !== "object") {
               return careContext;
             }
-            
+            // PROMPT #9: Do not invent UUIDs or append HI types. Preserve the exact reference.
             const baseReference = normalizeCareContextReferenceForLinking(careContext.referenceNumber);
-            const baseDisplay = careContext.display || "";
-            const types = careContext.hiTypes || [guessHiType(careContext.display)];
-            
-            // Create a separate Care Context for each hiType so they display individually in the app
-            return types.map(type => ({
+            return {
               ...careContext,
-              referenceNumber: `${baseReference}-${type}`,
-              display: baseDisplay ? `${baseDisplay} - ${type}` : type,
-              hiTypes: [type],
-              hiType: type,
-            }));
+              referenceNumber: baseReference
+            };
           })
         : entry.careContexts,
     };
@@ -556,8 +544,19 @@ exports.generateToken = async (req, res) => {
     });
     const requestId = headers["REQUEST-ID"];
 
-    // Check for an active pending request
-    const activeRequest = getActiveRequest(payload);
+    // Check for an active pending request (within last 5 mins)
+    const allTxs = M2TransactionStore.listTransactions();
+    const abhaAddress = toText(payload.AbhaAddress).toLowerCase();
+    
+    // ABDM expects a unique requestId per API call, but we can prevent spam by returning 429
+    // if a link is already actively pending for this patient.
+    const activeRequest = allTxs.find(tx => 
+      tx.currentState === "Created" && 
+      toText(tx.abhaAddress).toLowerCase() === abhaAddress &&
+      tx.transactionType === "HIP_LINK_TOKEN" &&
+      (Date.now() - (tx.createdTimestamp || 0)) < 5 * 60 * 1000
+    );
+
     if (activeRequest) {
       console.log("=========================================");
       console.log(`[HIP LINK TOKEN] Reusing active pending request ${activeRequest.requestId} for patient.`);
@@ -571,66 +570,58 @@ exports.generateToken = async (req, res) => {
       });
     }
 
-    // Initialize request state in memory store
-    initializeRequest(requestId, payload);
+    // Initialize request state safely with M2TransactionStore
+    await M2TransactionStore.createTransaction({
+      requestId,
+      abhaAddress,
+      patientId: abhaAddress,
+      transactionType: "HIP_LINK_TOKEN",
+      currentState: "Created"
+    });
 
     console.log("=========================================");
     console.log("[HIP LINK TOKEN] Generate Token Request Received");
-    console.log("Payload:", "<omitted for security>");
     console.log("[HIP LINK TOKEN] Outgoing Request Payload");
-    console.log("URL:", `${process.env.GATEWAY_BASE}/api/hiecm/v3/token/generate-token`);
-    console.log("Headers:", "<omitted for security>");
-    console.log("Body:", "<omitted for security>");
+    console.log("=========================================");
 
     const response = await axios.post(
-      `${process.env.GATEWAY_BASE}/api/hiecm/v3/token/generate-token`,
+      `${process.env.GATEWAY_BASE || "https://dev.abdm.gov.in"}/api/hiecm/v3/token/generate-token`,
       payload,
       { headers }
     );
-
-    console.log("[HIP LINK TOKEN] ABDM Immediate Response");
-    console.log("Status:", response.status);
-    console.log("Data:", "<omitted for security>");
-    console.log("=========================================");
 
     return res.json({
       requestId,
       callbackPending: true,
       statusCode: response.status,
-      message:
-        "Link token request accepted. Use the callback check until ABDM sends the token.",
-      immediateResponse:
-        response.data && typeof response.data === "object"
-          ? response.data
-          : {},
+      message: "Link token request accepted. Use the callback check until ABDM sends the token.",
+      immediateResponse: response.data && typeof response.data === "object" ? response.data : {},
     });
   } catch (err) {
     const { status, body } = getErrorPayload(err);
-    console.log("[HIP LINK TOKEN] ABDM Immediate Error Response");
-    console.log("Status:", status);
-    console.log("Body:", "<omitted for security>");
-    console.log("=========================================");
     return res.status(status).json(body);
   }
 };
-
 exports.getTokenCallback = async (req, res) => {
   const requestId = toText(req.params?.requestId);
-
   if (!requestId) {
     return res.status(400).json({ error: "requestId is required" });
   }
 
-  const callback = getCallback(requestId);
-
-  if (!callback) {
+  const tx = M2TransactionStore.getTransaction(requestId);
+  if (!tx || tx.transactionType !== "HIP_LINK_TOKEN") {
     return res.status(404).json({
-      error: "Request ID not found",
+      error: "Link token callback has not been received yet",
       requestId,
     });
   }
 
-  return res.json(callback);
+  return res.json({
+    requestId: tx.requestId,
+    status: tx.currentState === "Completed" ? "SUCCESS" : tx.currentState === "Failed" ? "FAILED" : "PENDING",
+    linkToken: tx.linkToken,
+    error: tx.errorDetails ? JSON.parse(tx.errorDetails) : null
+  });
 };
 
 exports.linkCareContext = async (req, res) => {
@@ -961,28 +952,62 @@ exports.notifyContext = async (req, res) => {
 exports.onGenerateToken = async (req, res) => {
   console.log("=========================================");
   console.log("[HIP LINK TOKEN] Incoming Callback Received");
-  console.log("Headers:", "<omitted for security>");
-  console.log("Body:", "<omitted for security>");
-
-  const entry = saveCallback(req.body || {});
-
-  console.log("[HIP LINK TOKEN] Callback Validation Result");
-  if (entry) {
-    console.log("Valid callback processed. Status:", entry.status);
-    console.log("Link Token Present:", Boolean(entry.linkToken));
-    console.log("[HIP LINK TOKEN] Stored Callback for RequestId:", entry.requestId);
-  } else {
-    console.log("Invalid callback payload (failed to extract requestId)");
-  }
   console.log("=========================================");
 
-  return res.status(202).json({
-    ok: true,
-    requestId: entry?.requestId || "",
-    linkTokenPresent: Boolean(entry?.linkToken),
-  });
-};
+  const payload = req.body || {};
+  const requestId = 
+    toText(payload?.resp?.requestId) ||
+    toText(payload?.response?.requestId) ||
+    toText(payload?.requestId);
 
+  if (!requestId) {
+    console.log("Invalid callback payload (failed to extract requestId)");
+    return res.status(400).json({ error: "Missing requestId in callback" });
+  }
+
+  try {
+    const tx = M2TransactionStore.getTransaction(requestId);
+    if (!tx || tx.transactionType !== "HIP_LINK_TOKEN") {
+      console.log("Callback does not match any pending HIP_LINK_TOKEN request");
+      return res.status(404).json({ error: "No matching request found" });
+    }
+
+    const linkToken = 
+      toText(payload?.linkToken) ||
+      toText(payload?.linkingToken) ||
+      toText(payload?.token) ||
+      toText(payload?.link?.token) ||
+      toText(payload?.link?.linkToken) ||
+      toText(payload?.token?.linkToken);
+
+    const error = payload?.error;
+
+    // Idempotency: Ignore duplicate callbacks
+    if (tx.currentState === "Completed" || tx.currentState === "Failed") {
+      console.log("Duplicate callback received for already completed request");
+      return res.status(202).json({ ok: true, requestId, linkTokenPresent: Boolean(tx.linkToken) });
+    }
+
+    await M2TransactionStore.updateTransaction(requestId, {
+      linkToken: linkToken,
+      errorDetails: error ? JSON.stringify(error) : undefined,
+      callbackPayload: payload
+    });
+
+    await M2TransactionStore.transitionState(requestId, error ? "Failed" : "Completed");
+
+    console.log(`Valid callback processed. Link Token Present: ${Boolean(linkToken)}`);
+    
+    return res.status(202).json({
+      ok: true,
+      requestId,
+      linkTokenPresent: Boolean(linkToken),
+    });
+  } catch (err) {
+    console.error("Error processing callback:", err);
+    return res.status(500).json({ error: "Internal server error processing callback" });
+  }
+};
 const contextNotifyStoreFile = path.join(dataRoot, "hip_context_notify_callbacks.json");
 const contextNotifyCallbacks = [];
 

@@ -186,7 +186,7 @@ const normalizeBirthDateValue = (value) => {
   if (iso) {
     return `${iso[1]}-${iso[2].padStart(2, "0")}-${iso[3].padStart(2, "0")}`;
   }
-  return "2000-01-01";
+  return undefined;
 };
 
 const extractIndentedValue = (lines, sectionPattern, fieldPattern) => {
@@ -266,7 +266,7 @@ const inferDrugCode = (drugName) => {
   if (/para|acetaminophen|paracetamol/.test(raw)) return "387517004";
   if (/amoxicillin/.test(raw)) return "387544009";
   if (/pantoprazole/.test(raw)) return "1086921000168107";
-  return "387517004";
+  return undefined; // PROMPT #8: Removed arbitrary SNOMED fallback
 };
 
 const inferIndicationCode = (indicationText) => {
@@ -275,7 +275,7 @@ const inferIndicationCode = (indicationText) => {
   if (/pain|ache/.test(raw)) return "22253000";
   if (/gas|gastr|acid|reflux/.test(raw)) return "235595009";
   if (/cough/.test(raw)) return "49727002";
-  return "404684003";
+  return undefined; // PROMPT #8: Removed arbitrary SNOMED fallback
 };
 
 const normalizeDrugName = (value) => {

@@ -41,8 +41,7 @@ const TRANSITION_RULES = {
       "Retry Pending",
       "Acknowledged",
       "WaitingForData"
-    ],
-    nextState: "CONSENT_GRANTED"
+    ]
   },
   "Consent Acknowledgement": {
     validFrom: ["Created", "Authentication Ready"],
@@ -177,8 +176,8 @@ class M2CallbackManager {
       if (!payload.notification || typeof payload.notification !== "object") {
         return { isValid: false, reason: "Consent Notify payload must contain notification." };
       }
-      if (!payload.notification.consentId && !payload.notification.consentDetail?.consentId) {
-        return { isValid: false, reason: "Consent Notify payload must contain notification.consentId." };
+      if (!payload.notification.consentId && !payload.notification.consentDetail?.consentId && !payload.notification.consentRequestId) {
+        return { isValid: false, reason: "Consent Notify payload must contain notification.consentId or consentRequestId." };
       }
       return { isValid: true };
     }
@@ -294,6 +293,18 @@ class M2CallbackManager {
     }
 
     if (!tx) {
+      // PROMPT #5 SECURITY: Only specific callbacks are allowed to initialize a NEW transaction.
+      // Other callbacks MUST match an existing transaction, otherwise they are rejected.
+      const allowedToInitialize = ["Consent Notification"];
+      if (!allowedToInitialize.includes(type)) {
+        Logger.warn("M2CallbackManager", "Transaction not found. Rejecting uncorrelatable callback.", { lookupId, type, callbackRequestId });
+        await this.appendAudit(callbackRequestId, "UNCORRELATABLE_CALLBACK_REJECTED", `Callback "${type}" could not be correlated to an existing transaction.`, {
+          callbackRequestId,
+          type
+        });
+        return { status: "error", error: "TRANSACTION_NOT_FOUND", message: "Callback could not be correlated to an existing transaction." };
+      }
+
       Logger.info("M2CallbackManager", "Transaction not found. Initializing new record.", { lookupId });
       
       // Auto-create transaction for initial consent notification
@@ -311,11 +322,7 @@ class M2CallbackManager {
         receiverPublicKey: payload.hiRequest?.keyMaterial?.dhPublicKey?.keyValue || "",
         receiverNonce: payload.hiRequest?.keyMaterial?.nonce || "",
         careContexts: payload.notification?.consentDetail?.careContexts || payload.notification?.careContexts || [],
-        // An unmatched consent must not be allowed to select a local bundle
-        // by HI type alone.  It may be a delayed callback from an older flow;
-        // retain it for acknowledgement/audit, but require an explicit local
-        // care-context match before any transfer can be started.
-        unmatchedConsentContext: type === "Consent Notification" && !matchMeta?.tx,
+        // unmatchedConsentContext removed
         currentState: "Created"
       });
     } else {
@@ -323,24 +330,20 @@ class M2CallbackManager {
       const incomingConsentId = payload.notification?.consentId || payload.notification?.consentDetail?.consentId || payload.hiRequest?.consent?.id || payload.consentId || "";
       const incomingPatientId = this.extractNotificationPatientId(payload);
       
-      const updatePayload = {
-        transactionId: incomingTransactionId,
-        gatewayRequestId: callbackRequestId || tx.gatewayRequestId,
-        consentId: type === "Consent Notification" ? (incomingConsentId || tx.consentId || "") : (tx.consentId || incomingConsentId),
-        consentRequestId: tx.consentRequestId || payload.notification?.consentRequestId || payload.notification?.consentDetail?.consentId || "",
-        patientId: type === "Consent Notification" ? (incomingPatientId || tx.patientId || "") : tx.patientId,
-        abhaAddress: type === "Consent Notification" ? (incomingPatientId || tx.abhaAddress || "") : tx.abhaAddress,
-        healthInformationRequestId: type === "Health Information Request" ? callbackRequestId : tx.healthInformationRequestId,
-        dataPushUrl: payload.hiRequest?.dataPushUrl || tx.dataPushUrl || "",
-        receiverPublicKey: payload.hiRequest?.keyMaterial?.dhPublicKey?.keyValue || tx.receiverPublicKey || "",
-        receiverNonce: payload.hiRequest?.keyMaterial?.nonce || tx.receiverNonce || "",
-        careContexts: payload.notification?.consentDetail?.careContexts || payload.notification?.careContexts || tx.careContexts || []
-      };
-
       if (type === "Health Information Request" && incomingTransactionId && tx.transactionId && incomingTransactionId !== tx.transactionId) {
-        // Prevent concurrent data transfer flows from overwriting each other's transactionId
-        // by creating a cloned child transaction for the new HI Request.
-        Logger.info("M2CallbackManager", "Spawning new transaction record for concurrent HI Request.", { incomingTransactionId, existingTransactionId: tx.transactionId });
+        const updatePayload = {
+          transactionId: incomingTransactionId,
+          gatewayRequestId: callbackRequestId || tx.gatewayRequestId,
+          consentId: tx.consentId || incomingConsentId,
+          consentRequestId: tx.consentRequestId || payload.notification?.consentRequestId || payload.notification?.consentDetail?.consentId || "",
+          patientId: tx.patientId,
+          abhaAddress: tx.abhaAddress,
+          healthInformationRequestId: callbackRequestId,
+          dataPushUrl: payload.hiRequest?.dataPushUrl || tx.dataPushUrl || "",
+          receiverPublicKey: payload.hiRequest?.keyMaterial?.dhPublicKey?.keyValue || tx.receiverPublicKey || "",
+          receiverNonce: payload.hiRequest?.keyMaterial?.nonce || tx.receiverNonce || "",
+          careContexts: payload.notification?.consentDetail?.careContexts || payload.notification?.careContexts || tx.careContexts || []
+        };
         tx = await M2TransactionStore.createTransaction({
           ...tx,
           ...updatePayload,
@@ -353,7 +356,21 @@ class M2CallbackManager {
           currentState: "Created"
         });
       } else {
-        tx = await M2TransactionStore.updateTransaction(tx.transactionId || tx.requestId, updatePayload);
+        tx = await M2TransactionStore.updateTransaction(tx.transactionId || tx.requestId, (currentTx) => {
+          return {
+            transactionId: incomingTransactionId,
+            gatewayRequestId: callbackRequestId || currentTx.gatewayRequestId,
+            consentId: type === "Consent Notification" ? (incomingConsentId || currentTx.consentId || "") : (currentTx.consentId || incomingConsentId),
+            consentRequestId: currentTx.consentRequestId || payload.notification?.consentRequestId || payload.notification?.consentDetail?.consentId || "",
+            patientId: type === "Consent Notification" ? (incomingPatientId || currentTx.patientId || "") : currentTx.patientId,
+            abhaAddress: type === "Consent Notification" ? (incomingPatientId || currentTx.abhaAddress || "") : currentTx.abhaAddress,
+            healthInformationRequestId: type === "Health Information Request" ? callbackRequestId : currentTx.healthInformationRequestId,
+            dataPushUrl: payload.hiRequest?.dataPushUrl || currentTx.dataPushUrl || "",
+            receiverPublicKey: payload.hiRequest?.keyMaterial?.dhPublicKey?.keyValue || currentTx.receiverPublicKey || "",
+            receiverNonce: payload.hiRequest?.keyMaterial?.nonce || currentTx.receiverNonce || "",
+            careContexts: payload.notification?.consentDetail?.careContexts || payload.notification?.careContexts || currentTx.careContexts || []
+          };
+        });
       }
     }
 
@@ -377,7 +394,7 @@ class M2CallbackManager {
 
     // 3. State Transition Rule Validation
     const rule = TRANSITION_RULES[type];
-    if (rule) {
+    if (rule && rule.nextState) {
       const allowedFrom = new Set(rule.validFrom);
       if (!allowedFrom.has(tx.currentState)) {
         const errorMsg = `Transition to state "${rule.nextState}" from "${tx.currentState}" is invalid for callback "${type}".`;
@@ -409,7 +426,7 @@ class M2CallbackManager {
 
     // 5. Update state transition
     let updatedTx = tx;
-    if (rule) {
+    if (rule && rule.nextState) {
       updatedTx = await M2TransactionStore.transitionState(transactionId, rule.nextState, {
         callbackRequestId,
         sourceCallback: type
@@ -560,51 +577,18 @@ class M2CallbackManager {
     const hipId = this.extractNotificationHipId(payload);
     
     // 1. Try exact match by consentId (for status updates)
-    const consentId = payload.notification?.consentId || payload.notification?.consentDetail?.consentId;
+    const consentId = payload.notification?.consentRequestId || payload.notification?.consentId || payload.notification?.consentDetail?.consentId;
     if (consentId) {
-      const tx = transactions.find(t => t.consentId === consentId || t.consentDetails?.consentId === consentId);
+      const tx = transactions.find(t => t.consentRequestId === consentId || t.consentId === consentId || t.consentDetails?.consentId === consentId);
       if (tx) {
         return { tx, reason: "Matched by exact consentId", careContextReferences, patientId, hipId };
       }
     }
 
-    // 2. Only look at transactions waiting for consent
-    const waiting = transactions.filter((item) => item.currentState === "WAITING_FOR_CONSENT");
-
-    if (careContextReferences.length > 0) {
-      const tx = waiting.find((item) => this.transactionCareContextReferences(item)
-        .some((ref) => careContextReferences.some((callbackRef) =>
-          this.sameCareContextReference(ref, callbackRef)
-        )));
-      if (tx) {
-        return { tx, reason: "Matched WAITING_FOR_CONSENT by CareContextReference", careContextReferences, patientId, hipId };
-      }
-    }
-
-    if (patientId && hipId) {
-      const tx = waiting.find((item) =>
-        this.sameText(item.patientId || item.abhaAddress, patientId) &&
-        this.sameText(item.hipId, hipId)
-      );
-      if (tx) {
-        return { tx, reason: "Matched WAITING_FOR_CONSENT by PatientAndHIP", careContextReferences, patientId, hipId };
-      }
-    }
-
-    if (waiting.length === 1) {
-      const item = waiting[0];
-      const patientMatches = patientId ? this.sameText(item.patientId || item.abhaAddress, patientId) : true;
-      const hipMatches = hipId ? this.sameText(item.hipId, hipId) : true;
-      if (patientMatches && hipMatches) {
-        return {
-          tx: item,
-          reason: "Matched by SingleWaitingPatientHIP",
-          careContextReferences,
-          patientId,
-          hipId
-        };
-      }
-    }
+    // 2. Fallback matching (latest pending, first pending, CareContext, Patient+HIP)
+    // has been REMOVED for security (Prompt #5: Authoritative Correlation).
+    // A callback must never be matched merely because a patient is the same,
+    // an ABHA number is the same, or it is the only transaction.
 
     return { tx: null, reason: "NoMatch", careContextReferences, patientId, hipId };
   }

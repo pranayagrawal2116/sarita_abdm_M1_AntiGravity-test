@@ -177,7 +177,7 @@ const buildMedicationRequest = (med, input, ids, index) => {
     status: "active",
     intent: "order",
     medicationCodeableConcept: {
-      coding: [{ system: SNOMED_SYSTEM, code: med.drugSnomedCode, display: med.drugName }],
+      coding: med.drugSnomedCode ? [{ system: SNOMED_SYSTEM, code: med.drugSnomedCode, display: med.drugName }] : [],
       text: med.drugName
     },
     subject: { reference: urnRef(ids.patient), display: input.patient.fullName },
@@ -185,7 +185,7 @@ const buildMedicationRequest = (med, input, ids, index) => {
     requester: { reference: urnRef(ids.practitioner), display: practitionerName },
     reasonCode: [
       {
-        coding: [{ system: SNOMED_SYSTEM, code: med.indicationSnomedCode, display: med.indicationText }],
+        coding: med.indicationSnomedCode ? [{ system: SNOMED_SYSTEM, code: med.indicationSnomedCode, display: med.indicationText }] : [],
         text: med.indicationText
       }
     ],

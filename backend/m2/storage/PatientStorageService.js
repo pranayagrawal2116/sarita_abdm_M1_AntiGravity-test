@@ -120,7 +120,9 @@ class PatientStorageService {
     const safeFileName = this._sanitizePathSegment(fileName);
     const filePath = path.join(dirPath, safeFileName);
 
-    fs.writeFileSync(filePath, content, 'utf8');
+    const tempPath = filePath + '.tmp';
+    fs.writeFileSync(tempPath, content, 'utf8');
+    fs.renameSync(tempPath, filePath);
 
     if (localOnly) {
       const localDataPath = path.join(dirPath, 'local data');

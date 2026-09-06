@@ -182,13 +182,13 @@ const createMedicationRequest = ({
     status: "active",
     intent: "order",
     medicationCodeableConcept: {
-      coding: [
+      coding: medCode ? [
         {
           system: "http://snomed.info/sct",
           code: medCode,
           display: medDisplay
         }
-      ],
+      ] : [],
       text: medDisplay
     },
     subject: {

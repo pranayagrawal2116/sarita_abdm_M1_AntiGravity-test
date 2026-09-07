@@ -1,20 +1,7 @@
 const fs = require('fs');
-let code = fs.readFileSync('lib/m3/widgets/fhir_data_viewer.dart', 'utf8');
+let content = fs.readFileSync('backend/m2/transfer/M2DataTransferManager.js', 'utf8');
 
-const badCode = `      final type = res['resourceType'];
-      if (type == 'Observation' && res['id'] != null && diagObsIds.contains(res['id'].toString())) {
-         continue; // skip! rendered inside diagnostic report
-      }
-      final res = entry['resource'];
-      if (res == null) continue;
+content = content.replace(/\/\* checksum removed \*\//g, 'checksum: undefined');
 
-      final type = res['resourceType'];`;
-
-const goodCode = `      final type = res['resourceType'];
-      if (type == 'Observation' && res['id'] != null && diagObsIds.contains(res['id'].toString())) {
-         continue; // skip! rendered inside diagnostic report
-      }`;
-
-code = code.replace(badCode, goodCode);
-fs.writeFileSync('lib/m3/widgets/fhir_data_viewer.dart', code);
+fs.writeFileSync('backend/m2/transfer/M2DataTransferManager.js', content);
 console.log("Fixed syntax error");

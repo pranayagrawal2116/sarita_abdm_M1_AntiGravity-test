@@ -294,9 +294,11 @@ class M2CallbackController {
             description: "Health information received successfully"
           }));
 
+          const reqId = require("crypto").randomUUID();
+          const ts = new Date().toISOString();
           const notifyPayload = {
-            requestId: require("crypto").randomUUID(),
-            timestamp: new Date().toISOString(),
+            requestId: reqId,
+            timestamp: ts,
             notification: {
               consentId: tx.consentId,
               transactionId: tx.transactionId,
@@ -316,7 +318,7 @@ class M2CallbackController {
           await axios.post(
             `${gatewayBase}/api/hiecm/data-flow/v3/health-information/notify`,
             notifyPayload,
-            { headers: { ...getHeaders(token), "X-HIU-ID": hiuId } }
+            { headers: { ...getHeaders(token, reqId, ts), "X-HIU-ID": hiuId } }
           );
           Logger.info("M2CallbackController", "Sent HIU Health Information Notify to Gateway (sessionStatus: RECEIVED, hiStatus: OK)");
         } catch (notifyErr) {

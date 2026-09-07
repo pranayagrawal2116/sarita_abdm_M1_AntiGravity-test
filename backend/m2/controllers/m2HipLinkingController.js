@@ -162,8 +162,8 @@ class M2HipLinkingController {
         headers: {
           "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
           "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
-          "REQUEST-ID": uuidv4(),
-          "TIMESTAMP": nowIso()
+          "REQUEST-ID": reqId,
+          "TIMESTAMP": ts
         }
       });
       Logger.info("M2HipLinkingController", "Successfully sent on-discover response to " + url);
@@ -191,7 +191,11 @@ class M2HipLinkingController {
     // Simulated SMS delivery
     Logger.info("M2HipLinkingController", `[MOCK SMS] -> OTP to link care contexts is: ${otp}`);
     
+    const reqId = require("uuid").v4();
+    const ts = nowIso();
     const responsePayload = {
+      requestId: reqId,
+      timestamp: ts,
       transactionId: transactionId,
       link: {
         referenceNumber: referenceNumber,
@@ -202,7 +206,7 @@ class M2HipLinkingController {
           communicationExpiry: nowIso(new Date(Date.now() + 5 * 60000))
         }
       },
-      response: {
+      resp: {
         requestId: requestId
       }
     };
@@ -216,8 +220,8 @@ class M2HipLinkingController {
         headers: {
           "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
           "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
-          "REQUEST-ID": uuidv4(),
-          "TIMESTAMP": nowIso()
+          "REQUEST-ID": reqId,
+          "TIMESTAMP": ts
         }
       });
       Logger.info("M2HipLinkingController", "Successfully sent on-init response to " + url);
@@ -241,8 +245,12 @@ class M2HipLinkingController {
     // Validate the OTP against our store (which is hardcoded to 123456 for sandbox)
     const session = otpStore.verifyOTP(referenceNumber, submittedOtp);
 
+    const reqId = require("uuid").v4();
+    const ts = nowIso();
     let responsePayload = {
-      response: {
+      requestId: reqId,
+      timestamp: ts,
+      resp: {
         requestId: requestId
       }
     };
@@ -291,8 +299,8 @@ class M2HipLinkingController {
         headers: {
           "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
           "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
-          "REQUEST-ID": uuidv4(),
-          "TIMESTAMP": nowIso()
+          "REQUEST-ID": reqId,
+          "TIMESTAMP": ts
         }
       });
       Logger.info("M2HipLinkingController", "Successfully sent on-confirm response to " + url);

@@ -218,7 +218,7 @@ class M2DataTransferManager {
       console.log("Encryption Started");
       const encryptedEntries = [];
       let totalRecords = 0;
-      let checksumStr = "";
+      
 
       let bundleIndex = 0;
       let pageNumber = 1;
@@ -251,11 +251,11 @@ class M2DataTransferManager {
           ourNonce
         );
         
-        checksumStr += encryptionRes.metadata.checksum;
+        
         const singleEntry = [{
           content: encryptionRes.encryptedPayload,
           media: "application/fhir+json",
-          checksum: encryptionRes.metadata.checksum,
+          
           careContextReference: transferCareContextReference
         }];
         
@@ -275,18 +275,18 @@ class M2DataTransferManager {
         pageNumber++;
       }
       
-      const overallChecksum = crypto.createHash("sha256").update(checksumStr).digest("hex");
+      
       console.log("Encryption and Pushing Completed");
 
       await M2TransactionStore.transitionState(transactionId, "Encryption Completed", {
         reason: "FHIR packet encrypted successfully.",
-        checksum: overallChecksum
+        checksum: undefined
       });
 
       // Update local storage values
       await M2TransactionStore.updateTransaction(transactionId, {
         encryptedPayload: encryptedEntries,
-        encryptionMetadata: { checksum: overallChecksum },
+        
         receiverPublicKey,
         receiverNonce,
         dataPushUrl,
@@ -392,7 +392,7 @@ class M2DataTransferManager {
           dataPushUrl,
           dataPushStatusCode: dataPushResult.statusCode,
           consentManagerNotifyStatusCode: notifyResult.statusCode,
-          checksum: overallChecksum,
+          checksum: undefined,
           encrypted: true,
           gatewayNotified: true,
           localRecordPromotion
@@ -567,7 +567,7 @@ class M2DataTransferManager {
         {
           content: encryptedEntries,
           media: "application/fhir+json",
-          checksum: crypto.createHash("sha256").update(encryptedEntries).digest("hex"),
+          
           careContextReference: careContextReference || this.getCareContextReference(tx)
         }
       ];
@@ -824,17 +824,21 @@ class M2DataTransferManager {
       throw new Error("Cannot send HIP health information response without original gateway requestId.");
     }
     const token = await M2TokenManager.getGatewayToken();
-    const baseHeaders = getHeaders(token);
+    const reqId = require("uuid").v4();
+    const ts = new Date().toISOString();
+    const baseHeaders = getHeaders(token, reqId, ts);
     const headers = {
       ...baseHeaders,
       "X-HIP-ID": process.env.HIP_ID || hospitalConfig.hipId
     };
     const body = {
+      requestId: reqId,
+      timestamp: ts,
       hiRequest: {
         transactionId,
         sessionStatus: "ACKNOWLEDGED"
       },
-      response: {
+      resp: {
         requestId
       }
     };

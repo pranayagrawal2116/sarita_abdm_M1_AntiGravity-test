@@ -71,8 +71,10 @@ const buildAcknowledgementPayload = ({ requestId, abhaAddress, tokenNumber, inte
   }
   
   return {
+    requestId: require("uuid").v4(),
+    timestamp: new Date().toISOString(),
     acknowledgement: ackData,
-    response: { requestId }
+    response: { requestId }, resp: { requestId }
   };
 };
 
@@ -113,7 +115,7 @@ const sendOnShareAcknowledgement = async (payload) => {
     `${process.env.GATEWAY_BASE}/api/hiecm/patient-share/v3/on-share`,
     payload,
     {
-      headers: getHeaders(gatewayToken),
+      headers: getHeaders(gatewayToken, payload.requestId, payload.timestamp),
     }
   );
   return response.data || {};
@@ -125,7 +127,7 @@ const sendOpenOrderAcknowledgement = async (payload) => {
     `${process.env.GATEWAY_BASE}/api/hiecm/scan-gateway/v3/patient/on-share/open-order`,
     payload,
     {
-      headers: getHeaders(gatewayToken),
+      headers: getHeaders(gatewayToken, payload.requestId, payload.timestamp),
     }
   );
   return response.data || {};
@@ -156,17 +158,14 @@ const acknowledgeInBackground = async ({
         error.message ||
         "Failed to acknowledge patient share",
     });
-    console.error(
-      "[ScanShare] Failed to send on-share acknowledgement",
-      "<omitted for security>"
-    );
+    console.error("[ScanShare] Failed to send on-share acknowledgement", error.response ? error.response.data : error.message);
   }
 };
 
 const handlePatientShare = async (req, res, { openOrder = false } = {}) => {
   const payload = req.body || {};
   const isOpenOrder =
-    openOrder || toText(payload.intent).toUpperCase() === "OPEN_PAYMENT_ORDER";
+    openOrder || (toText(typeof (payload.intent || {}) === 'object' ? (payload.intent || {}).type : payload.intent).toUpperCase() === "OPEN_PAYMENT_ORDER");
   const requestId = getRequestId(req, payload);
   const patient = summarizePatient(payload);
   const hipId = getHipId(payload);
@@ -177,6 +176,31 @@ const handlePatientShare = async (req, res, { openOrder = false } = {}) => {
         accepted: false,
         error: "requestId is required for Scan and Share callback",
       });
+    }
+
+    if (!patient.abhaAddress && !patient.abhaNumber && !patient.mobile && !patient.name) {
+      return res.status(400).json({
+        accepted: false,
+        error: "Patient demographic identifiers are required. Application safety limit.",
+      });
+    }
+
+    const rawIntent = payload.intent || {};
+    const intentStr = toText(typeof rawIntent === 'object' ? rawIntent.type : rawIntent).toUpperCase();
+    if (!intentStr) {
+      return res.status(400).json({ accepted: false, error: "intent is required by ABDM specification" });
+    }
+    const validIntents = ["PROFILE_SHARE", "RECORD_SHARE", "PAYMENT_SHARE", "OPEN_PAYMENT_ORDER"];
+    if (!validIntents.includes(intentStr)) {
+      return res.status(400).json({ accepted: false, error: "Unknown intent" });
+    }
+
+    if (intentStr === "RECORD_SHARE" && !payload.healthInfoBundle) {
+      return res.status(400).json({ accepted: false, error: "healthInfoBundle is required for RECORD_SHARE" });
+    }
+
+    if (intentStr === "PAYMENT_SHARE" && !payload.paymentBundle) {
+      return res.status(400).json({ accepted: false, error: "paymentBundle is required for PAYMENT_SHARE" });
     }
 
     const issued = recordIssuedToken({
@@ -210,20 +234,22 @@ const handlePatientShare = async (req, res, { openOrder = false } = {}) => {
     const acknowledgementPayload = isOpenOrder
       ? buildOpenOrderAcknowledgementPayload({
           requestId,
-          abhaAddress: patient.abhaAddress,
+          abhaAddress: issued.patient.abhaAddress, // FIXED: Use authoritative patient
           tokenNumber: issued.tokenNumber,
         })
       : buildAcknowledgementPayload({
           requestId,
-          abhaAddress: patient.abhaAddress,
-          tokenNumber: issued.tokenNumber, intent: toText(payload.intent).toUpperCase()
+          abhaAddress: issued.patient.abhaAddress, // FIXED: Use authoritative patient
+          tokenNumber: issued.tokenNumber, intent: intentStr
         });
 
-    acknowledgeInBackground({
-      issued,
-      isOpenOrder,
-      acknowledgementPayload,
-    });
+    if (!issued._preventConcurrentAck) {
+      acknowledgeInBackground({
+        issued,
+        isOpenOrder,
+        acknowledgementPayload,
+      });
+    }
 
     return res.status(202).json({
       accepted: true,
@@ -237,6 +263,15 @@ const handlePatientShare = async (req, res, { openOrder = false } = {}) => {
       acknowledgementStatus: "pending",
     });
   } catch (error) {
+    if (error.message && error.message.includes("SCAN_SHARE_QUEUE_FULL")) {
+        return res.status(503).json({
+            accepted: false,
+            requestId,
+            hipId,
+            error: "Application resource protection limit reached. Queue is full."
+        });
+    }
+
     return res.status(202).json({
       accepted: false,
       requestId,

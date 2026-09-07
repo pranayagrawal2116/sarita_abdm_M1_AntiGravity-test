@@ -8,6 +8,7 @@
 const express = require("express");
 const router = express.Router();
 const M2CallbackController = require("../controllers/m2CallbackController");
+const GatewayAuthMiddleware = require("../../middlewares/GatewayAuthMiddleware");
 
 // Consent notifications callback
 router.post(
@@ -19,14 +20,17 @@ router.post(
     "/api/v3/consents/hip/notify",
     "/v3/consents/hip/notify"
   ],
+  GatewayAuthMiddleware,
   M2CallbackController.onHipConsentNotify);
 
 router.post(
   ["/api/v3/consent/request/on-init", "/v3/consent/request/on-init"],
+  GatewayAuthMiddleware,
   M2CallbackController.onConsentRequestInit);
 
 router.post(
   ["/api/v3/consent/request/on-status", "/v3/consent/request/on-status"],
+  GatewayAuthMiddleware,
   M2CallbackController.onConsentRequestStatus);
 
 // Health information HIP request callbacks
@@ -39,6 +43,7 @@ router.post(
     "/api/v3/health-information/hip/on-request",
     "/v3/health-information/hip/on-request"
   ],
+  GatewayAuthMiddleware,
   M2CallbackController.handleHipRequest);
 router.post(
   [
@@ -52,6 +57,7 @@ router.post(
     "/api/v3/health-information/notify",
     "/v3/health-information/notify",
   ],
+  GatewayAuthMiddleware,
   M2CallbackController.onHealthInformationNotify);
 
 // Older automated HIP linking registrations use these callback URLs. Do not

@@ -121,11 +121,11 @@ exports.encrypt = (plaintextPlain, receiverPublicKeyBase64, receiverNonceBase64)
   const encryptedContent = Buffer.concat([ciphertext, tag]).toString("base64");
   
   // 9. Checksum is SHA-256 hex of the base64-encoded encrypted content
-  const checksum = crypto.createHash("sha256").update(encryptedContent).digest("hex");
+  
   
   return {
     encryptedContent,
-    checksum,
+    
     ourPublicKey: ourPublicKeyBase64,
     ourNonce: ourNonceBase64
   };

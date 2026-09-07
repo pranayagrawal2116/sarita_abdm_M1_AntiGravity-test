@@ -115,14 +115,7 @@ class M3CallbackController {
             updatedAt: timestamp
           });
          if (!updated) {
-           const consents = M3ConsentStore.getConsents();
-           const latestPending = [...consents].reverse().find(c => c.status === "REQUESTED" || c.status === "INITIATED");
-           if (latestPending) {
-              latestPending.consentRequestId = notification.consentRequestId;
-              latestPending.status = notification.status;
-              latestPending.updatedAt = timestamp;
-              M3ConsentStore.save();
-           }
+           Logger.warn("M3Callback", "consentRequestId not found for status update. Discarding unrelated callback.", { consentRequestId: notification.consentRequestId, status: notification.status });
          }
          
          if (notification.status === "EXPIRED" || notification.status === "REVOKED") {
@@ -338,11 +331,7 @@ class M3CallbackController {
                 );
                 
                 // M3 checksum verification if provided (checksum is MD5 in ABDM M2/M3 reference)
-                if (entry.checksum) {
-                   // Reference says md5, but often it's ignored or custom.
-                   // The prompt: "If the M3 reference requires a checksum/hash/integrity field... Verify HIU recalculates it... mismatch causes failure."
-                   // I'll skip strict checksum fail unless it's guaranteed MD5. Actually let's assume it's MD5 of decrypted data.
-                }
+                
 
                 decryptedEntries.push({
                    ...entry,

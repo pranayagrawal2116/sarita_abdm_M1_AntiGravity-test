@@ -178,7 +178,7 @@ logApiDebug(
       {
         status: error.response?.status,
         headers: sanitizeHeaders(error.response?.headers || {}),
-        data: error.response ? "<omitted for security>" : error.message,
+        data: error.response ? error.response.data : error.message,
       }
     );
     return Promise.reject(error);
@@ -186,6 +186,18 @@ logApiDebug(
 );
 
 app.use(cors());
+// M1 Scan & Share Route-Specific Payload Protection
+app.use([
+  "/api/v3/hip/patient/share",
+  "/v3/hip/patient/share",
+  "/api/hiecm/patient-share/v3/share",
+  "/hiecm/patient-share/v3/share",
+  "/api/v3/hip/patient/share/open-order",
+  "/v3/hip/patient/share/open-order",
+  "/api/hiecm/scan-gateway/v3/patient/share/open-order",
+  "/hiecm/scan-gateway/v3/patient/share/open-order"
+], express.json({ limit: process.env.SCAN_SHARE_BODY_LIMIT || "100kb" }));
+
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: process.env.JSON_BODY_LIMIT || "50mb" }));
 

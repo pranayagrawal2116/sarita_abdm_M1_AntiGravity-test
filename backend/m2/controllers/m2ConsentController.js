@@ -104,7 +104,7 @@ const postHealthInformationRequestToAbdm = async ({ requestId, transactionId, hi
   };
 
   const headers = {
-    ...getHeaders(token),
+    ...getHeaders(token, requestId, payload.timestamp),
     "X-HIU-ID": toText(process.env.HIU_ID) || toText(hospitalConfig.hiuId),
   };
 

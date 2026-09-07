@@ -10,8 +10,8 @@ let tokenRequestPromise = null;
 // Reuse outbound sockets.  Windows Server otherwise pays a fresh DNS/TLS
 // setup cost after the API has been idle, precisely when the mobile callback
 // has the smallest timeout budget.
-const httpAgent = new http.Agent({ keepAlive: true, keepAliveMsecs: 30000, maxSockets: 32 });
-const httpsAgent = new https.Agent({ keepAlive: true, keepAliveMsecs: 30000, maxSockets: 32 });
+const httpAgent = new http.Agent({ keepAlive: true, keepAliveMsecs: 30000, timeout: 60000, maxSockets: 32 });
+const httpsAgent = new https.Agent({ keepAlive: true, keepAliveMsecs: 30000, timeout: 60000, maxSockets: 32 });
 const TOKEN_TIMEOUT_MS = Number(process.env.GATEWAY_TOKEN_TIMEOUT_MS || 8000);
 const TOKEN_ATTEMPTS = Number(process.env.GATEWAY_TOKEN_ATTEMPTS || 2);
 

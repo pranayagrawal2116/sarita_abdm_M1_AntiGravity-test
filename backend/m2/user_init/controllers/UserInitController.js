@@ -23,6 +23,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const gatewayHttpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 30000,
+  timeout: 60000,
   maxSockets: 8,
 });
 
@@ -96,7 +97,14 @@ class UserInitController {
     // the callback header as well when it is available, so the HIE-CM can
     // associate the first Fetch record request with this response immediately.
     // A generated id remains available for callbacks without a correlation id.
-    const callbackRequestId = String(correlationRequestId || '').trim() || newId();
+    const callbackRequestId = newId();
+    const callbackTimestamp = nowIso();
+    data.requestId = callbackRequestId;
+    data.timestamp = callbackTimestamp;
+    if (data.response) {
+        data.resp = data.response;
+        /* kept data.response for backwards compatibility with undocumented ABDM quirks */
+    }
     let lastError;
     for (let attempt = 1; attempt <= CALLBACK_ATTEMPTS; attempt += 1) {
       try {
@@ -110,7 +118,7 @@ class UserInitController {
             "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
             "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
             "REQUEST-ID": callbackRequestId,
-            "TIMESTAMP": nowIso()
+            "TIMESTAMP": callbackTimestamp
           }
         });
       } catch (error) {

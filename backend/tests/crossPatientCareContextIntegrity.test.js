@@ -1,0 +1,132 @@
+const assert = require("assert");
+const fs = require("fs");
+const path = require("path");
+
+// Mock environment
+process.env.RUNTIME_DATA_DIR = path.join(__dirname, "test_data_integrity_audit");
+if (fs.existsSync(process.env.RUNTIME_DATA_DIR)) {
+    fs.rmSync(process.env.RUNTIME_DATA_DIR, { recursive: true, force: true });
+}
+fs.mkdirSync(process.env.RUNTIME_DATA_DIR, { recursive: true });
+
+// M2 Components
+const BundleRegistry = require("../m2/fhir/BundleRegistry");
+const M2CallbackManager = require("../m2/callbacks/M2CallbackManager");
+const M2TransactionStore = require("../m2/transactions/M2TransactionStore");
+const M2DataTransferManager = require("../m2/transfer/M2DataTransferManager");
+
+// Mock UUID
+let idCounter = 1;
+const uuidv4 = () => `mock-uuid-${idCounter++}`;
+
+
+// Mock Token Manager
+const M2TokenManager = require("../m2/tokens/M2TokenManager");
+M2TokenManager.getValidAuthentication = async () => ({ success: true, accessToken: "mock-token" });
+M2TokenManager.getGatewayToken = async () => "mock-token";
+
+
+
+// Mock Gateway Calls
+const M2AuthenticationManager = require("../m2/authentication/M2AuthenticationManager");
+M2AuthenticationManager.callGatewayApi = async () => ({ data: { message: "ACK" } });
+
+const axiosClient = require("../m2/helpers/axiosClient");
+axiosClient.post = async () => ({ data: { message: "ACK" } });
+axiosClient.get = async () => ({ data: { message: "ACK" } });
+
+
+// Mock axios
+const axios = require("axios");
+axios.post = async () => ({ data: { message: "ACK" } });
+axios.get = async () => ({ data: { message: "ACK" } });
+
+
+async function runTests() {
+    console.log("Running Cross-Patient Integrity & Isolation Tests...");
+
+    // 1. Patient Folder Isolation
+    const patientA = "patientA@sbx";
+    const patientB = "patientB@sbx";
+
+    // Create synthetic bundles for A and B
+    const bundleAPath = path.join(process.env.RUNTIME_DATA_DIR, "ABHA_Verified", "patientA@sbx_NameA");
+    const bundleBPath = path.join(process.env.RUNTIME_DATA_DIR, "ABHA_Verified", "patientB@sbx_NameB");
+    fs.mkdirSync(bundleAPath, { recursive: true });
+    fs.mkdirSync(bundleBPath, { recursive: true });
+
+    fs.writeFileSync(path.join(bundleAPath, "patientA@sbx_11_bundle.json"), JSON.stringify({ resourceType: "Bundle", id: "bundleA" }));
+    fs.writeFileSync(path.join(bundleBPath, "patientB@sbx_22_bundle.json"), JSON.stringify({ resourceType: "Bundle", id: "bundleB" }));
+    fs.writeFileSync(path.join(bundleAPath, "patientA@sbx_11.txt"), "CareContextA");
+    fs.writeFileSync(path.join(bundleBPath, "patientB@sbx_22.txt"), "CareContextB");
+
+    BundleRegistry.init();
+    
+    // Validate Isolation
+    const bundlesA = BundleRegistry.getBundlesForPatient(patientA);
+    const bundlesB = BundleRegistry.getBundlesForPatient(patientB);
+    
+    assert.strictEqual(bundlesA.length, 1);
+    assert.strictEqual(bundlesA[0].patientId, patientA);
+    assert.strictEqual(bundlesA[0].bundleFileName, "patientA@sbx_11_bundle.json");
+
+    assert.strictEqual(bundlesB.length, 1);
+    assert.strictEqual(bundlesB[0].patientId, patientB);
+    assert.strictEqual(bundlesB[0].bundleFileName, "patientB@sbx_22_bundle.json");
+
+    // 2. M2 Adversarial Care Context Match
+    // Test what happens if Consent requests CareContextB for PatientA
+    // M2CallbackManager receives Consent Notification for Patient A with CareContext B
+    let consentPayload = {
+        requestId: uuidv4(),
+        notification: {
+            consentId: "CONSENT-A",
+            consentDetail: {
+                consentId: "CONSENT-A",
+                patient: { id: patientA },
+                careContexts: [{ careContextReference: "patientB@sbx_22_bundle.json" }]
+            }
+        }
+    };
+
+    let result = await M2CallbackManager.processCallback("Consent Notification", consentPayload);
+    assert.strictEqual(result.status, "success");
+
+    let tx = M2TransactionStore.getTransaction("CONSENT-A");
+    assert.strictEqual(tx.patientId, patientA);
+
+    // Now Gateway requests Health Info
+    let hiPayload = {
+        requestId: uuidv4(),
+        hiRequest: {
+            transactionId: "TX-A",
+            consent: { id: "CONSENT-A" },
+            dataPushUrl: "http://mock-hiu/data/push",
+            keyMaterial: {
+                cryptoAlg: "ECDH",
+                curve: "Curve25519",
+                dhPublicKey: { keyValue: "mock-key", expiry: "2025" },
+                nonce: "mock-nonce"
+            }
+        }
+    };
+
+    result = await M2CallbackManager.processCallback("Health Information Request", hiPayload);
+    assert.strictEqual(result.status, "success");
+    
+    // Simulate manual HI Transfer
+    // M2DataTransferManager will try to fetch bundle "patientB@sbx_22_bundle.json" from PatientA's directory
+    try {
+        await M2DataTransferManager.initiateTransfer("CONSENT-A", patientA, "OP Consultation", "mock-key", "mock-nonce", "http://push", "TX-A");
+        assert.fail("Should have thrown error due to missing bundle in patient's isolated directory");
+    } catch (err) {
+        assert.ok(err.message.includes("No bundles available") || err.message.includes("Consent validation rejected"), "Failed correctly: " + err.message);
+    }
+    
+    console.log("All Cross-Patient Integrity Tests Passed!");
+}
+
+runTests().catch(err => {
+    console.error(err);
+    process.exit(1);
+});

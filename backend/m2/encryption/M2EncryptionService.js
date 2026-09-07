@@ -167,7 +167,7 @@ class M2EncryptionService {
 
       // Combined package: ciphertext bytes + 16-byte tag
       const encryptedPayload = Buffer.concat([ciphertext, tag]).toString("base64");
-      const checksum = crypto.createHash("sha256").update(encryptedPayload).digest("hex");
+      
 
       const duration = Date.now() - startTime;
       Logger.info("M2EncryptionService", "Encryption completed successfully.", { durationMs: duration });
@@ -178,7 +178,7 @@ class M2EncryptionService {
         senderPublicKey: ourPublicKeyBase64,
         senderNonce: ourNonceBase64,
         metadata: {
-          checksum,
+          
           algorithm: "ECDH-AES256GCM",
           curve: "curve25519"
         },

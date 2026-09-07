@@ -485,7 +485,9 @@ class M2ConsentManager {
     const notificationStatus = payload.notification?.status || "UNKNOWN";
     let statusMapping = "Requested";
     if (notificationStatus === "GRANTED") statusMapping = "Active";
-    else if (notificationStatus === "DENIED" || notificationStatus === "REVOKED" || notificationStatus === "EXPIRED") statusMapping = "Rejected";
+    else if (notificationStatus === "DENIED") statusMapping = "Rejected";
+    else if (notificationStatus === "REVOKED") statusMapping = "Revoked";
+    else if (notificationStatus === "EXPIRED") statusMapping = "Expired";
     const permission = consentDetail.permission || payload.notification?.permission || {};
     const hiTypes = consentDetail.hiTypes || payload.notification?.hiTypes || [];
     const receivedTime = new Date().toISOString();
@@ -594,19 +596,21 @@ class M2ConsentManager {
       throw new Error("Cannot send consent on-notify acknowledgement without original gateway requestId.");
     }
     const token = await M2TokenManager.getGatewayToken();
-    const baseHeaders = getHeaders(token);
+    const reqId = require("uuid").v4();
+    const ts = new Date().toISOString();
+    const baseHeaders = getHeaders(token, reqId, ts);
     const headers = {
       ...baseHeaders,
       "X-HIP-ID": process.env.HIP_ID || hospitalConfig.hipId
     };
     const body = {
+      requestId: reqId,
+      timestamp: ts,
       acknowledgement: {
         status,
         consentId
       },
-      response: {
-        requestId
-      }
+      resp: { requestId }, response: { requestId }
     };
 
     Logger.info("M2ConsentManager", "Sending Consent HIP on-notify acknowledgement.", {

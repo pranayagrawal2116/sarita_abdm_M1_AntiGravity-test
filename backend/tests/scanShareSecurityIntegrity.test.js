@@ -118,8 +118,7 @@ async function runTests() {
 
   // 6. Payment Share ACK
   let { req: req6, res: res6 } = createMockReqRes("POST", { "request-id": "req-pay" }, {
-    intent: "PAYMENT_SHARE",
-    profile: { patient: { abhaAddress: "pay@sbx" } }
+    intent: "PAYMENT_SHARE", paymentBundle: { amount: 100 }, profile: { patient: { abhaAddress: "pay@sbx" } }
   });
   await onPatientShare(req6, res6);
   if (res6.statusCode !== 202) {

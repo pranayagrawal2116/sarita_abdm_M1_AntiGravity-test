@@ -141,41 +141,67 @@ class M2CallbackController {
     }
   }
 
+  
   static async onConsentRequestInit(req, res) {
     Logger.info("M2CallbackController", "onConsentRequestInit callback triggered.");
     const payload = req.body || {};
     const headerRequestId = req.headers["request-id"] || req.headers["request_id"];
-    if (headerRequestId && !payload.requestId) {
-      payload.requestId = headerRequestId;
+    
+    // The requestId is usually in response.requestId or resp.requestId linking back to the original request
+    const originalRequestId = toText(payload.resp?.requestId || payload.response?.requestId);
+    if (!originalRequestId) {
+      return res.status(400).json({ error: "Missing response.requestId linking to original request." });
     }
-    const requestId = toText(payload.requestId || payload.resp?.requestId);
-    if (!requestId) return res.status(400).json({ error: "requestId is required." });
 
     try {
-      const tx = M2TransactionStore.getTransaction(requestId);
+      const tx = M2TransactionStore.getTransaction(originalRequestId);
       if (tx) {
-        await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_INIT_CALLBACK_RECEIVED", "Consent init callback processed by M2CallbackManager route.", {
-          callbackRequestId: requestId,
+        const consentRequestId = payload.consentRequest?.id;
+        
+        const updateData = {};
+        if (consentRequestId) updateData.consentRequestId = consentRequestId;
+        if (payload.error) {
+          updateData.currentState = "Failed";
+          updateData.error = payload.error;
+        } else {
+          updateData.currentState = "GatewayAcknowledged";
+        }
+        
+        await M2TransactionStore.updateTransaction(tx.transactionId, updateData);
+
+        await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_INIT_CALLBACK_RECEIVED", "Consent init callback processed.", {
+          callbackRequestId: originalRequestId,
+          consentRequestId,
           payload
         });
       }
-      return res.status(202).json({ ok: true, requestId, transactionId: tx?.transactionId || "" });
+      return res.status(202).json({ ok: true });
     } catch (err) {
       Logger.error("M2CallbackController", "Error processing consent init callback.", err);
       return res.status(500).json({ error: err.message });
     }
   }
 
+  
   static async onConsentRequestStatus(req, res) {
     Logger.info("M2CallbackController", "onConsentRequestStatus callback triggered.");
     const payload = req.body || {};
     const headerRequestId = req.headers["request-id"] || req.headers["request_id"];
-    if (headerRequestId && !payload.requestId) {
-      payload.requestId = headerRequestId;
-    }
-    const consentId = toText(payload.consentId || payload.notification?.consentId || payload.consent?.id);
-    const requestId = toText(payload.requestId || payload.response?.requestId || payload.resp?.requestId);
-    if (!consentId) return res.status(400).json({ error: "consentId is required." });
+    
+    const requestId = toText(payload.requestId || headerRequestId);
+    const consentRequestId = toText(payload.notification?.consentRequestId);
+    
+    // In HIU notify, we get consentRequestId and consentArtefacts
+    // We can map it to our local transaction by consentRequestId
+    const consentId = toText(
+      payload.consentId || 
+      payload.notification?.consentId || 
+      payload.consent?.id || 
+      (payload.notification?.consentArtefacts && payload.notification.consentArtefacts[0]?.id) ||
+      consentRequestId
+    );
+
+    if (!consentId && !consentRequestId) return res.status(400).json({ error: "consentId or consentRequestId is required." });
     if (!requestId) return res.status(400).json({ error: "requestId is required." });
 
     try {
@@ -184,7 +210,8 @@ class M2CallbackController {
         requestId,
         notification: {
           ...(payload.notification || {}),
-          consentId,
+          consentId: consentId,
+          consentRequestId: consentRequestId,
           status: payload.status || payload.notification?.status || "GRANTED"
         }
       };

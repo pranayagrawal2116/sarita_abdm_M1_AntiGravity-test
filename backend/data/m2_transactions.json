@@ -1,708 +1,39 @@
 {
-  "tx-A": {
-    "transactionId": "tx-A",
-    "requestId": "req-A",
-    "consentId": "creq-A",
-    "consentRequestId": "creq-A",
-    "healthInformationRequestId": "",
-    "gatewayRequestId": "req-rej",
-    "hiRequestId": "",
-    "patientId": "patient@sbx",
-    "patient": {},
-    "abhaAddress": "",
-    "hipId": "",
-    "linkToken": "",
-    "linkedAt": "",
-    "createdTime": "",
-    "careContexts": [],
-    "careContextReference": "",
-    "dataPushUrl": "",
-    "receiverPublicKey": "",
-    "receiverNonce": "",
-    "senderNonce": "",
-    "encryptionMetadata": {},
-    "callbackHistory": [
-      {
-        "timestamp": 1788700709449,
-        "eventType": "CALLBACK_RECEIVED",
-        "message": "Callback \"Consent Notification\" processed.",
-        "details": {
-          "callbackRequestId": "req-rej",
-          "type": "Consent Notification",
-          "consentId": "",
-          "matchReason": "Matched by exact consentId"
-        }
-      }
-    ],
-    "retryHistory": [],
-    "statusHistory": [
-      {
-        "timestamp": 1788700709452,
-        "from": "Created",
-        "to": "CONSENT_DENIED",
-        "metadata": {
-          "reason": "Consent status transitioned to Rejected",
-          "metadata": {
-            "source": "Gateway Notification Callback",
-            "requestId": "req-A",
-            "incomingRequestId": "req-rej"
-          }
-        }
-      }
-    ],
-    "currentState": "CONSENT_DENIED",
-    "previousState": "Created",
-    "createdTimestamp": 1788700709444,
-    "updatedTimestamp": 1788700709453,
-    "retryCount": 0,
-    "failureCount": 0,
-    "errorDetails": "",
-    "auditHistory": [
-      {
-        "timestamp": 1788700709444,
-        "eventType": "CREATED",
-        "message": "Transaction record initialized.",
-        "details": {}
-      },
-      {
-        "timestamp": 1788700709449,
-        "eventType": "CALLBACK_RECEIVED",
-        "message": "Callback \"Consent Notification\" processed.",
-        "details": {
-          "callbackRequestId": "req-rej",
-          "type": "Consent Notification",
-          "consentId": "",
-          "matchReason": "Matched by exact consentId"
-        }
-      },
-      {
-        "timestamp": 1788700709452,
-        "eventType": "STATE_TRANSITION",
-        "message": "State changed from \"Created\" to \"CONSENT_DENIED\".",
-        "details": {
-          "reason": "Consent status transitioned to Rejected",
-          "metadata": {
-            "source": "Gateway Notification Callback",
-            "requestId": "req-A",
-            "incomingRequestId": "req-rej"
-          }
-        }
-      },
-      {
-        "timestamp": 1788700709453,
-        "eventType": "CONSENT_STATUS_UPDATED",
-        "message": "Consent status changed to \"Rejected\".",
-        "details": {
-          "consentId": "creq-A",
-          "from": "Requested",
-          "to": "Rejected",
-          "metadata": {
-            "source": "Gateway Notification Callback",
-            "requestId": "req-A",
-            "incomingRequestId": "req-rej"
-          }
-        }
-      }
-    ],
-    "consentDetails": {
-      "status": "Rejected",
-      "consentId": "creq-A",
-      "consentRequestId": "creq-A",
-      "consentArtifactId": "",
-      "patientId": "patient@sbx",
-      "patient": {},
-      "hip": {},
-      "hiTypes": [],
-      "permission": {},
-      "purpose": {},
-      "dateRange": {},
-      "expiry": 1791292709449,
-      "receivedTime": "2026-09-06T13:18:29.449Z",
-      "signature": "",
-      "createdAt": 1788700709449,
-      "updatedAt": 1788700709451,
-      "rawNotification": {
-        "requestId": "req-rej",
-        "notification": {
-          "status": "DENIED",
-          "consentRequestId": "creq-A"
-        }
-      }
-    },
-    "consentStatus": "DENIED",
-    "identifierProtectionHistory": [
-      {
-        "timestamp": 1788700709447,
-        "skippedFields": [
-          "abhaAddress",
-          "healthInformationRequestId"
-        ],
-        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
-      },
-      {
-        "timestamp": 1788700709450,
-        "skippedFields": [
-          "hipId"
-        ],
-        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
-      }
-    ],
-    "permission": {},
-    "hiTypes": [],
-    "consentDetail": {
-      "status": "DENIED",
-      "consentRequestId": "creq-A"
-    },
-    "consentReceivedAt": "2026-09-06T13:18:29.449Z",
-    "consentSignature": "",
-    "consentNotifyPayload": {
-      "requestId": "req-rej",
-      "notification": {
-        "status": "DENIED",
-        "consentRequestId": "creq-A"
-      }
-    }
-  },
-  "tx-B": {
-    "transactionId": "tx-B",
-    "requestId": "req-B",
-    "consentId": "artefact-B",
-    "consentRequestId": "creq-B",
-    "healthInformationRequestId": "",
-    "gatewayRequestId": "req-grant",
-    "hiRequestId": "",
-    "patientId": "patient@sbx",
-    "patient": {},
-    "abhaAddress": "",
-    "hipId": "",
-    "linkToken": "",
-    "linkedAt": "",
-    "createdTime": "",
-    "careContexts": [],
-    "careContextReference": "",
-    "dataPushUrl": "",
-    "receiverPublicKey": "",
-    "receiverNonce": "",
-    "senderNonce": "",
-    "encryptionMetadata": {},
-    "callbackHistory": [
-      {
-        "timestamp": 1788700709499,
-        "eventType": "CALLBACK_RECEIVED",
-        "message": "Callback \"Consent Notification\" processed.",
-        "details": {
-          "callbackRequestId": "req-grant",
-          "type": "Consent Notification",
-          "consentId": "",
-          "matchReason": "Matched by exact consentId"
-        }
-      },
-      {
-        "timestamp": 1788700709507,
-        "eventType": "DUPLICATE_CALLBACK_RECEIVED",
-        "message": "Duplicate callback \"Consent Notification\" rejected.",
-        "details": {
-          "callbackRequestId": "req-grant",
-          "consentId": ""
-        }
-      }
-    ],
-    "retryHistory": [],
-    "statusHistory": [
-      {
-        "timestamp": 1788700709501,
-        "from": "Created",
-        "to": "CONSENT_GRANTED",
-        "metadata": {
-          "reason": "Consent status transitioned to Active",
-          "metadata": {
-            "source": "Gateway Notification Callback",
-            "requestId": "req-B",
-            "incomingRequestId": "req-grant"
-          }
-        }
-      }
-    ],
-    "currentState": "CONSENT_GRANTED",
-    "previousState": "Created",
-    "createdTimestamp": 1788700709497,
-    "updatedTimestamp": 1788700709507,
-    "retryCount": 0,
-    "failureCount": 0,
-    "errorDetails": "",
-    "auditHistory": [
-      {
-        "timestamp": 1788700709497,
-        "eventType": "CREATED",
-        "message": "Transaction record initialized.",
-        "details": {}
-      },
-      {
-        "timestamp": 1788700709499,
-        "eventType": "CALLBACK_RECEIVED",
-        "message": "Callback \"Consent Notification\" processed.",
-        "details": {
-          "callbackRequestId": "req-grant",
-          "type": "Consent Notification",
-          "consentId": "",
-          "matchReason": "Matched by exact consentId"
-        }
-      },
-      {
-        "timestamp": 1788700709501,
-        "eventType": "STATE_TRANSITION",
-        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
-        "details": {
-          "reason": "Consent status transitioned to Active",
-          "metadata": {
-            "source": "Gateway Notification Callback",
-            "requestId": "req-B",
-            "incomingRequestId": "req-grant"
-          }
-        }
-      },
-      {
-        "timestamp": 1788700709502,
-        "eventType": "CONSENT_STATUS_UPDATED",
-        "message": "Consent status changed to \"Active\".",
-        "details": {
-          "consentId": "artefact-B",
-          "from": "Requested",
-          "to": "Active",
-          "metadata": {
-            "source": "Gateway Notification Callback",
-            "requestId": "req-B",
-            "incomingRequestId": "req-grant"
-          }
-        }
-      },
-      {
-        "timestamp": 1788700709507,
-        "eventType": "DUPLICATE_CALLBACK_RECEIVED",
-        "message": "Duplicate callback \"Consent Notification\" rejected.",
-        "details": {
-          "callbackRequestId": "req-grant",
-          "consentId": ""
-        }
-      }
-    ],
-    "consentDetails": {
-      "status": "Active",
-      "consentId": "artefact-B",
-      "consentRequestId": "creq-B",
-      "consentArtifactId": "artefact-B",
-      "patientId": "patient@sbx",
-      "patient": {},
-      "hip": {},
-      "hiTypes": [],
-      "permission": {},
-      "purpose": {},
-      "dateRange": {},
-      "expiry": 1791292709499,
-      "receivedTime": "2026-09-06T13:18:29.499Z",
-      "signature": "",
-      "createdAt": 1788700709499,
-      "updatedAt": 1788700709500,
-      "rawNotification": {
-        "requestId": "req-grant",
-        "notification": {
-          "status": "GRANTED",
-          "consentRequestId": "creq-B",
-          "consentArtefacts": [
-            {
-              "id": "artefact-B"
-            }
-          ]
-        }
-      }
-    },
-    "consentStatus": "GRANTED",
-    "identifierProtectionHistory": [
-      {
-        "timestamp": 1788700709498,
-        "skippedFields": [
-          "abhaAddress",
-          "healthInformationRequestId"
-        ],
-        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
-      },
-      {
-        "timestamp": 1788700709499,
-        "skippedFields": [
-          "hipId"
-        ],
-        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
-      },
-      {
-        "timestamp": 1788700709506,
-        "skippedFields": [
-          "abhaAddress",
-          "healthInformationRequestId"
-        ],
-        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
-      }
-    ],
-    "permission": {},
-    "hiTypes": [],
-    "consentDetail": {
-      "status": "GRANTED",
-      "consentRequestId": "creq-B",
-      "consentArtefacts": [
-        {
-          "id": "artefact-B"
-        }
-      ]
-    },
-    "consentReceivedAt": "2026-09-06T13:18:29.499Z",
-    "consentSignature": "",
-    "consentNotifyPayload": {
-      "requestId": "req-grant",
-      "notification": {
-        "status": "GRANTED",
-        "consentRequestId": "creq-B",
-        "consentArtefacts": [
-          {
-            "id": "artefact-B"
-          }
-        ]
-      }
-    }
-  },
-  "req-unmatched": {
-    "transactionId": "",
-    "requestId": "req-unmatched",
-    "consentId": "",
-    "consentRequestId": "unknown-req",
-    "healthInformationRequestId": "",
-    "gatewayRequestId": "req-unmatched",
-    "hiRequestId": "",
-    "patientId": "",
-    "patient": {},
-    "abhaAddress": "",
-    "hipId": "",
-    "linkToken": "",
-    "linkedAt": "",
-    "createdTime": "",
-    "careContexts": [],
-    "careContextReference": "",
-    "dataPushUrl": "",
-    "receiverPublicKey": "",
-    "receiverNonce": "",
-    "senderNonce": "",
-    "encryptionMetadata": {},
-    "callbackHistory": [
-      {
-        "timestamp": 1788700709514,
-        "eventType": "CALLBACK_RECEIVED",
-        "message": "Callback \"Consent Notification\" processed.",
-        "details": {
-          "callbackRequestId": "req-unmatched",
-          "type": "Consent Notification",
-          "consentId": "",
-          "matchReason": "NoMatch"
-        }
-      }
-    ],
-    "retryHistory": [],
-    "statusHistory": [],
-    "currentState": "Created",
-    "previousState": "",
-    "createdTimestamp": 1788700709512,
-    "updatedTimestamp": 1788700709515,
-    "retryCount": 0,
-    "failureCount": 0,
-    "errorDetails": "",
-    "auditHistory": [
-      {
-        "timestamp": 1788700709512,
-        "eventType": "CREATED",
-        "message": "Transaction record initialized.",
-        "details": {}
-      },
-      {
-        "timestamp": 1788700709514,
-        "eventType": "CALLBACK_RECEIVED",
-        "message": "Callback \"Consent Notification\" processed.",
-        "details": {
-          "callbackRequestId": "req-unmatched",
-          "type": "Consent Notification",
-          "consentId": "",
-          "matchReason": "NoMatch"
-        }
-      }
-    ],
-    "consentStatus": "GRANTED",
-    "permission": {},
-    "hiTypes": [],
-    "consentDetail": {
-      "status": "GRANTED",
-      "consentRequestId": "unknown-req"
-    },
-    "consentReceivedAt": "2026-09-06T13:18:29.514Z",
-    "consentSignature": "",
-    "consentNotifyPayload": {
-      "requestId": "req-unmatched",
-      "notification": {
-        "status": "GRANTED",
-        "consentRequestId": "unknown-req"
-      }
-    },
-    "consentDetails": {
-      "consentId": "",
-      "consentRequestId": "unknown-req",
-      "consentArtifactId": "",
-      "patientId": "",
-      "patient": {},
-      "hip": {},
-      "hiTypes": [],
-      "permission": {},
-      "purpose": {},
-      "dateRange": {},
-      "expiry": 1791292709514,
-      "receivedTime": "2026-09-06T13:18:29.514Z",
-      "signature": "",
-      "createdAt": 1788700709514,
-      "updatedAt": 1788700709514,
-      "rawNotification": {
-        "requestId": "req-unmatched",
-        "notification": {
-          "status": "GRANTED",
-          "consentRequestId": "unknown-req"
-        }
-      }
-    },
-    "identifierProtectionHistory": [
-      {
-        "timestamp": 1788700709515,
-        "skippedFields": [
-          "transactionId",
-          "consentId",
-          "patientId",
-          "hipId"
-        ],
-        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
-      }
-    ]
-  },
-  "req-1-1788700712312": {
-    "transactionId": "",
-    "requestId": "req-1-1788700712312",
+  "15c83a25-a824-4f42-82d8-d179efdb49fb": {
+    "transactionId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
+    "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
     "consentId": "",
     "consentRequestId": "",
     "healthInformationRequestId": "",
-    "gatewayRequestId": "",
-    "hiRequestId": "",
-    "patientId": "patientA@sbx",
-    "patient": {},
-    "abhaAddress": "patientA@sbx",
-    "hipId": "",
-    "linkToken": "valid-token-123",
-    "linkedAt": "",
-    "createdTime": "",
-    "careContexts": [],
-    "careContextReference": "",
-    "dataPushUrl": "",
-    "receiverPublicKey": "",
-    "receiverNonce": "",
-    "senderNonce": "",
-    "encryptionMetadata": {},
-    "callbackHistory": [],
-    "retryHistory": [],
-    "statusHistory": [
-      {
-        "timestamp": 1788700712316,
-        "from": "Created",
-        "to": "Completed",
-        "metadata": {}
-      }
-    ],
-    "currentState": "Completed",
-    "previousState": "Created",
-    "createdTimestamp": 1788700712314,
-    "updatedTimestamp": 1788700712316,
-    "retryCount": 0,
-    "failureCount": 0,
-    "auditHistory": [
-      {
-        "timestamp": 1788700712314,
-        "eventType": "CREATED",
-        "message": "Transaction record initialized.",
-        "details": {}
-      },
-      {
-        "timestamp": 1788700712316,
-        "eventType": "STATE_TRANSITION",
-        "message": "State changed from \"Created\" to \"Completed\".",
-        "details": {}
-      }
-    ],
-    "transactionType": "HIP_LINK_TOKEN",
-    "callbackPayload": {
-      "requestId": "req-1-1788700712312",
-      "linkToken": "valid-token-123"
-    }
-  },
-  "tx-test-1": {
-    "transactionId": "tx-test-1",
-    "requestId": "req-3",
-    "consentId": "",
-    "consentRequestId": "",
-    "healthInformationRequestId": "",
-    "gatewayRequestId": "req-3",
-    "hiRequestId": "",
-    "patientId": "test-user@sbx",
-    "patient": {},
-    "abhaAddress": "test-user@sbx",
-    "hipId": "IN2410002480",
-    "linkToken": "",
-    "linkedAt": "",
-    "createdTime": "",
-    "careContexts": [
-      {
-        "patientReference": "PAT-dummy",
-        "careContextReference": "dummy",
-        "referenceNumber": "dummy",
-        "display": "Linked Record",
-        "hiType": "OPConsultation"
-      }
-    ],
-    "careContextReference": "",
-    "dataPushUrl": "",
-    "receiverPublicKey": "",
-    "receiverNonce": "",
-    "senderNonce": "",
-    "encryptionMetadata": {},
-    "callbackHistory": [],
-    "retryHistory": [],
-    "statusHistory": [],
-    "currentState": "WAITING_FOR_CONSENT",
-    "previousState": "",
-    "createdTimestamp": 1788700713792,
-    "updatedTimestamp": 1788715339133,
-    "retryCount": 0,
-    "failureCount": 0,
-    "errorDetails": "",
-    "auditHistory": [
-      {
-        "timestamp": 1788700713792,
-        "eventType": "CREATED",
-        "message": "Transaction record initialized.",
-        "details": {}
-      }
-    ],
-    "abhaNumber": "",
-    "patientName": "Test User",
-    "recordType": [
-      "OPConsultation"
-    ],
-    "userInitiatedLinking": true,
-    "sourceStorageClass": "NON_ABHA_VERIFIED",
-    "sourcePatientFolder": "/var/folders/t7/d8wgky5j0yq4rbgd45031zl40000gn/T/abdm-user-init-discovery-VCUgQe/Non_ABHA_Verified/2005_M_5555555555",
-    "sourcePatientFolderName": "2005_M_5555555555",
-    "nonAbhaPatientIdentity": {
-      "yearOfBirth": "2005",
-      "gender": "M",
-      "mobile": "5555555555"
-    }
-  },
-  "tx-test-6a": {
-    "transactionId": "tx-test-6a",
-    "requestId": "req-12a",
-    "consentId": "",
-    "consentRequestId": "",
-    "healthInformationRequestId": "",
-    "gatewayRequestId": "req-13a",
-    "hiRequestId": "",
-    "patientId": "concurrent-a@sbx",
-    "patient": {},
-    "abhaAddress": "concurrent-a@sbx",
-    "hipId": "IN2410002480",
-    "linkToken": "",
-    "linkedAt": "",
-    "createdTime": "",
-    "careContexts": [
-      {
-        "patientReference": "PAT-dummy",
-        "careContextReference": "dummy",
-        "referenceNumber": "dummy",
-        "display": "Linked Record",
-        "hiType": "OPConsultation"
-      }
-    ],
-    "careContextReference": "",
-    "dataPushUrl": "",
-    "receiverPublicKey": "",
-    "receiverNonce": "",
-    "senderNonce": "",
-    "encryptionMetadata": {},
-    "callbackHistory": [],
-    "retryHistory": [],
-    "statusHistory": [],
-    "currentState": "WAITING_FOR_CONSENT",
-    "previousState": "",
-    "createdTimestamp": 1788700713812,
-    "updatedTimestamp": 1788715339155,
-    "retryCount": 0,
-    "failureCount": 0,
-    "errorDetails": "",
-    "auditHistory": [
-      {
-        "timestamp": 1788700713812,
-        "eventType": "CREATED",
-        "message": "Transaction record initialized.",
-        "details": {}
-      }
-    ],
-    "abhaNumber": "",
-    "patientName": "concurrent-a@sbx",
-    "recordType": [
-      "OPConsultation"
-    ],
-    "userInitiatedLinking": true,
-    "sourceStorageClass": "NON_ABHA_VERIFIED",
-    "sourcePatientFolder": "/var/folders/t7/d8wgky5j0yq4rbgd45031zl40000gn/T/abdm-user-init-discovery-VCUgQe/Non_ABHA_Verified/2007_M_7777777777",
-    "sourcePatientFolderName": "2007_M_7777777777",
-    "nonAbhaPatientIdentity": {
-      "yearOfBirth": "2007",
-      "gender": "M",
-      "mobile": "7777777777"
-    }
-  },
-  "051a196f-8eaa-4094-9e86-2e5441533a09": {
-    "transactionId": "051a196f-8eaa-4094-9e86-2e5441533a09",
-    "requestId": "051a196f-8eaa-4094-9e86-2e5441533a09",
-    "consentId": "",
-    "consentRequestId": "",
-    "healthInformationRequestId": "",
-    "gatewayRequestId": "051a196f-8eaa-4094-9e86-2e5441533a09",
+    "gatewayRequestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
     "hiRequestId": "",
     "patientId": "pranay_2025@sbx",
     "patient": [
       {
         "referenceNumber": "Pranay Anup Agrawal",
-        "display": "OPConsultation - Pranay Anup Agrawal",
+        "display": "Prescription - Pranay Anup Agrawal",
         "careContexts": [
           {
-            "referenceNumber": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583",
-            "display": "OP-Consultation-Record-2026-09-07-21-29-37"
+            "referenceNumber": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
+            "display": "Prescription-Record-2026-09-08-08-24-48"
           }
         ],
-        "hiType": "OPConsultation",
+        "hiType": "Prescription",
         "count": 1
       }
     ],
     "abhaAddress": "pranay_2025@sbx",
     "hipId": "IN2410002480",
     "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
-    "linkedAt": "2026-09-07T15:59:47.582Z",
-    "createdTime": "2026-09-07T15:59:47.582Z",
+    "linkedAt": "2026-09-08T02:54:58.884Z",
+    "createdTime": "2026-09-08T02:54:58.884Z",
     "careContexts": [
       {
-        "referenceNumber": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583",
-        "display": "OP-Consultation-Record-2026-09-07-21-29-37"
+        "referenceNumber": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
+        "display": "Prescription-Record-2026-09-08-08-24-48"
       }
     ],
-    "careContextReference": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583",
+    "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
     "dataPushUrl": "",
     "receiverPublicKey": "",
     "receiverNonce": "",
@@ -712,55 +43,55 @@
     "retryHistory": [],
     "statusHistory": [
       {
-        "timestamp": 1788796787592,
+        "timestamp": 1788836098888,
         "from": "LINKED",
         "to": "WAITING_FOR_CONSENT",
         "metadata": {
-          "requestId": "051a196f-8eaa-4094-9e86-2e5441533a09",
+          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
           "reason": "Waiting For Consent"
         }
       }
     ],
     "currentState": "WAITING_FOR_CONSENT",
     "previousState": "LINKED",
-    "createdTimestamp": 1788796787589,
-    "updatedTimestamp": 1788796790616,
+    "createdTimestamp": 1788836098886,
+    "updatedTimestamp": 1788836101924,
     "retryCount": 0,
     "failureCount": 0,
     "errorDetails": "",
     "auditHistory": [
       {
-        "timestamp": 1788796787589,
+        "timestamp": 1788836098886,
         "eventType": "CREATED",
         "message": "Transaction record initialized.",
         "details": {}
       },
       {
-        "timestamp": 1788796787591,
+        "timestamp": 1788836098888,
         "eventType": "HIP_LINK_CREATED",
         "message": "HIP Link Created.",
         "details": {
-          "requestId": "051a196f-8eaa-4094-9e86-2e5441533a09",
-          "careContextReference": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583",
+          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
+          "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
           "abhaAddress": "pranay_2025@sbx"
         }
       },
       {
-        "timestamp": 1788796787592,
+        "timestamp": 1788836098888,
         "eventType": "STATE_TRANSITION",
         "message": "State changed from \"LINKED\" to \"WAITING_FOR_CONSENT\".",
         "details": {
-          "requestId": "051a196f-8eaa-4094-9e86-2e5441533a09",
+          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
           "reason": "Waiting For Consent"
         }
       },
       {
-        "timestamp": 1788796790616,
+        "timestamp": 1788836101924,
         "eventType": "HIP_LINK_CREATED",
         "message": "HIP Link Created.",
         "details": {
-          "requestId": "051a196f-8eaa-4094-9e86-2e5441533a09",
-          "careContextReference": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583",
+          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
+          "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
           "abhaAddress": "pranay_2025@sbx"
         }
       }
@@ -768,7 +99,7 @@
     "abhaNumber": "",
     "linkTokenTransactionId": "1137e8ce-4e0d-45c8-a662-16580394a6d5",
     "linkResponse": {
-      "requestId": "051a196f-8eaa-4094-9e86-2e5441533a09",
+      "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
       "statusCode": 202,
       "response": {}
     },
@@ -782,21 +113,21 @@
       "patient": [
         {
           "referenceNumber": "Pranay Anup Agrawal",
-          "display": "OPConsultation - Pranay Anup Agrawal",
+          "display": "Prescription - Pranay Anup Agrawal",
           "careContexts": [
             {
-              "referenceNumber": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583",
-              "display": "OP-Consultation-Record-2026-09-07-21-29-37"
+              "referenceNumber": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
+              "display": "Prescription-Record-2026-09-08-08-24-48"
             }
           ],
-          "hiType": "OPConsultation",
+          "hiType": "Prescription",
           "count": 1
         }
       ]
     },
     "identifierProtectionHistory": [
       {
-        "timestamp": 1788796790613,
+        "timestamp": 1788836101923,
         "skippedFields": [
           "healthInformationRequestId"
         ],

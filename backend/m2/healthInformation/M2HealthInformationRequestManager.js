@@ -83,7 +83,7 @@ class M2HealthInformationRequestManager {
       }
 
       // 2. Resolve the ABDM transaction before any outbound gateway work.
-      const requestId = `req_${uuidv4()}`;
+      const requestId = uuidv4();
       
       const existingTx = M2TransactionStore.getTransaction(consentId);
       if (!existingTx) {

@@ -285,18 +285,21 @@ class M2ConsentController {
     }
   }
 
+  
   static async fetchConsentInitCallback(req, res) {
     const requestId = toText(req.params?.requestId);
     if (!requestId) return res.status(400).json({ error: "requestId is required" });
 
     const tx = M2TransactionStore.getTransaction(requestId);
-    if (!tx) return res.status(404).json({ error: "Callback not received yet for this requestId" });
+    if (!tx || !tx.consentRequestId) {
+      return res.status(404).json({ error: "Callback not received yet for this requestId" });
+    }
 
     return res.json({
       success: true,
       requestId,
-      consentId: tx.consentId,
-      consentRequest: { id: tx.consentId },
+      consentId: tx.consentRequestId, // Use the REAL Gateway Consent Request ID
+      consentRequest: { id: tx.consentRequestId },
       payload: tx.consentDetails || {},
       source: "M2TransactionStore"
     });

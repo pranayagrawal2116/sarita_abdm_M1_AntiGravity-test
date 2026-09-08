@@ -13,6 +13,7 @@
  *   - registerConsentAcknowledgement(payload, tx)
  */
 
+const { v4: uuidv4 } = require("uuid");
 const Logger = require("../logging/logger");
 const axios = require("../helpers/axiosClient");
 const M2TokenManager = require("../tokens/M2TokenManager");
@@ -72,11 +73,11 @@ class M2ConsentManager {
       }
 
       // 2. Establish transaction record in Store
-      const tempId = consentData.transactionId || `tx_${Date.now()}`;
+      const tempId = consentData.transactionId || uuidv4();
       const tx = await M2TransactionStore.createTransaction({
         transactionId: tempId,
-        requestId: consentData.requestId || `req_${Date.now()}`,
-        consentId: consentData.consentId || `consent_${Date.now()}`,
+        requestId: consentData.requestId || uuidv4(),
+        consentId: consentData.consentId || uuidv4(),
         patientId: consentData.patientId || "",
         currentState: "Created",
         careContexts: consentData.careContexts || []
@@ -100,13 +101,76 @@ class M2ConsentManager {
         consentDetails: consentObj
       });
 
-      await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_CREATED", "Consent request initialized and persisted.", {
+      
+      await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_CREATED", "Consent request initialized and persisted locally.", {
         consentId: tx.consentId,
         status: "Requested"
       });
 
+      // 5. Send ACTUAL Consent Request to ABDM Gateway
+      const timestamp = new Date().toISOString();
+      const gatewayHeaders = getHeaders(token, tx.requestId, timestamp);
+      const hiuId = process.env.HIU_ID || hospitalConfig.hiuId || "Sub_HIU";
+
+      const gatewayPayload = {
+        requestId: tx.requestId,
+        timestamp,
+        consent: {
+          purpose: {
+            text: consentData.purpose?.text || "Care Management",
+            code: consentData.purpose?.code || "CAREMGT",
+            refUri: consentData.purpose?.refUri || "https://www.mciindia.org"
+          },
+          patient: {
+            id: tx.patientId
+          },
+          hiu: {
+            id: hiuId
+          },
+          requester: {
+            name: "Dr. Manjula",
+            identifier: {
+              type: "REGNO",
+              value: "MH1001",
+              system: "https://www.mciindia.org"
+            }
+          },
+          hiTypes: consentData.hiTypes && consentData.hiTypes.length > 0 ? consentData.hiTypes : ["OPCONSULTATION"],
+          permission: {
+            accessMode: "VIEW",
+            dateRange: {
+              from: consentData.dateRange?.from ? new Date(consentData.dateRange.from).toISOString() : new Date(Date.now() - 365*24*60*60*1000).toISOString(),
+              to: consentData.dateRange?.to ? new Date(consentData.dateRange.to).toISOString() : new Date().toISOString()
+            },
+            dataEraseAt: consentData.expiry ? new Date(consentData.expiry).toISOString() : new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+            frequency: {
+              unit: "HOUR",
+              value: 0,
+              repeats: 0
+            }
+          }
+        }
+      };
+
+      if (consentData.careContexts && consentData.careContexts.length > 0) {
+        gatewayPayload.consent.careContexts = consentData.careContexts;
+      }
+
+      Logger.info("M2ConsentManager", "Dispatching Consent Request to ABDM Gateway", { url: `${config.gatewayBaseUrl}/api/hiecm/consent/v3/request/init` });
+      
+      const response = await axios.post(
+        `${config.gatewayBaseUrl}/api/hiecm/consent/v3/request/init`,
+        gatewayPayload,
+        { headers: gatewayHeaders }
+      );
+
+      await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_GATEWAY_DISPATCHED", "Gateway accepted consent initialization.", {
+        statusCode: response.status
+      });
+
       Logger.info("M2ConsentManager", "Consent record created successfully.", { consentId: tx.consentId });
       return consentObj;
+
     } catch (err) {
       Logger.error("M2ConsentManager", "Failed to create consent.", err);
       return { status: "error", error: "CREATION_FAILED", message: err.message };
@@ -304,17 +368,16 @@ class M2ConsentManager {
     };
   }
 
+  
   async submitConsentDecision(consentId, decision, metadata = {}) {
-    Logger.info("M2ConsentManager", "Submitting consent decision through manager.", { consentId, decision });
-    const normalized = String(decision || "").toLowerCase();
-    const nextStatus = normalized === "approve" || normalized === "approved" || normalized === "grant" || normalized === "granted"
-      ? "Active"
-      : "Rejected";
-    return this.updateConsentStatus(consentId, nextStatus, {
-      ...metadata,
-      source: "M2ConsentController"
-    });
+    Logger.info("M2ConsentManager", "submitConsentDecision called locally. Ignoring auto-approval to wait for real ABDM Gateway callback.", { consentId, decision });
+    const tx = M2TransactionStore.getTransaction(consentId);
+    if (!tx || !tx.consentDetails) {
+      throw new Error(`Consent record with ID ${consentId} not found.`);
+    }
+    return tx.consentDetails;
   }
+
 
   /**
    * Retrieves a structured consent details model from the transaction store.

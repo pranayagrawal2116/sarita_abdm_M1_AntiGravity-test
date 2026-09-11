@@ -685,3 +685,1225 @@
   "body": "{\"ok\":true,\"values\":{\"bridgeId\":\"SBXID_010086\",\"publicBaseUrl\":\"https://isolation-pouncing-ecard.ngrok-free.dev\",\"facilityId\":\"IN2410002480\",\"facilityName\":\"Yashfeen Group of Hospitals\",\"serviceName\":\"Yashfeen Group of Hospitals\",\"serviceId\":\"IN2410002480\"},\"callbackUrl\":\"https://isolation-pouncing-ecard.ngrok-free.dev/api/hiecm/patient-share/v3/share\",\"steps\":[{\"name\":\"session\",\"ok\":true,\"required\":true,\"status\":200,\"accessTokenPresent\":true},{\"name\":\"updateBridgeUrl\",\"ok\":true,\"required\":true,\"status\":202,\"payload\":{\"url\":\"https://isolation-pouncing-ecard.ngrok-free.dev\"}},{\"name\":\"registerBridgeServices\",\"ok\":true,\"required\":false,\"status\":200,\"payload\":{\"facilityId\":\"IN2410002480\",\"facilityName\":\"Yashfeen Group of Hospitals\",\"HRP\":[{\"bridgeId\":\"SBXID_010086\",\"hipName\":\"Yashfeen Group of Hospitals\",\"type\":\"HIP\",\"active\":true}]},\"data\":[{\"error\":{\"code\":\"2500\",\"message\":\"Bridge-Id=SBXID_010086 is already associated with Hfr-Id=IN2410002480 for Service-Id=IN2410002480, Service-Name=Yashfeen Group of Hospitals\"}}]},{\"name\":\"findBridgeServiceByServiceId\",\"ok\":false,\"required\":false,\"status\":401,\"error\":{\"error\":\"\"}},{\"name\":\"findServicesByBridgeId\",\"ok\":false,\"required\":false,\"status\":404,\"error\":{\"code\":\"404\",\"type\":\"Status report\",\"message\":\"Runtime Error\",\"description\":\"No matching resource found for given API Request\"}}]}"
 }
 
+[REQUEST] POST https://dev.abdm.gov.in/gateway/v0.5/sessions
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "12db324a-9895-4605-9339-294094b6aeb3",
+    "TIMESTAMP": "2026-09-11T18:06:38.783Z",
+    "X-CM-ID": "sbx"
+  },
+  "data": {
+    "clientId": "SBXID_010086",
+    "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+    "grantType": "client_credentials"
+  }
+}
+
+[REQUEST] POST https://dev.abdm.gov.in/api/hiecm/gateway/v3/sessions
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "d6611b5a-eaad-40ca-b051-472c7f1b7ba7",
+    "TIMESTAMP": "2026-09-11T18:06:38.787Z",
+    "X-CM-ID": "sbx"
+  },
+  "data": {
+    "clientId": "SBXID_010086",
+    "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+    "grantType": "client_credentials"
+  }
+}
+
+[REQUEST] POST https://dev.abdm.gov.in/gateway/v0.5/sessions
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "bff8291a-19c7-4eb0-b79b-9fe9a68534ad",
+    "TIMESTAMP": "2026-09-11T18:06:41.632Z",
+    "X-CM-ID": "sbx"
+  },
+  "data": {
+    "clientId": "SBXID_010086",
+    "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+    "grantType": "client_credentials"
+  }
+}
+
+[REQUEST] POST https://dev.abdm.gov.in/api/hiecm/gateway/v3/sessions
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "99864eeb-1ed0-4a1f-9361-a9259091d04d",
+    "TIMESTAMP": "2026-09-11T18:06:41.634Z",
+    "X-CM-ID": "sbx"
+  },
+  "data": {
+    "clientId": "SBXID_010086",
+    "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+    "grantType": "client_credentials"
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/gateway/v0.5/sessions
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 11 Sep 2026 18:06:41 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "10",
+    "access-control-allow-origin": "*",
+    "correlation-id": "75600747-60c7-42c3-aa53-377ec60b2e25",
+    "pragma": "no-cache",
+    "activityid": "ad8733aa-04b8-4f70-b883-bbfdc3abb12a",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 1fce96555c435863f3cd4ed6fc52abe6.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "UgOmPKrepG1OiTKwUzocqqXc5VZ5VZvMXDsYSHlzRtFtOzz53TBF3Q==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": {
+    "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNTA2NzAsImlhdCI6MTc4OTE0OTQ3MCwianRpIjoiOTkzOTAwMjktY2FkNS00ZWU4LTkwNzItNTA0ZjYxZTQ5YjU3IiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiI5YjIxNGRiOC1hYmEzLTRjYTAtYmRkNS1kMjc1YjVjZjc3MmUiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.iAEYixJZmbtF26SuPud1NAAzGGItIyTmfpOGyY5vIl0JcaTSxWYVqWIr-rVyWCXAu5_p3xE39MoQuylKUAWxbFiYcvGpmGtvq4NZd9DqbAR6jr-Qx5-Lw6pwhuR8v_5YO59O68vEj5J-iV59Mw2l2B8aWIJg8YuONDD9vDQIIxhHbG3hWCCtPi8zew-a7UFhXjdBPntA6-H4XB9QT7ttVHrIlNODWmRVicmC4WzAI54KhfFZhQrFWv8mOCfjQHkOpURRkDw6ETs_WSSTdm3KqOf_4AuZhFlj9mGPhqlPG4WzVhXKKjGfaFmxOSCZv2xjMEILwCmYlC97MYFe8Y4jQw",
+    "expiresIn": 1200,
+    "refreshExpiresIn": 1800,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyMWU5NzA4OS00ZTcxLTQyNGEtOTAzYS1jOTAyMWM1NmFlNWYifQ.eyJleHAiOjE3ODkxNTEyNzAsImlhdCI6MTc4OTE0OTQ3MCwianRpIjoiYjIzZTUyZGEtMjdkYi00NmJlLWJlMmUtM2QyOTI1M2I4ZTU3IiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6Imh0dHBzOi8vZGV2LmFiZG0uZ292LmluL2F1dGgvcmVhbG1zL2NlbnRyYWwtcmVnaXN0cnkiLCJzdWIiOiIxMDM4ZDIzNy02ZDhjLTRkMzUtOGE3Mi1iZDA4ZTY5M2I4OTYiLCJ0eXAiOiJSZWZyZXNoIiwiYXpwIjoiU0JYSURfMDEwMDg2Iiwic2Vzc2lvbl9zdGF0ZSI6IjliMjE0ZGI4LWFiYTMtNGNhMC1iZGQ1LWQyNzViNWNmNzcyZSIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUifQ.fVOTYdWknAu-YvNWSpHcD9MWJ8NJlI10n1OOzmR-sCA",
+    "tokenType": "bearer"
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/gateway/v3/sessions
+{
+  "status": 200,
+  "headers": {
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 11 Sep 2026 18:06:42 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "223",
+    "access-control-allow-origin": "*",
+    "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+    "correlation-id": "e6e27a84-b2b6-4c34-b6f9-938cb231f3c2",
+    "pragma": "no-cache",
+    "activityid": "acee8386-dc2b-4be1-a27a-95febd1d31bb",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 1fce96555c435863f3cd4ed6fc52abe6.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "ToHB4yEl3E8LEsMYrGGKQ3axd_SGjlW-XTyijbife9Y7_1WkHsE-gQ==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": {
+    "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNTEyMDIsImlhdCI6MTc4OTE1MDAwMiwianRpIjoiYzc4YWJiNjEtZWE5Ni00YTRhLTgxODktZTRmMDc1OTNmYWUyIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiI0MmQyODE4Ni0yZjUwLTRiYzktYWJlZC0zOTVmNzY1OTAzMTMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS43OS4xOSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiY2xpZW50SWQiOiJTQlhJRF8wMTAwODYiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJzZXJ2aWNlLWFjY291bnQtc2J4aWRfMDEwMDg2IiwiY2xpZW50QWRkcmVzcyI6IjEwLjIwMS43OS4xOSJ9.SsyQHhLiT8n6TpT9mAC4SEdkoWJxoaAE7rSEimfl24BIMQ2aB1HFQSs5FSkTWrWmo3lJmCEtsWDYN5_uEfTgOyDQ4sx_OMxYxup6X04d2GsxYb0cwHmImASJ-XS8Z5kVgAnYVmmKOtFczg2qOVc5pdEzy9-zENLFdAc-uk1lsKNXGKUMAeY_V-HGYt6RUoUI_q91tzthi2g7eJyPdBmRIlyskMUuxwVC_0lc2LZZOjzOxDDcEUxRbTMdlhJWX45jnHkJYdRQDyaYRZJiXitkgpOViC4oHaQTuLm7lLonIVc_bXtN4eFC2cLsIb-1prlBsREX11HfnRDUdHIk9LvB-g",
+    "expiresIn": 1200,
+    "refreshExpiresIn": 1800,
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyMWU5NzA4OS00ZTcxLTQyNGEtOTAzYS1jOTAyMWM1NmFlNWYifQ.eyJleHAiOjE3ODkxNTE4MDIsImlhdCI6MTc4OTE1MDAwMiwianRpIjoiMWQ1ZjQ5ZWItZmRmNS00ZjQ2LTg4MDgtODUwMzc5MDFjN2Q1IiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6Imh0dHBzOi8vZGV2LmFiZG0uZ292LmluL2F1dGgvcmVhbG1zL2NlbnRyYWwtcmVnaXN0cnkiLCJzdWIiOiIxMDM4ZDIzNy02ZDhjLTRkMzUtOGE3Mi1iZDA4ZTY5M2I4OTYiLCJ0eXAiOiJSZWZyZXNoIiwiYXpwIjoiU0JYSURfMDEwMDg2Iiwic2Vzc2lvbl9zdGF0ZSI6IjQyZDI4MTg2LTJmNTAtNGJjOS1hYmVkLTM5NWY3NjU5MDMxMyIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUifQ.r0ADqHAAkLgs771hwuNfeEz0hnomoGTbxZwdChU2-WY",
+    "tokenType": "bearer"
+  }
+}
+
+[INBOUND REQUEST] POST /api/v3/consent/request/hip/notify
+{
+  "headers": {
+    "host": "isolation-pouncing-ecard.ngrok-free.dev",
+    "user-agent": "ReactorNetty/1.1.19",
+    "content-length": "8084",
+    "accept": "*/*",
+    "authorization": "Bear***T9Ag",
+    "baggage": "Self=1-6aa44314-1e84e3495646bddd22f3bc31,xrsr=21b111cbfe6e8fca",
+    "content-type": "application/json",
+    "request-id": "72676680-6442-4801-b81d-2fe426bf8ebc",
+    "timestamp": "2026-09-11T18:07:12.916Z",
+    "traceparent": "00-6aa443142af9975d8beee9ff29c83462-6802aa77bb5fdddd-00",
+    "tracestate": "xrsr=21b111cbfe6e8fca",
+    "x-amzn-trace-id": "Root=1-6aa44314-2af9975d8beee9ff29c83462;Parent=6802aa77bb5fdddd;Sampled=0;Self=1-6aa44314-1e84e3495646bddd22f3bc31;xrsr=21b111cbfe6e8fca",
+    "x-forwarded-for": "13.203.245.166",
+    "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+    "x-forwarded-proto": "https",
+    "x-hip-id": "IN2410002480",
+    "accept-encoding": "gzip"
+  },
+  "query": {},
+  "body": {
+    "notification": {
+      "status": "GRANTED",
+      "consentId": "04b2b268-5585-4108-97aa-41266ef09a58",
+      "consentDetail": {
+        "schemaVersion": "v3",
+        "consentId": "04b2b268-5585-4108-97aa-41266ef09a58",
+        "createdAt": "2026-09-11T18:04:49.869Z",
+        "patient": {
+          "id": "saurav_50505@sbx"
+        },
+        "careContexts": [
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "72818e4b-c6bd-4018-a189-0f5fd2cbf5fe-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "45dffceb-7709-4a0c-a503-e78cc82eecd3-WellnessRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "8562e01f-e455-463b-af25-ee93149bb604-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "06fd1d8c-82b3-4416-a6cd-725c23edda37-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "6714a24e-08b8-4865-aa04-890f5c713800-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "512f030c-2f05-451a-ae49-a2f9b5f2af74-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "fa294069-b86a-4d75-a37c-d785f2d0e1b6-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "75550a95-ee4e-476b-a973-457b049751f1-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "84f6101e-f265-46f9-a665-3fc0f0ad5d4a-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "2c58bbac-5f51-47e9-ad2c-df1bdf1ba358-HealthDocumentRecord"
+          },
+          {
+            "patientReference": "4666bb6f-773c-4913-94bc-23ec92805b49",
+            "careContextReference": "linked-ctx"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "e8ab7f6b-c8b6-45f0-ad76-51acf88e9b22-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "68ee0f2b-28a4-4aff-a360-5ef4e68fe283-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "a6d8b05f-e5ab-493b-a3dc-81eaab30dbb6-WellnessRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "dfeb0d19-35ec-4e94-a728-dc43c8f1b1ab-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "917c50f5-631c-4180-a8de-472af9c8ad19-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "4da6b97b-e06d-4bb7-a41e-4c773a7b73a6-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "22f8786b-1132-43c7-a460-34cb5b313f19-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c6dd7aee-42d7-4629-ad04-16f32aefa9e7-HealthDocumentRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "91fbe9bf-5600-4faa-ad0e-083d01b2132b-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "2a9341c9-a2b0-4392-a42d-cf48fadab5c3-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "1f0d5c66-8732-4c22-a958-aa8879f7aac4-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "93433ffb-4527-4976-a7ea-cb59cace0b3c-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "6dd8a4de-c3e6-47c7-a7d3-e182f28758f8-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "96bc3878-711c-4ccd-a712-abe7a00bd600-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "87237738-04b5-4bc5-a8c8-7dba6b8079c3-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "ea79dbb2-54e4-4566-a728-5b5f7bde7842-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c276ea84-b851-4299-a393-baefc9502bab-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "e61acebc-a505-4fb2-a810-4e6ddc3e07e2-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "3e8c8af1-9ea2-4b38-ae12-2375ba051fce-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "ccae5611-2667-434d-a677-8cdd6c6c21d4-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "581a4fec-d405-4141-a5fe-055536684293-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "fd591b56-a203-45ba-a2cb-c8ab558a446f-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "70fc558c-3987-44b7-a98a-40c0a2d72c7c-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "3cfa2d2f-04ea-4f1a-a024-134f332d6273-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c817aeec-0796-4caa-a0ce-e5016e54a710-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "9f0e5b93-a905-41e4-afc4-61de84c83260-WellnessRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "93260372-be4e-4254-aa36-32d27d4d25fb-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "369be66c-3dca-47ab-a3ba-6619cc3d9c42-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "17c4cdcf-a77f-4dde-afe1-4f16167d74fd-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "f15de695-de8a-4d1a-ab68-4b84aee3a027-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "8546253e-2d0e-4724-a41a-6dfe795c584a-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "a364c4c3-05f4-4a39-a1c8-6a26b91716ce-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "17b7ff6a-77aa-45c6-a326-e6c4507e3110-HealthDocumentRecord"
+          },
+          {
+            "patientReference": "PAT-b1e7de24",
+            "careContextReference": "b1e7de24"
+          },
+          {
+            "patientReference": "PAT-d18f0d9f",
+            "careContextReference": "d18f0d9f"
+          },
+          {
+            "patientReference": "PAT-98eec984",
+            "careContextReference": "98eec984"
+          },
+          {
+            "patientReference": "PAT-3db2c582",
+            "careContextReference": "3db2c582"
+          },
+          {
+            "patientReference": "PAT-47061ee4",
+            "careContextReference": "47061ee4"
+          },
+          {
+            "patientReference": "PAT-2c7a710f",
+            "careContextReference": "2c7a710f"
+          },
+          {
+            "patientReference": "PAT-2acdba4e",
+            "careContextReference": "2acdba4e"
+          },
+          {
+            "patientReference": "PAT-50fbae2d",
+            "careContextReference": "50fbae2d"
+          },
+          {
+            "patientReference": "PAT-974cc018",
+            "careContextReference": "974cc018"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "f5aa8db1"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "83f86a79"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "149d5d38"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "02748f51"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "8f18ea1b"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "c69c5590"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "7d10aa08"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "8eb25647"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "8966e1bf"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "892e54ed"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "77f22c23-821b-4dc7-a3c9-6aeb2ee14948-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c050b693-10fb-4fd2-a8cc-a951953fb40d-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "0843e16c-1d35-432a-adc3-f201aee93910-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "9ce1f5d8-6f07-46aa-adb9-97382fbd4633-Invoice"
+          }
+        ],
+        "purpose": {
+          "text": "Care Management",
+          "code": "CAREMGT",
+          "refUri": "http://abdm.gov.in"
+        },
+        "hip": {
+          "id": "IN2410002480",
+          "name": "Yashfeen Group of Hospitals",
+          "type": "HIP"
+        },
+        "consentManager": {
+          "id": "sbx"
+        },
+        "hiTypes": [
+          "Prescription",
+          "DiagnosticReport",
+          "OPConsultation",
+          "DischargeSummary",
+          "ImmunizationRecord",
+          "HealthDocumentRecord",
+          "WellnessRecord",
+          "Invoice"
+        ],
+        "permission": {
+          "accessMode": "VIEW",
+          "dateRange": {
+            "from": "2025-07-31T18:30:00.000Z",
+            "to": "2026-09-11T18:02:47.695Z"
+          },
+          "dataEraseAt": "2026-10-14T12:29:00.000Z",
+          "frequency": {
+            "unit": "HOUR",
+            "value": 1,
+            "repeats": 0
+          }
+        }
+      },
+      "signature": "PEysiZhhzjnrALl31XsdhuAy3jYyigIXuMN9Wh6t7Hj83cujyPDuj3NDG0UqoLtPHNBnYs++sLwIe0iVE9XVXle+tXU5u9ebtXrNFp8K9YuDlBV1N1kUHWtcRBcnCjSjEke+4e9FNgb+XZW+RID3Z9EAI3C4KEP7L2JOxgFSRi7MhqfVrquHlRUE43y3YzHiG9CWk53DZrkH4MfQ67c5o3HqKYOXj0qO1D1u9lwCmH1zDmBNcRPugqXQOMCQwHcCANGE2for5Y/CPb9pTVo/umn0EHCN/9y5vxq2W1IVpQQTT8U6ZOyQLN4dIdSU+h1qEsb8VP0EXck1l49cAwwjWA==",
+      "grantAcknowledgement": false
+    }
+  }
+}
+
+[REQUEST] POST https://webhook.site/47d2ebd0-7041-4732-a16a-fb37ad636b7b/api/v3/consent/request/hip/notify
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "x-hip-id": "IN2410002480",
+    "x-hiu-id": ""
+  },
+  "data": {
+    "notification": {
+      "status": "GRANTED",
+      "consentId": "04b2b268-5585-4108-97aa-41266ef09a58",
+      "consentDetail": {
+        "schemaVersion": "v3",
+        "consentId": "04b2b268-5585-4108-97aa-41266ef09a58",
+        "createdAt": "2026-09-11T18:04:49.869Z",
+        "patient": {
+          "id": "saurav_50505@sbx"
+        },
+        "careContexts": [
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "72818e4b-c6bd-4018-a189-0f5fd2cbf5fe-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "45dffceb-7709-4a0c-a503-e78cc82eecd3-WellnessRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "8562e01f-e455-463b-af25-ee93149bb604-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "06fd1d8c-82b3-4416-a6cd-725c23edda37-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "6714a24e-08b8-4865-aa04-890f5c713800-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "512f030c-2f05-451a-ae49-a2f9b5f2af74-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "fa294069-b86a-4d75-a37c-d785f2d0e1b6-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "75550a95-ee4e-476b-a973-457b049751f1-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "84f6101e-f265-46f9-a665-3fc0f0ad5d4a-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "2c58bbac-5f51-47e9-ad2c-df1bdf1ba358-HealthDocumentRecord"
+          },
+          {
+            "patientReference": "4666bb6f-773c-4913-94bc-23ec92805b49",
+            "careContextReference": "linked-ctx"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "e8ab7f6b-c8b6-45f0-ad76-51acf88e9b22-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "68ee0f2b-28a4-4aff-a360-5ef4e68fe283-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "a6d8b05f-e5ab-493b-a3dc-81eaab30dbb6-WellnessRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "dfeb0d19-35ec-4e94-a728-dc43c8f1b1ab-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "917c50f5-631c-4180-a8de-472af9c8ad19-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "4da6b97b-e06d-4bb7-a41e-4c773a7b73a6-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "22f8786b-1132-43c7-a460-34cb5b313f19-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c6dd7aee-42d7-4629-ad04-16f32aefa9e7-HealthDocumentRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "91fbe9bf-5600-4faa-ad0e-083d01b2132b-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "2a9341c9-a2b0-4392-a42d-cf48fadab5c3-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "1f0d5c66-8732-4c22-a958-aa8879f7aac4-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "93433ffb-4527-4976-a7ea-cb59cace0b3c-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "6dd8a4de-c3e6-47c7-a7d3-e182f28758f8-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "96bc3878-711c-4ccd-a712-abe7a00bd600-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "87237738-04b5-4bc5-a8c8-7dba6b8079c3-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "ea79dbb2-54e4-4566-a728-5b5f7bde7842-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c276ea84-b851-4299-a393-baefc9502bab-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "e61acebc-a505-4fb2-a810-4e6ddc3e07e2-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "3e8c8af1-9ea2-4b38-ae12-2375ba051fce-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "ccae5611-2667-434d-a677-8cdd6c6c21d4-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "581a4fec-d405-4141-a5fe-055536684293-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "fd591b56-a203-45ba-a2cb-c8ab558a446f-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "70fc558c-3987-44b7-a98a-40c0a2d72c7c-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "3cfa2d2f-04ea-4f1a-a024-134f332d6273-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c817aeec-0796-4caa-a0ce-e5016e54a710-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "9f0e5b93-a905-41e4-afc4-61de84c83260-WellnessRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "93260372-be4e-4254-aa36-32d27d4d25fb-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "369be66c-3dca-47ab-a3ba-6619cc3d9c42-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "17c4cdcf-a77f-4dde-afe1-4f16167d74fd-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "f15de695-de8a-4d1a-ab68-4b84aee3a027-DischargeSummary"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "8546253e-2d0e-4724-a41a-6dfe795c584a-OPConsultation"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "a364c4c3-05f4-4a39-a1c8-6a26b91716ce-Invoice"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "17b7ff6a-77aa-45c6-a326-e6c4507e3110-HealthDocumentRecord"
+          },
+          {
+            "patientReference": "PAT-b1e7de24",
+            "careContextReference": "b1e7de24"
+          },
+          {
+            "patientReference": "PAT-d18f0d9f",
+            "careContextReference": "d18f0d9f"
+          },
+          {
+            "patientReference": "PAT-98eec984",
+            "careContextReference": "98eec984"
+          },
+          {
+            "patientReference": "PAT-3db2c582",
+            "careContextReference": "3db2c582"
+          },
+          {
+            "patientReference": "PAT-47061ee4",
+            "careContextReference": "47061ee4"
+          },
+          {
+            "patientReference": "PAT-2c7a710f",
+            "careContextReference": "2c7a710f"
+          },
+          {
+            "patientReference": "PAT-2acdba4e",
+            "careContextReference": "2acdba4e"
+          },
+          {
+            "patientReference": "PAT-50fbae2d",
+            "careContextReference": "50fbae2d"
+          },
+          {
+            "patientReference": "PAT-974cc018",
+            "careContextReference": "974cc018"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "f5aa8db1"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "83f86a79"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "149d5d38"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "02748f51"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "8f18ea1b"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "c69c5590"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "7d10aa08"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "8eb25647"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "8966e1bf"
+          },
+          {
+            "patientReference": "saurav_50505@sbx",
+            "careContextReference": "892e54ed"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "77f22c23-821b-4dc7-a3c9-6aeb2ee14948-Prescription"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "c050b693-10fb-4fd2-a8cc-a951953fb40d-DiagnosticReport"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "0843e16c-1d35-432a-adc3-f201aee93910-ImmunizationRecord"
+          },
+          {
+            "patientReference": "Saurav Kumar",
+            "careContextReference": "9ce1f5d8-6f07-46aa-adb9-97382fbd4633-Invoice"
+          }
+        ],
+        "purpose": {
+          "text": "Care Management",
+          "code": "CAREMGT",
+          "refUri": "http://abdm.gov.in"
+        },
+        "hip": {
+          "id": "IN2410002480",
+          "name": "Yashfeen Group of Hospitals",
+          "type": "HIP"
+        },
+        "consentManager": {
+          "id": "sbx"
+        },
+        "hiTypes": [
+          "Prescription",
+          "DiagnosticReport",
+          "OPConsultation",
+          "DischargeSummary",
+          "ImmunizationRecord",
+          "HealthDocumentRecord",
+          "WellnessRecord",
+          "Invoice"
+        ],
+        "permission": {
+          "accessMode": "VIEW",
+          "dateRange": {
+            "from": "2025-07-31T18:30:00.000Z",
+            "to": "2026-09-11T18:02:47.695Z"
+          },
+          "dataEraseAt": "2026-10-14T12:29:00.000Z",
+          "frequency": {
+            "unit": "HOUR",
+            "value": 1,
+            "repeats": 0
+          }
+        }
+      },
+      "signature": "PEysiZhhzjnrALl31XsdhuAy3jYyigIXuMN9Wh6t7Hj83cujyPDuj3NDG0UqoLtPHNBnYs++sLwIe0iVE9XVXle+tXU5u9ebtXrNFp8K9YuDlBV1N1kUHWtcRBcnCjSjEke+4e9FNgb+XZW+RID3Z9EAI3C4KEP7L2JOxgFSRi7MhqfVrquHlRUE43y3YzHiG9CWk53DZrkH4MfQ67c5o3HqKYOXj0qO1D1u9lwCmH1zDmBNcRPugqXQOMCQwHcCANGE2for5Y/CPb9pTVo/umn0EHCN/9y5vxq2W1IVpQQTT8U6ZOyQLN4dIdSU+h1qEsb8VP0EXck1l49cAwwjWA==",
+      "grantAcknowledgement": false
+    }
+  }
+}
+
+[REQUEST] POST https://dev.abdm.gov.in/api/hiecm/consent/v3/request/hip/on-notify
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "5639711b-f5d3-41cd-a6eb-d2a59f336ecb",
+    "TIMESTAMP": "2026-09-11T18:07:17.376Z",
+    "X-CM-ID": "sbx",
+    "Authorization": "Bear***4jQw",
+    "X-HIP-ID": "IN2410002480"
+  },
+  "data": {
+    "acknowledgement": {
+      "status": "ok",
+      "consentId": "04b2b268-5585-4108-97aa-41266ef09a58"
+    },
+    "response": {
+      "requestId": "72676680-6442-4801-b81d-2fe426bf8ebc"
+    }
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/consent/v3/request/hip/on-notify
+{
+  "status": 202,
+  "headers": {
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 11 Sep 2026 18:07:39 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "22295",
+    "access-control-allow-origin": "*",
+    "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+    "correlation-id": "cd97b576-ba94-4e51-bd23-f06726e967f0",
+    "pragma": "no-cache",
+    "activityid": "1f3292e0-f165-48fd-9632-10b2e74d5d93",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 f75007f93d7a2428f5ae5fe0d25913a0.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "rbDJc1QCqKeQ5oQ4wYV69GjpFm7slkND97tTtHBQEsjhNsodxhAoRw==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": ""
+}
+
+[INBOUND RESPONSE] POST /api/v3/consent/request/hip/notify
+{
+  "status": 202,
+  "body": "{\"status\":\"success\",\"duplicate\":false,\"transactionId\":\"72676680-6442-4801-b81d-2fe426bf8ebc\",\"currentState\":\"CONSENT_GRANTED\",\"dispatched\":true,\"dispatchResult\":{\"dispatched\":true,\"result\":{\"success\":true,\"consentId\":\"04b2b268-5585-4108-97aa-41266ef09a58\",\"status\":\"Active\",\"acknowledgement\":{\"statusCode\":202,\"requestId\":\"72676680-6442-4801-b81d-2fe426bf8ebc\",\"body\":{\"acknowledgement\":{\"status\":\"ok\",\"consentId\":\"04b2b268-5585-4108-97aa-41266ef09a58\"},\"response\":{\"requestId\":\"72676680-6442-4801-b81d-2fe426bf8ebc\"}}}}}}"
+}
+
+[INBOUND REQUEST] POST /api/v3/hip/health-information/request
+{
+  "headers": {
+    "host": "isolation-pouncing-ecard.ngrok-free.dev",
+    "user-agent": "ReactorNetty/1.1.19",
+    "content-length": "661",
+    "accept": "*/*",
+    "authorization": "Bear***ScNA",
+    "content-type": "application/json",
+    "request-id": "37aedb50-4c54-48d4-b5f5-c908799bbdf7",
+    "timestamp": "2026-09-11 18:07:40.752",
+    "traceparent": "00-6aa4436d9d356b47adb2e414f6f7c49a-9279bfc8eabe231f-00",
+    "tracestate": "xrsr=21b111cbfe6e8fca",
+    "x-amzn-trace-id": "Root=1-6aa4436d-9d356b47adb2e414f6f7c49a;Parent=9279bfc8eabe231f;Sampled=0;xrsr=21b111cbfe6e8fca",
+    "x-forwarded-for": "65.0.113.207",
+    "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+    "x-forwarded-proto": "https",
+    "x-hip-id": "IN2410002480",
+    "accept-encoding": "gzip"
+  },
+  "query": {},
+  "body": {
+    "transactionId": "41d0778b-0164-4edd-8d62-6c7f0b22ed86",
+    "hiRequest": {
+      "consent": {
+        "id": "04b2b268-5585-4108-97aa-41266ef09a58"
+      },
+      "dateRange": {
+        "from": "2025-07-31T18:30:00.000Z",
+        "to": "2026-09-11T18:02:47.695Z"
+      },
+      "dataPushUrl": "https://3ba4-2401-4900-88f4-ea3a-7004-c8b-df6c-171a.ngrok-free.app/api/v3/hiu/data/push",
+      "keyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "dhPublicKey": {
+          "expiry": "2026-09-12T18:07:37.805Z",
+          "parameters": "Curve25519/X509 encoded public key",
+          "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARLYSB9ocJ1ebGPgLIznhPyvELzi9mLIIARl8p0tjFUyElHbXGubk2vbtSYa4m7lx03fHFFNG9cCCXki0xWqIOS"
+        },
+        "nonce": "7l3iBKfP/GzM6gPFChfWv7yb4r+TY4SGP6GKDTOFt+I="
+      }
+    }
+  }
+}
+
+[REQUEST] POST https://webhook.site/47d2ebd0-7041-4732-a16a-fb37ad636b7b/api/v3/hip/health-information/request
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "x-hip-id": "IN2410002480",
+    "x-hiu-id": ""
+  },
+  "data": {
+    "transactionId": "41d0778b-0164-4edd-8d62-6c7f0b22ed86",
+    "hiRequest": {
+      "consent": {
+        "id": "04b2b268-5585-4108-97aa-41266ef09a58"
+      },
+      "dateRange": {
+        "from": "2025-07-31T18:30:00.000Z",
+        "to": "2026-09-11T18:02:47.695Z"
+      },
+      "dataPushUrl": "https://3ba4-2401-4900-88f4-ea3a-7004-c8b-df6c-171a.ngrok-free.app/api/v3/hiu/data/push",
+      "keyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "dhPublicKey": {
+          "expiry": "2026-09-12T18:07:37.805Z",
+          "parameters": "Curve25519/X509 encoded public key",
+          "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARLYSB9ocJ1ebGPgLIznhPyvELzi9mLIIARl8p0tjFUyElHbXGubk2vbtSYa4m7lx03fHFFNG9cCCXki0xWqIOS"
+        },
+        "nonce": "7l3iBKfP/GzM6gPFChfWv7yb4r+TY4SGP6GKDTOFt+I="
+      }
+    }
+  }
+}
+
+[REQUEST] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/hip/on-request
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "0e4f7ec7-0178-47ac-9a09-808bf989f0a5",
+    "TIMESTAMP": "2026-09-11T18:07:45.437Z",
+    "X-CM-ID": "sbx",
+    "Authorization": "Bear***4jQw",
+    "X-HIP-ID": "IN2410002480"
+  },
+  "data": {
+    "hiRequest": {
+      "transactionId": "41d0778b-0164-4edd-8d62-6c7f0b22ed86",
+      "sessionStatus": "ACKNOWLEDGED"
+    },
+    "response": {
+      "requestId": "37aedb50-4c54-48d4-b5f5-c908799bbdf7"
+    }
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/hip/on-request
+{
+  "status": 200,
+  "headers": {
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 11 Sep 2026 18:07:45 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "31",
+    "access-control-allow-origin": "*",
+    "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+    "correlation-id": "0f1a039b-0256-4051-9702-43779ad3d4b7",
+    "pragma": "no-cache",
+    "activityid": "e47b608e-728b-4b68-bcb8-214de8ae888d",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 f75007f93d7a2428f5ae5fe0d25913a0.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "C7-rAxjihJmVei1sj03IxXn4hcnwngVxpDZXKIFi57h_rYFvAinjzQ==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": ""
+}
+
+[INBOUND RESPONSE] POST /api/v3/hip/health-information/request
+{
+  "status": 200,
+  "body": "{\"status\":\"success\",\"duplicate\":false,\"transactionId\":\"41d0778b-0164-4edd-8d62-6c7f0b22ed86\",\"currentState\":\"HI Request Received\",\"dispatched\":true,\"dispatchResult\":{\"dispatched\":true,\"result\":{\"success\":true,\"requestId\":\"37aedb50-4c54-48d4-b5f5-c908799bbdf7\",\"hiResponse\":{\"statusCode\":200,\"body\":{\"hiRequest\":{\"transactionId\":\"41d0778b-0164-4edd-8d62-6c7f0b22ed86\",\"sessionStatus\":\"ACKNOWLEDGED\"},\"response\":{\"requestId\":\"37aedb50-4c54-48d4-b5f5-c908799bbdf7\"}}}}}}"
+}
+
+[OUTBOUND REQUEST] POST https://3ba4-2401-4900-88f4-ea3a-7004-c8b-df6c-171a.ngrok-free.app/api/v3/hiu/data/push
+{
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "data": {
+    "pageNumber": 1,
+    "pageCount": 1,
+    "transactionId": "41d0778b-0164-4edd-8d62-6c7f0b22ed86",
+    "entries": [
+      {
+        "content": "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",
+        "media": "application/fhir+json",
+        "checksum": "103f01ab6d461da96b07209e37b29d2748ddba76826a764138a026cc889c0a71",
+        "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "Curve25519",
+      "dhPublicKey": {
+        "expiry": "2027-09-11T18:07:49.485Z",
+        "parameters": "Curve25519/32byte random key",
+        "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAReqjApj2PeqMGv9DE8MbKotuuIrHvLZgBVcLIWK9rBaEPEkXd2dnhaj+zek2zvbX0CLYhfCqSUR8zzHyqTfvcH"
+      },
+      "nonce": "I+4Lcgdn39GkQtP4CQ0IXNc7QBkP6LENNS9rbp4kcWc="
+    }
+  }
+}
+
+[REQUEST] POST https://3ba4-2401-4900-88f4-ea3a-7004-c8b-df6c-171a.ngrok-free.app/api/v3/hiu/data/push
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json"
+  },
+  "data": {
+    "pageNumber": 1,
+    "pageCount": 1,
+    "transactionId": "41d0778b-0164-4edd-8d62-6c7f0b22ed86",
+    "entries": [
+      {
+        "content": "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",
+        "media": "application/fhir+json",
+        "checksum": "103f01ab6d461da96b07209e37b29d2748ddba76826a764138a026cc889c0a71",
+        "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "Curve25519",
+      "dhPublicKey": {
+        "expiry": "2027-09-11T18:07:49.485Z",
+        "parameters": "Curve25519/32byte random key",
+        "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAReqjApj2PeqMGv9DE8MbKotuuIrHvLZgBVcLIWK9rBaEPEkXd2dnhaj+zek2zvbX0CLYhfCqSUR8zzHyqTfvcH"
+      },
+      "nonce": "I+4Lcgdn39GkQtP4CQ0IXNc7QBkP6LENNS9rbp4kcWc="
+    }
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://3ba4-2401-4900-88f4-ea3a-7004-c8b-df6c-171a.ngrok-free.app/api/v3/hiu/data/push
+{
+  "status": 202,
+  "headers": {
+    "access-control-allow-credentials": "true",
+    "content-length": "16",
+    "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+    "content-type": "application/json; charset=utf-8",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "same-origin",
+    "date": "Fri, 11 Sep 2026 18:07:50 GMT",
+    "etag": "W/\"10-oV4hJxRVSENxc/wX8+mA4/Pe4tA\"",
+    "ngrok-agent-ips": "2401:4900:88f4:ea3a:7004:c8b:df6c:171a",
+    "origin-agent-cluster": "?1",
+    "referrer-policy": "no-referrer",
+    "request-id": "f7b2517a-086d-48dd-b52d-a4dd2bda9e0c",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "vary": "Origin, Accept-Encoding",
+    "x-content-type-options": "nosniff",
+    "x-dns-prefetch-control": "off",
+    "x-download-options": "noopen",
+    "x-frame-options": "SAMEORIGIN",
+    "x-permitted-cross-domain-policies": "none",
+    "x-xss-protection": "0"
+  },
+  "data": {
+    "success": true
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://3ba4-2401-4900-88f4-ea3a-7004-c8b-df6c-171a.ngrok-free.app/api/v3/hiu/data/push
+{
+  "status": 202,
+  "data": {
+    "success": true
+  }
+}
+
+[REQUEST] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
+{
+  "headers": {
+    "Accept": "application/json, text/plain, */*",
+    "Content-Type": "application/json",
+    "REQUEST-ID": "40c2a2b2-8178-406c-b655-fe8c348f1351",
+    "TIMESTAMP": "2026-09-11T18:07:53.159Z",
+    "X-CM-ID": "sbx",
+    "Authorization": "Bear***4jQw",
+    "X-HIP-ID": "IN2410002480"
+  },
+  "data": {
+    "requestId": "c31d712d-99ba-49c2-9924-3b05da985e73",
+    "timestamp": "2026-09-11T18:07:53.159Z",
+    "notification": {
+      "consentId": "04b2b268-5585-4108-97aa-41266ef09a58",
+      "transactionId": "41d0778b-0164-4edd-8d62-6c7f0b22ed86",
+      "doneAt": "2026-09-11T18:07:53.159Z",
+      "notifier": {
+        "type": "HIP",
+        "id": "IN2410002480"
+      },
+      "statusNotification": {
+        "sessionStatus": "TRANSFERRED",
+        "hipId": "IN2410002480",
+        "statusResponses": [
+          {
+            "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation",
+            "hiStatus": "OK",
+            "description": "Health information transferred"
+          }
+        ]
+      }
+    }
+  }
+}
+
+[OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
+{
+  "status": 202,
+  "headers": {
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "date": "Fri, 11 Sep 2026 18:07:53 GMT",
+    "access-control-expose-headers": "*",
+    "x-frame-options": "SAMEORIGIN",
+    "expires": "0",
+    "x-envoy-upstream-service-time": "23",
+    "access-control-allow-origin": "*",
+    "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+    "correlation-id": "25b10770-19a5-4be7-9d73-d0cec8195e90",
+    "pragma": "no-cache",
+    "activityid": "b6efd896-4f51-41bd-adf3-8174487a25ee",
+    "x-content-type-options": "nosniff",
+    "x-xss-protection": "1; mode=block",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+    "server": "istio-envoy",
+    "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+    "access-control-allow-headers": "*",
+    "x-cache": "Miss from cloudfront",
+    "via": "1.1 5b3ba25f8eac620d91408a458d7b2a9e.cloudfront.net (CloudFront)",
+    "x-amz-cf-pop": "BOM78-P1",
+    "x-amz-cf-id": "_jIjFhIazUn1Loi6fVuSDS0G4cE1CLnYubFethZmbq3aBJc-FOfWrQ==",
+    "content-security-policy": "https://es-staging.cdac.in",
+    "strict-transport-security": "max-age=31536000",
+    "cross-origin-embedder-policy": "require-corp",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "cross-origin",
+    "permissions-policy": "geolocation=(self)"
+  },
+  "data": {
+    "status": "Notification is Accepted"
+  }
+}
+

@@ -27,8 +27,6 @@ class M3ConsentService {
       };
 
       const abdmPayload = {
-        requestId: requestId,
-        timestamp: timestamp,
         consent: {
           purpose: {
             text: payload.purpose,
@@ -45,8 +43,8 @@ class M3ConsentService {
             name: payload.requesterName,
             identifier: {
               type: "REGNO",
-              value: hospitalConfig.requesterIdentifier || payload.requesterIdentifier || "MH1001",
-              system: hospitalConfig.requesterSystem || payload.requesterSystem || "https://www.mciindia.org"
+              value: "MH1001",
+              system: "https://www.mciindia.org"
             }
           },
           hiTypes: payload.hiTypes,
@@ -117,8 +115,6 @@ class M3ConsentService {
       };
 
       const abdmPayload = {
-        requestId: requestId,
-        timestamp: timestamp,
         consentRequestId: consentRequestId
       };
 
@@ -157,8 +153,6 @@ class M3ConsentService {
       };
 
       const abdmPayload = {
-        requestId: requestId,
-        timestamp: timestamp,
         consentId: consentId
       };
 
@@ -243,8 +237,6 @@ class M3ConsentService {
       });
 
       const abdmPayload = {
-        requestId: requestId,
-        timestamp: timestamp,
         hiRequest: {
           consent: {
             id: consentId
@@ -302,8 +294,6 @@ class M3ConsentService {
       };
 
       const abdmPayload = {
-        requestId: requestId,
-        timestamp: timestamp,
         notification: {
           consentId: payload.consentId,
           transactionId: payload.transactionId,

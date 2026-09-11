@@ -104,7 +104,7 @@ const postHealthInformationRequestToAbdm = async ({ requestId, transactionId, hi
   };
 
   const headers = {
-    ...getHeaders(token, requestId, payload.timestamp),
+    ...getHeaders(token),
     "X-HIU-ID": toText(process.env.HIU_ID) || toText(hospitalConfig.hiuId),
   };
 
@@ -285,21 +285,18 @@ class M2ConsentController {
     }
   }
 
-  
   static async fetchConsentInitCallback(req, res) {
     const requestId = toText(req.params?.requestId);
     if (!requestId) return res.status(400).json({ error: "requestId is required" });
 
     const tx = M2TransactionStore.getTransaction(requestId);
-    if (!tx || !tx.consentRequestId) {
-      return res.status(404).json({ error: "Callback not received yet for this requestId" });
-    }
+    if (!tx) return res.status(404).json({ error: "Callback not received yet for this requestId" });
 
     return res.json({
       success: true,
       requestId,
-      consentId: tx.consentRequestId, // Use the REAL Gateway Consent Request ID
-      consentRequest: { id: tx.consentRequestId },
+      consentId: tx.consentId,
+      consentRequest: { id: tx.consentId },
       payload: tx.consentDetails || {},
       source: "M2TransactionStore"
     });
@@ -334,10 +331,13 @@ class M2ConsentController {
       const consent = M2ConsentManager.getConsent(consentId);
       if (!consent) return res.status(404).json({ error: "Consent record not found." });
 
+      const frontendRequestId = toText(req.body?.requestId || hiRequest?.requestId);
+
       requestDetails = await M2HealthInformationRequestManager.createRequest(
         consentId,
         consent.patientId,
-        toObject(hiRequest?.dateRange)
+        toObject(hiRequest?.dateRange),
+        frontendRequestId
       );
 
       const normalizedDataPushUrl =
@@ -448,12 +448,7 @@ class M2ConsentController {
       status: tx.currentState,
       entriesCount: Array.isArray(tx.entries) ? tx.entries.length : 0,
       payload: tx,
-      source: "M2TransactionStore",
-      notification: {
-        status: tx.consentDetails?.status || tx.currentState,
-        consentArtefacts: tx.consentDetails?.consentArtefacts || []
-      },
-      entries: tx.entries || []
+      source: "M2TransactionStore"
     });
   }
 

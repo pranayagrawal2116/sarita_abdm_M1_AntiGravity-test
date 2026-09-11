@@ -239,7 +239,7 @@ exports.requestHealthInformation = async (req, res) => {
     });
   } catch (err) {
     const { status, body } = getErrorPayload(err);
-    console.log(`[HI REQUEST] Failed. Status: ${status}, Body: <omitted>`);
+    console.log(`[HI REQUEST] Failed. Status: ${status}, Body: ${JSON.stringify(body)}`);
     return res.status(status).json(body);
   }
 };

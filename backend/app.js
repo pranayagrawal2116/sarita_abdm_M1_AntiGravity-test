@@ -146,14 +146,25 @@ const logApiDebug = (label, details) => {
     lines.push(`${key}: ${typeof value === "string" ? value : stringifyForLog(value)}`);
   }
 
-  console.log(truncateLog(lines.join("\n")));
+  const logStr = truncateLog(lines.join("\n"));
+  console.log(logStr);
+  
+  // Write to api_responses.txt
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const apiLogPath = path.join(__dirname, 'data', 'api_responses.txt');
+    fs.appendFileSync(apiLogPath, logStr + "\n\n");
+  } catch (e) {
+    // Ignore error
+  }
 };
 
 axios.interceptors.request.use((config) => {
   logApiDebug(`[API OUTBOUND] ${String(config.method || "GET").toUpperCase()} ${config.url || ""}`, {
     headers: sanitizeHeaders(config.headers || {}),
     params: config.params,
-    data: "<omitted for security>"
+    data: config.data,
   });
 
   return config;
@@ -166,7 +177,7 @@ logApiDebug(
   {
     status: response.status,
     headers: sanitizeHeaders(response.headers || {}),
-    data: "<omitted for security>"
+    data: response.data,
   }
 );
 
@@ -178,7 +189,7 @@ logApiDebug(
       {
         status: error.response?.status,
         headers: sanitizeHeaders(error.response?.headers || {}),
-        data: error.response ? error.response.data : error.message,
+        data: error.response?.data || error.message,
       }
     );
     return Promise.reject(error);
@@ -186,18 +197,6 @@ logApiDebug(
 );
 
 app.use(cors());
-// M1 Scan & Share Route-Specific Payload Protection
-app.use([
-  "/api/v3/hip/patient/share",
-  "/v3/hip/patient/share",
-  "/api/hiecm/patient-share/v3/share",
-  "/hiecm/patient-share/v3/share",
-  "/api/v3/hip/patient/share/open-order",
-  "/v3/hip/patient/share/open-order",
-  "/api/hiecm/scan-gateway/v3/patient/share/open-order",
-  "/hiecm/scan-gateway/v3/patient/share/open-order"
-], express.json({ limit: process.env.SCAN_SHARE_BODY_LIMIT || "100kb" }));
-
 app.use(express.json({ limit: process.env.JSON_BODY_LIMIT || "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: process.env.JSON_BODY_LIMIT || "50mb" }));
 
@@ -216,7 +215,7 @@ app.use((req, res, next) => {
   logApiDebug(`[API INBOUND] ${req.method} ${req.originalUrl}`, {
     headers: sanitizeHeaders(req.headers),
     query: req.query,
-    body: "<omitted for security>"
+    body: req.body,
   });
 
   const oldWrite = res.write;
@@ -234,7 +233,7 @@ app.use((req, res, next) => {
     
     logApiDebug(`[API INBOUND RESPONSE] ${req.method} ${req.originalUrl}`, {
       status: res.statusCode,
-      body: "<omitted for security>"
+      body: body.length > 2000 ? `<body ${body.length} bytes>` : body,
     });
     
     return oldEnd.apply(res, args);

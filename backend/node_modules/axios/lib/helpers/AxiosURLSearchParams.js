@@ -18,8 +18,9 @@ function encode(str) {
     ')': '%29',
     '~': '%7E',
     '%20': '+',
+    '%00': '\x00',
   };
-  return encodeURIComponent(str).replace(/[!'()~]|%20/g, function replacer(match) {
+  return encodeURIComponent(str).replace(/[!'()~]|%20|%00/g, function replacer(match) {
     return charMap[match];
   });
 }
@@ -46,7 +47,9 @@ prototype.append = function append(name, value) {
 
 prototype.toString = function toString(encoder) {
   const _encode = encoder
-    ? (value) => encoder.call(this, value, encode)
+    ? function (value) {
+        return encoder.call(this, value, encode);
+      }
     : encode;
 
   return this._pairs

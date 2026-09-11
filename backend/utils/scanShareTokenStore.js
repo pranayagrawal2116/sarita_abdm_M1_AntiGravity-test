@@ -95,44 +95,26 @@ const nextTokenNumber = () => {
 };
 
 const recordIssuedToken = (payload = {}) => {
-  loadQueue();
-
-  // PHYSICAL EXPIRY CLEANUP: Remove logically expired or very old records to prevent unbounded disk/memory growth
-  const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-  queue = queue.filter(r => {
-      if (r.status === 'queued') {
-          return isCoolingPeriodActive(r);
-      } else {
-          const issuedAtMs = Date.parse(r.issuedAt || "");
-          return Number.isFinite(issuedAtMs) && (Date.now() - issuedAtMs) < TWENTY_FOUR_HOURS;
-      }
-  });
-
   const fingerprint = patientFingerprint(payload);
-  
-  if (payload.requestId) {
-    const existing = queue.find((record) => record.requestId === payload.requestId);
+  if (fingerprint) {
+    const existing = queue.find(
+      (record) =>
+        record.patientFingerprint === fingerprint && isCoolingPeriodActive(record)
+    );
+
     if (existing) {
       latestRecord = existing;
-      const isCurrentlyPending = existing.acknowledgementStatus === "pending";
       Object.assign(existing, {
-        // DO NOT overwrite the authoritative patient or fingerprint payload
+        requestId: payload.requestId || existing.requestId,
+        patient: payload.patient || existing.patient,
         lastSeenAt: nowIso(),
         scanCount: Number(existing.scanCount || 1) + 1,
         acknowledgementStatus: payload.acknowledgementStatus || "pending",
         duplicateScan: true,
-        _preventConcurrentAck: isCurrentlyPending
       });
       persistQueue();
       return clone(existing);
     }
-  }
-
-  // QUEUE CAPACITY PROTECTION
-  const activeEntries = queue.filter(r => r.status === 'queued');
-  const MAX_QUEUE_ENTRIES = Number(process.env.SCAN_SHARE_MAX_QUEUE_ENTRIES) || 500;
-  if (activeEntries.length >= MAX_QUEUE_ENTRIES) {
-    throw new Error("SCAN_SHARE_QUEUE_FULL: Application resource protection limit reached.");
   }
 
   const tokenNumber = nextTokenNumber();
@@ -157,7 +139,6 @@ const recordIssuedToken = (payload = {}) => {
 const getLatestIssuedToken = () => clone(latestRecord);
 
 const listIssuedTokens = ({ status } = {}) => {
-  loadQueue();
   const normalizedStatus = String(status || "").trim().toLowerCase();
   const records = normalizedStatus
     ? queue.filter((record) => record.status === normalizedStatus)
@@ -166,7 +147,6 @@ const listIssuedTokens = ({ status } = {}) => {
 };
 
 const updateIssuedTokenStatus = (tokenNumber, status) => {
-  loadQueue();
   const normalizedToken = String(tokenNumber || "").trim();
   const record = queue.find((item) => item.tokenNumber === normalizedToken);
   if (!record) {
@@ -183,7 +163,6 @@ const updateIssuedTokenStatus = (tokenNumber, status) => {
 };
 
 const updateIssuedToken = (tokenNumber, patch = {}) => {
-  loadQueue();
   const normalizedToken = String(tokenNumber || "").trim();
   const record = queue.find((item) => item.tokenNumber === normalizedToken);
   if (!record) {

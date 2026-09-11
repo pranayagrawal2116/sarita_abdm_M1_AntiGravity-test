@@ -61,7 +61,7 @@ class M2HealthInformationRequestManager {
    * @param {Object} [dateRange] - Specific request date range (optional).
    * @returns {Promise<Object>} Assembled request details.
    */
-  async createRequest(consentId, patientId, dateRange = null) {
+  async createRequest(consentId, patientId, dateRange = null, providedRequestId = null) {
     Logger.info("M2HealthInformationRequestManager", "Initializing health information request.", { consentId, patientId });
 
     try {
@@ -83,7 +83,7 @@ class M2HealthInformationRequestManager {
       }
 
       // 2. Resolve the ABDM transaction before any outbound gateway work.
-      const requestId = uuidv4();
+      const requestId = providedRequestId || `req_${uuidv4()}`;
       
       const existingTx = M2TransactionStore.getTransaction(consentId);
       if (!existingTx) {
@@ -207,9 +207,13 @@ class M2HealthInformationRequestManager {
       reason: "User initiated cancellation."
     });
 
-    await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
-      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Cancelled", updatedAt: Date.now() }
-    }));
+    const details = tx.hiRequestDetails;
+    details.status = "Cancelled";
+    details.updatedAt = Date.now();
+
+    await M2TransactionStore.updateTransaction(tx.transactionId, {
+      hiRequestDetails: details
+    });
 
     await M2TransactionStore.appendAuditEvent(tx.transactionId, "HI_REQUEST_CANCELLED", "Request cancelled by user.", {
       requestId
@@ -234,9 +238,13 @@ class M2HealthInformationRequestManager {
       reason: "Request lifespan expired."
     });
 
-    await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
-      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Expired", updatedAt: Date.now() }
-    }));
+    const details = tx.hiRequestDetails;
+    details.status = "Expired";
+    details.updatedAt = Date.now();
+
+    await M2TransactionStore.updateTransaction(tx.transactionId, {
+      hiRequestDetails: details
+    });
 
     await M2TransactionStore.appendAuditEvent(tx.transactionId, "HI_REQUEST_EXPIRED", "Request marked as expired.", {
       requestId
@@ -282,17 +290,24 @@ class M2HealthInformationRequestManager {
           reason: `Gateway Error: ${payload.error.message}`
         });
 
-        await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
-      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Failed", error: payload.error, updatedAt: Date.now() }
-    }));
+        details.status = "Failed";
+        details.error = payload.error;
+        details.updatedAt = Date.now();
+
+        await M2TransactionStore.updateTransaction(tx.transactionId, {
+          hiRequestDetails: details
+        });
 
         return { success: false, status: "Failed", error: payload.error };
       }
 
       // If callback classification transitioned state to Acknowledged, update local payload details
-      await M2TransactionStore.updateTransaction(tx.transactionId, (currentTx) => ({
-      hiRequestDetails: { ...currentTx.hiRequestDetails, status: "Acknowledged", updatedAt: Date.now() }
-    }));
+      details.status = "Acknowledged";
+      details.updatedAt = Date.now();
+
+      await M2TransactionStore.updateTransaction(tx.transactionId, {
+        hiRequestDetails: details
+      });
 
       return { success: true, status: "Acknowledged" };
     } catch (err) {
@@ -303,8 +318,8 @@ class M2HealthInformationRequestManager {
 
   // --- Static wrappers for singleton calls ---
 
-  static async createRequest(consentId, patientId, dateRange) {
-    return this.getInstance().createRequest(consentId, patientId, dateRange);
+  static async createRequest(consentId, patientId, dateRange, providedRequestId) {
+    return this.getInstance().createRequest(consentId, patientId, dateRange, providedRequestId);
   }
 
   static async validateRequest(requestId) {

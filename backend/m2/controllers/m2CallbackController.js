@@ -141,67 +141,41 @@ class M2CallbackController {
     }
   }
 
-  
   static async onConsentRequestInit(req, res) {
     Logger.info("M2CallbackController", "onConsentRequestInit callback triggered.");
     const payload = req.body || {};
     const headerRequestId = req.headers["request-id"] || req.headers["request_id"];
-    
-    // The requestId is usually in response.requestId or resp.requestId linking back to the original request
-    const originalRequestId = toText(payload.resp?.requestId || payload.response?.requestId);
-    if (!originalRequestId) {
-      return res.status(400).json({ error: "Missing response.requestId linking to original request." });
+    if (headerRequestId && !payload.requestId) {
+      payload.requestId = headerRequestId;
     }
+    const requestId = toText(payload.requestId || payload.resp?.requestId);
+    if (!requestId) return res.status(400).json({ error: "requestId is required." });
 
     try {
-      const tx = M2TransactionStore.getTransaction(originalRequestId);
+      const tx = M2TransactionStore.getTransaction(requestId);
       if (tx) {
-        const consentRequestId = payload.consentRequest?.id;
-        
-        const updateData = {};
-        if (consentRequestId) updateData.consentRequestId = consentRequestId;
-        if (payload.error) {
-          updateData.currentState = "Failed";
-          updateData.error = payload.error;
-        } else {
-          updateData.currentState = "GatewayAcknowledged";
-        }
-        
-        await M2TransactionStore.updateTransaction(tx.transactionId, updateData);
-
-        await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_INIT_CALLBACK_RECEIVED", "Consent init callback processed.", {
-          callbackRequestId: originalRequestId,
-          consentRequestId,
+        await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_INIT_CALLBACK_RECEIVED", "Consent init callback processed by M2CallbackManager route.", {
+          callbackRequestId: requestId,
           payload
         });
       }
-      return res.status(202).json({ ok: true });
+      return res.status(202).json({ ok: true, requestId, transactionId: tx?.transactionId || "" });
     } catch (err) {
       Logger.error("M2CallbackController", "Error processing consent init callback.", err);
       return res.status(500).json({ error: err.message });
     }
   }
 
-  
   static async onConsentRequestStatus(req, res) {
     Logger.info("M2CallbackController", "onConsentRequestStatus callback triggered.");
     const payload = req.body || {};
     const headerRequestId = req.headers["request-id"] || req.headers["request_id"];
-    
-    const requestId = toText(payload.requestId || headerRequestId);
-    const consentRequestId = toText(payload.notification?.consentRequestId);
-    
-    // In HIU notify, we get consentRequestId and consentArtefacts
-    // We can map it to our local transaction by consentRequestId
-    const consentId = toText(
-      payload.consentId || 
-      payload.notification?.consentId || 
-      payload.consent?.id || 
-      (payload.notification?.consentArtefacts && payload.notification.consentArtefacts[0]?.id) ||
-      consentRequestId
-    );
-
-    if (!consentId && !consentRequestId) return res.status(400).json({ error: "consentId or consentRequestId is required." });
+    if (headerRequestId && !payload.requestId) {
+      payload.requestId = headerRequestId;
+    }
+    const consentId = toText(payload.consentId || payload.notification?.consentId || payload.consent?.id);
+    const requestId = toText(payload.requestId || payload.response?.requestId || payload.resp?.requestId);
+    if (!consentId) return res.status(400).json({ error: "consentId is required." });
     if (!requestId) return res.status(400).json({ error: "requestId is required." });
 
     try {
@@ -210,8 +184,7 @@ class M2CallbackController {
         requestId,
         notification: {
           ...(payload.notification || {}),
-          consentId: consentId,
-          consentRequestId: consentRequestId,
+          consentId,
           status: payload.status || payload.notification?.status || "GRANTED"
         }
       };
@@ -301,58 +274,7 @@ class M2CallbackController {
         entries: entries,
         bundles: Object.keys(bundles).length > 0 ? bundles : tx.bundles
       });
-
-      // PROMPT #7: HIU MUST NOTIFY GATEWAY AFTER RECEIVING DATA
-      // If we received entries, we acted as the HIU receiving a data push.
-      // We must notify the CM that we received it.
-      if (entries.length > 0 && payload.entries) {
-        try {
-          const M2TokenManager = require("../tokens/M2TokenManager");
-          const { getHeaders } = require("../helpers/headers");
-          const axios = require("axios");
-
-          const token = await M2TokenManager.getGatewayToken();
-          const gatewayBase = process.env.GATEWAY_BASE || "https://dev.abdm.gov.in";
-          const hiuId = process.env.HIU_ID || "HIU_ID";
-
-          const statusResponses = entries.map(entry => ({
-            careContextReference: entry.careContextReference || "default",
-            hiStatus: "OK",
-            description: "Health information received successfully"
-          }));
-
-          const reqId = require("crypto").randomUUID();
-          const ts = new Date().toISOString();
-          const notifyPayload = {
-            requestId: reqId,
-            timestamp: ts,
-            notification: {
-              consentId: tx.consentId,
-              transactionId: tx.transactionId,
-              doneAt: new Date().toISOString(),
-              notifier: {
-                type: "HIU",
-                id: hiuId
-              },
-              statusNotification: {
-                sessionStatus: "RECEIVED",
-                hiuId: hiuId,
-                statusResponses
-              }
-            }
-          };
-
-          await axios.post(
-            `${gatewayBase}/api/hiecm/data-flow/v3/health-information/notify`,
-            notifyPayload,
-            { headers: { ...getHeaders(token, reqId, ts), "X-HIU-ID": hiuId } }
-          );
-          Logger.info("M2CallbackController", "Sent HIU Health Information Notify to Gateway (sessionStatus: RECEIVED, hiStatus: OK)");
-        } catch (notifyErr) {
-          Logger.error("M2CallbackController", "Failed to send HIU Health Information Notify to Gateway.", notifyErr);
-        }
-      }
-
+      
       return res.status(202).json({ ok: true, transactionId: tx.transactionId });
     } catch (err) {
       Logger.error("M2CallbackController", "Error processing health information notify callback.", err);

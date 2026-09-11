@@ -13,7 +13,6 @@
  *   - registerConsentAcknowledgement(payload, tx)
  */
 
-const { v4: uuidv4 } = require("uuid");
 const Logger = require("../logging/logger");
 const axios = require("../helpers/axiosClient");
 const M2TokenManager = require("../tokens/M2TokenManager");
@@ -25,9 +24,8 @@ const hospitalConfig = require("../../config/hospitalConfig");
 const { firstText, extractTransactionIdFromLinkToken } = require("../helpers/identifierUtils");
 
 const VALID_CONSENT_TRANSITIONS = {
-  "Requested": ["Active", "GRANTED", "Rejected", "Expired"],
+  "Requested": ["Active", "Rejected", "Expired"],
   "Active": ["Expired", "Revoked", "Completed"],
-  "GRANTED": ["Expired", "Revoked", "Completed"],
   "Rejected": [],
   "Expired": [],
   "Revoked": [],
@@ -66,7 +64,6 @@ class M2ConsentManager {
   async createConsent(consentData) {
     Logger.info("M2ConsentManager", "Creating consent record.", { patientId: consentData?.patientId });
 
-    let tempId;
     try {
       // 1. Obtain gateway credentials through TokenManager ONLY
       const token = await M2TokenManager.getGatewayToken();
@@ -75,11 +72,11 @@ class M2ConsentManager {
       }
 
       // 2. Establish transaction record in Store
-      tempId = consentData.transactionId || uuidv4();
+      const tempId = consentData.transactionId || `tx_${Date.now()}`;
       const tx = await M2TransactionStore.createTransaction({
         transactionId: tempId,
-        requestId: consentData.requestId || uuidv4(),
-        consentId: consentData.consentId || uuidv4(),
+        requestId: consentData.requestId || `req_${Date.now()}`,
+        consentId: consentData.consentId || `consent_${Date.now()}`,
         patientId: consentData.patientId || "",
         currentState: "Created",
         careContexts: consentData.careContexts || []
@@ -103,100 +100,16 @@ class M2ConsentManager {
         consentDetails: consentObj
       });
 
-      
-      await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_CREATED", "Consent request initialized and persisted locally.", {
+      await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_CREATED", "Consent request initialized and persisted.", {
         consentId: tx.consentId,
         status: "Requested"
       });
 
-      // 5. Send ACTUAL Consent Request to ABDM Gateway
-      const timestamp = new Date().toISOString();
-      const gatewayHeaders = getHeaders(token, tx.requestId, timestamp);
-      const hiuId = process.env.HIU_ID || hospitalConfig.hiuId || "Sub_HIU";
-
-      const gatewayPayload = {
-        requestId: tx.requestId,
-        timestamp,
-        consent: {
-          purpose: {
-            text: consentData.purpose?.text || "Care Management",
-            code: consentData.purpose?.code || "CAREMGT",
-            refUri: consentData.purpose?.refUri || "https://www.mciindia.org"
-          },
-          patient: {
-            id: tx.patientId
-          },
-          hiu: {
-            id: hiuId
-          },
-          requester: {
-            name: "Dr. Manjula",
-            identifier: {
-              type: "REGNO",
-              value: "MH1001",
-              system: "https://www.mciindia.org"
-            }
-          },
-          hiTypes: consentData.hiTypes && consentData.hiTypes.length > 0 ? consentData.hiTypes : ["OPConsultation"],
-          permission: {
-            accessMode: "VIEW",
-            dateRange: {
-              from: consentData.dateRange?.from ? new Date(consentData.dateRange.from).toISOString() : new Date(Date.now() - 365*24*60*60*1000).toISOString(),
-              to: consentData.dateRange?.to 
-                ? (new Date(consentData.dateRange.to) > new Date() ? new Date().toISOString() : new Date(consentData.dateRange.to).toISOString())
-                : new Date().toISOString()
-            },
-            dataEraseAt: consentData.expiry ? new Date(consentData.expiry).toISOString() : new Date(Date.now() + 30*24*60*60*1000).toISOString(),
-            frequency: {
-              unit: "HOUR",
-              value: 0,
-              repeats: 0
-            }
-          }
-        }
-      };
-
-      if (consentData.careContexts && consentData.careContexts.length > 0) {
-        gatewayPayload.consent.careContexts = consentData.careContexts;
-      }
-
-      Logger.info("M2ConsentManager", "Dispatching Consent Request to ABDM Gateway", { url: `${config.gatewayBaseUrl}/api/hiecm/consent/v3/request/init` });
-      
-      const response = await axios.post(
-        `${config.gatewayBaseUrl}/api/hiecm/consent/v3/request/init`,
-        gatewayPayload,
-        { headers: gatewayHeaders }
-      );
-
-      await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_GATEWAY_DISPATCHED", "Gateway accepted consent initialization.", {
-        statusCode: response.status
-      });
-
       Logger.info("M2ConsentManager", "Consent record created successfully.", { consentId: tx.consentId });
       return consentObj;
-
     } catch (err) {
       Logger.error("M2ConsentManager", "Failed to create consent.", err);
-      let gatewayError = undefined;
-      if (err.response) {
-        gatewayError = err.response.data;
-        Logger.error("M2ConsentManager", "ABDM Gateway responded with error", gatewayError);
-      }
-      
-      // Prevent false positive consent statuses by marking transaction as failed
-      if (tempId) {
-        try {
-          await M2TransactionStore.updateTransaction(tempId, {
-            currentState: "Error",
-            consentDetails: { status: "Error", error: err.message }
-          });
-          await M2TransactionStore.appendAuditEvent(tempId, "CONSENT_GATEWAY_ERROR", "Consent initialization failed at Gateway.", { error: err.message });
-        } catch (e) {
-           Logger.error("M2ConsentManager", "Failed to mark transaction as error.", e);
-        }
-      }
-      
-      return { status: "error", error: "CREATION_FAILED", message: err.message, gatewayError };
+      return { status: "error", error: "CREATION_FAILED", message: err.message };
     }
   }
 
@@ -354,11 +267,11 @@ class M2ConsentManager {
         currentState: tx.currentState
       });
 
-      if (tx.consentStatus === "GRANTED" && tx.currentState !== "CONSENT_GRANTED") {
+      if (tx.consentDetails && tx.currentState !== "CONSENT_GRANTED") {
         await M2TransactionStore.transitionState(txKey, "CONSENT_GRANTED", {
           requestId: tx.requestId,
           consentId: tx.consentId,
-          reason: "Consent Granted"
+          reason: "Consent Stored"
         });
       } else if (!tx.consentDetails && tx.currentState === "LINKED") {
         await M2TransactionStore.transitionState(txKey, "WAITING_FOR_CONSENT", {
@@ -391,16 +304,17 @@ class M2ConsentManager {
     };
   }
 
-  
   async submitConsentDecision(consentId, decision, metadata = {}) {
-    Logger.info("M2ConsentManager", "submitConsentDecision called locally. Ignoring auto-approval to wait for real ABDM Gateway callback.", { consentId, decision });
-    const tx = M2TransactionStore.getTransaction(consentId);
-    if (!tx || !tx.consentDetails) {
-      throw new Error(`Consent record with ID ${consentId} not found.`);
-    }
-    return tx.consentDetails;
+    Logger.info("M2ConsentManager", "Submitting consent decision through manager.", { consentId, decision });
+    const normalized = String(decision || "").toLowerCase();
+    const nextStatus = normalized === "approve" || normalized === "approved" || normalized === "grant" || normalized === "granted"
+      ? "Active"
+      : "Rejected";
+    return this.updateConsentStatus(consentId, nextStatus, {
+      ...metadata,
+      source: "M2ConsentController"
+    });
   }
-
 
   /**
    * Retrieves a structured consent details model from the transaction store.
@@ -433,7 +347,7 @@ class M2ConsentManager {
       return { isValid: false, reason: "Consent has expired." };
     }
 
-    if (consent.status !== "Active" && consent.status !== "GRANTED") {
+    if (consent.status !== "Active") {
       return { isValid: false, reason: `Consent is not active. Current status: ${consent.status}` };
     }
 
@@ -457,7 +371,7 @@ class M2ConsentManager {
     }
 
     const consent = tx.consentDetails;
-    const currentStatus = consent.status || "Requested";
+    const currentStatus = consent.status;
     if (currentStatus === nextStatus) {
       Logger.info("M2ConsentManager", "Consent status already at requested state.", {
         consentId,
@@ -543,11 +457,6 @@ class M2ConsentManager {
    * @returns {Promise<Object>} Result coordinates.
    */
   async registerConsentNotification(payload, tx) {
-    if (!tx) {
-      Logger.error("M2ConsentManager", "Unmatched consent callback received.", { payload });
-      return { success: false, error: "Unmatched consent transaction" };
-    }
-    
     Logger.info("M2ConsentManager", "registerConsentNotification callback handler triggered.", {
       consentId: tx.consentId
     });
@@ -556,7 +465,6 @@ class M2ConsentManager {
     const workflowRequestId = tx.requestId || tx.gatewayRequestId || "";
     const consentDetail = payload.notification?.consentDetail || payload.notification || {};
     const incomingConsentId = firstText(
-      payload.notification?.consentArtefacts?.[0]?.id,
       payload.notification?.consentId,
       consentDetail.consentId
     );
@@ -568,12 +476,8 @@ class M2ConsentManager {
       tx.abhaAddress
     );
     const careContexts = consentDetail.careContexts || payload.notification?.careContexts || tx.careContexts || [];
-    const notificationStatus = payload.notification?.status || "UNKNOWN";
-    let statusMapping = "Requested";
-    if (notificationStatus === "GRANTED") statusMapping = "Active";
-    else if (notificationStatus === "DENIED") statusMapping = "Rejected";
-    else if (notificationStatus === "REVOKED") statusMapping = "Revoked";
-    else if (notificationStatus === "EXPIRED") statusMapping = "Expired";
+    const notificationStatus = payload.notification?.status || "GRANTED";
+    const statusMapping = notificationStatus === "DENIED" || notificationStatus === "REVOKED" ? "Rejected" : "Active";
     const permission = consentDetail.permission || payload.notification?.permission || {};
     const hiTypes = consentDetail.hiTypes || payload.notification?.hiTypes || [];
     const receivedTime = new Date().toISOString();
@@ -618,6 +522,7 @@ class M2ConsentManager {
         consentId,
         consentRequestId: tx.consentRequestId || tx.consentId || "",
         consentArtifactId: incomingConsentId || tx.consentDetails?.consentArtifactId || "",
+        status: "Requested",
         patientId,
         patient: consentDetail.patient || payload.notification?.patient || {},
         hip: consentDetail.hip || payload.notification?.hip || {},
@@ -682,21 +587,19 @@ class M2ConsentManager {
       throw new Error("Cannot send consent on-notify acknowledgement without original gateway requestId.");
     }
     const token = await M2TokenManager.getGatewayToken();
-    const reqId = require("uuid").v4();
-    const ts = new Date().toISOString();
-    const baseHeaders = getHeaders(token, reqId, ts);
+    const baseHeaders = getHeaders(token);
     const headers = {
       ...baseHeaders,
       "X-HIP-ID": process.env.HIP_ID || hospitalConfig.hipId
     };
     const body = {
-      requestId: reqId,
-      timestamp: ts,
       acknowledgement: {
         status,
         consentId
       },
-      resp: { requestId }, response: { requestId }
+      response: {
+        requestId
+      }
     };
 
     Logger.info("M2ConsentManager", "Sending Consent HIP on-notify acknowledgement.", {
@@ -783,11 +686,7 @@ class M2ConsentManager {
   static async registerConsentNotification(payload, tx) {
     // If called statically, get instance and run
     // Since callback manager invokes the resolved method, it will bind properly
-    const txContext = tx || M2TransactionStore.getTransaction(
-      payload.notification?.consentRequestId || 
-      payload.notification?.consentId || 
-      payload.consentId
-    );
+    const txContext = tx || M2TransactionStore.getTransaction(payload.notification?.consentId || payload.consentId);
     return this.getInstance().registerConsentNotification(payload, txContext);
   }
 

@@ -13,7 +13,6 @@ const Logger = require("../logging/logger");
 const gatewayHttpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 30000,
-  timeout: 60000,
   maxSockets: 16,
 });
 

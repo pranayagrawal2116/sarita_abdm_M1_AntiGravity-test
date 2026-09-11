@@ -1,29 +1,899 @@
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/gateway/v3/sessions
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "42e8d605-dc8b-49a3-8c83-425cc4b5f043",
+  "TIMESTAMP": "2026-09-11T19:30:12.161Z",
+  "X-CM-ID": "sbx"
+}
+data: {
+  "clientId": "SBXID_010086",
+  "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+  "grantType": "client_credentials"
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/gateway/v3/sessions
+status: 200
+headers: {
+  "content-type": "application/json",
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:12 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "53",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "9baa75a0-66aa-4f07-8043-550700d7c601",
+  "pragma": "no-cache",
+  "activityid": "5b9587a1-653e-48b7-bd17-7193fe5de0ad",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 b2eb657996ec271973f6d03fdc8ee958.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "fsdANtNffuTQsZH0JqT6mHHaErPRYNiEQ0f_-Bsdy6JEnT7_lbToug==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+data: {
+  "accessToken": "<string 1458 chars>",
+  "expiresIn": 1200,
+  "refreshExpiresIn": 1800,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyMWU5NzA4OS00ZTcxLTQyNGEtOTAzYS1jOTAyMWM1NmFlNWYifQ.eyJleHAiOjE3ODkxNTY4MTIsImlhdCI6MTc4OTE1NTAxMiwianRpIjoiMmEyOGRlN2QtMzg1YS00ZTY0LTk3ZTAtNDE5MWU1ZTRlMjljIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6Imh0dHBzOi8vZGV2LmFiZG0uZ292LmluL2F1dGgvcmVhbG1zL2NlbnRyYWwtcmVnaXN0cnkiLCJzdWIiOiIxMDM4ZDIzNy02ZDhjLTRkMzUtOGE3Mi1iZDA4ZTY5M2I4OTYiLCJ0eXAiOiJSZWZyZXNoIiwiYXpwIjoiU0JYSURfMDEwMDg2Iiwic2Vzc2lvbl9zdGF0ZSI6ImVkZTk4ZTEzLWUwMDctNDQ2Yy04MjIyLTlmNWFkOGE1YzA5OSIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUifQ.ILeG7AveTKLMqs5tjB6ISCiO3o_IDE_vyfnQbqUOarI",
+  "tokenType": "bearer"
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/gateway/v0.5/sessions
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "889b6efd-7577-47c8-bb54-26eab701272f",
+  "TIMESTAMP": "2026-09-11T19:30:12.385Z",
+  "X-CM-ID": "sbx"
+}
+data: {
+  "clientId": "SBXID_010086",
+  "clientSecret": "bf9e7411-5b6a-47e0-ab6b-5809b4393bbe",
+  "grantType": "client_credentials"
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/gateway/v0.5/sessions
+status: 200
+headers: {
+  "content-type": "application/json",
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:12 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "8",
+  "access-control-allow-origin": "*",
+  "correlation-id": "d461c916-c21f-4f51-b625-a81a884ad607",
+  "pragma": "no-cache",
+  "activityid": "a39f0d07-b2a0-4d3b-a56e-3cc0b7d7912f",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 e4425241f96de4dcab71358d741d8c3e.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "5euvZfTNTuW29RAapI7QF2_npms0Hg0AIrnxnEnuCxkO0qatA7mZZw==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+data: {
+  "accessToken": "<string 1458 chars>",
+  "expiresIn": 1200,
+  "refreshExpiresIn": 1800,
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIyMWU5NzA4OS00ZTcxLTQyNGEtOTAzYS1jOTAyMWM1NmFlNWYifQ.eyJleHAiOjE3ODkxNTY3NTEsImlhdCI6MTc4OTE1NDk1MSwianRpIjoiOTQ5OTZlYzQtODY3Yy00NWIyLTkwYjktZjU4MWRlYzhlMjk0IiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsImF1ZCI6Imh0dHBzOi8vZGV2LmFiZG0uZ292LmluL2F1dGgvcmVhbG1zL2NlbnRyYWwtcmVnaXN0cnkiLCJzdWIiOiIxMDM4ZDIzNy02ZDhjLTRkMzUtOGE3Mi1iZDA4ZTY5M2I4OTYiLCJ0eXAiOiJSZWZyZXNoIiwiYXpwIjoiU0JYSURfMDEwMDg2Iiwic2Vzc2lvbl9zdGF0ZSI6ImVkZTdlODBhLWFkNDUtNDVlZS1hOWMyLTBkYTljZDNlZjMwNiIsInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUifQ.3wZ6WxGhchG7GZlLnc2l-CPG8xN-BJ5PEnWw0Qyq2HY",
+  "tokenType": "bearer"
+}
+
+[API INBOUND] POST /api/hip/setup/scan-share/run
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "2",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {}
+
+[API OUTBOUND] PATCH https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge/url
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "Authorization": "Bear***CmEg",
+  "X-CM-ID": "sbx",
+  "REQUEST-ID": "19e0d3ce-456b-4fb9-bdc6-f7dc5d852bae",
+  "TIMESTAMP": "2026-09-11T19:30:22.615Z"
+}
+data: {
+  "url": "https://isolation-pouncing-ecard.ngrok-free.dev"
+}
+
+[API OUTBOUND RESPONSE] PATCH https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge/url
+status: 202
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:23 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "250",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "69a31879-0ac1-4cfe-912a-cca16e08a05c",
+  "pragma": "no-cache",
+  "activityid": "78bb05f3-2cde-498c-89e1-ebe4674700e1",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 d921d59804f529f8264802ca2380ea54.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "a4lfzORKsVvUj6tgAxNxZx6MIq6VNiC-j_lvWUGkbV817b7gPJsUFQ==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
+[API OUTBOUND] POST https://apihspsbx.abdm.gov.in/v4/int/v1/bridges/MutipleHRPAddUpdateServices
+headers: {
+  "Accept": "application/json",
+  "Content-Type": "application/json",
+  "Authorization": "Bear***CiTg"
+}
+data: {
+  "facilityId": "IN2410002480",
+  "facilityName": "Yashfeen Group of Hospitals",
+  "HRP": [
+    {
+      "bridgeId": "SBXID_010086",
+      "hipName": "Yashfeen Group of Hospitals",
+      "type": "HIP",
+      "active": true
+    }
+  ]
+}
+
+[API OUTBOUND RESPONSE] POST https://apihspsbx.abdm.gov.in/v4/int/v1/bridges/MutipleHRPAddUpdateServices
+status: 200
+headers: {
+  "content-type": "application/json",
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:23 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "activityid": "66362f5b-2a0d-4fdc-ae96-d457e29f8930",
+  "x-envoy-upstream-service-time": "39",
+  "access-control-allow-origin": "*",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 9e8c29342ff6f7610166562f3559cbe4.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "AJ6bwkvou7_eN9i1wdshxopVFHL28ASibqKNxMWYM8_aQXI8LvSKGA==",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "x-content-type-options": "nosniff",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+data: [
+  {
+    "error": {
+      "code": "2500",
+      "message": "Bridge-Id=SBXID_010086 is already associated with Hfr-Id=IN2410002480 for Service-Id=IN2410002480, Service-Name=Yashfeen Group of Hospitals"
+    }
+  }
+]
+
+[API OUTBOUND] GET https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge-service/serviceId/IN2410002480
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "Authorization": "Bear***CmEg",
+  "X-CM-ID": "sbx",
+  "REQUEST-ID": "19e0d3ce-456b-4fb9-bdc6-f7dc5d852bae",
+  "TIMESTAMP": "2026-09-11T19:30:22.615Z"
+}
+
+[API OUTBOUND ERROR] GET https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge-service/serviceId/IN2410002480
+status: 401
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:23 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "23",
+  "access-control-allow-origin": "*",
+  "www-authenticate": "Basic realm=\"Realm\"",
+  "pragma": "no-cache",
+  "activityid": "f8d69aa9-dd87-4d9a-970a-885cab0838f4",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Error from cloudfront",
+  "via": "1.1 d921d59804f529f8264802ca2380ea54.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "Gpdsb0AAv7oIaqR3gzNV1U0OMh8an7TOcS-A1TkK6_NRkTFKzTBdIQ==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+data: Request failed with status code 401
+
+[API OUTBOUND] GET https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge-services
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "Authorization": "Bear***CmEg",
+  "X-CM-ID": "sbx",
+  "REQUEST-ID": "19e0d3ce-456b-4fb9-bdc6-f7dc5d852bae",
+  "TIMESTAMP": "2026-09-11T19:30:22.615Z"
+}
+
+[API OUTBOUND ERROR] GET https://dev.abdm.gov.in/api/hiecm/gateway/v3/bridge-services
+status: 401
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:23 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "76",
+  "access-control-allow-origin": "*",
+  "www-authenticate": "Basic realm=\"Realm\"",
+  "pragma": "no-cache",
+  "activityid": "b9465375-a4b3-4d91-bc2f-56cffed343b1",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Error from cloudfront",
+  "via": "1.1 d921d59804f529f8264802ca2380ea54.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "5w7DUTlHS8bgvpTWrr1yHvIqCxAalnzwh1qOt2_3YDFllVKHxmzB8Q==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+data: Request failed with status code 401
+
+[API INBOUND RESPONSE] POST /api/hip/setup/scan-share/run
+status: 200
+body: {"ok":true,"values":{"bridgeId":"SBXID_010086","publicBaseUrl":"https://isolation-pouncing-ecard.ngrok-free.dev","facilityId":"IN2410002480","facilityName":"Yashfeen Group of Hospitals","serviceName":"Yashfeen Group of Hospitals","serviceId":"IN2410002480"},"callbackUrl":"https://isolation-pouncing-ecard.ngrok-free.dev/api/hiecm/patient-share/v3/share","steps":[{"name":"session","ok":true,"required":true,"status":200,"accessTokenPresent":true},{"name":"updateBridgeUrl","ok":true,"required":true,"status":202,"payload":{"url":"https://isolation-pouncing-ecard.ngrok-free.dev"}},{"name":"registerBridgeServices","ok":true,"required":false,"status":200,"payload":{"facilityId":"IN2410002480","facilityName":"Yashfeen Group of Hospitals","HRP":[{"bridgeId":"SBXID_010086","hipName":"Yashfeen Group of Hospitals","type":"HIP","active":true}]},"data":[{"error":{"code":"2500","message":"Bridge-Id=SBXID_010086 is already associated with Hfr-Id=IN2410002480 for Service-Id=IN2410002480, Service-Name=Yashfeen Group of Hospitals"}}]},{"name":"findBridgeServiceByServiceId","ok":false,"required":false,"status":401,"error":{"error":""}},{"name":"findServicesByBridgeId","ok":false,"required":false,"status":401,"error":{"error":""}}]}
+
+[API INBOUND] POST /api/v3/hip/patient/share
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "538",
+  "accept": "*/*",
+  "authorization": "Bear***gDbA",
+  "baggage": "Self=1-6aa456d2-2c62948e144749dd6e88b283,xrsr=21b111cbfe6e8fca",
+  "content-type": "application/json",
+  "request-id": "3811ec94-9384-4688-9371-01073a814591",
+  "timestamp": "2026-09-11T19:30:27.338Z",
+  "traceparent": "00-6aa456d217bb3fab32d5d1571ab7ede3-1880f2d4ba4b50f2-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa456d2-17bb3fab32d5d1571ab7ede3;Parent=1880f2d4ba4b50f2;Sampled=0;Self=1-6aa456d2-2c62948e144749dd6e88b283;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "65.0.113.207",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480",
+  "accept-encoding": "gzip"
+}
+query: {}
+body: {
+  "intent": "PROFILE_SHARE",
+  "metaData": {
+    "hipId": "IN2410002480",
+    "context": "1",
+    "hprId": "abdulkalam@hpr.abdm",
+    "latitude": "18.5092882",
+    "longitude": "73.8128025"
+  },
+  "profile": {
+    "patient": {
+      "abhaNumber": "91-1722-0400-0829",
+      "abhaAddress": "pranay211.2006@sbx",
+      "name": "Pranay Anup Agrawal",
+      "gender": "M",
+      "dayOfBirth": "21",
+      "monthOfBirth": "1",
+      "yearOfBirth": "2006",
+      "address": {
+        "line": "120/A, radheshyam society, gandevi road, jamalpore, Navsari, Vasda, Navsari, Gujarat",
+        "district": "NAVSARI",
+        "state": "GUJARAT",
+        "pincode": "396445"
+      },
+      "phoneNumber": "9510029575"
+    }
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/hip/patient/share
+status: 202
+body: {"accepted":true,"requestId":"3811ec94-9384-4688-9371-01073a814591","hipId":"IN2410002480","flow":"profile-share","tokenNumber":"14","expirySeconds":1800,"duplicateScan":false,"scanCount":1,"acknowledgementStatus":"pending"}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/patient-share/v3/on-share
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "402a7a53-bc7d-45db-a874-1615d70e6514",
+  "TIMESTAMP": "2026-09-11T19:30:27.550Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***CiTg"
+}
+data: {
+  "timestamp": "2026-09-11T19:30:27.549Z",
+  "acknowledgement": {
+    "status": "SUCCESS",
+    "abhaAddress": "pranay211.2006@sbx",
+    "profile": {
+      "context": "5",
+      "tokenNumber": "14",
+      "expiry": "1800"
+    }
+  },
+  "resp": {
+    "requestId": "3811ec94-9384-4688-9371-01073a814591"
+  },
+  "response": {
+    "requestId": "3811ec94-9384-4688-9371-01073a814591"
+  }
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/patient-share/v3/on-share
+status: 202
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:27 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "46",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "808c91e6-0976-4bbd-869e-768ce4aa9210",
+  "pragma": "no-cache",
+  "activityid": "3f0fe106-754d-40f6-93c5-d2f779c14091",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 d921d59804f529f8264802ca2380ea54.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "b7GNi98XzXFAiExPqdaXjbUZW_tcZqPywNGupZ16ZPy6E7GaK5unkA==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
+[API INBOUND] POST /api/scan-share/queue/14/register
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "0",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {}
+
+[API INBOUND RESPONSE] POST /api/scan-share/queue/14/register
+status: 200
+body: {"updated":{"id":"1789155027546-14","tokenNumber":"14","status":"registered","expirySeconds":1800,"issuedAt":"2026-09-11T19:30:27.546Z","lastSeenAt":"2026-09-11T19:30:27.546Z","registeredAt":"2026-09-11T19:30:32.499Z","scanCount":1,"duplicateScan":false,"patientFingerprint":"in2410002480:pranay211.2006@sbx","requestId":"3811ec94-9384-4688-9371-01073a814591","hipId":"IN2410002480","patient":{"abhaNumber":"91-1722-0400-0829","abhaAddress":"pranay211.2006@sbx","name":"Pranay Anup Agrawal","gender":"M","dob":"21-1-2006","mobile":"9510029575","address":"120/A, radheshyam society, gandevi road, jamalpore, Navsari, Vasda, Navsari, Gujarat","district":"NAVSARI","state":"GUJARAT","pincode":"396445","rawProfile":{"abhaNumber":"91-1722-0400-0829","abhaAddress":"pranay211.2006@sbx","name":"Pranay Anup Agrawal","gender":"M","dayOfBirth":"21","monthOfBirth":"1","yearOfBirth":"2006","address":{"line":"120/A, radheshyam society, gandevi road, jamalpore, Navsari, Vasda, Navsari, Gujarat","district":"NAVSARI","state":"GUJARAT","pincode":"396445"},"phoneNumber":"9510029575"}},"facilityName":"Yashfeen Group of Hospitals","counterLabel":"Counter: 1","flow":"profile-share","source":"patient-share-callback","acknowledgementStatus":"sent","acknowledgementSentAt":"2026-09-11T19:30:27.746Z","acknowledgementResponse":{},"updatedAt":"2026-09-11T19:30:27.746Z"}}
+
+[API INBOUND] POST /api/m2/patient-storage/write
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "730",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "abhaId": "pranay211.2006@sbx",
+  "patientName": "Pranay Anup Agrawal",
+  "fileName": "Prescription_Record_91-1722-0400-0829_20260912_010046.txt",
+  "content": "Health Information Record\n=========================\nType: Prescription Record\nSaved At: 2026-09-12 01:00:46\n\n--- Patient Details ---\nName: Pranay Anup Agrawal\nABHA Address: pranay211.2006@sbx\nABHA Number: 91-1722-0400-0829\nMobile: 9510029575\nGender: M\nDOB / YOB: 21-1-2006\nUHID: SHC12092601\n\n--- Record Data ---\n\nMedications:\n  - Item 1:\n    Name: Dolo 650mg\n    Dose: 1-0-1\n    Route: Oral\n    Timing: After Food\n    Instructions: Fever\nDraft Medication:\n  Name: -\n  Dose: -\n  Route: Oral\n  Timing: After Food\n  Instructions: -\n",
+  "isLocalDraft": false
+}
+
+[API INBOUND RESPONSE] POST /api/m2/patient-storage/write
+status: 200
+body: {"success":true,"message":"File saved successfully","path":"/Users/pranay/Documents/Development/AntigravityWork/sarita_abdm_M1_AntiGravity-test/backend/data/ABHA_Verified/pranay211.2006@sbx_Pranay_Anup_Agrawal/Prescription_Record_91-1722-0400-0829_20260912_010046.txt"}
+
+[API INBOUND] POST /api/m2/patient-storage/read
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "99",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "abhaId": "pranay211.2006@sbx",
+  "patientName": "Pranay Anup Agrawal",
+  "fileName": "hip_link_token.txt"
+}
+
+[API INBOUND RESPONSE] POST /api/m2/patient-storage/read
+status: 200
+body: {"success":true,"content":"Saved At: 2026-09-12T00:55:00.767\nABHA Address: pranay211.2006@sbx\nABHA Number: 91172204000829\nLink Token:\neyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ\n"}
+
+[API INBOUND] POST /api/hip/link/carecontext
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "1067",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "hipId": "IN2410002480",
+  "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ",
+  "abhaNumber": "91172204000829",
+  "abhaAddress": "pranay211.2006@sbx",
+  "AbhaNumber": "91172204000829",
+  "AbhaAddress": "pranay211.2006@sbx",
+  "patient": [
+    {
+      "referenceNumber": "Pranay Anup Agrawal",
+      "display": "Prescription - Pranay Anup Agrawal",
+      "careContexts": [
+        {
+          "referenceNumber": "6c68ce64-eae4-425c-a2b4-5c11ba132940",
+          "display": "Prescription-Record-2026-09-12-01-00-46"
+        }
+      ],
+      "hiType": "Prescription",
+      "count": 1
+    }
+  ]
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/carecontext
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "b3dce0aa-8a25-4e63-b557-e6e8a15649d5",
+  "TIMESTAMP": "2026-09-11T19:30:57.046Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***CiTg",
+  "X-HIP-ID": "IN2410002480",
+  "X-LINK-TOKEN": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ"
+}
+data: {
+  "abhaNumber": "91172204000829",
+  "abhaAddress": "pranay211.2006@sbx",
+  "patient": [
+    {
+      "referenceNumber": "Pranay Anup Agrawal",
+      "display": "Prescription - Pranay Anup Agrawal",
+      "careContexts": [
+        {
+          "referenceNumber": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription",
+          "display": "Prescription-Record-2026-09-12-01-00-46 - Prescription",
+          "hiTypes": [
+            "Prescription"
+          ],
+          "hiType": "Prescription"
+        }
+      ],
+      "hiType": "Prescription",
+      "count": 1
+    }
+  ]
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/carecontext
+status: 202
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:30:57 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "376",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "c900821e-5d55-49a0-b6d5-b45a670b55d8",
+  "pragma": "no-cache",
+  "activityid": "af9b9039-2bbc-45a9-85b2-4341e0262e42",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 758f428b51e0e061eed046e334a053c4.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "LSaJpiJOQ2u4LK_l7WAlVsmwQqGFhcAQ1QCopdmicvoRHs6jy5jwlA==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
+[API INBOUND RESPONSE] POST /api/hip/link/carecontext
+status: 200
+body: {"requestId":"b3dce0aa-8a25-4e63-b557-e6e8a15649d5","statusCode":202,"response":{}}
+
+[API INBOUND] POST /api/v3/link/on_carecontext
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "144",
+  "accept": "*/*",
+  "authorization": "Bear***MFCQ",
+  "content-type": "application/json",
+  "request-id": "19afa343-80f4-48e5-a09a-084243862188",
+  "timestamp": "2026-09-11T19:30:57.661541704",
+  "traceparent": "00-6aa456f1746174255dd172297d6f6e93-cb58e5dfe154f0aa-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa456f1-746174255dd172297d6f6e93;Parent=cb58e5dfe154f0aa;Sampled=0;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "65.0.113.207",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480",
+  "accept-encoding": "gzip"
+}
+query: {}
+body: {
+  "abhaAddress": "pranay211.2006@sbx",
+  "status": "Successfully Linked care context",
+  "response": {
+    "requestId": "b3dce0aa-8a25-4e63-b557-e6e8a15649d5"
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/link/on_carecontext
+status: 202
+body: {"ok":true}
+
+[API INBOUND] POST /api/m2/consents/link/context
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "2280",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "requestId": "b3dce0aa-8a25-4e63-b557-e6e8a15649d5",
+  "hipId": "IN2410002480",
+  "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ",
+  "abhaAddress": "pranay211.2006@sbx",
+  "AbhaAddress": "pranay211.2006@sbx",
+  "patient": [
+    {
+      "referenceNumber": "Pranay Anup Agrawal",
+      "display": "Prescription - Pranay Anup Agrawal",
+      "careContexts": [
+        {
+          "referenceNumber": "6c68ce64-eae4-425c-a2b4-5c11ba132940",
+          "display": "Prescription-Record-2026-09-12-01-00-46"
+        }
+      ],
+      "hiType": "Prescription",
+      "count": 1
+    }
+  ],
+  "createdTime": "2026-09-11T19:31:01.210Z",
+  "linkPayload": {
+    "hipId": "IN2410002480",
+    "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ",
+    "abhaNumber": "91172204000829",
+    "abhaAddress": "pranay211.2006@sbx",
+    "AbhaNumber": "91172204000829",
+    "AbhaAddress": "pranay211.2006@sbx",
+    "patient": [
+      {
+        "referenceNumber": "Pranay Anup Agrawal",
+        "display": "Prescription - Pranay Anup Agrawal",
+        "careContexts": [
+          {
+            "referenceNumber": "6c68ce64-eae4-425c-a2b4-5c11ba132940",
+            "display": "Prescription-Record-2026-09-12-01-00-46"
+          }
+        ],
+        "hiType": "Prescription",
+        "count": 1
+      }
+    ]
+  },
+  "linkResponse": {
+    "requestId": "b3dce0aa-8a25-4e63-b557-e6e8a15649d5",
+    "statusCode": 202,
+    "response": {}
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/m2/consents/link/context
+status: 202
+body: {"success":true,"requestId":"b3dce0aa-8a25-4e63-b557-e6e8a15649d5","currentState":"WAITING_FOR_CONSENT","source":"M2TransactionStore"}
+
+[API INBOUND] POST /api/hip/link/context/notify
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "1027",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "hipId": "IN2410002480",
+  "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ",
+  "mobile": "9510029575",
+  "phoneNo": "9510029575",
+  "notification": {
+    "patient": {
+      "id": "pranay211.2006@sbx",
+      "mobile": "9510029575",
+      "phoneNo": "9510029575"
+    },
+    "careContext": {
+      "patientReference": "Pranay Anup Agrawal",
+      "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940"
+    },
+    "hiTypes": [
+      "Prescription"
+    ],
+    "date": "2026-09-11T19:31:07.105Z",
+    "hip": {
+      "id": "IN2410002480"
+    }
+  }
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/context/notify
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "70cb79cd-99ac-4b72-88e4-16cbe2d58e03",
+  "TIMESTAMP": "2026-09-11T19:31:07.154Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***CiTg",
+  "X-HIP-ID": "IN2410002480",
+  "X-LINK-TOKEN": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ"
+}
+data: {
+  "notification": {
+    "patient": {
+      "id": "pranay211.2006@sbx",
+      "mobile": "9510029575",
+      "phoneNo": "9510029575"
+    },
+    "careContext": {
+      "patientReference": "Pranay Anup Agrawal",
+      "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription"
+    },
+    "hiTypes": [
+      "Prescription"
+    ],
+    "date": "2026-09-11T19:31:07.105Z",
+    "hip": {
+      "id": "IN2410002480"
+    }
+  }
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/context/notify
+status: 202
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:31:07 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "57",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "09171d05-5254-4ab4-8221-537a488b3ea6",
+  "pragma": "no-cache",
+  "activityid": "edf071d1-60fc-41e0-9035-e7e103f7da56",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 e4425241f96de4dcab71358d741d8c3e.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "l-zx-z9tvAiYuWLaLzhSDQrj7tC2SWbyQi-aJ5Ka3uxh46IHtBoxzg==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
 [OUTBOUND REQUEST] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/context/notify
 {
   "headers": {
     "Content-Type": "application/json",
-    "REQUEST-ID": "09792d97-fda0-4c40-971f-499c3a607fd3",
-    "TIMESTAMP": "2026-09-11T16:58:47.655Z",
+    "REQUEST-ID": "70cb79cd-99ac-4b72-88e4-16cbe2d58e03",
+    "TIMESTAMP": "2026-09-11T19:31:07.154Z",
     "X-CM-ID": "sbx",
-    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNDY2MzMsImlhdCI6MTc4OTE0NTQzMywianRpIjoiNDU2ZTEzYjAtZTE1NS00ZTIyLTkyZGQtZGYyMzUwODNmODIwIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJkNGRmODkwNi0wNjc0LTRmY2YtODQzNi0xMzdmNjFiNDdiZGMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.HgCDpIuRTZotlZGQWsyv70S4ce8MZoEAY9MrMAWRzHCk4wMWpkGGLZPbW2BhjfVeFM1xp9M4RxR9oZqbPNr-UKboHhlltlkdQNmhiX8L25O_Aekc9fBC1Ll0nYTFTr4omCi_yf-by7GYD0LnwjlTR0PW3VoPoQ9eI9-nkN8r1mudYfkOlRfRw9Se-BANnsJTfC3FVWhq-S4WqBRjfRZe6RxvTqj8RQFEXV0xj7lU1-jQemk_HmAo_DxOunUsO_xZCpGExBtPTo3QT7eRjJtgzu2xBzuL_tdTYblYkq_wDs60GqFJ0cq6-qOV9bgcz1FhP6kL96B5siMlTpDkdEuarw",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNTYxNTEsImlhdCI6MTc4OTE1NDk1MSwianRpIjoiOTNiZjRiNmYtYTM4Yi00NDRkLWJlNzMtZjcwMTA3NTRlZmVkIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJlZGU3ZTgwYS1hZDQ1LTQ1ZWUtYTljMi0wZGE5Y2QzZWYzMDYiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS45NS4xNjIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuOTUuMTYyIn0.W6tTWFwWMydZIrvbkWjIO9e8ogJptFx63RtJRsphOgqWua5K7p6iu5TUQtX0RJqgu2aE-eQbON-4PIDlSBnwCc2srVeDVvvm45y92NidrWHiAUu7PxLCUTU87vLOaFEXxxKnfMrcd5VixtDBJnA-BOL2gBiVak3bXJSPsx6ITTqCzOWGpDqphGytxZ0ac4Yj10ngyjuGqwnPX5DSNwTGNR8FHXgc9tOvu3G2laIrVLc1t69GN5lfjfHhqxMx23FYAaV_4MYkGBkq58rJbSyL7duWSWtWOGl0VafQPX1JtzFy_CqWBIp33eAOSz0m4mPUjuXbNBiJ-fL00yMJBrCiTg",
     "X-HIP-ID": "IN2410002480",
-    "X-LINK-TOKEN": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w"
+    "X-LINK-TOKEN": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiNmQzMmFmZWMtNGJmYy00MTdlLWJmN2UtNWYyMGMyYjk2YzIzIiwiYWJoYUFkZHJlc3MiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJzdWIiOiJwcmFuYXkyMTEuMjAwNkBzYngiLCJpYXQiOjE3ODkxNTQ2OTcsImV4cCI6MTgwNDkyMjY5N30.Zq-vc-rku4MIBp1tVV5kqfSBN9Q997n0JssU7gfL9mNW5r_7rHiW9cxKq132SZTz6G5e8zTPMa0HqSNEDCLowHLF4G2GkbKs07k0IjU-CwInpvrB9wZ9Y6A-mLH0P1PTKZMlttN9ZL6DSXfsL4LmZ8hEeZ5720kBM3ifsso6kvEzfE__2aEpI889_ChP0V8f5MqDs5c0BJFJYZF5tZ0HRTnT8QX17rZ-YC-e7Ny-IKZoJTOygistTYKzi44_3okKI8XV_iEIPF7reAPGSaKBBI7Jeq--IUJ31szPqzwaT9fdjpYqlAPAKtEXANR9B4ET6qy7psnwfEmK8acuHefatQ"
   },
   "data": {
     "notification": {
       "patient": {
-        "id": "pranay_2025@sbx",
+        "id": "pranay211.2006@sbx",
         "mobile": "9510029575",
         "phoneNo": "9510029575"
       },
       "careContext": {
         "patientReference": "Pranay Anup Agrawal",
-        "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c-OPConsultation"
+        "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription"
       },
       "hiTypes": [
-        "OPConsultation"
+        "Prescription"
       ],
-      "date": "2026-09-11T16:58:47.639Z",
+      "date": "2026-09-11T19:31:07.105Z",
       "hip": {
         "id": "IN2410002480"
       }
@@ -32,18 +902,106 @@
 }
 [RESPONSE] Status: 202
 
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links/sms/notify2
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "d3c57c30-826b-4564-baa2-c296060431d6",
+  "TIMESTAMP": "2026-09-11T19:31:07.509Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***CiTg"
+}
+data: {
+  "requestId": "d3c57c30-826b-4564-baa2-c296060431d6",
+  "timestamp": "2026-09-11T19:31:07.509Z",
+  "notification": {
+    "phoneNo": "9510029575",
+    "hip": {
+      "name": "Sarita Health Care",
+      "id": "IN2410002480"
+    }
+  }
+}
+
+[API INBOUND] POST /api/v3/links/context/on-notify
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "104",
+  "accept": "*/*",
+  "accept-encoding": "gzip",
+  "authorization": "Bear***MFCQ",
+  "content-type": "application/json",
+  "request_id": "2f86a24b-37f5-4a22-a4f4-17c6bd4220fc",
+  "timestamp": "2026-09-11T19:31:07.473Z",
+  "traceparent": "00-6aa456fb06acc925dc95cb99ed18a0af-1f60f0200a0ad1d2-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa456fb-06acc925dc95cb99ed18a0af;Parent=1f60f0200a0ad1d2;Sampled=0;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "13.203.245.166",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480"
+}
+query: {}
+body: {
+  "acknowledgement": {
+    "status": "SUCCESS"
+  },
+  "response": {
+    "requestId": "70cb79cd-99ac-4b72-88e4-16cbe2d58e03"
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/links/context/on-notify
+status: 202
+body: {"ok":true}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links/sms/notify2
+status: 202
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:31:07 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "101",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "1ab6a10c-2d31-406d-8b49-151e340265b8",
+  "pragma": "no-cache",
+  "activityid": "0d72ee05-6a72-484d-8977-ab9942fff994",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 e4425241f96de4dcab71358d741d8c3e.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "H1pWmnslyE6FKiIN3DcGgZeMuuuiSXQfwUVy43iCOecK-CJ8SA4iDA==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
 [OUTBOUND REQUEST] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links/sms/notify2
 {
   "headers": {
     "Content-Type": "application/json",
-    "REQUEST-ID": "6b89fe3d-f516-4048-88ad-879890b0cc46",
-    "TIMESTAMP": "2026-09-11T16:58:47.903Z",
+    "REQUEST-ID": "d3c57c30-826b-4564-baa2-c296060431d6",
+    "TIMESTAMP": "2026-09-11T19:31:07.509Z",
     "X-CM-ID": "sbx",
-    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNDY2MzMsImlhdCI6MTc4OTE0NTQzMywianRpIjoiNDU2ZTEzYjAtZTE1NS00ZTIyLTkyZGQtZGYyMzUwODNmODIwIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJkNGRmODkwNi0wNjc0LTRmY2YtODQzNi0xMzdmNjFiNDdiZGMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.HgCDpIuRTZotlZGQWsyv70S4ce8MZoEAY9MrMAWRzHCk4wMWpkGGLZPbW2BhjfVeFM1xp9M4RxR9oZqbPNr-UKboHhlltlkdQNmhiX8L25O_Aekc9fBC1Ll0nYTFTr4omCi_yf-by7GYD0LnwjlTR0PW3VoPoQ9eI9-nkN8r1mudYfkOlRfRw9Se-BANnsJTfC3FVWhq-S4WqBRjfRZe6RxvTqj8RQFEXV0xj7lU1-jQemk_HmAo_DxOunUsO_xZCpGExBtPTo3QT7eRjJtgzu2xBzuL_tdTYblYkq_wDs60GqFJ0cq6-qOV9bgcz1FhP6kL96B5siMlTpDkdEuarw"
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNTYxNTEsImlhdCI6MTc4OTE1NDk1MSwianRpIjoiOTNiZjRiNmYtYTM4Yi00NDRkLWJlNzMtZjcwMTA3NTRlZmVkIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJlZGU3ZTgwYS1hZDQ1LTQ1ZWUtYTljMi0wZGE5Y2QzZWYzMDYiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS45NS4xNjIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuOTUuMTYyIn0.W6tTWFwWMydZIrvbkWjIO9e8ogJptFx63RtJRsphOgqWua5K7p6iu5TUQtX0RJqgu2aE-eQbON-4PIDlSBnwCc2srVeDVvvm45y92NidrWHiAUu7PxLCUTU87vLOaFEXxxKnfMrcd5VixtDBJnA-BOL2gBiVak3bXJSPsx6ITTqCzOWGpDqphGytxZ0ac4Yj10ngyjuGqwnPX5DSNwTGNR8FHXgc9tOvu3G2laIrVLc1t69GN5lfjfHhqxMx23FYAaV_4MYkGBkq58rJbSyL7duWSWtWOGl0VafQPX1JtzFy_CqWBIp33eAOSz0m4mPUjuXbNBiJ-fL00yMJBrCiTg"
   },
   "data": {
-    "requestId": "6b89fe3d-f516-4048-88ad-879890b0cc46",
-    "timestamp": "2026-09-11T16:58:47.903Z",
+    "requestId": "d3c57c30-826b-4564-baa2-c296060431d6",
+    "timestamp": "2026-09-11T19:31:07.509Z",
     "notification": {
       "phoneNo": "9510029575",
       "hip": {
@@ -55,18 +1013,136 @@
 }
 [RESPONSE] Status: 202
 
+[API INBOUND RESPONSE] POST /api/hip/link/context/notify
+status: 200
+body: {"requestId":"70cb79cd-99ac-4b72-88e4-16cbe2d58e03","statusCode":202,"response":{},"smsNotification":{"ok":true,"requestId":"d3c57c30-826b-4564-baa2-c296060431d6","statusCode":202,"response":{}}}
+
+[API INBOUND] POST /api/v3/patients/sms/on-notify
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "102",
+  "accept": "*/*",
+  "accept-encoding": "gzip",
+  "authorization": "Bear***MFCQ",
+  "content-type": "application/json",
+  "request_id": "c85b7d48-dd6b-458b-a968-df6a6bc38a9d",
+  "timestamp": "2026-09-11T19:31:07.772Z",
+  "traceparent": "00-6aa456fbcf411ad76782e6f4f6fd1c2d-adbfb5b3425324bc-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa456fb-cf411ad76782e6f4f6fd1c2d;Parent=adbfb5b3425324bc;Sampled=0;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "65.0.113.207",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480"
+}
+query: {}
+body: {
+  "status": "ACKNOWLEDGED",
+  "error": null,
+  "response": {
+    "requestId": "d3c57c30-826b-4564-baa2-c296060431d6"
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/patients/sms/on-notify
+status: 202
+body: {"ok":true}
+
+[API INBOUND] POST /api/hip/link/patient/links/sms/notify2
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "78",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "hipId": "IN2410002480",
+  "hipName": "Sarita Health Care",
+  "phoneNo": "9510029575"
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links/sms/notify2
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "c94178f6-6b19-432c-b127-9c98655699bc",
+  "TIMESTAMP": "2026-09-11T19:31:08.783Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***CiTg"
+}
+data: {
+  "requestId": "c94178f6-6b19-432c-b127-9c98655699bc",
+  "timestamp": "2026-09-11T19:31:08.783Z",
+  "notification": {
+    "phoneNo": "9510029575",
+    "hip": {
+      "name": "Sarita Health Care",
+      "id": "IN2410002480"
+    }
+  }
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links/sms/notify2
+status: 202
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:31:08 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "149",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "b28f3fc5-982a-48ef-867e-dd4f8cac87a5",
+  "pragma": "no-cache",
+  "activityid": "d5b3d43b-02a0-4218-a493-03ce984a36af",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 e4425241f96de4dcab71358d741d8c3e.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "jXK1Z0rWS-r-IHJGuRoIa0FmHboXbMah1H7y7durSg773shGC8tiiQ==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
 [OUTBOUND REQUEST] POST https://dev.abdm.gov.in/api/hiecm/hip/v3/link/patient/links/sms/notify2
 {
   "headers": {
     "Content-Type": "application/json",
-    "REQUEST-ID": "45fae9c9-e3d5-489b-986f-85a063dfda36",
-    "TIMESTAMP": "2026-09-11T16:58:49.206Z",
+    "REQUEST-ID": "c94178f6-6b19-432c-b127-9c98655699bc",
+    "TIMESTAMP": "2026-09-11T19:31:08.783Z",
     "X-CM-ID": "sbx",
-    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNDY2MzMsImlhdCI6MTc4OTE0NTQzMywianRpIjoiNDU2ZTEzYjAtZTE1NS00ZTIyLTkyZGQtZGYyMzUwODNmODIwIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJkNGRmODkwNi0wNjc0LTRmY2YtODQzNi0xMzdmNjFiNDdiZGMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.HgCDpIuRTZotlZGQWsyv70S4ce8MZoEAY9MrMAWRzHCk4wMWpkGGLZPbW2BhjfVeFM1xp9M4RxR9oZqbPNr-UKboHhlltlkdQNmhiX8L25O_Aekc9fBC1Ll0nYTFTr4omCi_yf-by7GYD0LnwjlTR0PW3VoPoQ9eI9-nkN8r1mudYfkOlRfRw9Se-BANnsJTfC3FVWhq-S4WqBRjfRZe6RxvTqj8RQFEXV0xj7lU1-jQemk_HmAo_DxOunUsO_xZCpGExBtPTo3QT7eRjJtgzu2xBzuL_tdTYblYkq_wDs60GqFJ0cq6-qOV9bgcz1FhP6kL96B5siMlTpDkdEuarw"
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNTYxNTEsImlhdCI6MTc4OTE1NDk1MSwianRpIjoiOTNiZjRiNmYtYTM4Yi00NDRkLWJlNzMtZjcwMTA3NTRlZmVkIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJlZGU3ZTgwYS1hZDQ1LTQ1ZWUtYTljMi0wZGE5Y2QzZWYzMDYiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS45NS4xNjIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuOTUuMTYyIn0.W6tTWFwWMydZIrvbkWjIO9e8ogJptFx63RtJRsphOgqWua5K7p6iu5TUQtX0RJqgu2aE-eQbON-4PIDlSBnwCc2srVeDVvvm45y92NidrWHiAUu7PxLCUTU87vLOaFEXxxKnfMrcd5VixtDBJnA-BOL2gBiVak3bXJSPsx6ITTqCzOWGpDqphGytxZ0ac4Yj10ngyjuGqwnPX5DSNwTGNR8FHXgc9tOvu3G2laIrVLc1t69GN5lfjfHhqxMx23FYAaV_4MYkGBkq58rJbSyL7duWSWtWOGl0VafQPX1JtzFy_CqWBIp33eAOSz0m4mPUjuXbNBiJ-fL00yMJBrCiTg"
   },
   "data": {
-    "requestId": "45fae9c9-e3d5-489b-986f-85a063dfda36",
-    "timestamp": "2026-09-11T16:58:49.206Z",
+    "requestId": "c94178f6-6b19-432c-b127-9c98655699bc",
+    "timestamp": "2026-09-11T19:31:08.783Z",
     "notification": {
       "phoneNo": "9510029575",
       "hip": {
@@ -78,109 +1154,1098 @@
 }
 [RESPONSE] Status: 202
 
-[OUTBOUND REQUEST] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
-{
-  "headers": {
-    "Content-Type": "application/json",
-    "REQUEST-ID": "cf809f5e-b97d-4369-9885-36d2f5499230",
-    "TIMESTAMP": "2026-09-11T17:03:47.504Z",
-    "X-CM-ID": "sbx",
-    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNDY2MzMsImlhdCI6MTc4OTE0NTQzMywianRpIjoiNDU2ZTEzYjAtZTE1NS00ZTIyLTkyZGQtZGYyMzUwODNmODIwIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJkNGRmODkwNi0wNjc0LTRmY2YtODQzNi0xMzdmNjFiNDdiZGMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.HgCDpIuRTZotlZGQWsyv70S4ce8MZoEAY9MrMAWRzHCk4wMWpkGGLZPbW2BhjfVeFM1xp9M4RxR9oZqbPNr-UKboHhlltlkdQNmhiX8L25O_Aekc9fBC1Ll0nYTFTr4omCi_yf-by7GYD0LnwjlTR0PW3VoPoQ9eI9-nkN8r1mudYfkOlRfRw9Se-BANnsJTfC3FVWhq-S4WqBRjfRZe6RxvTqj8RQFEXV0xj7lU1-jQemk_HmAo_DxOunUsO_xZCpGExBtPTo3QT7eRjJtgzu2xBzuL_tdTYblYkq_wDs60GqFJ0cq6-qOV9bgcz1FhP6kL96B5siMlTpDkdEuarw",
-    "X-HIP-ID": "IN2410002480"
-  },
-  "data": {
-    "requestId": "697e5611-fc2f-4e66-b0c8-45dfe17e78bf",
-    "timestamp": "2026-09-11T17:03:47.504Z",
-    "notification": {
-      "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
-      "transactionId": "f590c63a-8c03-4794-bdb4-ee80ac4e28c6",
-      "doneAt": "2026-09-11T17:03:47.505Z",
-      "notifier": {
-        "type": "HIP",
-        "id": "IN2410002480"
+[API INBOUND RESPONSE] POST /api/hip/link/patient/links/sms/notify2
+status: 200
+body: {"ok":true,"requestId":"c94178f6-6b19-432c-b127-9c98655699bc","statusCode":202,"response":{}}
+
+[API INBOUND] POST /api/v3/patients/sms/on-notify
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "102",
+  "accept": "*/*",
+  "accept-encoding": "gzip",
+  "authorization": "Bear***MFCQ",
+  "content-type": "application/json",
+  "request_id": "8907791a-c75c-4b25-8d7e-8d9d735d90a7",
+  "timestamp": "2026-09-11T19:31:08.999Z",
+  "traceparent": "00-6aa456fc9a3b8d4f549b37179427ac1d-4b05ac23669013a3-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa456fc-9a3b8d4f549b37179427ac1d;Parent=4b05ac23669013a3;Sampled=0;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "13.203.245.166",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480"
+}
+query: {}
+body: {
+  "status": "ACKNOWLEDGED",
+  "error": null,
+  "response": {
+    "requestId": "c94178f6-6b19-432c-b127-9c98655699bc"
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/patients/sms/on-notify
+status: 202
+body: {"ok":true}
+
+[API INBOUND] POST /api/m2/initialize
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "0",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {}
+
+[API INBOUND RESPONSE] POST /api/m2/initialize
+status: 200
+body: {"success":true,"message":"M2TokenManager initialized successfully."}
+
+[API INBOUND] POST /api/m2/consents/manager/init
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "542",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "requestId": "da3b9c43-12ba-b3d2-c7e2-a88fc48a5e2a",
+  "timestamp": "2026-09-11T19:31:09.000Z",
+  "consent": {
+    "purpose": {
+      "code": "PATRQT",
+      "text": "Self Requested"
+    },
+    "patient": {
+      "id": "pranay211.2006@sbx"
+    },
+    "hiu": {
+      "id": "IN2410002480"
+    },
+    "requester": {
+      "name": "Sarita ABDM App",
+      "identifier": {
+        "type": "REGNO",
+        "value": "MCI-1234"
+      }
+    },
+    "hiTypes": [
+      "Prescription"
+    ],
+    "permission": {
+      "accessMode": "VIEW",
+      "dateRange": {
+        "from": "2025-09-11T19:31:09.000Z",
+        "to": "2026-09-11T19:31:09.000Z"
       },
-      "statusNotification": {
-        "sessionStatus": "FAILED",
-        "hipId": "IN2410002480",
-        "statusResponses": [
-          {
-            "careContextReference": "657f132e-9b8f-45ef-a2c3-66229e24fda4",
-            "hiStatus": "ERRORED",
-            "description": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
-          }
-        ]
+      "dataEraseAt": "2026-10-11T19:31:09.000Z",
+      "frequency": {
+        "unit": "HOUR",
+        "value": 1,
+        "repeats": 0
       }
     }
   }
 }
-[RESPONSE] Status: 202
+
+[API INBOUND RESPONSE] POST /api/m2/consents/manager/init
+status: 200
+body: {"requestId":"da3b9c43-12ba-b3d2-c7e2-a88fc48a5e2a","consentId":"consent_1789155069235","timestamp":"2026-09-11T19:31:09.643Z","response":{"status":"REQUESTED","source":"M2ConsentManager"}}
+
+[API INBOUND] GET /api/m2/consents/manager/callbacks/on-init/da3b9c43-12ba-b3d2-c7e2-a88fc48a5e2a?_t=1789155072649
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {
+  "_t": "1789155072649"
+}
+
+[API INBOUND RESPONSE] GET /api/m2/consents/manager/callbacks/on-init/da3b9c43-12ba-b3d2-c7e2-a88fc48a5e2a?_t=1789155072649
+status: 200
+body: {"success":true,"requestId":"da3b9c43-12ba-b3d2-c7e2-a88fc48a5e2a","consentId":"consent_1789155069235","consentRequest":{"id":"consent_1789155069235"},"payload":{"consentId":"consent_1789155069235","status":"Requested","patientId":"pranay211.2006@sbx","hiTypes":["Prescription"],"purpose":{"code":"PATRQT","text":"Self Requested"},"dateRange":{"from":"2025-09-11T19:31:09.000Z","to":"2026-09-11T19:31:09.000Z"},"expiry":1791747069000,"createdAt":1789155069370,"updatedAt":1789155069370},"source":"M2TransactionStore"}
+
+[API INBOUND] POST /api/m2/consents/decision
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "59",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "x-consent-mode": "current_default",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "consentId": "consent_1789155069235",
+  "decision": "APPROVED"
+}
+
+[API INBOUND RESPONSE] POST /api/m2/consents/decision
+status: 200
+body: {"success":true,"status":"Active","consentId":"consent_1789155069235","consentArtefactId":"consent_1789155069235"}
+
+[API INBOUND] POST /api/m2/consents/manager/health-information/request
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "226",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "requestId": "c5f0cedf-b48c-bebf-4cdf-e1ea8adb6f84",
+  "timestamp": "2026-09-11T19:31:13.000Z",
+  "hiRequest": {
+    "consent": {
+      "id": "consent_1789155069235"
+    },
+    "dateRange": {
+      "from": "2025-09-11T19:31:09.000Z",
+      "to": "2026-09-11T19:31:09.000Z"
+    }
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/m2/consents/manager/health-information/request
+status: 200
+body: {"requestId":"c5f0cedf-b48c-bebf-4cdf-e1ea8adb6f84","transactionId":"tx_1789155069234","consentId":"consent_1789155069235","dataPushUrl":"https://isolation-pouncing-ecard.ngrok-free.dev/api/v3/health-information/notify","response":{"status":"SUBMITTED","source":"M2HealthInformationRequestManager","outboundResponse":{}}}
+
+[API INBOUND] GET /api/m2/consents/manager/callbacks/health-information/on-request/c5f0cedf-b48c-bebf-4cdf-e1ea8adb6f84?_t=1789155077211
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {
+  "_t": "1789155077211"
+}
+
+[API INBOUND RESPONSE] GET /api/m2/consents/manager/callbacks/health-information/on-request/c5f0cedf-b48c-bebf-4cdf-e1ea8adb6f84?_t=1789155077211
+status: 200
+body: {"success":true,"requestId":"c5f0cedf-b48c-bebf-4cdf-e1ea8adb6f84","transactionId":"tx_1789155069234","payload":{"requestId":"c5f0cedf-b48c-bebf-4cdf-e1ea8adb6f84","transactionId":"tx_1789155069234","consentId":"consent_1789155069235","patientId":"pranay211.2006@sbx","status":"Submitted","dateRange":{"from":"2025-09-11T19:31:09.000Z","to":"2026-09-11T19:31:09.000Z"},"createdAt":1789155073365,"updatedAt":1789155073681},"source":"M2TransactionStore"}
+
+[API INBOUND] POST /api/m2/hip/transfer/push
+headers: {
+  "host": "localhost:3000",
+  "connection": "keep-alive",
+  "content-length": "145",
+  "ngrok-skip-browser-warning": "true",
+  "sec-ch-ua-platform": "\"macOS\"",
+  "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36",
+  "sec-ch-ua": "\"Chromium\";v=\"152\", \"Not?A_Brand\";v=\"24\", \"Google Chrome\";v=\"152\"",
+  "content-type": "application/json",
+  "sec-ch-ua-mobile": "?0",
+  "accept": "*/*",
+  "origin": "http://localhost:55420",
+  "sec-fetch-site": "same-site",
+  "sec-fetch-mode": "cors",
+  "sec-fetch-dest": "empty",
+  "referer": "http://localhost:55420/",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "en-GB,en-US;q=0.9,en;q=0.8"
+}
+query: {}
+body: {
+  "consentId": "consent_1789155069235",
+  "transactionId": "tx_1789155069234",
+  "recordTypes": [
+    "Prescription Record"
+  ],
+  "abhaAddress": "pranay211.2006@sbx"
+}
+
+[API INBOUND RESPONSE] POST /api/m2/hip/transfer/push
+status: 200
+body: {"success":true,"transaction":{"status":"TRANSFER_COMPLETED","transactionId":"tx_1789155069234","consentId":"consent_1789155069235"}}
+
+[OUTBOUND REQUEST] POST https://isolation-pouncing-ecard.ngrok-free.dev/api/v3/health-information/notify
+{
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "data": {
+    "pageNumber": 1,
+    "pageCount": 1,
+    "transactionId": "tx_1789155069234",
+    "entries": [
+      {
+        "content": "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",
+        "media": "application/fhir+json",
+        "checksum": "1edc177632993066eb5658bee5e7e845ca62245da19d6880dd941c220b9c3d5e",
+        "careContextReference": "87c79f00"
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "Curve25519",
+      "dhPublicKey": {
+        "expiry": "2027-09-11T19:31:18.285Z",
+        "parameters": "Curve25519/32byte random key",
+        "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAR89BEdaVYSeqTefOjHUMvzZj3bCxU8xZJaWQMknCSfiAgETTsLbixgXJXB4GQFk9d57023H4EPckzS/lTQjFkd"
+      },
+      "nonce": "+19+WXsAUTdciNmOJGqJBwmCBw3N8ovAoIAWOEi8I0E="
+    }
+  }
+}
+
+[API OUTBOUND] POST https://isolation-pouncing-ecard.ngrok-free.dev/api/v3/health-information/notify
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json"
+}
+data: {
+  "pageNumber": 1,
+  "pageCount": 1,
+  "transactionId": "tx_1789155069234",
+  "entries": [
+    {
+      "content": "<string 12932 chars>",
+      "media": "application/fhir+json",
+      "checksum": "1edc177632993066eb5658bee5e7e845ca62245da19d6880dd941c220b9c3d5e",
+      "careContextReference": "87c79f00"
+    }
+  ],
+  "keyMaterial": {
+    "cryptoAlg": "ECDH",
+    "curve": "Curve25519",
+    "dhPublicKey": {
+      "expiry": "2027-09-11T19:31:18.285Z",
+      "parameters": "Curve25519/32byte random key",
+      "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAR89BEdaVYSeqTefOjHUMvzZj3bCxU8xZJaWQMknCSfiAgETTsLbixgXJXB4GQFk9d57023H4EPckzS/lTQjFkd"
+    },
+    "nonce": "+19+WXsAUTdciNmOJGqJBwmCBw3N8ovAoIAWOEi8I0E="
+  }
+}
+
+[API INBOUND] POST /api/v3/health-information/notify
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "axios/1.13.6",
+  "content-length": "13513",
+  "accept": "application/json, text/plain, */*",
+  "accept-encoding": "gzip, compress, deflate, br",
+  "content-type": "application/json",
+  "x-forwarded-for": "2409:40c2:100e:cff6:656b:409b:8a74:306",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https"
+}
+query: {}
+body: {
+  "pageNumber": 1,
+  "pageCount": 1,
+  "transactionId": "tx_1789155069234",
+  "entries": [
+    {
+      "content": "<string 12932 chars>",
+      "media": "application/fhir+json",
+      "checksum": "1edc177632993066eb5658bee5e7e845ca62245da19d6880dd941c220b9c3d5e",
+      "careContextReference": "87c79f00"
+    }
+  ],
+  "keyMaterial": {
+    "cryptoAlg": "ECDH",
+    "curve": "Curve25519",
+    "dhPublicKey": {
+      "expiry": "2027-09-11T19:31:18.285Z",
+      "parameters": "Curve25519/32byte random key",
+      "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAR89BEdaVYSeqTefOjHUMvzZj3bCxU8xZJaWQMknCSfiAgETTsLbixgXJXB4GQFk9d57023H4EPckzS/lTQjFkd"
+    },
+    "nonce": "+19+WXsAUTdciNmOJGqJBwmCBw3N8ovAoIAWOEi8I0E="
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/health-information/notify
+status: 202
+body: {"ok":true,"transactionId":"tx_1789155069234"}
+
+[API OUTBOUND RESPONSE] POST https://isolation-pouncing-ecard.ngrok-free.dev/api/v3/health-information/notify
+status: 202
+headers: {
+  "access-control-allow-origin": "*",
+  "content-length": "46",
+  "content-type": "application/json; charset=utf-8",
+  "date": "Fri, 11 Sep 2026 19:31:18 GMT",
+  "etag": "W/\"2e-4zWzMUyG5XgK37i5yZHMVLfQ5RY\"",
+  "ngrok-agent-ips": "2409:40c2:100e:cff6:656b:409b:8a74:306",
+  "x-powered-by": "Express"
+}
+data: {
+  "ok": true,
+  "transactionId": "tx_1789155069234"
+}
+
+[OUTBOUND RESPONSE] POST https://isolation-pouncing-ecard.ngrok-free.dev/api/v3/health-information/notify
+{
+  "status": 202,
+  "data": {
+    "ok": true,
+    "transactionId": "tx_1789155069234"
+  }
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "7fd95b95-491e-4ba9-bd13-5cc7807ba866",
+  "TIMESTAMP": "2026-09-11T19:31:19.618Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***Iwfg",
+  "X-HIP-ID": "IN2410002480"
+}
+data: {
+  "requestId": "bda9ea03-8e0d-4ce4-aece-a39617ee8817",
+  "timestamp": "2026-09-11T19:31:19.618Z",
+  "notification": {
+    "consentId": "consent_1789155069235",
+    "transactionId": "tx_1789155069234",
+    "doneAt": "2026-09-11T19:31:19.618Z",
+    "notifier": {
+      "type": "HIP",
+      "id": "IN2410002480"
+    },
+    "statusNotification": {
+      "sessionStatus": "TRANSFERRED",
+      "hipId": "IN2410002480",
+      "statusResponses": [
+        {
+          "careContextReference": "87c79f00",
+          "hiStatus": "OK",
+          "description": "Health information transferred"
+        }
+      ]
+    }
+  }
+}
+
+[API OUTBOUND ERROR] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
+status: 400
+headers: {
+  "content-type": "application/json",
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:31:19 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "20",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "14befa37-6ca7-43d4-9313-70c8b639f5aa",
+  "pragma": "no-cache",
+  "activityid": "1e82d6d8-ad04-473f-9f8d-53e17599949c",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Error from cloudfront",
+  "via": "1.1 e4425241f96de4dcab71358d741d8c3e.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "Zi6y3cJKjh4Ere71Ytvu9bhlEJbO671-qWurvdnD1I5ZYrTiDd6wNg==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+data: {
+  "error": {
+    "code": "ABDM-1080",
+    "message": "Invalid Consent artefact id"
+  }
+}
+
+[API INBOUND] POST /api/v3/consent/request/hip/notify
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "1273",
+  "accept": "*/*",
+  "authorization": "Bear***lkiQ",
+  "content-type": "application/json",
+  "request-id": "789726d3-2cc1-4721-8cff-3e0d3d67d9e2",
+  "timestamp": "2026-09-11T19:33:03.677Z",
+  "traceparent": "00-6aa457408f54956d3b67024d56e3b743-d2a61c1143c1a6a4-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa45740-8f54956d3b67024d56e3b743;Parent=d2a61c1143c1a6a4;Sampled=0;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "13.203.245.166",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480",
+  "accept-encoding": "gzip"
+}
+query: {}
+body: {
+  "notification": {
+    "status": "GRANTED",
+    "consentId": "34817037-7402-4879-96b8-e5f0675f5fe4",
+    "consentDetail": {
+      "schemaVersion": "v3",
+      "consentId": "34817037-7402-4879-96b8-e5f0675f5fe4",
+      "createdAt": "2026-09-11T19:31:06.493Z",
+      "patient": {
+        "id": "pranay211.2006@sbx"
+      },
+      "careContexts": [
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription"
+        }
+      ],
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "consentManager": {
+        "id": "sbx"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T19:31:04.942Z",
+          "to": "2026-09-11T19:31:04.942Z"
+        },
+        "dataEraseAt": "2126-09-11T19:31:04.942Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      }
+    },
+    "signature": "TO8EjcZUcDMN2YyjE29t5LCwkl2P9COxeNwWzwRx5xyesaO/uxOIAXEw3Av4kNKnVRBobUBZaIN6PBDxMn9RSha8Bn2Kj97BNxgiSfstOXFvbahZeCchJfLMo2zeKYEm2GcCOQMMLXspoEfFlRDt7KlBwK+bKPQPyWYXJx0rZ2MIFhBc5Gcad4l8zzn9E6cHUlnzRB/gsa/5Qamp/N9GGV39Q933D0L9CbCBElBMjbKI/5kUo5RQ6f2iUQsGrheSijG0TOuJ33qpjLMj/eS5XRygbfJg0UpBeAZsYdS5P0LyUMPfFyDgi/nwgXkWTF6BwWBmh6TgxTYDLPP7ZC3NtA==",
+    "grantAcknowledgement": false
+  }
+}
+
+[API INBOUND] POST /api/v3/consent/request/hip/notify
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "1273",
+  "accept": "*/*",
+  "authorization": "Bear***lkiQ",
+  "content-type": "application/json",
+  "request-id": "91b2e665-a221-4f92-b8e6-94ff9d480121",
+  "timestamp": "2026-09-11T19:33:18.949Z",
+  "traceparent": "00-6aa4574e49fdf8907e4d1a66d11c8f03-345122b9e4bb4f0c-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa4574e-49fdf8907e4d1a66d11c8f03;Parent=345122b9e4bb4f0c;Sampled=0;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "13.203.243.253",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480",
+  "accept-encoding": "gzip"
+}
+query: {}
+body: {
+  "notification": {
+    "status": "GRANTED",
+    "consentId": "7bfb3c8b-917d-4a04-85ee-29080a85707b",
+    "consentDetail": {
+      "schemaVersion": "v3",
+      "consentId": "7bfb3c8b-917d-4a04-85ee-29080a85707b",
+      "createdAt": "2026-09-11T19:31:19.583Z",
+      "patient": {
+        "id": "pranay211.2006@sbx"
+      },
+      "careContexts": [
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription"
+        }
+      ],
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "consentManager": {
+        "id": "sbx"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T19:31:15.147Z",
+          "to": "2026-09-11T19:31:15.147Z"
+        },
+        "dataEraseAt": "2126-09-11T19:31:15.147Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      }
+    },
+    "signature": "UUeXkBeqz1Z/ckU+01ck/o0dknxuRHOwPBabS+jvCg53koJgFoa4eKSvXOvnQDRItdWJN8jEzF09Pidu+/qlGZt4WPH890+E1ge/GMmrBl8Mcm71RcALVkb7FfmA0v4ski9Nw4xjLwssEVgEYaZtvwSIfFPOTeX8lRRbmJKE9hEm159UewtcafHLmZTG+JVDGHmS5oarYDQs2fjlmwYVCa6qIINagyq5hzN8Avp0E5VBjNkNyIbWccii1l736ipUmhvsEsPi9s5kyzK1bTfBYBMt5PfMv+fFO69I7rkSd0P4vjNWzdlYGnQdznLoryF4BlobjU0yUm+IwezumAfh4Q==",
+    "grantAcknowledgement": false
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/consent/request/hip/notify
+status: 202
+body: {"status":"success","duplicate":false,"transactionId":"b3dce0aa-8a25-4e63-b557-e6e8a15649d5","currentState":"CONSENT_GRANTED","dispatched":true,"dispatchResult":{"dispatched":true,"result":{"success":true,"consentId":"34817037-7402-4879-96b8-e5f0675f5fe4","status":"Active","acknowledgement":{"statusCode":202,"requestId":"789726d3-2cc1-4721-8cff-3e0d3d67d9e2","body":{"acknowledgement":{"status":"ok","consentId":"34817037-7402-4879-96b8-e5f0675f5fe4"},"response":{"requestId":"789726d3-2cc1-4721-8cff-3e0d3d67d9e2"}}}}}}
+
+[API INBOUND] POST /api/v3/hip/health-information/request
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "612",
+  "accept": "*/*",
+  "authorization": "Bear***5_gw",
+  "baggage": "Self=1-6aa45780-64874b880a334db7005e4023,xrsr=21b111cbfe6e8fca",
+  "content-type": "application/json",
+  "request-id": "a4d27928-493f-4329-9314-0c922e7ece27",
+  "timestamp": "2026-09-11 19:33:20.212",
+  "traceparent": "00-6aa457408f54956d3b67024d56e3b743-ada74e07baf12c45-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa45740-8f54956d3b67024d56e3b743;Parent=ada74e07baf12c45;Sampled=0;Self=1-6aa45780-64874b880a334db7005e4023;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "13.203.245.166",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480",
+  "accept-encoding": "gzip"
+}
+query: {}
+body: {
+  "transactionId": "87716cc4-7d94-46d7-aa7f-7a89b021936c",
+  "hiRequest": {
+    "consent": {
+      "id": "34817037-7402-4879-96b8-e5f0675f5fe4"
+    },
+    "dateRange": {
+      "from": "1926-09-11T19:31:04.942Z",
+      "to": "2026-09-11T19:31:04.942Z"
+    },
+    "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "curve25519",
+      "dhPublicKey": {
+        "expiry": "2026-09-21T19:33:20.210Z",
+        "parameters": "Ephemeral public key",
+        "keyValue": "BDGmpKAEzSDQ8rBWzAssF2zZMotubnA652qZNvscn+YySffxkUb/OWJrspMCu8BfGGUFu4YcT4jhrfDTNKqQn4k="
+      },
+      "nonce": "mxNN4+7F7wHHvQeWADXlTJrI75Hz9bUOWfqwsFrsP6c="
+    }
+  }
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/hip/on-request
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "e584d829-f521-4351-ac98-14573f4854a6",
+  "TIMESTAMP": "2026-09-11T19:33:23.747Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***Iwfg",
+  "X-HIP-ID": "IN2410002480"
+}
+data: {
+  "hiRequest": {
+    "transactionId": "87716cc4-7d94-46d7-aa7f-7a89b021936c",
+    "sessionStatus": "ACKNOWLEDGED"
+  },
+  "response": {
+    "requestId": "a4d27928-493f-4329-9314-0c922e7ece27"
+  }
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/hip/on-request
+status: 200
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:33:23 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "22",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "1984437f-5126-4893-afe4-cb7bfbd40208",
+  "pragma": "no-cache",
+  "activityid": "89f93a77-e7c1-418b-9b5b-f6a87c894f4a",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 1caa5149e68cfec3d959d5e48b583ea2.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "5XsRnoxTUUx3npjkzdulrQA9x_YsTizg-kK1JWl0y7GOQ8m9DQ5Bgw==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
+[API INBOUND RESPONSE] POST /api/v3/hip/health-information/request
+status: 200
+body: {"status":"success","duplicate":false,"transactionId":"87716cc4-7d94-46d7-aa7f-7a89b021936c","currentState":"HI Request Received","dispatched":true,"dispatchResult":{"dispatched":true,"result":{"success":true,"requestId":"a4d27928-493f-4329-9314-0c922e7ece27","hiResponse":{"statusCode":200,"body":{"hiRequest":{"transactionId":"87716cc4-7d94-46d7-aa7f-7a89b021936c","sessionStatus":"ACKNOWLEDGED"},"response":{"requestId":"a4d27928-493f-4329-9314-0c922e7ece27"}}}}}}
+
+[OUTBOUND REQUEST] POST https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer
+{
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "data": {
+    "pageNumber": 1,
+    "pageCount": 1,
+    "transactionId": "87716cc4-7d94-46d7-aa7f-7a89b021936c",
+    "entries": [
+      {
+        "content": "8pOh5E3JaC8rYIZaHKq7oy8eGRrJZBMoyV2mqMRm7X8vmJf0hXv5y2QLghP/UHTpuue83bNcATkndKTbgF+DnQJgVeXRrb3g80sM/x/qVOCEFrD1DwQhri/ZegEpT3LUQnAR+MJsymxsP+X1ylMlZlU3so5KsOBf/k0pEITbO2xCVCSJny9a00fse346M4ctn87f7JqMRmXGRGm6Iz660jvYVwoGzPSAubmgrg2YpxxE+oxRD+7zUtgDU0GYQvmBAXAwIbH4Rxl5CJor/p1DTkNjYeyUWevw2Y9vpG3p6MjN7W4oama5iQLLrPHdhoM6AbdolzRzF7sXRwhq4VBVIoDMXQ4/whGQhctkNeZ322ocYcmbL/6tI/m61lfYuFdQiI7RHOlo9VlL5HLZHPdSF+K01dodMu3/wl+FZSuxKgZrAnTV+lgplXxySER4CbQc2DW6SvVKuggUf0hkJwP3NRXRjPkbrQOKFun6uKwlHN/svuH9uVyimgpbTnBSh6LCm/nR+tUG+pVw+McHO3EKEob02eMYgmZHXW/eM0R4GwGrLutRBDQ/aCTVvQMJS67PsiuPUrjysOdhE+Y0Mj4aoY2MuoxL3ADyulmAwdyyU6Cd2BttMEPPQHFCGRnYK4BJ2/rxgk2vtbunz2INVX6RX3OQAr+gHIbcbiWGd9vSCoQUgRxr5YlHM9Ecz6PTfA7lNpNeQ678ZBSPEZ7lEKS0S71vpoAiWq09ey4AJ5ZHm0p6SgdD2r9d2DhKkCDDdMjQ/Jzy42oGS/Rv2qOQ6J3nBtA5V0sXw6os6JcsrJdmxWHXE74MHGsm0GAvGrZTWGl6IFbTsY8pLTPJXKuZxbH97sDZBmEfs5pivtSZ00884k+wBL0+Mtc3B5vRLxvlIAjr0eN93UfeHv2Y9rKymlbJkHpjMrOnJChTnMu0bbbQxY8cpONV7Qq6P3dIRWYDwRuYJuJ18TaYYDA7GOELrWE20VGNu3Ao/ZrDag5RmBCTu058iYsqhhq2DjczGduK8KPBiurIVdf9gP+OYMtNX8blSmaiuQ2GPuQ0WUsM2eFhEi7A0sLUX/ZtjZuF82a7KMUKuE3PKcFjF5wfrZNKF0RIdt3oMFrm+Y8rpRhd9AT9GWPFX6aXwknVoM3/xVEb7oXu+oN8WvGSob91QhYjLyX7YhS0m4QZFUIFpsuSuVhQTWgV4Os8KyoNlTURRQMeza68GZqp+yKfMS8ceMage0Ax+IgwXJXC1fSU7m2/Mcb8GN/mbGvt3evwiJ6YLK4cfl9uHhn+IDLRrtHI2xK28MxvqiB9g+AU8LfRBC9qfpkCP3pICxsjMpEAG7ptyvqc19iNqZMbY5VSclYVXqa+pUiH8wHHrbTW8xZ9KbvAdMGkbq9a0ucFAl06iSmuyOO+4Z+KGNlH0m/hP+VhQJua2mIzya/sc4wtvo/hJSLd45bL3gtoYemJmdZBh0QC14jc4XT5fPqZXppVI2u/q+IP6VFd7lM947W+pmDl9GG1Q80RNt8HlW3tyBA01kh0wxIt06xnTTX6/e3/JlfppOWlGKNFpPDXfVzr0M7XZbjoOr43y36L2ER4RMPBkZlA5S37os5NJM/GQKu+NV+MY1CmRuVZdQBShfWfOzUIi2CYC7h1eq/EzaaspeHB2Bn2kXB4+/9NicHpqfXGh4Ifb0cBhJncVK2Ph+BStrtwZDVZzys01IKK0EnOK9S+/K88SrIcntf3gAtF4lWshMFmKMgVBSPeAjbVtOCriD4J0zPSrZkmUyWqV+VOzILJDLurPCeLvTcHuRVnn3Qsj+2fsF7iKEwuxgyUGD0u7xO1VPsPB+CRtqu6NgC+ULAJ3+b4vvwablawO8SGa7XDwTuX+ccxGKYp77S6UVdUBI/NmsFmG1Nfj1osbNzCgxa2cIEsMvZWovx6l+2nhjl1dryDxjgtCm10YI82tjZGFmjkDK42iNw7WbnIL6pvCrxeFT5D+M+2sewXqQIInQiT+Ir5NPt7M12ossirOZrEgNYzw1nrizgmE7g3AKomd2pP7TnwRj4yA+rZkRERW+7oIXMCkpAXYDe9yxzT7Qruq2QCe+oHpFQxRXmsTYcUC9+t5h1ZxdKAXHUI3rw1zh7ISDf3C+eO4W0tt1BAvEUdV0+ZharpQFlf+4STwka3eeSdfq1I+Gv4ft69xbbzUkKDCtUlh3yXAlw23o74wZtJpj+nNTyfonKuj4kTYgzJqCaZtz4meMhdJGSEaiBIPysipPpIpA+arWhGa3AYtZeX5l5rAUvhqi1MnH+El3IZl3+UuRIZFM0rYdmUNKbIDKoSNqGhxvjOO2RSRhIBy2nSo8BZ/2/ZYmIhlfhzQqcwf/OWM7LkR//gEl7K44eq7DZHaKoWgNaLHA37H77iFv14BrCFUdvM5vq7zHH1ysYD6CAm2qHTd6v6qdrugc+CJN33Vg/Cn7XhhGSqsisI7oBRN0G/r5fN0hTYo1TsF/5nnPoHUqK7T94uFAyUwtrEpd9skyzjWdhfFIsEGU6pP03GGanHBOjpR3SFuU22HJ5uzHD8ZNxWoC+ObSQGfFzdGKvKWBCqDOmz+sIgrEUbB31j7njSz7tQy/QpyWYZpvusLA6h2LAAfryXuPIWI9Zj7heRg/Bc24ils5QNrxg7tAUvwPiCnxf65x/zwGGWfvLSWu6EUlqp6wO5YEGBaWsAc5CPLSv9YrDqMDyRWNSeydU0SasMzGvGd94hLhWgYkW/eyFrlNhlzelYkIbUdA5NqbMd9JkH+/RBw0qk+W49rdIlSWnaYFAWykTqXu0MSnGgsGCZxlxA7zUivU2tG8Q/VnyLrCCSJS0ldc3oh5bjrYBD33luJoctmd47o13sSQlUmQIqMk13/UldlAZdGDuL1siT+twQRIlTZriSB5TUhnr/OEfWVIOB0a1kKPJC2zVxHQ2o0mdR237t/BiJpK/Z2nrlWSWnyu2IZqOIfX/4py56ccKEQyArAuBYBZjEADm6AzRJ/O8ewOXYixmbNPY8uuPWVNqS3F3z9dHXyXQiaduEh99C/N7NokNvhlzMCWtuU0du21qeIcCXoiuG/j6vipzobAXsB32uKXuOQtqqnOWIcRUabHWcXLJpL3YVr3hFvSv7Aqk7r09KkpffjPaA4nDVF+7Yw947MMF9giiri9zP6jLqXgeql37ggvqXnfVybk0cDsqVtt1YXo1w0VTNFx02gBDiRNmAtxI9oRhQJXpZLJ9S1lttRr/7OcH3+h6ZDHEKXuyRi8F8zIYGtivVbHMp2HddveWnlj6v6aJKGHemz4w2zaFC/cDPjK9zBuXH5got/xJm9VX0+TlRibrC764S/Ig8KWFjSgEEQVAgoTXNF/xy2TOTGsxs9lYvSQx9zmI17IKmINon3uOy9m+Sfc/c+WYAsy2moDoPZQtTFCzrzjyTrcKNMyK8nsaHknqaMluvjB/bcb7De2TxVHOm5thmjkQx/a7Jhn2f/Qens9xtvH8OsBAUCDMtdr2nQYGXiBAMsz4gLTeC/cbQj2FfecWBbFNkC22IYFGVPOyY58Pc6IOX4ZDLoVR4cgGtHLjBa/wQvAZOAZRlQB9LeU7qvbSZogwyhpokluVa1uZuFh5oY13gBrIul7HBw820qL5ldO2c2aCqDTLwyolk0dgOADaBvRfclM3feN/9/IObiyQVYowm6yd3LguXdLHQwzo9VZPrUuUkH8/xU9tR/9mPVrcCpqK1YqZ5OhKO1Eg73T2AiiUoCWzu3EbIH6GdMrvClSRu5qEdZ7g3B6Ur/AAeLZaOUgd6Owgs6zNW4KkZh7VGYu1JCCY7/kKhG2u5Sajy45u6Qq5dHQHhQtdCL2KNAHhxwvY4igZm5zvKQvbD3JElX81I2j2RXsRqiT4p6KSZvqZQRo40DZRryil+HU4OWJEZ4HkYatXU1rONO3altAw/4ZRyl8UxG9dEdeuQkPaz1rTyt8HN80kEEFE8YNFIUpsGh7pDMCMJDNhwEHivdjUEQz8g0CIXXaboOhXCVuq35sVmmsuNKgMNFsXKAIWRPqxXn0v2nbR3KlfxH/CCG1exHhdMqHGsriVEEFnSWQEz27ABhfIp9fCEtIL8PG8qq0SWccQOz/Qx8oOsGLBsYp0uUN54TW2MrKVL5X0ty5Mqy0Rz9k4HmMZAga45TxAhuQLhiu59OhlM/+p98/3UG3yH702x7Vg+Xm5qtAU649lKrKZdPYsOOmK6K9WvqdHZKiWLl9BkC0puQX9LWtj22uYNZNVADQRBXFQhosXIF+9eJIKLsp0Wb94o48uHprXDC+m7RQZTS5hLTcBRmhBF/ijYqzETJV7w2YIxCC/oOBOcx7tSlCiT7G9H6anANbCTWY57gMJSBNEE5w7eBa0Y94pHPkrpD2FpWzSRUyYn/G4B8Wf8ao3X8MGFCETVizkqFPmSAQ8NHkWuottmUdmdMg5Af9LdFWoLFEJI1P3AqP97/6bg3DqC/C+PwKJf8cFiIjB8/2TvHkBS9qIXDyEmSd0TrgqhCtJpiuKy+RhJMOaE4+0kQIeyoO48qZqrtJxptmWN/KLM2j2XQ1IWMrP3mN2WWX449GXhkZh/qyZ4y0bd1NjD6K69lXRwkcy5yaOkaj0EEvS6W4kiK155Mc83x2P3sc93xKvhHYltlxjZb5BkrrLUGvJfOWPt8VQddDUP+27Qd5YBg9j768hYdttGCjatWS20j5OzTVZirIL4kyzg6xjFwuYO9L3SJ7e7fOAH4OAF27Np95qztLg/WPoO8a8qeDzOlVIQLglrobgTaqYp8XmSibM/XrXKjQTESeCe2EP9mIr7iOOHjhSy1ZJPavKJVNPUMliYvow9fYbGpTannNLUk4YvqVT+7Bs0JYLP+jTC/YYFraSLknhJHfwZzNtvsMBt4xpTWcTAEbjscD1/TDXelpFYtcHUVV1Fi8MzP1XfXS5IWXWgnLXPqBMdnLJ56lvYYWt5d/J5oMfdrGNkzQYzAb+PzuI08/DT6SjPYGWALmkPh6PTyV7Rv+uqruxEd+o1jvSd7R25i7qjr+YauezSYI/UHyiV4HjSN6TxhoLdmEVZd39P9O9o011g2HfV9adxr0DBxgGcFp7rljAztfbm2Vm+oBK2tGb6Dah+H0aMY9r6J9SBYmh7BQKcaVTjgQfhK9RMu97LumSUjE3Fke52mqHvnntrIeO5qHrkvh6BqiJdbdD+PyK0VF5JhRR868lZrpdUPJ39YuJcqKqN4cikEUP00BA+PB/dyAgodqGTPo2lR+IS+aPUa3vxAPASkXgXdZeztOKHYQfpOvDFE1nISKyRTHH+0tXl7uQZJwjvpcFF1dGkj8t28r4oTDcsKz/R6iLVU1gRTbmGt8WsF5pJ7Lp1Y24dS2xaoUTDGrxQ1FjRPeGyaiMIZKacL8n1juWgRzxJ3QQkmdsTYpagHfBcdiAdTlWp3xae0btXiU8UZ0Oy0KW1oOuPOuYX0ApKxy2kFYBectf29KB09nzV0aejHuDEsYkVUf2KuY3iQy9QkGXrzYKb54RfFxXWilcocUldckFu5418PJXfuPss/Z3dSpkPHkckr4Ep3rb98viqftBSQSStb9qA5m7RHBX/XxSFRstY0slHjIQt7WC1r2qmR7xIU3oGrh0rto2KZoppgB5jPr8COMtLxlEUq4ZuZhmJDiHASEpyXue65zyXpfYM7uqpIAgVQjcMLDGgbJiPTmzFy/CB7U/2CdZfXzK5cI1EOTgurF/85quZEqmW9Jdc8SqPlZbzHWVbCkGYw0sqHzU8OUhNEZ5bJhIITcIYVGqav9HnNJKZb4bfWEJ9bPvBS268YUCeQ79ThqRlJDydp97PKkYKKeXUgDq9rw9R+Xm44qAsoe2HoJpWD10JU7ztZ/laobEyGhW9GyoxoRa/+w2sO8SdnWMGFiAyZJnFQ5nG4Iu0qrcBBuMGEa/jBDF2wuFvqGZqQdcAsWrs7H2d13HekFp4HIgHPQlp5T9ovJSPcXjrr9rXvBNeHWRlwxLSEfDJEg4HLcv7VO6ukyO2SmrEu07xMliPLTYGLiTDdQuNY0WJVJYcckIFfLntZPKJFrx/XURj8aJVmhuM7RLs5zBCtWigtUlBFao78yptH8N6xwEIVE/nvQLGtAOKBtr43eBO6X+gaFPaaZrWyexLjl6t8VMiAof/gF2lLdv2UJ8wm7DA5ryqTf6OPgw1kh/j+NLuUevJ8NxyBMPWLAJBInsoxnNO8ejf3AwkB2kctjhfPx+6az+ryWTnhb7CVtVjVYrudN+Wd4fIWQHebWViytLZIIzJGwLyql4CkO2L6iD2aU2NZBz7qWn0kI0DrM/LNLf8uQqjY+6OOeIuBtEo9QLnHncEsDB1rKvXGsxhn2piMUGjV4rwpLMi00/4KQX6BF7iF6+XUZszl91iMiA1TzOITcOo/dwcufisVnqv/dFItFeU310DB1oPJuVzvmI1b8k/bznY/Jhs6Bw/NJpp/UInYSQzV/JB7yj8zgkafr0QgWFhAskbZ7EQTH4oOvZHxw7vavaLRCpsGM7xKTFagODZQ+wa5TErSzhCy/0DBLQNsZvvbmgBnHCUqW3/WOL4VqzD/CEHsXJ2wuVuIhLAWmiWoy0RB+t00Luf7cPa4Sxv1C8VdXN5Zb/oTi24PTuqi4pn5yeBeKZ4zJtVJCygJIE6/Tcnc+37wMcPs1YEK+Q1Y+tRzxRDxravLNvZcCrlKPgXpsZGTixgvR9kfQB+MfVHEig+vFD0rnkpgwhNqT7RtmMZTLEIPCRC6zhaBzQej2/Gd6duNkI9SIhMSQ88DAWC3EGUt8420CbHP12ihk2qD1nhjQ2zn/oT0kPu9pumsIYMcIgSlF1QqbeZ73gu7LPc5Th2r4vZV9OuPRKAV/xADURZudO0Sumv0boYyaQGrbrajCb6Ngne0zM9KVsa/mgsPFiyyDt1lNwf0nGvOIv4zQs94bud+kKnh7Vke18z3tT3uMJUXmF8FeeCKvgMtxpnryJ/y/6QiBV5/r3uAL9sKtUoVTTNKtKRGZ6IdQzg0bjQ+hBB4WOxBqL7MB1vH/nH5k/5TtAn4So/PsnS6mhYhOD1Tb+tPa+9eMC6BukmFsqJrF/Lj4/1K3R9ZDQ7UGQ1wMqqWPnfKWAyrt4HGx7UbupDo9yq7yG4/vQJ+xdfk+YntJq7cmtV8KW0iaS1GPOHihxasZeYmFz5shImOEYlOjf6HXIgapJE2BcJKl8QGvXA1y3WZMaSjc/r8j2LlmjguNX1pzIPm/UZBCr6EqjHvD4kqNO62oKuOxq2rBPhKPUpfZEf1C323AJOP1s/89H7Xe76A81IKK5R+yNkEjMxnVLGTnRwPAusS8L3MEu8dMDbY3NUnGG+EMMdjhr8n6Vq2FrHd8k9B+YQfL7PMNC44/7ccczw5xUid1ULVovt8Bio7TSEK3IMeYSJ54VsnInaWH8rXisRQyiVwZgyBTxoYi9R5yBSGhUWIOKMHEfU+o5/7yC/MVVzu1iE83lFlSwfogMywaIOznPqjvUqf4n9Ia8UwlvIA78QA+3tAxoy7Kej5CFIo7OICDP7pImuCnTN4hnZpIeNk8G5hMw/uX+L/pOMmzkvit7Lub4CFePXzWYmr+W783hsw5VQ7JESl4xSX1FAEVExEo/Nb7PuzQ+VRrhUXe0oBIN3U5acfQlKgrOzdPfzPQfn5zapQNLf04g4MezGdMRegFmOD2xo1ooa8XMuoJ+UW1RtI30pRXOpaWyp+b/v+uzN1Ghz1eBiUkNU9tOqbmj+x8rM57W81l25Y7Iz7HuhkPMBExahL5chll4YduR56LwC2ieNFWq9fkCbJ1WQMgvKop9qvvpe4w3geGDhrHnyj+H++NqIAmsjECuJPLyw0R+rB5lVjXHanZ8gq1U93Ms63b06ZEvra26tD1X73DIfkpa+kxHL7u6q2/fhVInkkL6pL4l+9/LHXHg4MQKgsMU1jbX45fmDZ7MFZJvbIbY8CmFx2C4lo33fNM743NcAt++mz2a1HXlc5xZtgyhD7Nx22BMdRtLO6T4k9Rt2uuZPu2vF7wMsWV4AoFFKgEa0WnVt9knQHq6jX6A76EABpSe8Mw3BgNfPRkL5FKz7NAsvfg+hVOySYiPyX3IVwbiBSKNiGmtoswn6Nhv6MY2aQ0LKS4RZKcsNqugGCI1YyhB3X2Y9VfcwAqqPG3YDZykcAlFOdkv8fzuCG7iKNeLzExpm0xWBYKR+e4ph9OrcFr6mH+Ql0bavfSSOpmnncXNVLTyxXgLk/sCEjlrq7G09imdGTkUEO+9jIez/PRWT5NU8TY9SavhQgj70MX+LtvxI+t7Xr/8d6IkjkrtDMQRSBvjTdLQWZ269iSWfjg7cYxFQuWd55YpDpNDfBfbsfjVk82eSWM+0FDgeEhUYLbJlbOQ6XJlXBgSyQwfKZomyXkuD+2MO3E++rcivvIuNkPVDGpaEvB5doH66VLPiVxFm54NkmcCeVke0aUUgJtspzBIoE3/yfYCDcEfU6xYDlxKHiWqg9WZjgjW79ImF473cJAU3S3SBxM3MN/L+T3LlxbYV8IlyHPT7Tihl44EKsMOd5pHjX4gEWsitP7J/ybsFpWkDFS06fioguJXsPeCOsJ6B9C1DWdg1PHP7zkm1VKBxkJiJ3Pgp6KnK27e5jkjv8SOOUPftynwRJ8uPH7sJcSqIutBO3VHKrNQ1hOnTM/v9JujU7sGALVh5EPVcYpE1ePFNUyHNgewGYc4gcrfDlrl48RQjQI2hM4XiNRlK2fvZ4JjlE5jmVkinfxTSLz7e+TJYyI4hyV60ITxUkBD5125avVBfFjBpJ5zrsCheGzfBIs4Y/WsRproNuzv+NgiM/+2KnfzLdquppeBaBxDvhvYYimO129wge7qQxsLqVrE5ANt/ax9t1A8M0RypvYojo+7qgvkfPmIWhjHoR1cCRLNcn13BBfkmJKfgPCG7VRMN00te/Y9uPNkdrx9+vU57pcf3LN731zfZcJdgkxE+SJ09/WrPmJsLcntc6a6Ry6a64QUKyVfoGyMz+ZWJu+YKjnlYXd8s0vZKHeWAFiWmtqOC/tWhmDw9QPN+Rvkcamj1+YPE49GN33pyvtjzM1OhxYaKZstTq63FPN7Ax6lK4xp7T8yfdkDxF0SgIAfIO0pL40hJ6JgW6ZOPvucw9NgqPlYxaN/huBIRfTBhWzr4BkCINKSCzlH8AebHoymIG0oG/HUdNoAcEdpr3TN73yQ/mUdNu0KK2GuQF9DascvRSZNoXUPzHC8h9uezRbwHCVDrTsiChLN7+WbXHuodZyoqVoCOL6DkLR3uXBTr34jHvXyypG4sJtyVEJ39jhhJH2UcWQWHRklOZvVyIJPKSppFdR6N1I7I0cCiTa8MlEAQY+qwazZe/bSKaFNoIsAxevWbjdeod/JsyZ/wQWwsAQBoVEGCmCf7tf7r5N8/WbQtigY6f4FYa/fM8hm9BM6DueecKyfqJ89ZGUuuVf4tudfuRCmeTtCivA/PnXAt9gr8DSfpmxlxR+pWKINqP06f3bi8CZGdzxDjZVOZbLyb3DqOwmoUyTypBsMMSHft8UidwfywfIuOQ5yeV722Jbye0mNzccsRR4jXCXtZRKdXlflp+IL8t9L2tuKDePz9rsB6zUk9hvUyAdBnnusDpa2YTGKSm2/KMQxSRCk2qM5WxzSPyQyS7vNl52hLZ2Hsv04qygsRUt7tIi9FF6JBVgAMYNw1xoghAFfckff4GL6qhXWoVFSS0Qm+UdwWVxYWIl9gOnT0LDN9Apxz9zb3C7R3JOBlJoVuaAKh2seteHkVuDyaHXFra22AWDjqntgTHyRPW5elziwHpma3tr0zM8Hiy8BN7pHRLUksrsDtGNKcZyZEUt3s1rssbY+MKVEjoVFHS0KH4Kp7goK7ZyHkkX/f3Y5gQNKrfG3pO80yPPz0mD+jCU+WBGVzrPQvOdsQjoDQYKw+bOBBNUQqU5kZknr/EQbjhG7YBPtQJbsMr6Lpub/DzBm1KsiVslXxIn+RlVKGQZvQ7uXm6ilY7+vPdKlbRsRRvtXj59RkRm5+tLe0/aro6CfSzICh7A/w4z8x8TwkNGspOc23+ceVQJ9XZpnzRkRzJF54hK5bH6OwdJLPqnXJcwPcwCd1y4qrXNPwAaIdJGcnbeChXy0JzOo5YXQjaldu6JGt8hW2Dtx4GVbcEDWXj0oY0lxJivVso6wPOIvCQH0ho0UTf0n1Y/ha6Ah/M1wToAFfRwSJD20wWB0dlNKYBNkWHSE/p/lvDLGxSX92kpZqHgHxEvrRtQoaToDSXP3Onp+PHuSdRTeXpvCRt/Cw9u7q6Shu3je49GvTRcP6u1O4QF+OCg18V5k6WA2G2MvW7eHfUWfo4k5Ee7tfWDs2DREEMjQMpS87moE1g3RKPN6Tw6MSTqXPRW9WW1gIRPIQoQ/z8q1nzEa3TJCMmu8EEaBSnjwW95WWdcto/MhJmtatzw8LkM0+g5QClzNcTi7Qc9CMxP2/Zm7L7YSVNR4THq+6GR077y96NZ14zzrsFSwVTPa5+jTTPi3TE/ImovRVVJVI6WqgNWUBd8nigqxSR8ocJ6qi9p8iLSDmsTHYGdefsWIhE9T5CL7VNK0IBbvyQnNiKEUXtfwN/6hFFv/cB64GsWTZOAcNz3r/IBym+rEQlY8AVS2gK9CNpkrzg+ywPtL2uXuORwfUr2Pemi9VtSlrjiLXHIWlCaT3ragBFTicNWnlJAMwG6Vo/gjQzAZTQQbEDAMoGEjZ/iJaKjHWHFbcWdzyx3HMoSFiEbuGLcgSZf7abgaZobFWmHV0t21laJ40Mw1iiVl6hPXEN45mi7vuHvRM/+beXMILXEXz7cmBbyt0JwJuVPNkgImFCwOFn4ncrmzRAHKY4ILVeNyb3ASJ4UKwrpbMNaOw8fjBy4lKUGYl7HCJCYmsB9i0pghd4mO0l/cHX7FSU+n/HuV59L5JP5IDpknMt9juP+TEEmE1Liz+tW6eySczk7mkcFWBfdOB3nKgiPh+CQMM5vy7Mmefndgxoil8vmGvzH5zsql/wVCnPOXQu8O2sA4gwZWJkM0XYbsGr2Kdy5ELj3p6UJqhafu664/ospAAtVlQc6A+6zZ6f5wv8H9+WdBT4+g45w+BDIoUUiWbBY+UmN8wq6sUVVTqA1pFx82pXTndkAJepllts5wQFB5lJ9HBJdxycq3OQe0mELRY0zCixyLmjZN6ORwlzWWGOUWjV5xp3nA4CU+TGGym3fQjIIpIvO7lM1Ugi6qB1gWAUvlam/zHLXr0JXwv69G+onLQk5BhwPVRNfhQrhHsEREbJxdddU1V+AZxFw2oX+oU09Yw6qHHaG8wTZ4QA6EEsI1TlyEVj+7PN0uDcMbQY99FslU1ICS8AjjQOPOx4pY5Qhu4GfUJHAeJQdRv0XOhzBkubQRGXMMKFzW7SH7uQOFQqOTclFkvlYug4uAUvxKVyfhUO5fpxyar83wuL8kiFSKLM8G+/r+d0FPfxI8XJxr9qu7YTbyNS3oda6v6krtEoYhlkS7tmSpOStioUF6ELaR5Jugfl+GMq5u0Wu0NLDad53Zm+zp7n1OvP1C4/pTAT3RXqYhqLJiXFUBQ/s7eQzEmc9aYjRXhuzeD6Z5xkI7iF2lc9BzO1/OAQ0hy+glbYAbs8XVEvrp0SECYmU435cZPqMMQA9EKCrDRIXZ2W8tZDd3SQF09achAtbpFmGDJ6jbWf0ayO5Mo+2JIRgH7Zyqupb4+o+j09J4XqUckulRexSC2a6JlkP9bnkXNNTpF5I5uBY8PEWEQoUHMa+XX3kO8wkwTmYHqwV3Hm5qUlpRZvDYDeseHNV1o258XNcpCVtXMPd9gs8wq61X2fIMEyHXlPpZ2q4Pyy7pQljnCrzbXyq/6NxBfShavSCPF8s3rxpe5510PpKWRuwIR6fSJUnjmf9tTFuaY0hGnUaRh7I40bbA/8MnFh7fYxX30jEC0Z6W8yJ4eZazxnT/lIGULz3bo/blVPCFrHrfkh69KGKia+plZVMTEuCqnyCMevhSgMwV3AB6t1tsbHTEqufPezzgXdtM+QJ/lyP0At83GavPcIVJfzQw7eJBC7x0kj/b/VcYgWFFbLc2ONTNzArntjHlH/eE9yP3CqqFycLoer7tDfnUR2BQW5it9QUZK/AU0gntC1vJT6JDWX4OPIwrnitZuHHBF4+h6hbDOar1AvsiAe3hDY3o1Lpe8FvYbwkybAUlisCM6RqX6OMcBZjlbaSC4kTxN7S4Ue9eMJlPE4PCnzwS6GMK356BN0Gp1Opcf5LjoLO7xIwGVuVVK7bODkWGSWeu/2Pdr5RaRIxm+GlUvYPcWlTpWWVhz3iOatUQI/odMC30+35Khzz3ePa708XIjW3H+Dbzl/15gcpYH8EGN0o5Di6TyFfPjrRzq5I5OLYMl2dt0R2g8ECJe3fw4VViPXT2OezAM9ObwB3jWZ2xTFW/oiTwgfWT7irkCzOor7Vg8R0fAhyUnJmYU5oj3xNzazhajtFiH2TAsyR/naOpfcBel75x/fSegZ5R+YIZQ8uUjiDj/yfwZSqJX03Utrk5UGOoiGSEwef9K+RUdZDeHMVPFWST32GmM2GVZZ/X2SC23rA4pVEws0IJSsv5zvi5CCW7P6RqcnmQliGtIbBVJZCYFPTgZ1aQVSwTiie2o7bvP75lOi7CRxxsDFUIErUNMnQHWwF6GylwhDBRZGYtWULbWf08N6fXntf/Eq0Y/lB2LxFTLiLknAX8/IfJgKQtVS3pWY95pUC+hSKD1aAPeKuslozYpbFx2fS6vZ1xGyyCMMPBdjx7QagLYZaNl17CevTp8ouCTwQ8GeB10a3CTc3qdJRdI89+Q6XENJ41XiJ+8rnGGiSXkPNKfe04DvQ+hu7IMQQ6vGwFN+RSL88GYMjOzP3JfToODvQ==",
+        "media": "application/fhir+json",
+        "checksum": "86f8fbbab54c6d53e594ed7eadf4f788f9cc9b0beffbab98698e2f1ac51e1756",
+        "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription"
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "Curve25519",
+      "dhPublicKey": {
+        "expiry": "2027-09-11T19:33:27.151Z",
+        "parameters": "Curve25519/32byte random key",
+        "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARlPGLXMDGgi5DgJtCepE2EqObYL2QGy7rjWAgXXV4jnj+uIryFY5Wf/eK1h/9l5yjZprW7+CpJV0vDDI2wsaVp"
+      },
+      "nonce": "M5WDPRuQvINclLDaKs3LfeSy+kKH7bRR/eGMIowAHxQ="
+    }
+  }
+}
+
+[API OUTBOUND] POST https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json"
+}
+data: {
+  "pageNumber": 1,
+  "pageCount": 1,
+  "transactionId": "87716cc4-7d94-46d7-aa7f-7a89b021936c",
+  "entries": [
+    {
+      "content": "<string 12932 chars>",
+      "media": "application/fhir+json",
+      "checksum": "86f8fbbab54c6d53e594ed7eadf4f788f9cc9b0beffbab98698e2f1ac51e1756",
+      "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription"
+    }
+  ],
+  "keyMaterial": {
+    "cryptoAlg": "ECDH",
+    "curve": "Curve25519",
+    "dhPublicKey": {
+      "expiry": "2027-09-11T19:33:27.151Z",
+      "parameters": "Curve25519/32byte random key",
+      "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARlPGLXMDGgi5DgJtCepE2EqObYL2QGy7rjWAgXXV4jnj+uIryFY5Wf/eK1h/9l5yjZprW7+CpJV0vDDI2wsaVp"
+    },
+    "nonce": "M5WDPRuQvINclLDaKs3LfeSy+kKH7bRR/eGMIowAHxQ="
+  }
+}
+
+[API INBOUND RESPONSE] POST /api/v3/consent/request/hip/notify
+status: 202
+body: {"status":"success","duplicate":false,"transactionId":"91b2e665-a221-4f92-b8e6-94ff9d480121","currentState":"CONSENT_GRANTED","dispatched":true,"dispatchResult":{"dispatched":true,"result":{"success":true,"consentId":"7bfb3c8b-917d-4a04-85ee-29080a85707b","status":"Active","acknowledgement":{"statusCode":202,"requestId":"91b2e665-a221-4f92-b8e6-94ff9d480121","body":{"acknowledgement":{"status":"ok","consentId":"7bfb3c8b-917d-4a04-85ee-29080a85707b"},"response":{"requestId":"91b2e665-a221-4f92-b8e6-94ff9d480121"}}}}}}
+
+[API INBOUND] POST /api/v3/hip/health-information/request
+headers: {
+  "host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "user-agent": "ReactorNetty/1.1.19",
+  "content-length": "612",
+  "accept": "*/*",
+  "authorization": "Bear***5_gw",
+  "baggage": "Self=1-6aa4578e-4e655372577330b040f9b1f4,xrsr=21b111cbfe6e8fca",
+  "content-type": "application/json",
+  "request-id": "5cd49858-b201-4e27-bc81-ea15257c0c4b",
+  "timestamp": "2026-09-11 19:33:34.224",
+  "traceparent": "00-6aa4574e49fdf8907e4d1a66d11c8f03-27decfa9ade807d3-00",
+  "tracestate": "xrsr=21b111cbfe6e8fca",
+  "x-amzn-trace-id": "Root=1-6aa4574e-49fdf8907e4d1a66d11c8f03;Parent=27decfa9ade807d3;Sampled=0;Self=1-6aa4578e-4e655372577330b040f9b1f4;xrsr=21b111cbfe6e8fca",
+  "x-forwarded-for": "65.0.113.207",
+  "x-forwarded-host": "isolation-pouncing-ecard.ngrok-free.dev",
+  "x-forwarded-proto": "https",
+  "x-hip-id": "IN2410002480",
+  "accept-encoding": "gzip"
+}
+query: {}
+body: {
+  "transactionId": "a0429341-2c01-4c94-bd55-05e46212f1a7",
+  "hiRequest": {
+    "consent": {
+      "id": "7bfb3c8b-917d-4a04-85ee-29080a85707b"
+    },
+    "dateRange": {
+      "from": "1926-09-11T19:31:15.147Z",
+      "to": "2026-09-11T19:31:15.147Z"
+    },
+    "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "curve25519",
+      "dhPublicKey": {
+        "expiry": "2026-09-21T19:33:34.222Z",
+        "parameters": "Ephemeral public key",
+        "keyValue": "BCN5Ua5JTVbPc9i0WUGXWTrT4nwJxS6zpKGrnCfUuCXfC7rI+EDN4UHLxh3u4hku46sb4bwt4s6LKFCkXTDMPJQ="
+      },
+      "nonce": "6NLpWnrWJtj7qcrkFrulJG0swq8YsKqeNCYUZOSEvOU="
+    }
+  }
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/hip/on-request
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "79c44254-8d3e-4078-953f-7ca3751f6d1a",
+  "TIMESTAMP": "2026-09-11T19:33:41.867Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***Iwfg",
+  "X-HIP-ID": "IN2410002480"
+}
+data: {
+  "hiRequest": {
+    "transactionId": "a0429341-2c01-4c94-bd55-05e46212f1a7",
+    "sessionStatus": "ACKNOWLEDGED"
+  },
+  "response": {
+    "requestId": "5cd49858-b201-4e27-bc81-ea15257c0c4b"
+  }
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/hip/on-request
+status: 200
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:33:41 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "22",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "a0a1b7d5-c1ee-419c-ae2a-e0a2420864f1",
+  "pragma": "no-cache",
+  "activityid": "610bc358-5805-418a-97d0-6b7a46d9f4d8",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 6e65028b4e532eed42927d1fb54e1d6e.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "QxF9zAvNf74R9ImLB2kcxj_2vX6SnUlo18mPVeieVBSXpUBASVkiTA==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
+[API INBOUND RESPONSE] POST /api/v3/hip/health-information/request
+status: 200
+body: {"status":"success","duplicate":false,"transactionId":"a0429341-2c01-4c94-bd55-05e46212f1a7","currentState":"HI Request Received","dispatched":true,"dispatchResult":{"dispatched":true,"result":{"success":true,"skipped":true,"reason":"UNMATCHED_CARE_CONTEXT","requestId":"5cd49858-b201-4e27-bc81-ea15257c0c4b","hiResponse":{"statusCode":200,"body":{"hiRequest":{"transactionId":"a0429341-2c01-4c94-bd55-05e46212f1a7","sessionStatus":"ACKNOWLEDGED"},"response":{"requestId":"5cd49858-b201-4e27-bc81-ea15257c0c4b"}}}}}}
+
+[API OUTBOUND ERROR] POST https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer
+headers: {}
+data: timeout of 30000ms exceeded
+
+[OUTBOUND ERROR] POST https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer
+{
+  "status": null,
+  "error": "timeout of 30000ms exceeded"
+}
+
+[API OUTBOUND] POST https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json"
+}
+data: {
+  "pageNumber": 1,
+  "pageCount": 1,
+  "transactionId": "87716cc4-7d94-46d7-aa7f-7a89b021936c",
+  "entries": [
+    {
+      "content": "<string 12932 chars>",
+      "media": "application/fhir+json",
+      "checksum": "86f8fbbab54c6d53e594ed7eadf4f788f9cc9b0beffbab98698e2f1ac51e1756",
+      "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription"
+    }
+  ],
+  "keyMaterial": {
+    "cryptoAlg": "ECDH",
+    "curve": "Curve25519",
+    "dhPublicKey": {
+      "expiry": "2027-09-11T19:33:27.151Z",
+      "parameters": "Curve25519/32byte random key",
+      "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARlPGLXMDGgi5DgJtCepE2EqObYL2QGy7rjWAgXXV4jnj+uIryFY5Wf/eK1h/9l5yjZprW7+CpJV0vDDI2wsaVp"
+    },
+    "nonce": "M5WDPRuQvINclLDaKs3LfeSy+kKH7bRR/eGMIowAHxQ="
+  }
+}
+
+[API OUTBOUND RESPONSE] POST https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer
+status: 200
+headers: {
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:34:03 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "4576",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "027b63a9-af1f-4523-b8bc-2ef9fba2a196",
+  "pragma": "no-cache",
+  "activityid": "c1a5cf18-fecb-48bd-8b82-77afcdbde3a2",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 939ac72d2cac41d9a569cd07d056cb64.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "zxAUxq5jAtssWKyNp9m6xPgeQEq4BHA_0ELUuo1b2iMNiaN7d5YOQg==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+
+[OUTBOUND RESPONSE] POST https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer
+{
+  "status": 200,
+  "data": ""
+}
+
+[API OUTBOUND] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
+headers: {
+  "Accept": "application/json, text/plain, */*",
+  "Content-Type": "application/json",
+  "REQUEST-ID": "ab86e8a2-6839-4584-abec-5a114c06779d",
+  "TIMESTAMP": "2026-09-11T19:34:05.944Z",
+  "X-CM-ID": "sbx",
+  "Authorization": "Bear***Iwfg",
+  "X-HIP-ID": "IN2410002480"
+}
+data: {
+  "requestId": "d312fc30-bbb4-4136-8abd-4d19d11829be",
+  "timestamp": "2026-09-11T19:34:05.959Z",
+  "notification": {
+    "consentId": "34817037-7402-4879-96b8-e5f0675f5fe4",
+    "transactionId": "87716cc4-7d94-46d7-aa7f-7a89b021936c",
+    "doneAt": "2026-09-11T19:34:05.959Z",
+    "notifier": {
+      "type": "HIP",
+      "id": "IN2410002480"
+    },
+    "statusNotification": {
+      "sessionStatus": "TRANSFERRED",
+      "hipId": "IN2410002480",
+      "statusResponses": [
+        {
+          "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription",
+          "hiStatus": "OK",
+          "description": "Health information transferred"
+        }
+      ]
+    }
+  }
+}
+
+[API OUTBOUND RESPONSE] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
+status: 202
+headers: {
+  "content-type": "application/json",
+  "transfer-encoding": "chunked",
+  "connection": "keep-alive",
+  "date": "Fri, 11 Sep 2026 19:34:06 GMT",
+  "access-control-expose-headers": "*",
+  "x-frame-options": "SAMEORIGIN",
+  "expires": "0",
+  "x-envoy-upstream-service-time": "134",
+  "access-control-allow-origin": "*",
+  "vary": "Origin,Access-Control-Request-Method,Access-Control-Request-Headers",
+  "correlation-id": "04acfb41-63fc-4b1f-b74d-dc51fb4340ab",
+  "pragma": "no-cache",
+  "activityid": "8b7dde66-9259-4203-b607-77e43e7e845b",
+  "x-content-type-options": "nosniff",
+  "x-xss-protection": "1; mode=block",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "cache-control": "no-cache, no-store, max-age=0, must-revalidate",
+  "server": "istio-envoy",
+  "access-control-allow-methods": "GET,HEAD,POST,PUT,DELETE,OPTIONS,CONNECT,TRACE,PATCH",
+  "access-control-allow-headers": "*",
+  "x-cache": "Miss from cloudfront",
+  "via": "1.1 939ac72d2cac41d9a569cd07d056cb64.cloudfront.net (CloudFront)",
+  "x-amz-cf-pop": "BOM78-P1",
+  "x-amz-cf-id": "6O11QoSpX6V8lQrh38op4AXhjwMumLlRi1K68QzpVXPPQ1lX1Yigmg==",
+  "content-security-policy": "https://es-staging.cdac.in",
+  "strict-transport-security": "max-age=31536000",
+  "cross-origin-embedder-policy": "require-corp",
+  "cross-origin-opener-policy": "same-origin",
+  "cross-origin-resource-policy": "cross-origin",
+  "permissions-policy": "geolocation=(self)"
+}
+data: {
+  "status": "Notification is Accepted"
+}
 
 [OUTBOUND REQUEST] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
 {
   "headers": {
     "Content-Type": "application/json",
-    "REQUEST-ID": "78f5a8eb-3c6c-4b1f-a1ed-772bc49b4be1",
-    "TIMESTAMP": "2026-09-11T17:04:45.263Z",
+    "REQUEST-ID": "ab86e8a2-6839-4584-abec-5a114c06779d",
+    "TIMESTAMP": "2026-09-11T19:34:05.944Z",
     "X-CM-ID": "sbx",
-    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNDY2MzMsImlhdCI6MTc4OTE0NTQzMywianRpIjoiNDU2ZTEzYjAtZTE1NS00ZTIyLTkyZGQtZGYyMzUwODNmODIwIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJkNGRmODkwNi0wNjc0LTRmY2YtODQzNi0xMzdmNjFiNDdiZGMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.HgCDpIuRTZotlZGQWsyv70S4ce8MZoEAY9MrMAWRzHCk4wMWpkGGLZPbW2BhjfVeFM1xp9M4RxR9oZqbPNr-UKboHhlltlkdQNmhiX8L25O_Aekc9fBC1Ll0nYTFTr4omCi_yf-by7GYD0LnwjlTR0PW3VoPoQ9eI9-nkN8r1mudYfkOlRfRw9Se-BANnsJTfC3FVWhq-S4WqBRjfRZe6RxvTqj8RQFEXV0xj7lU1-jQemk_HmAo_DxOunUsO_xZCpGExBtPTo3QT7eRjJtgzu2xBzuL_tdTYblYkq_wDs60GqFJ0cq6-qOV9bgcz1FhP6kL96B5siMlTpDkdEuarw",
+    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNTU0OTQsImlhdCI6MTc4OTE1NDI5NCwianRpIjoiOWQxYjMxNjUtYTYwMi00MThmLThmMmQtODYzN2M3ZjI4YjJhIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJkYWE0NzA3OC04YWEzLTRlNDYtYjRhMy03ZDhkM2VlYWI4OTUiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.TtnCB3qQDLxyRXv3ZO1gkl6ZeBaGGOoUtXMhBWrofEGGiFBPuCPoJ_WumLrKHA9peue-SKWqgkKqraper1Z__Ue4gnbfgcpwhdvT5rEfIYMRZWsLomssBrpiWhPQMlytlglS2Qz8rJOWja21RWz3mpHzp9sdF72lQnNTypW4JM1BC3w5BHgxjRYmXPPdAL9l_4rlI0jvEtTVsBtUtK0CpZP1HIAOOMW4V5SYoBaSJ4maHKXYbxTJRKQwIUyaXJIVpblcRb1_B3ysF27-U1MFcCi-4DRjKe4REkq_6nBwX96d6xIUYHOhke5oF63mJODHvXL2qGdZtfeNRRjLj1Iwfg",
     "X-HIP-ID": "IN2410002480"
   },
   "data": {
-    "requestId": "335cf43e-17a2-4a80-b3e6-4ccd864fb631",
-    "timestamp": "2026-09-11T17:04:45.264Z",
+    "requestId": "d312fc30-bbb4-4136-8abd-4d19d11829be",
+    "timestamp": "2026-09-11T19:34:05.959Z",
     "notification": {
-      "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
-      "transactionId": "e73e7d60-8328-469a-a741-fe23012c6b65",
-      "doneAt": "2026-09-11T17:04:45.264Z",
+      "consentId": "34817037-7402-4879-96b8-e5f0675f5fe4",
+      "transactionId": "87716cc4-7d94-46d7-aa7f-7a89b021936c",
+      "doneAt": "2026-09-11T19:34:05.959Z",
       "notifier": {
         "type": "HIP",
         "id": "IN2410002480"
       },
       "statusNotification": {
-        "sessionStatus": "FAILED",
+        "sessionStatus": "TRANSFERRED",
         "hipId": "IN2410002480",
         "statusResponses": [
           {
-            "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c",
-            "hiStatus": "ERRORED",
-            "description": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
-          }
-        ]
-      }
-    }
-  }
-}
-[RESPONSE] Status: 202
-
-[OUTBOUND REQUEST] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
-{
-  "headers": {
-    "Content-Type": "application/json",
-    "REQUEST-ID": "1c2a9a39-3d09-45a9-a223-8ba2e4fe44d7",
-    "TIMESTAMP": "2026-09-11T17:05:27.612Z",
-    "X-CM-ID": "sbx",
-    "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJBbFJiNVdDbThUbTlFSl9JZk85ejA2ajlvQ3Y1MXBLS0ZrbkdiX1RCdkswIn0.eyJleHAiOjE3ODkxNDY2MzMsImlhdCI6MTc4OTE0NTQzMywianRpIjoiNDU2ZTEzYjAtZTE1NS00ZTIyLTkyZGQtZGYyMzUwODNmODIwIiwiaXNzIjoiaHR0cHM6Ly9kZXYuYWJkbS5nb3YuaW4vYXV0aC9yZWFsbXMvY2VudHJhbC1yZWdpc3RyeSIsInN1YiI6IjEwMzhkMjM3LTZkOGMtNGQzNS04YTcyLWJkMDhlNjkzYjg5NiIsInR5cCI6IkJlYXJlciIsImF6cCI6IlNCWElEXzAxMDA4NiIsInNlc3Npb25fc3RhdGUiOiJkNGRmODkwNi0wNjc0LTRmY2YtODQzNi0xMzdmNjFiNDdiZGMiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6OTAwNyJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiSElVX1BBWUVSIiwiRElHSV9ET0NUT1IiLCJoZWFsdGhJZCIsImhlYWx0aF9sb2NrZXIiLCJoaXAiLCJISVBfUEFZRVIiLCJoZnIiLCJoaXUiLCJvZmZsaW5lX2FjY2VzcyIsInBociIsIk9JREMiLCJIaWRBYmhhU2VhcmNoIiwiaHBfaWQiXX0sInJlc291cmNlX2FjY2VzcyI6eyJTQlhJRF8wMTAwODYiOnsicm9sZXMiOlsidW1hX3Byb3RlY3Rpb24iXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIiwiY2xpZW50SG9zdCI6IjEwLjIwMS44OS4yMTYiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImNsaWVudElkIjoiU0JYSURfMDEwMDg2IiwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LXNieGlkXzAxMDA4NiIsImNsaWVudEFkZHJlc3MiOiIxMC4yMDEuODkuMjE2In0.HgCDpIuRTZotlZGQWsyv70S4ce8MZoEAY9MrMAWRzHCk4wMWpkGGLZPbW2BhjfVeFM1xp9M4RxR9oZqbPNr-UKboHhlltlkdQNmhiX8L25O_Aekc9fBC1Ll0nYTFTr4omCi_yf-by7GYD0LnwjlTR0PW3VoPoQ9eI9-nkN8r1mudYfkOlRfRw9Se-BANnsJTfC3FVWhq-S4WqBRjfRZe6RxvTqj8RQFEXV0xj7lU1-jQemk_HmAo_DxOunUsO_xZCpGExBtPTo3QT7eRjJtgzu2xBzuL_tdTYblYkq_wDs60GqFJ0cq6-qOV9bgcz1FhP6kL96B5siMlTpDkdEuarw",
-    "X-HIP-ID": "IN2410002480"
-  },
-  "data": {
-    "requestId": "a23ddd10-5002-475b-a8b5-bf7d7a7c5e0d",
-    "timestamp": "2026-09-11T17:05:27.612Z",
-    "notification": {
-      "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
-      "transactionId": "73dc1fc6-3cd7-47bb-bd05-69c452f8a807",
-      "doneAt": "2026-09-11T17:05:27.612Z",
-      "notifier": {
-        "type": "HIP",
-        "id": "IN2410002480"
-      },
-      "statusNotification": {
-        "sessionStatus": "FAILED",
-        "hipId": "IN2410002480",
-        "statusResponses": [
-          {
-            "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c",
-            "hiStatus": "ERRORED",
-            "description": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+            "careContextReference": "6c68ce64-eae4-425c-a2b4-5c11ba132940-Prescription",
+            "hiStatus": "OK",
+            "description": "Health information transferred"
           }
         ]
       }

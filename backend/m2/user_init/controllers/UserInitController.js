@@ -23,7 +23,6 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const gatewayHttpsAgent = new https.Agent({
   keepAlive: true,
   keepAliveMsecs: 30000,
-  timeout: 60000,
   maxSockets: 8,
 });
 
@@ -97,14 +96,7 @@ class UserInitController {
     // the callback header as well when it is available, so the HIE-CM can
     // associate the first Fetch record request with this response immediately.
     // A generated id remains available for callbacks without a correlation id.
-    const callbackRequestId = newId();
-    const callbackTimestamp = nowIso();
-    data.requestId = callbackRequestId;
-    data.timestamp = callbackTimestamp;
-    if (data.response) {
-        data.resp = data.response;
-        /* kept data.response for backwards compatibility with undocumented ABDM quirks */
-    }
+    const callbackRequestId = String(correlationRequestId || '').trim() || newId();
     let lastError;
     for (let attempt = 1; attempt <= CALLBACK_ATTEMPTS; attempt += 1) {
       try {
@@ -118,7 +110,7 @@ class UserInitController {
             "X-CM-ID": process.env.ABDM_CM_ID || "sbx",
             "X-HIP-ID": process.env.HIP_ID || "IN2410002480",
             "REQUEST-ID": callbackRequestId,
-            "TIMESTAMP": callbackTimestamp
+            "TIMESTAMP": nowIso()
           }
         });
       } catch (error) {
@@ -234,7 +226,17 @@ class UserInitController {
       });
       const abhaNumber = UserInitController.abhaNumberFromDiscovery(identifiers);
 
-
+      if (discoveryResult.storageFolderPath) {
+        await LocalDataRegistry.persistPatientDocumentIdentity({
+          folderPath: discoveryResult.storageFolderPath,
+          folderName: discoveryResult.storageFolderName,
+          storageClass: discoveryResult.storageClass,
+          identity: discoveryResult.identity,
+          patientName: patientDetails.name || requestedAbhaAddress,
+          abhaAddress: requestedAbhaAddress,
+          abhaNumber,
+        });
+      }
       const documents = discoveryResult.documents;
       
       if (documents.length > 0) {
@@ -474,34 +476,6 @@ class UserInitController {
       responsePayload.error = { code: "ABDM-1100", message: "Invalid or expired OTP" };
     } else {
       // Success
-      
-      // Ownership is persisted ONLY after successful confirmation.
-      // This establishes the durable binding between the folder and the ABHA.
-      if (tx.sourceStorageClass === 'NON_ABHA_VERIFIED' && tx.sourcePatientFolder) {
-        try {
-          await LocalDataRegistry.persistPatientDocumentIdentity({
-            folderPath: tx.sourcePatientFolder,
-            folderName: tx.sourcePatientFolderName,
-            storageClass: tx.sourceStorageClass,
-            identity: tx.nonAbhaPatientIdentity,
-            patientName: tx.patientName,
-            abhaAddress: tx.abhaAddress,
-            abhaNumber: tx.abhaNumber,
-          });
-        } catch (error) {
-          responsePayload.error = { code: "ABDM-1086", message: error.message };
-          try {
-            await UserInitController.sendGatewayCallback(
-              `${process.env.GATEWAY_BASE || 'https://dev.abdm.gov.in'}/api/hiecm/user-initiated-linking/v3/link/care-context/on-confirm`,
-              responsePayload,
-              "on-confirm",
-              incomingRequestId
-            );
-          } catch (_) {}
-          return;
-        }
-      }
-
       UserInitState.updateTransaction(txId, { status: "LINK_COMPLETED" });
       await UserInitController.persistUserInitiatedTransferContext(tx, incomingRequestId);
       confirmedCareContexts = tx.selectedCareContexts || [];

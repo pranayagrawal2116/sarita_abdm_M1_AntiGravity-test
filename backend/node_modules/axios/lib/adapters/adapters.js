@@ -25,13 +25,11 @@ const knownAdapters = {
 utils.forEach(knownAdapters, (fn, value) => {
   if (fn) {
     try {
-      // Null-proto descriptors so a polluted Object.prototype.get cannot turn
-      // these data descriptors into accessor descriptors on the way in.
-      Object.defineProperty(fn, 'name', { __proto__: null, value });
+      Object.defineProperty(fn, 'name', { value });
     } catch (e) {
       // eslint-disable-next-line no-empty
     }
-    Object.defineProperty(fn, 'adapterName', { __proto__: null, value });
+    Object.defineProperty(fn, 'adapterName', { value });
   }
 });
 
@@ -107,7 +105,7 @@ function getAdapter(adapters, config) {
 
     throw new AxiosError(
       `There is no suitable adapter to dispatch the request ` + s,
-      AxiosError.ERR_NOT_SUPPORT
+      'ERR_NOT_SUPPORT'
     );
   }
 

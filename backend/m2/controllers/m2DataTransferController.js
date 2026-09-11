@@ -48,18 +48,41 @@ class M2DataTransferController {
       // Map dashboard record type to canonical HI Type
       const canonicalMap = {
         "Prescription": "Prescription",
+        "Prescription Record": "Prescription",
+        "PrescriptionRecord": "Prescription",
+        
         "Diagnostic Report": "DiagnosticReport",
+        "DiagnosticReport": "DiagnosticReport",
+        "Diagnostic Report Record": "DiagnosticReport",
+        "DiagnosticReportRecord": "DiagnosticReport",
+        
         "OP Consultation": "OPConsultation",
         "OPConsultation": "OPConsultation",
+        "OP Consultation Record": "OPConsultation",
+        "OPConsultationRecord": "OPConsultation",
+        
         "Discharge Summary": "DischargeSummary",
         "IPD Discharge Summary": "DischargeSummary",
         "IPDDischargeSummary": "DischargeSummary",
+        "Discharge Summary Record": "DischargeSummary",
+        "DischargeSummaryRecord": "DischargeSummary",
+        
         "Immunization": "ImmunizationRecord",
+        "Immunization Record": "ImmunizationRecord",
+        "ImmunizationRecord": "ImmunizationRecord",
+        
         "Health Document": "HealthDocumentRecord",
         "HealthDocument": "HealthDocumentRecord",
+        "Health Document Record": "HealthDocumentRecord",
         "HealthDocumentRecord": "HealthDocumentRecord",
+        
         "Wellness": "WellnessRecord",
-        "Invoice": "Invoice"
+        "Wellness Record": "WellnessRecord",
+        "WellnessRecord": "WellnessRecord",
+        
+        "Invoice": "Invoice",
+        "Invoice Record": "Invoice",
+        "InvoiceRecord": "Invoice"
       };
 
       // Filter dashboard types by what's actually authorized
@@ -69,12 +92,17 @@ class M2DataTransferController {
         if (["healthdocument", "healthdocumentrecord", "healthrecord"].includes(normalized)) return "healthdocumentrecord";
         return normalized;
       };
-      let recordType = dashboardTypes.filter(type => {
+      
+      let recordType = [];
+      for (const type of dashboardTypes) {
         const canonical = canonicalMap[type] || type.replace(/\s+/g, "");
-        return authorizedHiTypes.some((authorizedType) =>
+        const isAuthorized = authorizedHiTypes.some((authorizedType) =>
           normalizeHiType(authorizedType) === normalizeHiType(canonical)
         );
-      });
+        if (isAuthorized && !recordType.includes(canonical)) {
+          recordType.push(canonical);
+        }
+      }
 
       // Prioritize the actual HI request payload from the mobile app (Gateway) over any mock data
       const actualHiRequest = tx.hiRequestPayload?.hiRequest;

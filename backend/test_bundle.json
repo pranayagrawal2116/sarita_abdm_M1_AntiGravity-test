@@ -1,0 +1,390 @@
+{
+  "resourceType": "Bundle",
+  "id": "prescription record-89c9d7e5-a7b5-4415-8004-ee18cd88c3ff",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-07-22T17:59:18.712+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "5517a74f-b344-493c-aa7c-eaa3788d01b4"
+  },
+  "type": "document",
+  "timestamp": "2026-07-22T17:59:18.712+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:1de7976d-5267-4567-8fa6-e74c90d68008",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "1de7976d-5267-4567-8fa6-e74c90d68008",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/PrescriptionRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Prescription record"
+        },
+        "subject": {
+          "reference": "urn:uuid:94d46f1c-7b4e-4e6d-bb26-b2ce95645e2b",
+          "display": "Pranay"
+        },
+        "encounter": {
+          "reference": "urn:uuid:ee573bc4-32ae-475a-8c49-83b8a7f855cc",
+          "display": "Ambulatory"
+        },
+        "date": "2026-07-22T17:59:18.712+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:c2b54daa-ee0b-4cc5-b406-18190e748081",
+            "display": "Dr. Doctor"
+          }
+        ],
+        "title": "Prescription record",
+        "custodian": {
+          "reference": "urn:uuid:ceafc0d7-38dd-4d41-be44-a0f889216210",
+          "display": "Org"
+        },
+        "section": [
+          {
+            "title": "Patient Information",
+            "entry": [
+              {
+                "reference": "urn:uuid:94d46f1c-7b4e-4e6d-bb26-b2ce95645e2b",
+                "display": "Pranay"
+              }
+            ]
+          },
+          {
+            "title": "Medications",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "721912009",
+                  "display": "Medication summary document"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:d31d2942-07a3-49f9-8259-929ae745c15d",
+                "display": "Dolo 650"
+              },
+              {
+                "reference": "urn:uuid:ece98187-0b8b-42f2-bfdf-b942ad184479",
+                "display": "Paracetamol 500 mg"
+              }
+            ]
+          },
+          {
+            "title": "Prescription Record",
+            "entry": [
+              {
+                "reference": "urn:uuid:037cfef6-3f4e-448e-ab92-a6afbe50c1cb",
+                "display": "Binary"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:94d46f1c-7b4e-4e6d-bb26-b2ce95645e2b",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "94d46f1c-7b4e-4e6d-bb26-b2ce95645e2b",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-22T17:59:18.712+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranay@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "999999999",
+            "use": "home"
+          }
+        ],
+        "gender": "M",
+        "birthDate": "2000-01-01"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c2b54daa-ee0b-4cc5-b406-18190e748081",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "c2b54daa-ee0b-4cc5-b406-18190e748081",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-07-22T17:59:18.712+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "hpr-id"
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Doctor"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ceafc0d7-38dd-4d41-be44-a0f889216210",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "ceafc0d7-38dd-4d41-be44-a0f889216210",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "hfr-id"
+          }
+        ],
+        "name": "Org"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ee573bc4-32ae-475a-8c49-83b8a7f855cc",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "ee573bc4-32ae-475a-8c49-83b8a7f855cc",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "enc-1"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:94d46f1c-7b4e-4e6d-bb26-b2ce95645e2b",
+          "display": "Pranay"
+        },
+        "period": {
+          "start": "2026-07-22T12:29:18.706Z"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d31d2942-07a3-49f9-8259-929ae745c15d",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "d31d2942-07a3-49f9-8259-929ae745c15d",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387517004",
+              "display": "Dolo 650"
+            }
+          ],
+          "text": "Dolo 650"
+        },
+        "subject": {
+          "reference": "urn:uuid:94d46f1c-7b4e-4e6d-bb26-b2ce95645e2b",
+          "display": "Pranay"
+        },
+        "authoredOn": "2026-07-22T12:29:18.711Z",
+        "requester": {
+          "reference": "urn:uuid:c2b54daa-ee0b-4cc5-b406-18190e748081",
+          "display": "Dr. Doctor"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386661006",
+                "display": "Fever"
+              }
+            ],
+            "text": "Fever"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "• 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:ece98187-0b8b-42f2-bfdf-b942ad184479",
+      "resource": {
+        "resourceType": "MedicationRequest",
+        "id": "ece98187-0b8b-42f2-bfdf-b942ad184479",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationRequest"
+          ]
+        },
+        "status": "active",
+        "intent": "order",
+        "medicationCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "387517004",
+              "display": "Paracetamol 500 mg"
+            }
+          ],
+          "text": "Paracetamol 500 mg"
+        },
+        "subject": {
+          "reference": "urn:uuid:94d46f1c-7b4e-4e6d-bb26-b2ce95645e2b",
+          "display": "Pranay"
+        },
+        "authoredOn": "2026-07-22T12:29:18.711Z",
+        "requester": {
+          "reference": "urn:uuid:c2b54daa-ee0b-4cc5-b406-18190e748081",
+          "display": "Dr. Doctor"
+        },
+        "reasonCode": [
+          {
+            "coding": [
+              {
+                "system": "http://snomed.info/sct",
+                "code": "386661006",
+                "display": "Fever"
+              }
+            ],
+            "text": "Fever"
+          }
+        ],
+        "dosageInstruction": [
+          {
+            "text": "• 1-0-1",
+            "route": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "26643006",
+                  "display": "Oral"
+                }
+              ],
+              "text": "Oral"
+            },
+            "method": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "421521009",
+                  "display": "After Food"
+                }
+              ],
+              "text": "After Food"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:037cfef6-3f4e-448e-ab92-a6afbe50c1cb",
+      "resource": {
+        "resourceType": "Binary",
+        "id": "037cfef6-3f4e-448e-ab92-a6afbe50c1cb",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Binary"
+          ]
+        },
+        "contentType": "application/pdf",
+        "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+IGVuZG9iago1IDAgb2JqIDw8IC9MZW5ndGggMjc3ID4+IHN0cmVhbQpCVAovRjEgMTQgVGYKNzIgNzYwIFRkCihQcmVzY3JpcHRpb24pIFRqCjAgLTI0IFRkCi9GMSAxMCBUZgooUGF0aWVudDogUHJhbmF5IHwgQUJIQTogcHJhbmF5QHNieCB8IERPQi9HZW5kZXI6IDIwMDAtMDEtMDEgLyBNIHwgRmFjaWxpdHk6IE9yZyB8IDEuIERvbG8gNjUwOyBEb3NlcyAxLTAtMTsgT3JhbDsgQWZ0ZXIgRm9vZDsgUmVhc29uOiBGZXZlciB8IDIuIFBhcmFjZXRhbW9sIDUwMCBtZzsgRG9zZXMgMS0wLTE7IE9yYWw7IEFmdGVyIEZvb2Q7IFJlYXNvbjogRmV2ZXIpIFRqCkVUCmVuZHN0cmVhbSBlbmRvYmoKdHJhaWxlciA8PCAvUm9vdCAxIDAgUiA+PgolJUVPRg=="
+      }
+    }
+  ]
+}

@@ -1,39 +1,198 @@
 {
-  "15c83a25-a824-4f42-82d8-d179efdb49fb": {
-    "transactionId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
-    "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
+  "tx-A": {
+    "transactionId": "tx-A",
+    "requestId": "req-A",
+    "consentId": "creq-A",
+    "consentRequestId": "creq-A",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "req-rej",
+    "hiRequestId": "",
+    "patientId": "patient@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789134739318,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "req-rej",
+          "type": "Consent Notification",
+          "consentId": "",
+          "matchReason": "Matched by exact consentId"
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789134739334,
+        "from": "Created",
+        "to": "CONSENT_DENIED",
+        "metadata": {
+          "reason": "Consent status transitioned to Rejected",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "req-A",
+            "incomingRequestId": "req-rej"
+          }
+        }
+      }
+    ],
+    "currentState": "CONSENT_DENIED",
+    "previousState": "Created",
+    "createdTimestamp": 1789134739219,
+    "updatedTimestamp": 1789134739341,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789134739219,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789134739318,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "req-rej",
+          "type": "Consent Notification",
+          "consentId": "",
+          "matchReason": "Matched by exact consentId"
+        }
+      },
+      {
+        "timestamp": 1789134739334,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_DENIED\".",
+        "details": {
+          "reason": "Consent status transitioned to Rejected",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "req-A",
+            "incomingRequestId": "req-rej"
+          }
+        }
+      },
+      {
+        "timestamp": 1789134739341,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Rejected\".",
+        "details": {
+          "consentId": "creq-A",
+          "from": "Requested",
+          "to": "Rejected",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "req-A",
+            "incomingRequestId": "req-rej"
+          }
+        }
+      }
+    ],
+    "consentDetails": {
+      "status": "Rejected",
+      "consentId": "creq-A",
+      "consentRequestId": "creq-A",
+      "consentArtifactId": "",
+      "patientId": "patient@sbx",
+      "patient": {},
+      "hip": {},
+      "hiTypes": [],
+      "permission": {},
+      "purpose": {},
+      "dateRange": {},
+      "expiry": 1791726739323,
+      "receivedTime": "2026-09-11T13:52:19.323Z",
+      "signature": "",
+      "createdAt": 1789134739323,
+      "updatedAt": 1789134739328,
+      "rawNotification": {
+        "requestId": "req-rej",
+        "notification": {
+          "status": "DENIED",
+          "consentRequestId": "creq-A"
+        }
+      }
+    },
+    "consentStatus": "DENIED",
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789134739316,
+        "skippedFields": [
+          "abhaAddress",
+          "healthInformationRequestId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      },
+      {
+        "timestamp": 1789134739324,
+        "skippedFields": [
+          "hipId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ],
+    "permission": {},
+    "hiTypes": [],
+    "consentDetail": {
+      "status": "DENIED",
+      "consentRequestId": "creq-A"
+    },
+    "consentReceivedAt": "2026-09-11T13:52:19.323Z",
+    "consentSignature": "",
+    "consentNotifyPayload": {
+      "requestId": "req-rej",
+      "notification": {
+        "status": "DENIED",
+        "consentRequestId": "creq-A"
+      }
+    }
+  },
+  "link-request-1": {
+    "transactionId": "link-request-1",
+    "requestId": "link-request-1",
     "consentId": "",
     "consentRequestId": "",
     "healthInformationRequestId": "",
-    "gatewayRequestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
+    "gatewayRequestId": "link-request-1",
     "hiRequestId": "",
-    "patientId": "pranay_2025@sbx",
+    "patientId": "pranay_0120061@sbx",
     "patient": [
       {
         "referenceNumber": "Pranay Anup Agrawal",
-        "display": "Prescription - Pranay Anup Agrawal",
         "careContexts": [
           {
-            "referenceNumber": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
-            "display": "Prescription-Record-2026-09-08-08-24-48"
+            "referenceNumber": "care-context-1"
           }
-        ],
-        "hiType": "Prescription",
-        "count": 1
+        ]
       }
     ],
-    "abhaAddress": "pranay_2025@sbx",
+    "abhaAddress": "pranay_0120061@sbx",
     "hipId": "IN2410002480",
-    "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
-    "linkedAt": "2026-09-08T02:54:58.884Z",
-    "createdTime": "2026-09-08T02:54:58.884Z",
+    "linkToken": "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFBZGRyZXNzIjoicHJhbmF5XzAxMjAwNjFAc2J4Iiwic3ViIjoicHJhbmF5XzAxMjAwNjFAc2J4IiwidHJhbnNhY3Rpb25JZCI6ImdhdGV3YXktdHhuLTEifQ.",
+    "linkedAt": "2026-09-11T13:52:19.311Z",
+    "createdTime": "2026-09-11T13:52:19.311Z",
     "careContexts": [
       {
-        "referenceNumber": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
-        "display": "Prescription-Record-2026-09-08-08-24-48"
+        "referenceNumber": "care-context-1"
       }
     ],
-    "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
+    "careContextReference": "care-context-1",
     "dataPushUrl": "",
     "receiverPublicKey": "",
     "receiverNonce": "",
@@ -43,105 +202,1249 @@
     "retryHistory": [],
     "statusHistory": [
       {
-        "timestamp": 1788836098888,
+        "timestamp": 1789134739321,
         "from": "LINKED",
         "to": "WAITING_FOR_CONSENT",
         "metadata": {
-          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
+          "requestId": "link-request-1",
           "reason": "Waiting For Consent"
         }
       }
     ],
     "currentState": "WAITING_FOR_CONSENT",
     "previousState": "LINKED",
-    "createdTimestamp": 1788836098886,
-    "updatedTimestamp": 1788836101924,
+    "createdTimestamp": 1789134739312,
+    "updatedTimestamp": 1789134739321,
     "retryCount": 0,
     "failureCount": 0,
     "errorDetails": "",
     "auditHistory": [
       {
-        "timestamp": 1788836098886,
+        "timestamp": 1789134739312,
         "eventType": "CREATED",
         "message": "Transaction record initialized.",
         "details": {}
       },
       {
-        "timestamp": 1788836098888,
+        "timestamp": 1789134739317,
         "eventType": "HIP_LINK_CREATED",
         "message": "HIP Link Created.",
         "details": {
-          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
-          "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
-          "abhaAddress": "pranay_2025@sbx"
+          "requestId": "link-request-1",
+          "careContextReference": "care-context-1",
+          "abhaAddress": "pranay_0120061@sbx"
         }
       },
       {
-        "timestamp": 1788836098888,
+        "timestamp": 1789134739321,
         "eventType": "STATE_TRANSITION",
         "message": "State changed from \"LINKED\" to \"WAITING_FOR_CONSENT\".",
         "details": {
-          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
+          "requestId": "link-request-1",
           "reason": "Waiting For Consent"
-        }
-      },
-      {
-        "timestamp": 1788836101924,
-        "eventType": "HIP_LINK_CREATED",
-        "message": "HIP Link Created.",
-        "details": {
-          "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
-          "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
-          "abhaAddress": "pranay_2025@sbx"
         }
       }
     ],
     "abhaNumber": "",
-    "linkTokenTransactionId": "1137e8ce-4e0d-45c8-a662-16580394a6d5",
-    "linkResponse": {
-      "requestId": "15c83a25-a824-4f42-82d8-d179efdb49fb",
-      "statusCode": 202,
-      "response": {}
+    "linkTokenTransactionId": "gateway-txn-1",
+    "linkResponse": {},
+    "linkPayload": {}
+  },
+  "consent-1": {
+    "transactionId": "gateway-txn-1",
+    "requestId": "consent-1",
+    "consentId": "consent-1",
+    "consentRequestId": "consent-1",
+    "healthInformationRequestId": "hi-request-1",
+    "gatewayRequestId": "hi-request-1",
+    "hiRequestId": "",
+    "patientId": "pranay_0120061@sbx",
+    "patient": {
+      "id": "pranay_0120061@sbx"
     },
-    "linkPayload": {
-      "hipId": "IN2410002480",
-      "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
-      "abhaNumber": "91172204000829",
-      "abhaAddress": "pranay_2025@sbx",
-      "AbhaNumber": "91172204000829",
-      "AbhaAddress": "pranay_2025@sbx",
-      "patient": [
+    "abhaAddress": "pranay_0120061@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [
+      {
+        "careContextReference": "care-context-1"
+      }
+    ],
+    "careContextReference": "",
+    "dataPushUrl": "https://phr.example.test/data-push",
+    "receiverPublicKey": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARD44IXsTkFkHUQp9yhbE4GEAmghyqyjEe8e5RZvKh7gljWPH5dFeheQR7MMIE+AyaXzwy7f5LUfXg/v6wlDlZ5",
+    "receiverNonce": "hcRzrvCeZ+zYxdXsUdBLiRi/tjpakdIROlveCEEbn+A=",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789134739330,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "",
+          "type": "Consent Notification",
+          "consentId": "consent-1",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789134739379,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "hi-request-1",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      }
+    ],
+    "retryHistory": [
+      {
+        "timestamp": 1789134740537,
+        "eventType": "DATA_PUSH_RETRY",
+        "message": "Recoverable data push failure; retrying attempt 2 of 2.",
+        "details": {
+          "statusCode": 500,
+          "dataPushUrl": "https://phr.example.test/data-push"
+        }
+      }
+    ],
+    "statusHistory": [
+      {
+        "timestamp": 1789134739373,
+        "from": "Created",
+        "to": "CONSENT_GRANTED",
+        "metadata": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "consent-1",
+            "incomingRequestId": ""
+          }
+        }
+      },
+      {
+        "timestamp": 1789134739379,
+        "from": "CONSENT_GRANTED",
+        "to": "HI Request Received",
+        "metadata": {
+          "callbackRequestId": "hi-request-1",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789134739384,
+        "from": "HI Request Received",
+        "to": "HI Request Received",
+        "metadata": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789134739387,
+        "from": "HI Request Received",
+        "to": "Acknowledged",
+        "metadata": {
+          "requestId": "hi-request-1",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789134740390,
+        "from": "Acknowledged",
+        "to": "Consent Received",
+        "metadata": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789134740508,
+        "from": "Consent Received",
+        "to": "FHIR Generated",
+        "metadata": {
+          "reason": "FHIR R4 bundle compiled from existing files."
+        }
+      },
+      {
+        "timestamp": 1789134740509,
+        "from": "FHIR Generated",
+        "to": "Encryption Started",
+        "metadata": {
+          "reason": "Starting GCM-128 Weierstrass ECDH key encryption."
+        }
+      },
+      {
+        "timestamp": 1789134740539,
+        "from": "Encryption Started",
+        "to": "Encryption Completed",
+        "metadata": {
+          "reason": "FHIR packet encrypted successfully."
+        }
+      },
+      {
+        "timestamp": 1789134740541,
+        "from": "Encryption Completed",
+        "to": "Data Push Completed",
+        "metadata": {
+          "reason": "Data package acknowledged by HIU receiver.",
+          "statusCode": 202
+        }
+      },
+      {
+        "timestamp": 1789134740544,
+        "from": "Data Push Completed",
+        "to": "Notify Sent",
+        "metadata": {
+          "requestId": "hi-request-1",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      },
+      {
+        "timestamp": 1789134740546,
+        "from": "Notify Sent",
+        "to": "Completed",
+        "metadata": {
+          "reason": "Complete transfer workflow completed and acknowledged."
+        }
+      }
+    ],
+    "currentState": "Completed",
+    "previousState": "Notify Sent",
+    "createdTimestamp": 1789134739326,
+    "updatedTimestamp": 1789134740549,
+    "retryCount": 1,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789134739326,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789134739330,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "",
+          "type": "Consent Notification",
+          "consentId": "consent-1",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789134739373,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
+        "details": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "consent-1",
+            "incomingRequestId": ""
+          }
+        }
+      },
+      {
+        "timestamp": 1789134739374,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Active\".",
+        "details": {
+          "consentId": "consent-1",
+          "from": "Requested",
+          "to": "Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "consent-1",
+            "incomingRequestId": ""
+          }
+        }
+      },
+      {
+        "timestamp": 1789134739379,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "hi-request-1",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      },
+      {
+        "timestamp": 1789134739379,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"CONSENT_GRANTED\" to \"HI Request Received\".",
+        "details": {
+          "callbackRequestId": "hi-request-1",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789134739384,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"HI Request Received\".",
+        "details": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789134739387,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"Acknowledged\".",
+        "details": {
+          "requestId": "hi-request-1",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789134740390,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Acknowledged\" to \"Consent Received\".",
+        "details": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789134740508,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Consent Received\" to \"FHIR Generated\".",
+        "details": {
+          "reason": "FHIR R4 bundle compiled from existing files."
+        }
+      },
+      {
+        "timestamp": 1789134740509,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"FHIR Generated\" to \"Encryption Started\".",
+        "details": {
+          "reason": "Starting GCM-128 Weierstrass ECDH key encryption."
+        }
+      },
+      {
+        "timestamp": 1789134740537,
+        "eventType": "DATA_PUSH_RETRY",
+        "message": "Recoverable data push failure; retrying attempt 2 of 2.",
+        "details": {
+          "statusCode": 500,
+          "dataPushUrl": "https://phr.example.test/data-push"
+        }
+      },
+      {
+        "timestamp": 1789134740539,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Encryption Started\" to \"Encryption Completed\".",
+        "details": {
+          "reason": "FHIR packet encrypted successfully."
+        }
+      },
+      {
+        "timestamp": 1789134740541,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Encryption Completed\" to \"Data Push Completed\".",
+        "details": {
+          "reason": "Data package acknowledged by HIU receiver.",
+          "statusCode": 202
+        }
+      },
+      {
+        "timestamp": 1789134740544,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Data Push Completed\" to \"Notify Sent\".",
+        "details": {
+          "requestId": "hi-request-1",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      },
+      {
+        "timestamp": 1789134740546,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Notify Sent\" to \"Completed\".",
+        "details": {
+          "reason": "Complete transfer workflow completed and acknowledged."
+        }
+      }
+    ],
+    "consentStatus": "GRANTED",
+    "permission": {
+      "dateRange": {
+        "from": "2026-07-01T00:00:00.000Z",
+        "to": "2026-07-02T00:00:00.000Z"
+      },
+      "dataEraseAt": "2126-07-02T00:00:00.000Z"
+    },
+    "hiTypes": [
+      "Prescription"
+    ],
+    "consentDetail": {
+      "consentId": "consent-1",
+      "patient": {
+        "id": "pranay_0120061@sbx"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "hiTypes": [
+        "Prescription"
+      ],
+      "careContexts": [
         {
-          "referenceNumber": "Pranay Anup Agrawal",
-          "display": "Prescription - Pranay Anup Agrawal",
+          "careContextReference": "care-context-1"
+        }
+      ],
+      "permission": {
+        "dateRange": {
+          "from": "2026-07-01T00:00:00.000Z",
+          "to": "2026-07-02T00:00:00.000Z"
+        },
+        "dataEraseAt": "2126-07-02T00:00:00.000Z"
+      }
+    },
+    "consentReceivedAt": "2026-09-11T13:52:19.335Z",
+    "consentSignature": "",
+    "consentNotifyPayload": {
+      "notification": {
+        "status": "GRANTED",
+        "consentId": "consent-1",
+        "patient": {
+          "id": "pranay_0120061@sbx"
+        },
+        "hip": {
+          "id": "IN2410002480"
+        },
+        "consentDetail": {
+          "consentId": "consent-1",
+          "patient": {
+            "id": "pranay_0120061@sbx"
+          },
+          "hip": {
+            "id": "IN2410002480"
+          },
+          "hiTypes": [
+            "Prescription"
+          ],
           "careContexts": [
             {
-              "referenceNumber": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424",
-              "display": "Prescription-Record-2026-09-08-08-24-48"
+              "careContextReference": "care-context-1"
             }
           ],
-          "hiType": "Prescription",
-          "count": 1
+          "permission": {
+            "dateRange": {
+              "from": "2026-07-01T00:00:00.000Z",
+              "to": "2026-07-02T00:00:00.000Z"
+            },
+            "dataEraseAt": "2126-07-02T00:00:00.000Z"
+          }
         }
-      ]
+      }
+    },
+    "consentDetails": {
+      "consentId": "consent-1",
+      "consentRequestId": "consent-1",
+      "consentArtifactId": "consent-1",
+      "patientId": "pranay_0120061@sbx",
+      "patient": {
+        "id": "pranay_0120061@sbx"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "hiTypes": [
+        "Prescription"
+      ],
+      "permission": {
+        "dateRange": {
+          "from": "2026-07-01T00:00:00.000Z",
+          "to": "2026-07-02T00:00:00.000Z"
+        },
+        "dataEraseAt": "2126-07-02T00:00:00.000Z"
+      },
+      "purpose": {},
+      "dateRange": {
+        "from": "2026-07-01T00:00:00.000Z",
+        "to": "2026-07-02T00:00:00.000Z"
+      },
+      "expiry": 4938624000000,
+      "receivedTime": "2026-09-11T13:52:19.335Z",
+      "signature": "",
+      "createdAt": 1789134739335,
+      "updatedAt": 1789134739342,
+      "rawNotification": {
+        "notification": {
+          "status": "GRANTED",
+          "consentId": "consent-1",
+          "patient": {
+            "id": "pranay_0120061@sbx"
+          },
+          "hip": {
+            "id": "IN2410002480"
+          },
+          "consentDetail": {
+            "consentId": "consent-1",
+            "patient": {
+              "id": "pranay_0120061@sbx"
+            },
+            "hip": {
+              "id": "IN2410002480"
+            },
+            "hiTypes": [
+              "Prescription"
+            ],
+            "careContexts": [
+              {
+                "careContextReference": "care-context-1"
+              }
+            ],
+            "permission": {
+              "dateRange": {
+                "from": "2026-07-01T00:00:00.000Z",
+                "to": "2026-07-02T00:00:00.000Z"
+              },
+              "dataEraseAt": "2126-07-02T00:00:00.000Z"
+            }
+          }
+        }
+      },
+      "status": "Active"
     },
     "identifierProtectionHistory": [
       {
-        "timestamp": 1788836101923,
+        "timestamp": 1789134739339,
         "skippedFields": [
+          "transactionId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "Curve25519",
+      "dhPublicKey": {
+        "expiry": "2026-09-11T14:52:19.311Z",
+        "parameters": "Curve25519/32byte random key",
+        "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARD44IXsTkFkHUQp9yhbE4GEAmghyqyjEe8e5RZvKh7gljWPH5dFeheQR7MMIE+AyaXzwy7f5LUfXg/v6wlDlZ5"
+      },
+      "nonce": "hcRzrvCeZ+zYxdXsUdBLiRi/tjpakdIROlveCEEbn+A="
+    },
+    "hiRequestPayload": {
+      "response": {
+        "requestId": "hi-request-1",
+        "transactionId": "gateway-txn-1"
+      },
+      "hiRequest": {
+        "consent": {
+          "id": "consent-1"
+        },
+        "dataPushUrl": "https://phr.example.test/data-push",
+        "keyMaterial": {
+          "cryptoAlg": "ECDH",
+          "curve": "Curve25519",
+          "dhPublicKey": {
+            "expiry": "2026-09-11T14:52:19.311Z",
+            "parameters": "Curve25519/32byte random key",
+            "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAARD44IXsTkFkHUQp9yhbE4GEAmghyqyjEe8e5RZvKh7gljWPH5dFeheQR7MMIE+AyaXzwy7f5LUfXg/v6wlDlZ5"
+          },
+          "nonce": "hcRzrvCeZ+zYxdXsUdBLiRi/tjpakdIROlveCEEbn+A="
+        },
+        "careContexts": [
+          {
+            "careContextReference": "care-context-1"
+          }
+        ]
+      }
+    },
+    "hiOnRequestPayload": {
+      "requestId": "bda3b45a-4d3b-4071-8995-76a34dfb5c4a",
+      "timestamp": "2026-09-11T13:52:19.385Z",
+      "hiRequest": {
+        "transactionId": "gateway-txn-1",
+        "sessionStatus": "ACKNOWLEDGED"
+      },
+      "resp": {
+        "requestId": "hi-request-1"
+      }
+    },
+    "hiOnRequestStatusCode": 202,
+    "dataPushPayload": {
+      "pageNumber": 1,
+      "pageCount": 1,
+      "transactionId": "gateway-txn-1",
+      "entries": [
+        {
+          "content": "0ceJqziq0yi+wYMC5YmUQC0kS44zO2hlW1aAw4VurSbXbn8yr0DbAjYtxKhqV0/U1kKqZrzCXgyYvBh7Eq8aVBdAbR0ylJPCUBAKVbTEyyvv349scUnPBSrHlMwNtWpQvuwoUGtxJKmwcWSzq/vtRiQ1HvA585m8AL/dUm6/J2eKXyargR6VAM8C0MuREvs8jXDOpZWawEcNwgUMrHXTnfwSQJYbmWU8mwb4lpZ22py6yo3SdP8q+h+TtoPtEZNGtWQq5Zm8DbnY8tRQloqFlCVIXviNWSFpQxSNUqLqOVT+a4FsU8zDoe6b0Tk7Tr7lEs1N3c/6L+DPS9e89MVEjRTtVH+5YD7zA9PCZM7YGi7X1NnnrxCLJzt7js+Ck5/lKeYtlPgzIGfETr1Zp7keSzk8reeUw0CgtXuJQY2JwkP8jBQTKEPXK3efZe+Bw6xVrsWck1iLIsczlp/MA308iJUe1XuFEfSqlkZglzQk04gj/DbF2xpABO9811nDWO1M9h7US5zRM296",
+          "media": "application/fhir+json",
+          "careContextReference": "care-context-1"
+        }
+      ],
+      "keyMaterial": {
+        "cryptoAlg": "ECDH",
+        "curve": "Curve25519",
+        "dhPublicKey": {
+          "expiry": "2027-09-11T13:52:20.530Z",
+          "parameters": "Curve25519/32byte random key",
+          "keyValue": "MFswFQYHKoZIzj0CAQYKKwYBBAGXVQEFAQNCAAQVNGq6AxoZw9zg05odH3QX3Gyc9rxt7kDybpLycanJ0hMPtKyRIZAuKOnZ0kLahVi3FDAihhObDmBJQgNZ7s+t"
+        },
+        "nonce": "0CrdS7yDF6E2l04T1Q0/02CiyF00gj+kUmcc1Cz5dQs="
+      }
+    },
+    "dataPushError": {
+      "message": "transient",
+      "statusCode": 500,
+      "response": {
+        "error": "transient"
+      },
+      "failedAt": 1789134740535,
+      "attempt": 1,
+      "maxAttempts": 2
+    },
+    "dataPushAcknowledgement": {
+      "ok": true,
+      "statusCode": 202,
+      "acknowledgedAt": 1789134740538,
+      "response": {
+        "acknowledgement": {
+          "status": "SUCCESS"
+        }
+      },
+      "attempts": 2,
+      "retryCount": 1
+    },
+    "dataPushResult": {
+      "ok": true,
+      "statusCode": 202,
+      "acknowledgedAt": 1789134740538,
+      "response": {
+        "acknowledgement": {
+          "status": "SUCCESS"
+        }
+      },
+      "attempts": 2,
+      "retryCount": 1
+    },
+    "encryptedPayload": [
+      {
+        "content": "0ceJqziq0yi+wYMC5YmUQC0kS44zO2hlW1aAw4VurSbXbn8yr0DbAjYtxKhqV0/U1kKqZrzCXgyYvBh7Eq8aVBdAbR0ylJPCUBAKVbTEyyvv349scUnPBSrHlMwNtWpQvuwoUGtxJKmwcWSzq/vtRiQ1HvA585m8AL/dUm6/J2eKXyargR6VAM8C0MuREvs8jXDOpZWawEcNwgUMrHXTnfwSQJYbmWU8mwb4lpZ22py6yo3SdP8q+h+TtoPtEZNGtWQq5Zm8DbnY8tRQloqFlCVIXviNWSFpQxSNUqLqOVT+a4FsU8zDoe6b0Tk7Tr7lEs1N3c/6L+DPS9e89MVEjRTtVH+5YD7zA9PCZM7YGi7X1NnnrxCLJzt7js+Ck5/lKeYtlPgzIGfETr1Zp7keSzk8reeUw0CgtXuJQY2JwkP8jBQTKEPXK3efZe+Bw6xVrsWck1iLIsczlp/MA308iJUe1XuFEfSqlkZglzQk04gj/DbF2xpABO9811nDWO1M9h7US5zRM296",
+        "media": "application/fhir+json",
+        "careContextReference": "care-context-1"
+      }
+    ],
+    "recordType": [
+      "Prescription"
+    ],
+    "transferCareContextReference": [
+      "care-context-1"
+    ],
+    "clinicalData": {},
+    "healthInformationNotifyPayload": {
+      "requestId": "520c7ebf-e55c-4694-87b9-52988d90c85a",
+      "timestamp": "2026-09-11T13:52:20.543Z",
+      "notification": {
+        "consentId": "consent-1",
+        "transactionId": "gateway-txn-1",
+        "doneAt": "2026-09-11T13:52:20.543Z",
+        "notifier": {
+          "type": "HIP",
+          "id": "MOCK_HIP"
+        },
+        "statusNotification": {
+          "sessionStatus": "TRANSFERRED",
+          "hipId": "MOCK_HIP",
+          "statusResponses": [
+            {
+              "careContextReference": "care-context-1",
+              "hiStatus": "DELIVERED",
+              "description": "Health information transferred"
+            }
+          ]
+        }
+      }
+    },
+    "healthInformationNotifyStatusCode": 202,
+    "transferHistory": [
+      {
+        "id": "gateway-txn-1:1789134740547",
+        "transactionId": "gateway-txn-1",
+        "requestId": "hi-request-1",
+        "consentId": "consent-1",
+        "requestedConsentId": "consent-1",
+        "patientId": "pranay_0120061@sbx",
+        "recordTypes": [
+          "Prescription"
+        ],
+        "recordsTransferred": 1,
+        "startedAt": 1789134740389,
+        "completedAt": 1789134740547,
+        "durationMs": 156,
+        "status": "TRANSFER_COMPLETED",
+        "evidence": {
+          "dataPushUrl": "https://phr.example.test/data-push",
+          "dataPushStatusCode": 202,
+          "consentManagerNotifyStatusCode": 202,
+          "encrypted": true,
+          "gatewayNotified": true,
+          "localRecordPromotion": null
+        }
+      }
+    ],
+    "lastTransferRecord": {
+      "id": "gateway-txn-1:1789134740547",
+      "transactionId": "gateway-txn-1",
+      "requestId": "hi-request-1",
+      "consentId": "consent-1",
+      "requestedConsentId": "consent-1",
+      "patientId": "pranay_0120061@sbx",
+      "recordTypes": [
+        "Prescription"
+      ],
+      "recordsTransferred": 1,
+      "startedAt": 1789134740389,
+      "completedAt": 1789134740547,
+      "durationMs": 156,
+      "status": "TRANSFER_COMPLETED",
+      "evidence": {
+        "dataPushUrl": "https://phr.example.test/data-push",
+        "dataPushStatusCode": 202,
+        "consentManagerNotifyStatusCode": 202,
+        "encrypted": true,
+        "gatewayNotified": true,
+        "localRecordPromotion": null
+      }
+    }
+  },
+  "tx-B": {
+    "transactionId": "tx-B",
+    "requestId": "req-B",
+    "consentId": "artefact-B",
+    "consentRequestId": "creq-B",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "req-grant",
+    "hiRequestId": "",
+    "patientId": "patient@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789134739695,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "req-grant",
+          "type": "Consent Notification",
+          "consentId": "",
+          "matchReason": "Matched by exact consentId"
+        }
+      },
+      {
+        "timestamp": 1789134739822,
+        "eventType": "DUPLICATE_CALLBACK_RECEIVED",
+        "message": "Duplicate callback \"Consent Notification\" rejected.",
+        "details": {
+          "callbackRequestId": "req-grant",
+          "consentId": ""
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789134739704,
+        "from": "Created",
+        "to": "CONSENT_GRANTED",
+        "metadata": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "req-B",
+            "incomingRequestId": "req-grant"
+          }
+        }
+      }
+    ],
+    "currentState": "CONSENT_GRANTED",
+    "previousState": "Created",
+    "createdTimestamp": 1789134739691,
+    "updatedTimestamp": 1789134739822,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789134739691,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789134739695,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "req-grant",
+          "type": "Consent Notification",
+          "consentId": "",
+          "matchReason": "Matched by exact consentId"
+        }
+      },
+      {
+        "timestamp": 1789134739704,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
+        "details": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "req-B",
+            "incomingRequestId": "req-grant"
+          }
+        }
+      },
+      {
+        "timestamp": 1789134739705,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Active\".",
+        "details": {
+          "consentId": "artefact-B",
+          "from": "Requested",
+          "to": "Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "req-B",
+            "incomingRequestId": "req-grant"
+          }
+        }
+      },
+      {
+        "timestamp": 1789134739822,
+        "eventType": "DUPLICATE_CALLBACK_RECEIVED",
+        "message": "Duplicate callback \"Consent Notification\" rejected.",
+        "details": {
+          "callbackRequestId": "req-grant",
+          "consentId": ""
+        }
+      }
+    ],
+    "consentDetails": {
+      "status": "Active",
+      "consentId": "artefact-B",
+      "consentRequestId": "creq-B",
+      "consentArtifactId": "artefact-B",
+      "patientId": "patient@sbx",
+      "patient": {},
+      "hip": {},
+      "hiTypes": [],
+      "permission": {},
+      "purpose": {},
+      "dateRange": {},
+      "expiry": 1791726739696,
+      "receivedTime": "2026-09-11T13:52:19.696Z",
+      "signature": "",
+      "createdAt": 1789134739696,
+      "updatedAt": 1789134739701,
+      "rawNotification": {
+        "requestId": "req-grant",
+        "notification": {
+          "status": "GRANTED",
+          "consentRequestId": "creq-B",
+          "consentArtefacts": [
+            {
+              "id": "artefact-B"
+            }
+          ]
+        }
+      }
+    },
+    "consentStatus": "GRANTED",
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789134739693,
+        "skippedFields": [
+          "abhaAddress",
           "healthInformationRequestId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      },
+      {
+        "timestamp": 1789134739698,
+        "skippedFields": [
+          "hipId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      },
+      {
+        "timestamp": 1789134739820,
+        "skippedFields": [
+          "abhaAddress",
+          "healthInformationRequestId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ],
+    "permission": {},
+    "hiTypes": [],
+    "consentDetail": {
+      "status": "GRANTED",
+      "consentRequestId": "creq-B",
+      "consentArtefacts": [
+        {
+          "id": "artefact-B"
+        }
+      ]
+    },
+    "consentReceivedAt": "2026-09-11T13:52:19.696Z",
+    "consentSignature": "",
+    "consentNotifyPayload": {
+      "requestId": "req-grant",
+      "notification": {
+        "status": "GRANTED",
+        "consentRequestId": "creq-B",
+        "consentArtefacts": [
+          {
+            "id": "artefact-B"
+          }
+        ]
+      }
+    }
+  },
+  "req-unmatched": {
+    "transactionId": "",
+    "requestId": "req-unmatched",
+    "consentId": "",
+    "consentRequestId": "unknown-req",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "req-unmatched",
+    "hiRequestId": "",
+    "patientId": "",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789134739824,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "req-unmatched",
+          "type": "Consent Notification",
+          "consentId": "",
+          "matchReason": "NoMatch"
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Created",
+    "previousState": "",
+    "createdTimestamp": 1789134739823,
+    "updatedTimestamp": 1789134739826,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789134739823,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789134739824,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "req-unmatched",
+          "type": "Consent Notification",
+          "consentId": "",
+          "matchReason": "NoMatch"
+        }
+      }
+    ],
+    "consentStatus": "GRANTED",
+    "permission": {},
+    "hiTypes": [],
+    "consentDetail": {
+      "status": "GRANTED",
+      "consentRequestId": "unknown-req"
+    },
+    "consentReceivedAt": "2026-09-11T13:52:19.825Z",
+    "consentSignature": "",
+    "consentNotifyPayload": {
+      "requestId": "req-unmatched",
+      "notification": {
+        "status": "GRANTED",
+        "consentRequestId": "unknown-req"
+      }
+    },
+    "consentDetails": {
+      "consentId": "",
+      "consentRequestId": "unknown-req",
+      "consentArtifactId": "",
+      "patientId": "",
+      "patient": {},
+      "hip": {},
+      "hiTypes": [],
+      "permission": {},
+      "purpose": {},
+      "dateRange": {},
+      "expiry": 1791726739825,
+      "receivedTime": "2026-09-11T13:52:19.825Z",
+      "signature": "",
+      "createdAt": 1789134739825,
+      "updatedAt": 1789134739825,
+      "rawNotification": {
+        "requestId": "req-unmatched",
+        "notification": {
+          "status": "GRANTED",
+          "consentRequestId": "unknown-req"
+        }
+      }
+    },
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789134739826,
+        "skippedFields": [
+          "transactionId",
+          "consentId",
+          "patientId",
+          "hipId"
         ],
         "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
       }
     ]
   },
-  "a1025518-0ad5-403e-91fb-36357b6780e9": {
-    "transactionId": "a1025518-0ad5-403e-91fb-36357b6780e9",
-    "requestId": "a1025518-0ad5-403e-91fb-36357b6780e9",
+  "3cbda6a4-9c90-4e37-b4c0-709005749579": {
+    "transactionId": "3cbda6a4-9c90-4e37-b4c0-709005749579",
+    "requestId": "22345678-1234-4234-8234-123456789012",
+    "consentId": "2001cafb-4932-4a26-93df-382594ca84ad",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "abdulkalam@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Error",
+    "previousState": "",
+    "createdTimestamp": 1789134795174,
+    "updatedTimestamp": 1789134795503,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789134795174,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789134795177,
+        "eventType": "CONSENT_CREATED",
+        "message": "Consent request initialized and persisted locally.",
+        "details": {
+          "consentId": "2001cafb-4932-4a26-93df-382594ca84ad",
+          "status": "Requested"
+        }
+      },
+      {
+        "timestamp": 1789134795503,
+        "eventType": "CONSENT_GATEWAY_ERROR",
+        "message": "Consent initialization failed at Gateway.",
+        "details": {
+          "error": "Request failed with status code 400"
+        }
+      }
+    ],
+    "consentDetails": {
+      "status": "Error",
+      "error": "Request failed with status code 400"
+    }
+  },
+  "c95ed90a-6a7b-4b4a-9ae4-5d1fad729bcd": {
+    "transactionId": "c95ed90a-6a7b-4b4a-9ae4-5d1fad729bcd",
+    "requestId": "659b763c-800b-4f50-8703-dee15537654e",
+    "consentId": "79e5342b-22b3-4fdd-8f82-d168cd1043e1",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "abdulkalam@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Created",
+    "previousState": "",
+    "createdTimestamp": 1789134807092,
+    "updatedTimestamp": 1789134807422,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789134807092,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789134807094,
+        "eventType": "CONSENT_CREATED",
+        "message": "Consent request initialized and persisted locally.",
+        "details": {
+          "consentId": "79e5342b-22b3-4fdd-8f82-d168cd1043e1",
+          "status": "Requested"
+        }
+      },
+      {
+        "timestamp": 1789134807422,
+        "eventType": "CONSENT_GATEWAY_DISPATCHED",
+        "message": "Gateway accepted consent initialization.",
+        "details": {
+          "statusCode": 202
+        }
+      }
+    ],
+    "consentDetails": {
+      "consentId": "79e5342b-22b3-4fdd-8f82-d168cd1043e1",
+      "status": "Requested",
+      "patientId": "abdulkalam@sbx",
+      "hiTypes": [
+        "OPConsultation"
+      ],
+      "purpose": {
+        "code": "PATRQT",
+        "text": "Self Requested"
+      },
+      "dateRange": {
+        "from": "2025-09-11T13:53:27.079Z",
+        "to": "2026-09-11T13:53:27.079Z"
+      },
+      "expiry": 1791726807079,
+      "createdAt": 1789134807093,
+      "updatedAt": 1789134807093
+    }
+  },
+  "e67402d1-df54-4430-ac02-b127ee411625": {
+    "transactionId": "e67402d1-df54-4430-ac02-b127ee411625",
+    "requestId": "2a1a4042-2a17-4a43-9077-e27230abee15",
+    "consentId": "96e1f040-956d-4faa-b9ac-81bb9921f292",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "invalid_patient@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Error",
+    "previousState": "",
+    "createdTimestamp": 1789134849757,
+    "updatedTimestamp": 1789134850105,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789134849757,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789134849760,
+        "eventType": "CONSENT_CREATED",
+        "message": "Consent request initialized and persisted locally.",
+        "details": {
+          "consentId": "96e1f040-956d-4faa-b9ac-81bb9921f292",
+          "status": "Requested"
+        }
+      },
+      {
+        "timestamp": 1789134850105,
+        "eventType": "CONSENT_GATEWAY_ERROR",
+        "message": "Consent initialization failed at Gateway.",
+        "details": {
+          "error": "Request failed with status code 400"
+        }
+      }
+    ],
+    "consentDetails": {
+      "status": "Error",
+      "error": "Request failed with status code 400"
+    }
+  },
+  "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df": {
+    "transactionId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
+    "requestId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
     "consentId": "",
     "consentRequestId": "",
     "healthInformationRequestId": "",
-    "gatewayRequestId": "a1025518-0ad5-403e-91fb-36357b6780e9",
+    "gatewayRequestId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
     "hiRequestId": "",
     "patientId": "pranay_2025@sbx",
     "patient": [
@@ -150,8 +1453,8 @@
         "display": "DischargeSummary - Pranay Anup Agrawal",
         "careContexts": [
           {
-            "referenceNumber": "ff97133b-e2f5-459b-a177-473d0996d47e",
-            "display": "Discharge-Summary-2026-09-08-09-06-06"
+            "referenceNumber": "0d746787-5950-4ea4-aef5-38066d93eb67",
+            "display": "Discharge-Summary-2026-09-11-19-50-25"
           }
         ],
         "hiType": "DischargeSummary",
@@ -161,15 +1464,15 @@
     "abhaAddress": "pranay_2025@sbx",
     "hipId": "IN2410002480",
     "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
-    "linkedAt": "2026-09-08T03:36:16.960Z",
-    "createdTime": "2026-09-08T03:36:16.960Z",
+    "linkedAt": "2026-09-11T14:20:36.348Z",
+    "createdTime": "2026-09-11T14:20:36.348Z",
     "careContexts": [
       {
-        "referenceNumber": "ff97133b-e2f5-459b-a177-473d0996d47e",
-        "display": "Discharge-Summary-2026-09-08-09-06-06"
+        "referenceNumber": "0d746787-5950-4ea4-aef5-38066d93eb67",
+        "display": "Discharge-Summary-2026-09-11-19-50-25"
       }
     ],
-    "careContextReference": "ff97133b-e2f5-459b-a177-473d0996d47e",
+    "careContextReference": "0d746787-5950-4ea4-aef5-38066d93eb67",
     "dataPushUrl": "",
     "receiverPublicKey": "",
     "receiverNonce": "",
@@ -179,55 +1482,55 @@
     "retryHistory": [],
     "statusHistory": [
       {
-        "timestamp": 1788838576978,
+        "timestamp": 1789136436365,
         "from": "LINKED",
         "to": "WAITING_FOR_CONSENT",
         "metadata": {
-          "requestId": "a1025518-0ad5-403e-91fb-36357b6780e9",
+          "requestId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
           "reason": "Waiting For Consent"
         }
       }
     ],
     "currentState": "WAITING_FOR_CONSENT",
     "previousState": "LINKED",
-    "createdTimestamp": 1788838576968,
-    "updatedTimestamp": 1788838579996,
+    "createdTimestamp": 1789136436358,
+    "updatedTimestamp": 1789136439404,
     "retryCount": 0,
     "failureCount": 0,
     "errorDetails": "",
     "auditHistory": [
       {
-        "timestamp": 1788838576968,
+        "timestamp": 1789136436358,
         "eventType": "CREATED",
         "message": "Transaction record initialized.",
         "details": {}
       },
       {
-        "timestamp": 1788838576971,
+        "timestamp": 1789136436360,
         "eventType": "HIP_LINK_CREATED",
         "message": "HIP Link Created.",
         "details": {
-          "requestId": "a1025518-0ad5-403e-91fb-36357b6780e9",
-          "careContextReference": "ff97133b-e2f5-459b-a177-473d0996d47e",
+          "requestId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
+          "careContextReference": "0d746787-5950-4ea4-aef5-38066d93eb67",
           "abhaAddress": "pranay_2025@sbx"
         }
       },
       {
-        "timestamp": 1788838576978,
+        "timestamp": 1789136436365,
         "eventType": "STATE_TRANSITION",
         "message": "State changed from \"LINKED\" to \"WAITING_FOR_CONSENT\".",
         "details": {
-          "requestId": "a1025518-0ad5-403e-91fb-36357b6780e9",
+          "requestId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
           "reason": "Waiting For Consent"
         }
       },
       {
-        "timestamp": 1788838579996,
+        "timestamp": 1789136439404,
         "eventType": "HIP_LINK_CREATED",
         "message": "HIP Link Created.",
         "details": {
-          "requestId": "a1025518-0ad5-403e-91fb-36357b6780e9",
-          "careContextReference": "ff97133b-e2f5-459b-a177-473d0996d47e",
+          "requestId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
+          "careContextReference": "0d746787-5950-4ea4-aef5-38066d93eb67",
           "abhaAddress": "pranay_2025@sbx"
         }
       }
@@ -235,7 +1538,7 @@
     "abhaNumber": "",
     "linkTokenTransactionId": "1137e8ce-4e0d-45c8-a662-16580394a6d5",
     "linkResponse": {
-      "requestId": "a1025518-0ad5-403e-91fb-36357b6780e9",
+      "requestId": "4f1aae47-bd0c-43cd-a9c5-f9a6700f64df",
       "statusCode": 202,
       "response": {}
     },
@@ -252,8 +1555,8 @@
           "display": "DischargeSummary - Pranay Anup Agrawal",
           "careContexts": [
             {
-              "referenceNumber": "ff97133b-e2f5-459b-a177-473d0996d47e",
-              "display": "Discharge-Summary-2026-09-08-09-06-06"
+              "referenceNumber": "0d746787-5950-4ea4-aef5-38066d93eb67",
+              "display": "Discharge-Summary-2026-09-11-19-50-25"
             }
           ],
           "hiType": "DischargeSummary",
@@ -263,7 +1566,7 @@
     },
     "identifierProtectionHistory": [
       {
-        "timestamp": 1788838579996,
+        "timestamp": 1789136439400,
         "skippedFields": [
           "healthInformationRequestId"
         ],
@@ -271,146 +1574,10 @@
       }
     ]
   },
-  "f740e1d2-c759-47dc-8ae9-0388f14b94ed": {
-    "transactionId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-    "requestId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-    "consentId": "",
-    "consentRequestId": "",
-    "healthInformationRequestId": "",
-    "gatewayRequestId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-    "hiRequestId": "",
-    "patientId": "pranay_2025@sbx",
-    "patient": [
-      {
-        "referenceNumber": "Pranay Anup Agrawal",
-        "display": "OPConsultation - Pranay Anup Agrawal",
-        "careContexts": [
-          {
-            "referenceNumber": "87bb0af1-50b4-4b32-a73b-7168431f1d4b",
-            "display": "OP-Consultation-Record-2026-09-11-18-34-40"
-          }
-        ],
-        "hiType": "OPConsultation",
-        "count": 1
-      }
-    ],
-    "abhaAddress": "pranay_2025@sbx",
-    "hipId": "IN2410002480",
-    "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
-    "linkedAt": "2026-09-11T13:04:51.124Z",
-    "createdTime": "2026-09-11T13:04:51.124Z",
-    "careContexts": [
-      {
-        "referenceNumber": "87bb0af1-50b4-4b32-a73b-7168431f1d4b",
-        "display": "OP-Consultation-Record-2026-09-11-18-34-40"
-      }
-    ],
-    "careContextReference": "87bb0af1-50b4-4b32-a73b-7168431f1d4b",
-    "dataPushUrl": "",
-    "receiverPublicKey": "",
-    "receiverNonce": "",
-    "senderNonce": "",
-    "encryptionMetadata": {},
-    "callbackHistory": [],
-    "retryHistory": [],
-    "statusHistory": [
-      {
-        "timestamp": 1789131891167,
-        "from": "LINKED",
-        "to": "WAITING_FOR_CONSENT",
-        "metadata": {
-          "requestId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-          "reason": "Waiting For Consent"
-        }
-      }
-    ],
-    "currentState": "WAITING_FOR_CONSENT",
-    "previousState": "LINKED",
-    "createdTimestamp": 1789131891152,
-    "updatedTimestamp": 1789131894241,
-    "retryCount": 0,
-    "failureCount": 0,
-    "errorDetails": "",
-    "auditHistory": [
-      {
-        "timestamp": 1789131891152,
-        "eventType": "CREATED",
-        "message": "Transaction record initialized.",
-        "details": {}
-      },
-      {
-        "timestamp": 1789131891162,
-        "eventType": "HIP_LINK_CREATED",
-        "message": "HIP Link Created.",
-        "details": {
-          "requestId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-          "careContextReference": "87bb0af1-50b4-4b32-a73b-7168431f1d4b",
-          "abhaAddress": "pranay_2025@sbx"
-        }
-      },
-      {
-        "timestamp": 1789131891167,
-        "eventType": "STATE_TRANSITION",
-        "message": "State changed from \"LINKED\" to \"WAITING_FOR_CONSENT\".",
-        "details": {
-          "requestId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-          "reason": "Waiting For Consent"
-        }
-      },
-      {
-        "timestamp": 1789131894241,
-        "eventType": "HIP_LINK_CREATED",
-        "message": "HIP Link Created.",
-        "details": {
-          "requestId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-          "careContextReference": "87bb0af1-50b4-4b32-a73b-7168431f1d4b",
-          "abhaAddress": "pranay_2025@sbx"
-        }
-      }
-    ],
-    "abhaNumber": "",
-    "linkTokenTransactionId": "1137e8ce-4e0d-45c8-a662-16580394a6d5",
-    "linkResponse": {
-      "requestId": "f740e1d2-c759-47dc-8ae9-0388f14b94ed",
-      "statusCode": 202,
-      "response": {}
-    },
-    "linkPayload": {
-      "hipId": "IN2410002480",
-      "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
-      "abhaNumber": "91172204000829",
-      "abhaAddress": "pranay_2025@sbx",
-      "AbhaNumber": "91172204000829",
-      "AbhaAddress": "pranay_2025@sbx",
-      "patient": [
-        {
-          "referenceNumber": "Pranay Anup Agrawal",
-          "display": "OPConsultation - Pranay Anup Agrawal",
-          "careContexts": [
-            {
-              "referenceNumber": "87bb0af1-50b4-4b32-a73b-7168431f1d4b",
-              "display": "OP-Consultation-Record-2026-09-11-18-34-40"
-            }
-          ],
-          "hiType": "OPConsultation",
-          "count": 1
-        }
-      ]
-    },
-    "identifierProtectionHistory": [
-      {
-        "timestamp": 1789131894223,
-        "skippedFields": [
-          "healthInformationRequestId"
-        ],
-        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
-      }
-    ]
-  },
-  "bb7f336e-95c9-4e8e-8732-3b7b7de496a1": {
-    "transactionId": "bb7f336e-95c9-4e8e-8732-3b7b7de496a1",
-    "requestId": "2af7baa0-e187-f247-232a-fb247cc8f6c3",
-    "consentId": "49df5a86-d17f-4f89-b939-3e045808903b",
+  "bcbe245f-e472-4d3f-aac0-619c3c082a3f": {
+    "transactionId": "bcbe245f-e472-4d3f-aac0-619c3c082a3f",
+    "requestId": "4491b3cd-3738-2200-bfe5-7af44d45d4dc",
+    "consentId": "f724a86b-1de0-4fc1-89f5-7888bcd4a879",
     "consentRequestId": "",
     "healthInformationRequestId": "",
     "gatewayRequestId": "",
@@ -434,30 +1601,1359 @@
     "statusHistory": [],
     "currentState": "Created",
     "previousState": "",
-    "createdTimestamp": 1789131900856,
-    "updatedTimestamp": 1789131900863,
+    "createdTimestamp": 1789136445828,
+    "updatedTimestamp": 1789136445961,
     "retryCount": 0,
     "failureCount": 0,
     "errorDetails": "",
     "auditHistory": [
       {
-        "timestamp": 1789131900856,
+        "timestamp": 1789136445828,
         "eventType": "CREATED",
         "message": "Transaction record initialized.",
         "details": {}
       },
       {
-        "timestamp": 1789131900863,
+        "timestamp": 1789136445834,
         "eventType": "CONSENT_CREATED",
         "message": "Consent request initialized and persisted locally.",
         "details": {
-          "consentId": "49df5a86-d17f-4f89-b939-3e045808903b",
+          "consentId": "f724a86b-1de0-4fc1-89f5-7888bcd4a879",
           "status": "Requested"
+        }
+      },
+      {
+        "timestamp": 1789136445961,
+        "eventType": "CONSENT_GATEWAY_DISPATCHED",
+        "message": "Gateway accepted consent initialization.",
+        "details": {
+          "statusCode": 202
         }
       }
     ],
     "consentDetails": {
-      "consentId": "49df5a86-d17f-4f89-b939-3e045808903b",
+      "consentId": "f724a86b-1de0-4fc1-89f5-7888bcd4a879",
+      "status": "Requested",
+      "patientId": "pranay_2025@sbx",
+      "hiTypes": [
+        "DischargeSummary"
+      ],
+      "purpose": {
+        "code": "PATRQT",
+        "text": "Self Requested"
+      },
+      "dateRange": {
+        "from": "2025-09-11T14:20:45.000Z",
+        "to": "2026-09-11T14:20:45.000Z"
+      },
+      "expiry": 1791728445000,
+      "createdAt": 1789136445830,
+      "updatedAt": 1789136445830
+    }
+  },
+  "17d0ebc0-64bd-46a3-b195-cfbd4d3f4022": {
+    "transactionId": "17d0ebc0-64bd-46a3-b195-cfbd4d3f4022",
+    "requestId": "6456e171-7c1e-4407-a661-90d468aee39e",
+    "consentId": "fb788b40-ec18-49e6-8824-ae7bc4587e81",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "abdulkalam@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Created",
+    "previousState": "",
+    "createdTimestamp": 1789136865757,
+    "updatedTimestamp": 1789136866288,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789136865757,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789136865760,
+        "eventType": "CONSENT_CREATED",
+        "message": "Consent request initialized and persisted locally.",
+        "details": {
+          "consentId": "fb788b40-ec18-49e6-8824-ae7bc4587e81",
+          "status": "Requested"
+        }
+      },
+      {
+        "timestamp": 1789136866288,
+        "eventType": "CONSENT_GATEWAY_DISPATCHED",
+        "message": "Gateway accepted consent initialization.",
+        "details": {
+          "statusCode": 202
+        }
+      }
+    ],
+    "consentDetails": {
+      "consentId": "fb788b40-ec18-49e6-8824-ae7bc4587e81",
+      "status": "Requested",
+      "patientId": "abdulkalam@sbx",
+      "hiTypes": [
+        "OPConsultation"
+      ],
+      "purpose": {
+        "code": "PATRQT",
+        "text": "Self Requested"
+      },
+      "dateRange": {
+        "from": "2025-09-11T14:27:45.726Z",
+        "to": "2026-09-11T14:27:45.726Z"
+      },
+      "expiry": 1791728865726,
+      "createdAt": 1789136865759,
+      "updatedAt": 1789136865759
+    }
+  },
+  "d926afb7-d774-41ed-8426-73bcde5c55e1": {
+    "transactionId": "02b9f3e4-46e7-45bb-afd8-2592a62828be",
+    "requestId": "d926afb7-d774-41ed-8426-73bcde5c55e1",
+    "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+    "consentRequestId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+    "healthInformationRequestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+    "gatewayRequestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+    "hiRequestId": "",
+    "patientId": "saurav_50505@sbx",
+    "patient": {
+      "id": "saurav_50505@sbx"
+    },
+    "abhaAddress": "saurav_50505@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [
+      {
+        "patientReference": "Saurav Kumar",
+        "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+      }
+    ],
+    "careContextReference": "",
+    "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+    "receiverPublicKey": "BDuqSBx1+mJvG26nVowS6WfsdF460pXb6My/skCnBkaTXriak/uR6CiSInc2ngOQuAQtsY/0TIt4Qh1dVHpqJ04=",
+    "receiverNonce": "cHwgycqdP0riSHYPo6SnQqrsfHtPGwJlnRfeA5WpdXg=",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789138334647,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "d926afb7-d774-41ed-8426-73bcde5c55e1",
+          "type": "Consent Notification",
+          "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789138347338,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789138334657,
+        "from": "Created",
+        "to": "CONSENT_GRANTED",
+        "metadata": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "d926afb7-d774-41ed-8426-73bcde5c55e1",
+            "incomingRequestId": "d926afb7-d774-41ed-8426-73bcde5c55e1"
+          }
+        }
+      },
+      {
+        "timestamp": 1789138347341,
+        "from": "CONSENT_GRANTED",
+        "to": "HI Request Received",
+        "metadata": {
+          "callbackRequestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789138347354,
+        "from": "HI Request Received",
+        "to": "HI Request Received",
+        "metadata": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789138347468,
+        "from": "HI Request Received",
+        "to": "Acknowledged",
+        "metadata": {
+          "requestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789138348481,
+        "from": "Acknowledged",
+        "to": "Consent Received",
+        "metadata": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789138348607,
+        "from": "Consent Received",
+        "to": "Failed",
+        "metadata": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789138348710,
+        "from": "Failed",
+        "to": "Notify Sent",
+        "metadata": {
+          "requestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "currentState": "Notify Sent",
+    "previousState": "Failed",
+    "createdTimestamp": 1789138334641,
+    "updatedTimestamp": 1789138348712,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789138334641,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789138334647,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "d926afb7-d774-41ed-8426-73bcde5c55e1",
+          "type": "Consent Notification",
+          "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789138334657,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
+        "details": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "d926afb7-d774-41ed-8426-73bcde5c55e1",
+            "incomingRequestId": "d926afb7-d774-41ed-8426-73bcde5c55e1"
+          }
+        }
+      },
+      {
+        "timestamp": 1789138334659,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Active\".",
+        "details": {
+          "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+          "from": "Requested",
+          "to": "Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "d926afb7-d774-41ed-8426-73bcde5c55e1",
+            "incomingRequestId": "d926afb7-d774-41ed-8426-73bcde5c55e1"
+          }
+        }
+      },
+      {
+        "timestamp": 1789138347338,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      },
+      {
+        "timestamp": 1789138347341,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"CONSENT_GRANTED\" to \"HI Request Received\".",
+        "details": {
+          "callbackRequestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789138347354,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"HI Request Received\".",
+        "details": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789138347468,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"Acknowledged\".",
+        "details": {
+          "requestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789138348481,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Acknowledged\" to \"Consent Received\".",
+        "details": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789138348607,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Consent Received\" to \"Failed\".",
+        "details": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789138348710,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Failed\" to \"Notify Sent\".",
+        "details": {
+          "requestId": "f18f7090-40cc-4153-80dc-d14772e51fa8",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "consentStatus": "GRANTED",
+    "permission": {
+      "accessMode": "VIEW",
+      "dateRange": {
+        "from": "1926-09-11T14:50:47.047Z",
+        "to": "2026-09-11T14:50:47.047Z"
+      },
+      "dataEraseAt": "2126-09-11T14:50:47.047Z",
+      "frequency": {
+        "unit": "DAY",
+        "value": 0,
+        "repeats": 2
+      }
+    },
+    "hiTypes": [
+      "Prescription",
+      "DiagnosticReport",
+      "OPConsultation",
+      "DischargeSummary",
+      "ImmunizationRecord",
+      "HealthDocumentRecord",
+      "WellnessRecord",
+      "Invoice"
+    ],
+    "consentDetail": {
+      "schemaVersion": "v3",
+      "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+      "createdAt": "2026-09-11T14:50:49.043Z",
+      "patient": {
+        "id": "saurav_50505@sbx"
+      },
+      "careContexts": [
+        {
+          "patientReference": "Saurav Kumar",
+          "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+        }
+      ],
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "consentManager": {
+        "id": "sbx"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T14:50:47.047Z",
+          "to": "2026-09-11T14:50:47.047Z"
+        },
+        "dataEraseAt": "2126-09-11T14:50:47.047Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      }
+    },
+    "consentReceivedAt": "2026-09-11T14:52:14.649Z",
+    "consentSignature": "IuZfxpvhli3iBoDJoeUW0XbL0T5JTdEIZplSvXtBHOgsdP4m24ognHVJoP7mkO+bVp6LBdxymimOLxIN2VYJdawQHT26sa09NqOdRrErp2+B9lgVNw2fjZ7HOoATYIuA5/J8s7vmpnzyglFpa164cxA7rCAtEi5W8EWcTItlLuLXcBJp1Uu2PrnpYmGN9/bsUS3ppyG21X5XCF9nwTUlkrXx0dfZtywiO2o8yyO8QKEXRk4/4/nYpwfalRvyydDpQDatiJxcqkSl7iM8HdvUQJrDdiElcaX8F6+uJg4fuEHUzCnv+5rdtC61ZzzdYfU106HB7uICjcgmtMaVBBZi3g==",
+    "consentNotifyPayload": {
+      "notification": {
+        "status": "GRANTED",
+        "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+        "consentDetail": {
+          "schemaVersion": "v3",
+          "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+          "createdAt": "2026-09-11T14:50:49.043Z",
+          "patient": {
+            "id": "saurav_50505@sbx"
+          },
+          "careContexts": [
+            {
+              "patientReference": "Saurav Kumar",
+              "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+            }
+          ],
+          "purpose": {
+            "text": "Self Requested",
+            "code": "PATRQT",
+            "refUri": "www.abdm.gov.in"
+          },
+          "hip": {
+            "id": "IN2410002480"
+          },
+          "consentManager": {
+            "id": "sbx"
+          },
+          "hiTypes": [
+            "Prescription",
+            "DiagnosticReport",
+            "OPConsultation",
+            "DischargeSummary",
+            "ImmunizationRecord",
+            "HealthDocumentRecord",
+            "WellnessRecord",
+            "Invoice"
+          ],
+          "permission": {
+            "accessMode": "VIEW",
+            "dateRange": {
+              "from": "1926-09-11T14:50:47.047Z",
+              "to": "2026-09-11T14:50:47.047Z"
+            },
+            "dataEraseAt": "2126-09-11T14:50:47.047Z",
+            "frequency": {
+              "unit": "DAY",
+              "value": 0,
+              "repeats": 2
+            }
+          }
+        },
+        "signature": "IuZfxpvhli3iBoDJoeUW0XbL0T5JTdEIZplSvXtBHOgsdP4m24ognHVJoP7mkO+bVp6LBdxymimOLxIN2VYJdawQHT26sa09NqOdRrErp2+B9lgVNw2fjZ7HOoATYIuA5/J8s7vmpnzyglFpa164cxA7rCAtEi5W8EWcTItlLuLXcBJp1Uu2PrnpYmGN9/bsUS3ppyG21X5XCF9nwTUlkrXx0dfZtywiO2o8yyO8QKEXRk4/4/nYpwfalRvyydDpQDatiJxcqkSl7iM8HdvUQJrDdiElcaX8F6+uJg4fuEHUzCnv+5rdtC61ZzzdYfU106HB7uICjcgmtMaVBBZi3g==",
+        "grantAcknowledgement": false
+      },
+      "requestId": "d926afb7-d774-41ed-8426-73bcde5c55e1"
+    },
+    "consentDetails": {
+      "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+      "consentRequestId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+      "consentArtifactId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+      "patientId": "saurav_50505@sbx",
+      "patient": {
+        "id": "saurav_50505@sbx"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T14:50:47.047Z",
+          "to": "2026-09-11T14:50:47.047Z"
+        },
+        "dataEraseAt": "2126-09-11T14:50:47.047Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      },
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "dateRange": {
+        "from": "1926-09-11T14:50:47.047Z",
+        "to": "2026-09-11T14:50:47.047Z"
+      },
+      "expiry": 4944811847047,
+      "receivedTime": "2026-09-11T14:52:14.649Z",
+      "signature": "IuZfxpvhli3iBoDJoeUW0XbL0T5JTdEIZplSvXtBHOgsdP4m24ognHVJoP7mkO+bVp6LBdxymimOLxIN2VYJdawQHT26sa09NqOdRrErp2+B9lgVNw2fjZ7HOoATYIuA5/J8s7vmpnzyglFpa164cxA7rCAtEi5W8EWcTItlLuLXcBJp1Uu2PrnpYmGN9/bsUS3ppyG21X5XCF9nwTUlkrXx0dfZtywiO2o8yyO8QKEXRk4/4/nYpwfalRvyydDpQDatiJxcqkSl7iM8HdvUQJrDdiElcaX8F6+uJg4fuEHUzCnv+5rdtC61ZzzdYfU106HB7uICjcgmtMaVBBZi3g==",
+      "createdAt": 1789138334649,
+      "updatedAt": 1789138334653,
+      "rawNotification": {
+        "notification": {
+          "status": "GRANTED",
+          "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+          "consentDetail": {
+            "schemaVersion": "v3",
+            "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+            "createdAt": "2026-09-11T14:50:49.043Z",
+            "patient": {
+              "id": "saurav_50505@sbx"
+            },
+            "careContexts": [
+              {
+                "patientReference": "Saurav Kumar",
+                "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation"
+              }
+            ],
+            "purpose": {
+              "text": "Self Requested",
+              "code": "PATRQT",
+              "refUri": "www.abdm.gov.in"
+            },
+            "hip": {
+              "id": "IN2410002480"
+            },
+            "consentManager": {
+              "id": "sbx"
+            },
+            "hiTypes": [
+              "Prescription",
+              "DiagnosticReport",
+              "OPConsultation",
+              "DischargeSummary",
+              "ImmunizationRecord",
+              "HealthDocumentRecord",
+              "WellnessRecord",
+              "Invoice"
+            ],
+            "permission": {
+              "accessMode": "VIEW",
+              "dateRange": {
+                "from": "1926-09-11T14:50:47.047Z",
+                "to": "2026-09-11T14:50:47.047Z"
+              },
+              "dataEraseAt": "2126-09-11T14:50:47.047Z",
+              "frequency": {
+                "unit": "DAY",
+                "value": 0,
+                "repeats": 2
+              }
+            }
+          },
+          "signature": "IuZfxpvhli3iBoDJoeUW0XbL0T5JTdEIZplSvXtBHOgsdP4m24ognHVJoP7mkO+bVp6LBdxymimOLxIN2VYJdawQHT26sa09NqOdRrErp2+B9lgVNw2fjZ7HOoATYIuA5/J8s7vmpnzyglFpa164cxA7rCAtEi5W8EWcTItlLuLXcBJp1Uu2PrnpYmGN9/bsUS3ppyG21X5XCF9nwTUlkrXx0dfZtywiO2o8yyO8QKEXRk4/4/nYpwfalRvyydDpQDatiJxcqkSl7iM8HdvUQJrDdiElcaX8F6+uJg4fuEHUzCnv+5rdtC61ZzzdYfU106HB7uICjcgmtMaVBBZi3g==",
+          "grantAcknowledgement": false
+        },
+        "requestId": "d926afb7-d774-41ed-8426-73bcde5c55e1"
+      },
+      "status": "Active"
+    },
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789138334650,
+        "skippedFields": [
+          "transactionId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "curve25519",
+      "dhPublicKey": {
+        "expiry": "2026-09-21T14:52:27.106Z",
+        "parameters": "Ephemeral public key",
+        "keyValue": "BDuqSBx1+mJvG26nVowS6WfsdF460pXb6My/skCnBkaTXriak/uR6CiSInc2ngOQuAQtsY/0TIt4Qh1dVHpqJ04="
+      },
+      "nonce": "cHwgycqdP0riSHYPo6SnQqrsfHtPGwJlnRfeA5WpdXg="
+    },
+    "hiRequestPayload": {
+      "transactionId": "02b9f3e4-46e7-45bb-afd8-2592a62828be",
+      "hiRequest": {
+        "consent": {
+          "id": "e5d93561-1ff6-43f6-8140-647455f2289c"
+        },
+        "dateRange": {
+          "from": "1926-09-11T14:50:47.047Z",
+          "to": "2026-09-11T14:50:47.047Z"
+        },
+        "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+        "keyMaterial": {
+          "cryptoAlg": "ECDH",
+          "curve": "curve25519",
+          "dhPublicKey": {
+            "expiry": "2026-09-21T14:52:27.106Z",
+            "parameters": "Ephemeral public key",
+            "keyValue": "BDuqSBx1+mJvG26nVowS6WfsdF460pXb6My/skCnBkaTXriak/uR6CiSInc2ngOQuAQtsY/0TIt4Qh1dVHpqJ04="
+          },
+          "nonce": "cHwgycqdP0riSHYPo6SnQqrsfHtPGwJlnRfeA5WpdXg="
+        }
+      },
+      "requestId": "f18f7090-40cc-4153-80dc-d14772e51fa8"
+    },
+    "healthInformationNotifyPayload": {
+      "requestId": "1c196341-d425-49d0-9ae6-62569084aa92",
+      "timestamp": "2026-09-11T14:52:28.609Z",
+      "notification": {
+        "consentId": "e5d93561-1ff6-43f6-8140-647455f2289c",
+        "transactionId": "02b9f3e4-46e7-45bb-afd8-2592a62828be",
+        "doneAt": "2026-09-11T14:52:28.609Z",
+        "notifier": {
+          "type": "HIP",
+          "id": "IN2410002480"
+        },
+        "statusNotification": {
+          "sessionStatus": "FAILED",
+          "hipId": "IN2410002480",
+          "statusResponses": [
+            {
+              "careContextReference": "d099ca51-e2a5-461f-a289-69163a00c8a2-OPConsultation",
+              "hiStatus": "ERRORED",
+              "description": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+            }
+          ]
+        }
+      }
+    },
+    "healthInformationNotifyStatusCode": 202
+  },
+  "test-tx-123": {
+    "transactionId": "test-tx-123",
+    "requestId": "",
+    "consentId": "",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "abdulkalam@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789144431746,
+        "from": "Created",
+        "to": "Failed",
+        "metadata": {
+          "reason": "Consent status transitioned to Expired",
+          "metadata": {
+            "reason": "Automated expiry check validation."
+          }
+        }
+      }
+    ],
+    "currentState": "Failed",
+    "previousState": "Created",
+    "createdTimestamp": 1789144375498,
+    "updatedTimestamp": 1789144431749,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789144375498,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789144431746,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"Failed\".",
+        "details": {
+          "reason": "Consent status transitioned to Expired",
+          "metadata": {
+            "reason": "Automated expiry check validation."
+          }
+        }
+      },
+      {
+        "timestamp": 1789144431749,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Expired\".",
+        "details": {
+          "consentId": "artefact-123",
+          "from": "GRANTED",
+          "to": "Expired",
+          "metadata": {
+            "reason": "Automated expiry check validation."
+          }
+        }
+      }
+    ],
+    "consentDetails": {
+      "status": "Expired",
+      "expiry": 1789144385494,
+      "consentArtefacts": [
+        {
+          "id": "artefact-123"
+        }
+      ],
+      "updatedAt": 1789144431741
+    },
+    "consentArtifactId": "artefact-123"
+  },
+  "91a4790c-0197-4b1a-a6cb-634f302cf8df": {
+    "transactionId": "91a4790c-0197-4b1a-a6cb-634f302cf8df",
+    "requestId": "",
+    "consentId": "",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "abdulkalam@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Created",
+    "previousState": "",
+    "createdTimestamp": 1789144431734,
+    "updatedTimestamp": 1789144431734,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789144431734,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      }
+    ],
+    "consentDetails": {
+      "status": "GRANTED",
+      "expiry": 1789145431727,
+      "consentArtefacts": [
+        {
+          "id": "artefact-123"
+        }
+      ]
+    },
+    "consentArtifactId": "artefact-123"
+  },
+  "64be7fb6-e1c7-4c97-b7a8-ec3b303accf5": {
+    "transactionId": "64be7fb6-e1c7-4c97-b7a8-ec3b303accf5",
+    "requestId": "",
+    "consentId": "",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "abdulkalam@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Created",
+    "previousState": "",
+    "createdTimestamp": 1789144491453,
+    "updatedTimestamp": 1789144491453,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789144491453,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      }
+    ],
+    "consentDetails": {
+      "status": "GRANTED",
+      "expiry": 1789145491443,
+      "consentArtefacts": [
+        {
+          "id": "50084157-7122-4ade-b6a8-51396a37d498"
+        }
+      ]
+    },
+    "consentArtifactId": "50084157-7122-4ade-b6a8-51396a37d498"
+  },
+  "8d06060c-d332-4c6f-a706-6aa9f00a53bd": {
+    "transactionId": "8d06060c-d332-4c6f-a706-6aa9f00a53bd",
+    "requestId": "",
+    "consentId": "",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "316a33e7-c2c5-4613-8971-54601f52f5fc",
+    "patientId": "abdulkalam@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789144515977,
+        "from": "Created",
+        "to": "Submitted",
+        "metadata": {
+          "reason": "Request submitted to ABDM Gateway"
+        }
+      }
+    ],
+    "currentState": "Submitted",
+    "previousState": "Created",
+    "createdTimestamp": 1789144515957,
+    "updatedTimestamp": 1789144515985,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789144515957,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789144515972,
+        "eventType": "HI_REQUEST_CREATED",
+        "message": "Health Information Request initialized in database.",
+        "details": {
+          "requestId": "316a33e7-c2c5-4613-8971-54601f52f5fc",
+          "consentId": "7ae26bad-5724-4ea8-a218-fc9fb2df049a"
+        }
+      },
+      {
+        "timestamp": 1789144515977,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"Submitted\".",
+        "details": {
+          "reason": "Request submitted to ABDM Gateway"
+        }
+      },
+      {
+        "timestamp": 1789144515985,
+        "eventType": "HI_REQUEST_SUBMITTED",
+        "message": "Health Information Request submitted to Gateway.",
+        "details": {
+          "requestId": "316a33e7-c2c5-4613-8971-54601f52f5fc"
+        }
+      }
+    ],
+    "consentDetails": {
+      "patientId": "abdulkalam@sbx",
+      "status": "GRANTED",
+      "expiry": 1789145515952,
+      "consentArtefacts": [
+        {
+          "id": "7ae26bad-5724-4ea8-a218-fc9fb2df049a"
+        }
+      ]
+    },
+    "consentArtifactId": "7ae26bad-5724-4ea8-a218-fc9fb2df049a",
+    "hiRequestDetails": {
+      "requestId": "316a33e7-c2c5-4613-8971-54601f52f5fc",
+      "transactionId": "8d06060c-d332-4c6f-a706-6aa9f00a53bd",
+      "consentId": "7ae26bad-5724-4ea8-a218-fc9fb2df049a",
+      "patientId": "abdulkalam@sbx",
+      "status": "Submitted",
+      "dateRange": {
+        "from": "2026-09-11T16:35:15.958Z",
+        "to": "2026-09-11T16:35:15.958Z"
+      },
+      "createdAt": 1789144515967,
+      "updatedAt": 1789144515979
+    }
+  },
+  "tx-base-1": {
+    "transactionId": "tx-base-1",
+    "requestId": "req-base-1",
+    "consentId": "consent-base-1",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "patient-1",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "WAITING_FOR_CONSENT",
+    "previousState": "",
+    "createdTimestamp": 1789144784174,
+    "updatedTimestamp": 1789144784174,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789144784174,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      }
+    ]
+  },
+  "test-req-999": {
+    "transactionId": "",
+    "requestId": "test-req-999",
+    "consentId": "consent-unknown-999",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "test-req-999",
+    "hiRequestId": "",
+    "patientId": "",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789144784182,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "test-req-999",
+          "type": "Consent Notification",
+          "consentId": "consent-unknown-999",
+          "matchReason": "NoMatch"
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789144784192,
+        "from": "Created",
+        "to": "CONSENT_GRANTED",
+        "metadata": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "test-req-999",
+            "incomingRequestId": "test-req-999"
+          }
+        }
+      }
+    ],
+    "currentState": "CONSENT_GRANTED",
+    "previousState": "Created",
+    "createdTimestamp": 1789144784179,
+    "updatedTimestamp": 1789144784194,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789144784179,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789144784182,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "test-req-999",
+          "type": "Consent Notification",
+          "consentId": "consent-unknown-999",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789144784192,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
+        "details": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "test-req-999",
+            "incomingRequestId": "test-req-999"
+          }
+        }
+      },
+      {
+        "timestamp": 1789144784194,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Active\".",
+        "details": {
+          "consentId": "consent-unknown-999",
+          "from": "Requested",
+          "to": "Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "test-req-999",
+            "incomingRequestId": "test-req-999"
+          }
+        }
+      }
+    ],
+    "consentStatus": "GRANTED",
+    "permission": {},
+    "hiTypes": [],
+    "consentDetail": {
+      "status": "GRANTED",
+      "consentId": "consent-unknown-999"
+    },
+    "consentReceivedAt": "2026-09-11T16:39:44.183Z",
+    "consentSignature": "",
+    "consentNotifyPayload": {
+      "requestId": "test-req-999",
+      "notification": {
+        "status": "GRANTED",
+        "consentId": "consent-unknown-999"
+      }
+    },
+    "consentDetails": {
+      "consentId": "consent-unknown-999",
+      "consentRequestId": "consent-unknown-999",
+      "consentArtifactId": "consent-unknown-999",
+      "patientId": "",
+      "patient": {},
+      "hip": {},
+      "hiTypes": [],
+      "permission": {},
+      "purpose": {},
+      "dateRange": {},
+      "expiry": 1791736784183,
+      "receivedTime": "2026-09-11T16:39:44.183Z",
+      "signature": "",
+      "createdAt": 1789144784183,
+      "updatedAt": 1789144784186,
+      "rawNotification": {
+        "requestId": "test-req-999",
+        "notification": {
+          "status": "GRANTED",
+          "consentId": "consent-unknown-999"
+        }
+      },
+      "status": "Active"
+    },
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789144784185,
+        "skippedFields": [
+          "transactionId",
+          "patientId",
+          "hipId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ]
+  },
+  "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a": {
+    "transactionId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+    "requestId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+    "consentId": "",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+    "hiRequestId": "",
+    "patientId": "pranay_2025@sbx",
+    "patient": [
+      {
+        "referenceNumber": "Pranay Anup Agrawal",
+        "display": "OPConsultation - Pranay Anup Agrawal",
+        "careContexts": [
+          {
+            "referenceNumber": "e94f2589-0027-4886-a5b4-d437765a030c",
+            "display": "OP-Consultation-Record-2026-09-11-22-28-29"
+          }
+        ],
+        "hiType": "OPConsultation",
+        "count": 1
+      }
+    ],
+    "abhaAddress": "pranay_2025@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
+    "linkedAt": "2026-09-11T16:58:39.555Z",
+    "createdTime": "2026-09-11T16:58:39.555Z",
+    "careContexts": [
+      {
+        "referenceNumber": "e94f2589-0027-4886-a5b4-d437765a030c",
+        "display": "OP-Consultation-Record-2026-09-11-22-28-29"
+      }
+    ],
+    "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789145919573,
+        "from": "LINKED",
+        "to": "WAITING_FOR_CONSENT",
+        "metadata": {
+          "requestId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+          "reason": "Waiting For Consent"
+        }
+      }
+    ],
+    "currentState": "WAITING_FOR_CONSENT",
+    "previousState": "LINKED",
+    "createdTimestamp": 1789145919565,
+    "updatedTimestamp": 1789145922619,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789145919565,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789145919570,
+        "eventType": "HIP_LINK_CREATED",
+        "message": "HIP Link Created.",
+        "details": {
+          "requestId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+          "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c",
+          "abhaAddress": "pranay_2025@sbx"
+        }
+      },
+      {
+        "timestamp": 1789145919573,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"LINKED\" to \"WAITING_FOR_CONSENT\".",
+        "details": {
+          "requestId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+          "reason": "Waiting For Consent"
+        }
+      },
+      {
+        "timestamp": 1789145922619,
+        "eventType": "HIP_LINK_CREATED",
+        "message": "HIP Link Created.",
+        "details": {
+          "requestId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+          "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c",
+          "abhaAddress": "pranay_2025@sbx"
+        }
+      }
+    ],
+    "abhaNumber": "",
+    "linkTokenTransactionId": "1137e8ce-4e0d-45c8-a662-16580394a6d5",
+    "linkResponse": {
+      "requestId": "14e22b00-522e-4f47-a4c8-9aa3b1f53d0a",
+      "statusCode": 202,
+      "response": {}
+    },
+    "linkPayload": {
+      "hipId": "IN2410002480",
+      "linkToken": "eyJhbGciOiJSUzUxMiJ9.eyJoaXBJZCI6IklOMjQxMDAwMjQ4MCIsImFiaGFOdW1iZXIiOjkxMTcyMjA0MDAwODI5LCJ0cmFuc2FjdGlvbklkIjoiMTEzN2U4Y2UtNGUwZC00NWM4LWE2NjItMTY1ODAzOTRhNmQ1IiwiYWJoYUFkZHJlc3MiOiJwcmFuYXlfMjAyNUBzYngiLCJzdWIiOiJwcmFuYXlfMjAyNUBzYngiLCJpYXQiOjE3ODgwMjMzODksImV4cCI6MTgwMzc5MTM4OX0.v7eJZVvIizaRT1X4PqNXj7W-Kg_xSfp5pc_tM-E9QRfgmuSut2ujN4x99B_zT8f7D0p1eQ682gWnJBVF9EyNsiqx9bv8Z-UIJ0W4bEIfZAkpVzfaPv97QSoB3ybJlBw7QxnE3ek3GY2F0wsl6F2qfsr35-A6m34XrZDPSVO1T0FGJ8F8zNy_LtYGsADwJCS9tFc8dR_Kzdl5BwGWD30jlqEylYjm4Kk9dTTx-a7eDn27a46aeK4qEKtYKgWxfD4v2tG65lMwyy9b03UkbKV-uVLSkM-drXyQ2P4ol49xbXnfcita0zQ_BEP3YIbRiSvzPfiFDL4TCPPPrcXKNIv26w",
+      "abhaNumber": "91172204000829",
+      "abhaAddress": "pranay_2025@sbx",
+      "AbhaNumber": "91172204000829",
+      "AbhaAddress": "pranay_2025@sbx",
+      "patient": [
+        {
+          "referenceNumber": "Pranay Anup Agrawal",
+          "display": "OPConsultation - Pranay Anup Agrawal",
+          "careContexts": [
+            {
+              "referenceNumber": "e94f2589-0027-4886-a5b4-d437765a030c",
+              "display": "OP-Consultation-Record-2026-09-11-22-28-29"
+            }
+          ],
+          "hiType": "OPConsultation",
+          "count": 1
+        }
+      ]
+    },
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789145922615,
+        "skippedFields": [
+          "healthInformationRequestId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ]
+  },
+  "4e011b01-7a39-41da-9c7e-cb91f5482a0c": {
+    "transactionId": "4e011b01-7a39-41da-9c7e-cb91f5482a0c",
+    "requestId": "848da91b-1f8c-d370-a47c-cac54fdb234c",
+    "consentId": "09371238-3c03-4e9f-9922-08b1c5432b7a",
+    "consentRequestId": "",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "pranay_2025@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "Created",
+    "previousState": "",
+    "createdTimestamp": 1789145929543,
+    "updatedTimestamp": 1789145929630,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789145929543,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789145929549,
+        "eventType": "CONSENT_CREATED",
+        "message": "Consent request initialized and persisted locally.",
+        "details": {
+          "consentId": "09371238-3c03-4e9f-9922-08b1c5432b7a",
+          "status": "Requested"
+        }
+      },
+      {
+        "timestamp": 1789145929630,
+        "eventType": "CONSENT_GATEWAY_DISPATCHED",
+        "message": "Gateway accepted consent initialization.",
+        "details": {
+          "statusCode": 202
+        }
+      }
+    ],
+    "consentDetails": {
+      "consentId": "09371238-3c03-4e9f-9922-08b1c5432b7a",
       "status": "Requested",
       "patientId": "pranay_2025@sbx",
       "hiTypes": [
@@ -468,12 +2964,1799 @@
         "text": "Self Requested"
       },
       "dateRange": {
-        "from": "2025-09-11T13:05:00.000Z",
-        "to": "2026-09-12T13:05:00.000Z"
+        "from": "2025-09-11T16:58:49.000Z",
+        "to": "2026-09-11T16:58:49.000Z"
       },
-      "expiry": 1791723900000,
-      "createdAt": 1789131900859,
-      "updatedAt": 1789131900859
+      "expiry": 1791737929000,
+      "createdAt": 1789145929544,
+      "updatedAt": 1789145929544
     }
+  },
+  "931b8cde-8830-4860-aa2e-4a35726f09ad": {
+    "transactionId": "f590c63a-8c03-4794-bdb4-ee80ac4e28c6",
+    "requestId": "931b8cde-8830-4860-aa2e-4a35726f09ad",
+    "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+    "consentRequestId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+    "healthInformationRequestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+    "gatewayRequestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+    "hiRequestId": "",
+    "patientId": "pranay_2025@sbx",
+    "patient": {
+      "id": "pranay_2025@sbx"
+    },
+    "abhaAddress": "pranay_2025@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "657f132e-9b8f-45ef-a2c3-66229e24fda4"
+      },
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "87bb0af1-50b4-4b32-a73b-7168431f1d4b"
+      },
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "0d746787-5950-4ea4-aef5-38066d93eb67"
+      },
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583"
+      },
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424"
+      },
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "ff97133b-e2f5-459b-a177-473d0996d47e"
+      }
+    ],
+    "careContextReference": "",
+    "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+    "receiverPublicKey": "BBGaFh/Td3txapssMAeg41mKpXctVz4HSSJE/FEM7sR1APQNx7HQ0s6Y/szfDyhUmKugljF3kBISP6ndoW/AS3A=",
+    "receiverNonce": "HPxWX8iKrMC9D1RilW5relIKtEtaNJZbhqzgYH35tk4=",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789146178759,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "931b8cde-8830-4860-aa2e-4a35726f09ad",
+          "type": "Consent Notification",
+          "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789146225050,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789146178766,
+        "from": "Created",
+        "to": "CONSENT_GRANTED",
+        "metadata": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "931b8cde-8830-4860-aa2e-4a35726f09ad",
+            "incomingRequestId": "931b8cde-8830-4860-aa2e-4a35726f09ad"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146225053,
+        "from": "CONSENT_GRANTED",
+        "to": "HI Request Received",
+        "metadata": {
+          "callbackRequestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789146225059,
+        "from": "HI Request Received",
+        "to": "HI Request Received",
+        "metadata": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789146226378,
+        "from": "HI Request Received",
+        "to": "Acknowledged",
+        "metadata": {
+          "requestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789146227384,
+        "from": "Acknowledged",
+        "to": "Consent Received",
+        "metadata": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789146227504,
+        "from": "Consent Received",
+        "to": "Failed",
+        "metadata": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789146227639,
+        "from": "Failed",
+        "to": "Notify Sent",
+        "metadata": {
+          "requestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "currentState": "Notify Sent",
+    "previousState": "Failed",
+    "createdTimestamp": 1789146178753,
+    "updatedTimestamp": 1789146227642,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789146178753,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789146178759,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "931b8cde-8830-4860-aa2e-4a35726f09ad",
+          "type": "Consent Notification",
+          "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789146178766,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
+        "details": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "931b8cde-8830-4860-aa2e-4a35726f09ad",
+            "incomingRequestId": "931b8cde-8830-4860-aa2e-4a35726f09ad"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146178771,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Active\".",
+        "details": {
+          "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+          "from": "Requested",
+          "to": "Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "931b8cde-8830-4860-aa2e-4a35726f09ad",
+            "incomingRequestId": "931b8cde-8830-4860-aa2e-4a35726f09ad"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146225050,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      },
+      {
+        "timestamp": 1789146225053,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"CONSENT_GRANTED\" to \"HI Request Received\".",
+        "details": {
+          "callbackRequestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789146225059,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"HI Request Received\".",
+        "details": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789146226378,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"Acknowledged\".",
+        "details": {
+          "requestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789146227384,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Acknowledged\" to \"Consent Received\".",
+        "details": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789146227504,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Consent Received\" to \"Failed\".",
+        "details": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789146227639,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Failed\" to \"Notify Sent\".",
+        "details": {
+          "requestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "consentStatus": "GRANTED",
+    "permission": {
+      "accessMode": "VIEW",
+      "dateRange": {
+        "from": "1926-09-11T16:58:31.281Z",
+        "to": "2026-09-11T16:58:31.281Z"
+      },
+      "dataEraseAt": "2126-09-11T16:58:31.281Z",
+      "frequency": {
+        "unit": "DAY",
+        "value": 0,
+        "repeats": 2
+      }
+    },
+    "hiTypes": [
+      "Prescription",
+      "DiagnosticReport",
+      "OPConsultation",
+      "DischargeSummary",
+      "ImmunizationRecord",
+      "HealthDocumentRecord",
+      "WellnessRecord",
+      "Invoice"
+    ],
+    "consentDetail": {
+      "schemaVersion": "v3",
+      "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+      "createdAt": "2026-09-11T16:58:39.543Z",
+      "patient": {
+        "id": "pranay_2025@sbx"
+      },
+      "careContexts": [
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "657f132e-9b8f-45ef-a2c3-66229e24fda4"
+        },
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "87bb0af1-50b4-4b32-a73b-7168431f1d4b"
+        },
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "0d746787-5950-4ea4-aef5-38066d93eb67"
+        },
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583"
+        },
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424"
+        },
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "ff97133b-e2f5-459b-a177-473d0996d47e"
+        }
+      ],
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "consentManager": {
+        "id": "sbx"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T16:58:31.281Z",
+          "to": "2026-09-11T16:58:31.281Z"
+        },
+        "dataEraseAt": "2126-09-11T16:58:31.281Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      }
+    },
+    "consentReceivedAt": "2026-09-11T17:02:58.761Z",
+    "consentSignature": "UPuXr2TueKBElvLZmBb6+IbGSt2nSItVlDmzyu9aQwABhDCUSM3m4tJsWK/tdF+764csT/gbffALO54JqszRGKRjbAklwYmK1NYW2s/Ci4oD7dkVi4Xr5dqfWIK+iF+qF5G9fzgUrIrLDB62pj4HDAVjd56wA97TgnE4yFYlWZUro3PNPx/8qBTi2yoc9Efzk0QlskReTbQYNLNSkE4w3zExYcQK1YAPeuazdQ/61/s+8W6r0pG2IDGaEIN4AUNcYsWyoQWg7uhgAEHZCnOXnCTEvuUFvHeqMsVtnk0r/ArVC2i2p6m/YiUypyTyee7z9v6hMR5jivcIQHY0pAX3uQ==",
+    "consentNotifyPayload": {
+      "notification": {
+        "status": "GRANTED",
+        "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+        "consentDetail": {
+          "schemaVersion": "v3",
+          "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+          "createdAt": "2026-09-11T16:58:39.543Z",
+          "patient": {
+            "id": "pranay_2025@sbx"
+          },
+          "careContexts": [
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "657f132e-9b8f-45ef-a2c3-66229e24fda4"
+            },
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "87bb0af1-50b4-4b32-a73b-7168431f1d4b"
+            },
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "0d746787-5950-4ea4-aef5-38066d93eb67"
+            },
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583"
+            },
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424"
+            },
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "ff97133b-e2f5-459b-a177-473d0996d47e"
+            }
+          ],
+          "purpose": {
+            "text": "Self Requested",
+            "code": "PATRQT",
+            "refUri": "www.abdm.gov.in"
+          },
+          "hip": {
+            "id": "IN2410002480"
+          },
+          "consentManager": {
+            "id": "sbx"
+          },
+          "hiTypes": [
+            "Prescription",
+            "DiagnosticReport",
+            "OPConsultation",
+            "DischargeSummary",
+            "ImmunizationRecord",
+            "HealthDocumentRecord",
+            "WellnessRecord",
+            "Invoice"
+          ],
+          "permission": {
+            "accessMode": "VIEW",
+            "dateRange": {
+              "from": "1926-09-11T16:58:31.281Z",
+              "to": "2026-09-11T16:58:31.281Z"
+            },
+            "dataEraseAt": "2126-09-11T16:58:31.281Z",
+            "frequency": {
+              "unit": "DAY",
+              "value": 0,
+              "repeats": 2
+            }
+          }
+        },
+        "signature": "UPuXr2TueKBElvLZmBb6+IbGSt2nSItVlDmzyu9aQwABhDCUSM3m4tJsWK/tdF+764csT/gbffALO54JqszRGKRjbAklwYmK1NYW2s/Ci4oD7dkVi4Xr5dqfWIK+iF+qF5G9fzgUrIrLDB62pj4HDAVjd56wA97TgnE4yFYlWZUro3PNPx/8qBTi2yoc9Efzk0QlskReTbQYNLNSkE4w3zExYcQK1YAPeuazdQ/61/s+8W6r0pG2IDGaEIN4AUNcYsWyoQWg7uhgAEHZCnOXnCTEvuUFvHeqMsVtnk0r/ArVC2i2p6m/YiUypyTyee7z9v6hMR5jivcIQHY0pAX3uQ==",
+        "grantAcknowledgement": false
+      },
+      "requestId": "931b8cde-8830-4860-aa2e-4a35726f09ad"
+    },
+    "consentDetails": {
+      "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+      "consentRequestId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+      "consentArtifactId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+      "patientId": "pranay_2025@sbx",
+      "patient": {
+        "id": "pranay_2025@sbx"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T16:58:31.281Z",
+          "to": "2026-09-11T16:58:31.281Z"
+        },
+        "dataEraseAt": "2126-09-11T16:58:31.281Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      },
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "dateRange": {
+        "from": "1926-09-11T16:58:31.281Z",
+        "to": "2026-09-11T16:58:31.281Z"
+      },
+      "expiry": 4944819511281,
+      "receivedTime": "2026-09-11T17:02:58.761Z",
+      "signature": "UPuXr2TueKBElvLZmBb6+IbGSt2nSItVlDmzyu9aQwABhDCUSM3m4tJsWK/tdF+764csT/gbffALO54JqszRGKRjbAklwYmK1NYW2s/Ci4oD7dkVi4Xr5dqfWIK+iF+qF5G9fzgUrIrLDB62pj4HDAVjd56wA97TgnE4yFYlWZUro3PNPx/8qBTi2yoc9Efzk0QlskReTbQYNLNSkE4w3zExYcQK1YAPeuazdQ/61/s+8W6r0pG2IDGaEIN4AUNcYsWyoQWg7uhgAEHZCnOXnCTEvuUFvHeqMsVtnk0r/ArVC2i2p6m/YiUypyTyee7z9v6hMR5jivcIQHY0pAX3uQ==",
+      "createdAt": 1789146178761,
+      "updatedAt": 1789146178763,
+      "rawNotification": {
+        "notification": {
+          "status": "GRANTED",
+          "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+          "consentDetail": {
+            "schemaVersion": "v3",
+            "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+            "createdAt": "2026-09-11T16:58:39.543Z",
+            "patient": {
+              "id": "pranay_2025@sbx"
+            },
+            "careContexts": [
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "657f132e-9b8f-45ef-a2c3-66229e24fda4"
+              },
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "87bb0af1-50b4-4b32-a73b-7168431f1d4b"
+              },
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "0d746787-5950-4ea4-aef5-38066d93eb67"
+              },
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "6bfe86ce-7cfa-4b5e-a29d-267aa2186583"
+              },
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "a73b5588-9b93-46fa-a4da-0aaa2fd4d424"
+              },
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "ff97133b-e2f5-459b-a177-473d0996d47e"
+              }
+            ],
+            "purpose": {
+              "text": "Self Requested",
+              "code": "PATRQT",
+              "refUri": "www.abdm.gov.in"
+            },
+            "hip": {
+              "id": "IN2410002480"
+            },
+            "consentManager": {
+              "id": "sbx"
+            },
+            "hiTypes": [
+              "Prescription",
+              "DiagnosticReport",
+              "OPConsultation",
+              "DischargeSummary",
+              "ImmunizationRecord",
+              "HealthDocumentRecord",
+              "WellnessRecord",
+              "Invoice"
+            ],
+            "permission": {
+              "accessMode": "VIEW",
+              "dateRange": {
+                "from": "1926-09-11T16:58:31.281Z",
+                "to": "2026-09-11T16:58:31.281Z"
+              },
+              "dataEraseAt": "2126-09-11T16:58:31.281Z",
+              "frequency": {
+                "unit": "DAY",
+                "value": 0,
+                "repeats": 2
+              }
+            }
+          },
+          "signature": "UPuXr2TueKBElvLZmBb6+IbGSt2nSItVlDmzyu9aQwABhDCUSM3m4tJsWK/tdF+764csT/gbffALO54JqszRGKRjbAklwYmK1NYW2s/Ci4oD7dkVi4Xr5dqfWIK+iF+qF5G9fzgUrIrLDB62pj4HDAVjd56wA97TgnE4yFYlWZUro3PNPx/8qBTi2yoc9Efzk0QlskReTbQYNLNSkE4w3zExYcQK1YAPeuazdQ/61/s+8W6r0pG2IDGaEIN4AUNcYsWyoQWg7uhgAEHZCnOXnCTEvuUFvHeqMsVtnk0r/ArVC2i2p6m/YiUypyTyee7z9v6hMR5jivcIQHY0pAX3uQ==",
+          "grantAcknowledgement": false
+        },
+        "requestId": "931b8cde-8830-4860-aa2e-4a35726f09ad"
+      },
+      "status": "Active"
+    },
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789146178762,
+        "skippedFields": [
+          "transactionId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "curve25519",
+      "dhPublicKey": {
+        "expiry": "2026-09-21T17:03:44.678Z",
+        "parameters": "Ephemeral public key",
+        "keyValue": "BBGaFh/Td3txapssMAeg41mKpXctVz4HSSJE/FEM7sR1APQNx7HQ0s6Y/szfDyhUmKugljF3kBISP6ndoW/AS3A="
+      },
+      "nonce": "HPxWX8iKrMC9D1RilW5relIKtEtaNJZbhqzgYH35tk4="
+    },
+    "hiRequestPayload": {
+      "transactionId": "f590c63a-8c03-4794-bdb4-ee80ac4e28c6",
+      "hiRequest": {
+        "consent": {
+          "id": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85"
+        },
+        "dateRange": {
+          "from": "1926-09-11T16:58:31.281Z",
+          "to": "2026-09-11T16:58:31.281Z"
+        },
+        "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+        "keyMaterial": {
+          "cryptoAlg": "ECDH",
+          "curve": "curve25519",
+          "dhPublicKey": {
+            "expiry": "2026-09-21T17:03:44.678Z",
+            "parameters": "Ephemeral public key",
+            "keyValue": "BBGaFh/Td3txapssMAeg41mKpXctVz4HSSJE/FEM7sR1APQNx7HQ0s6Y/szfDyhUmKugljF3kBISP6ndoW/AS3A="
+          },
+          "nonce": "HPxWX8iKrMC9D1RilW5relIKtEtaNJZbhqzgYH35tk4="
+        }
+      },
+      "requestId": "fb332791-8113-4f0c-9b04-c7edcfdffa8f"
+    },
+    "healthInformationNotifyPayload": {
+      "requestId": "697e5611-fc2f-4e66-b0c8-45dfe17e78bf",
+      "timestamp": "2026-09-11T17:03:47.504Z",
+      "notification": {
+        "consentId": "c05b7f5d-264d-4111-8ce5-dc6bbeac0f85",
+        "transactionId": "f590c63a-8c03-4794-bdb4-ee80ac4e28c6",
+        "doneAt": "2026-09-11T17:03:47.505Z",
+        "notifier": {
+          "type": "HIP",
+          "id": "IN2410002480"
+        },
+        "statusNotification": {
+          "sessionStatus": "FAILED",
+          "hipId": "IN2410002480",
+          "statusResponses": [
+            {
+              "careContextReference": "657f132e-9b8f-45ef-a2c3-66229e24fda4",
+              "hiStatus": "ERRORED",
+              "description": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+            }
+          ]
+        }
+      }
+    },
+    "healthInformationNotifyStatusCode": 202
+  },
+  "9b2d5b61-893d-4699-b608-06e78633881e": {
+    "transactionId": "e73e7d60-8328-469a-a741-fe23012c6b65",
+    "requestId": "9b2d5b61-893d-4699-b608-06e78633881e",
+    "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+    "consentRequestId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+    "healthInformationRequestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+    "gatewayRequestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+    "hiRequestId": "",
+    "patientId": "pranay_2025@sbx",
+    "patient": {
+      "id": "pranay_2025@sbx"
+    },
+    "abhaAddress": "pranay_2025@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+      }
+    ],
+    "careContextReference": "",
+    "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+    "receiverPublicKey": "BHiYfg8jcjBQ6l/xd6ulfh3aUQ8TeNjxuZGPb3EPknWYf3Kmf5iwlk7iV5LEBwKU4WjCKD2KEZha9MkqhnB5Bv8=",
+    "receiverNonce": "4D9dowj4OLlhZkDmzcOg2/+Ml8f0j48xmrRa/YL9CGM=",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789146245369,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "9b2d5b61-893d-4699-b608-06e78633881e",
+          "type": "Consent Notification",
+          "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789146283982,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789146245384,
+        "from": "Created",
+        "to": "CONSENT_GRANTED",
+        "metadata": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "9b2d5b61-893d-4699-b608-06e78633881e",
+            "incomingRequestId": "9b2d5b61-893d-4699-b608-06e78633881e"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146283986,
+        "from": "CONSENT_GRANTED",
+        "to": "HI Request Received",
+        "metadata": {
+          "callbackRequestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789146283997,
+        "from": "HI Request Received",
+        "to": "HI Request Received",
+        "metadata": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789146284081,
+        "from": "HI Request Received",
+        "to": "Acknowledged",
+        "metadata": {
+          "requestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789146285094,
+        "from": "Acknowledged",
+        "to": "Consent Received",
+        "metadata": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789146285262,
+        "from": "Consent Received",
+        "to": "Failed",
+        "metadata": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789146285447,
+        "from": "Failed",
+        "to": "Notify Sent",
+        "metadata": {
+          "requestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "currentState": "Notify Sent",
+    "previousState": "Failed",
+    "createdTimestamp": 1789146245365,
+    "updatedTimestamp": 1789146285452,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789146245365,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789146245369,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "9b2d5b61-893d-4699-b608-06e78633881e",
+          "type": "Consent Notification",
+          "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789146245384,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
+        "details": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "9b2d5b61-893d-4699-b608-06e78633881e",
+            "incomingRequestId": "9b2d5b61-893d-4699-b608-06e78633881e"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146245387,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Active\".",
+        "details": {
+          "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+          "from": "Requested",
+          "to": "Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "9b2d5b61-893d-4699-b608-06e78633881e",
+            "incomingRequestId": "9b2d5b61-893d-4699-b608-06e78633881e"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146283982,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      },
+      {
+        "timestamp": 1789146283986,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"CONSENT_GRANTED\" to \"HI Request Received\".",
+        "details": {
+          "callbackRequestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789146283997,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"HI Request Received\".",
+        "details": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789146284081,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"Acknowledged\".",
+        "details": {
+          "requestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789146285094,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Acknowledged\" to \"Consent Received\".",
+        "details": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789146285262,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Consent Received\" to \"Failed\".",
+        "details": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789146285447,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Failed\" to \"Notify Sent\".",
+        "details": {
+          "requestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "consentStatus": "GRANTED",
+    "permission": {
+      "accessMode": "VIEW",
+      "dateRange": {
+        "from": "1926-09-11T16:58:55.337Z",
+        "to": "2026-09-11T16:58:55.337Z"
+      },
+      "dataEraseAt": "2126-09-11T16:58:55.337Z",
+      "frequency": {
+        "unit": "DAY",
+        "value": 0,
+        "repeats": 2
+      }
+    },
+    "hiTypes": [
+      "Prescription",
+      "DiagnosticReport",
+      "OPConsultation",
+      "DischargeSummary",
+      "ImmunizationRecord",
+      "HealthDocumentRecord",
+      "WellnessRecord",
+      "Invoice"
+    ],
+    "consentDetail": {
+      "schemaVersion": "v3",
+      "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+      "createdAt": "2026-09-11T16:58:58.345Z",
+      "patient": {
+        "id": "pranay_2025@sbx"
+      },
+      "careContexts": [
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+        }
+      ],
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "consentManager": {
+        "id": "sbx"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T16:58:55.337Z",
+          "to": "2026-09-11T16:58:55.337Z"
+        },
+        "dataEraseAt": "2126-09-11T16:58:55.337Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      }
+    },
+    "consentReceivedAt": "2026-09-11T17:04:05.371Z",
+    "consentSignature": "MWswgJavx2QWdDjCVfMC7SzzY8lY72nCo+BVBj3MabriP+SWRtSERnz2lmHHmV9oFYr7OJQrE8CK4tFBtN4abBWl+NOSWNHLOH9DgtwlPGFP3zsbV9SWSG0+bgIDLZdJZE8rv7vHEObLlmQJIJnpnb1Ba++4E8HU7C4K1rI7cbtagJ0DRv4NZrifu8Sm//uDIuWArAsfU+dgSFR+M6Ip/7CG2WD8Fg+NDpEBYAKdY67XEmJQXn4IzQpk1WEUgunLkBK/7YRFS18RFtTzdRv5SJ+qzVI+mY5ntd6hkE89S7pOmokaYG4G8ueArTlE6kzLKputDg1sQEqKUK/GEdZMYw==",
+    "consentNotifyPayload": {
+      "notification": {
+        "status": "GRANTED",
+        "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+        "consentDetail": {
+          "schemaVersion": "v3",
+          "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+          "createdAt": "2026-09-11T16:58:58.345Z",
+          "patient": {
+            "id": "pranay_2025@sbx"
+          },
+          "careContexts": [
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+            }
+          ],
+          "purpose": {
+            "text": "Self Requested",
+            "code": "PATRQT",
+            "refUri": "www.abdm.gov.in"
+          },
+          "hip": {
+            "id": "IN2410002480"
+          },
+          "consentManager": {
+            "id": "sbx"
+          },
+          "hiTypes": [
+            "Prescription",
+            "DiagnosticReport",
+            "OPConsultation",
+            "DischargeSummary",
+            "ImmunizationRecord",
+            "HealthDocumentRecord",
+            "WellnessRecord",
+            "Invoice"
+          ],
+          "permission": {
+            "accessMode": "VIEW",
+            "dateRange": {
+              "from": "1926-09-11T16:58:55.337Z",
+              "to": "2026-09-11T16:58:55.337Z"
+            },
+            "dataEraseAt": "2126-09-11T16:58:55.337Z",
+            "frequency": {
+              "unit": "DAY",
+              "value": 0,
+              "repeats": 2
+            }
+          }
+        },
+        "signature": "MWswgJavx2QWdDjCVfMC7SzzY8lY72nCo+BVBj3MabriP+SWRtSERnz2lmHHmV9oFYr7OJQrE8CK4tFBtN4abBWl+NOSWNHLOH9DgtwlPGFP3zsbV9SWSG0+bgIDLZdJZE8rv7vHEObLlmQJIJnpnb1Ba++4E8HU7C4K1rI7cbtagJ0DRv4NZrifu8Sm//uDIuWArAsfU+dgSFR+M6Ip/7CG2WD8Fg+NDpEBYAKdY67XEmJQXn4IzQpk1WEUgunLkBK/7YRFS18RFtTzdRv5SJ+qzVI+mY5ntd6hkE89S7pOmokaYG4G8ueArTlE6kzLKputDg1sQEqKUK/GEdZMYw==",
+        "grantAcknowledgement": false
+      },
+      "requestId": "9b2d5b61-893d-4699-b608-06e78633881e"
+    },
+    "consentDetails": {
+      "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+      "consentRequestId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+      "consentArtifactId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+      "patientId": "pranay_2025@sbx",
+      "patient": {
+        "id": "pranay_2025@sbx"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T16:58:55.337Z",
+          "to": "2026-09-11T16:58:55.337Z"
+        },
+        "dataEraseAt": "2126-09-11T16:58:55.337Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      },
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "dateRange": {
+        "from": "1926-09-11T16:58:55.337Z",
+        "to": "2026-09-11T16:58:55.337Z"
+      },
+      "expiry": 4944819535337,
+      "receivedTime": "2026-09-11T17:04:05.371Z",
+      "signature": "MWswgJavx2QWdDjCVfMC7SzzY8lY72nCo+BVBj3MabriP+SWRtSERnz2lmHHmV9oFYr7OJQrE8CK4tFBtN4abBWl+NOSWNHLOH9DgtwlPGFP3zsbV9SWSG0+bgIDLZdJZE8rv7vHEObLlmQJIJnpnb1Ba++4E8HU7C4K1rI7cbtagJ0DRv4NZrifu8Sm//uDIuWArAsfU+dgSFR+M6Ip/7CG2WD8Fg+NDpEBYAKdY67XEmJQXn4IzQpk1WEUgunLkBK/7YRFS18RFtTzdRv5SJ+qzVI+mY5ntd6hkE89S7pOmokaYG4G8ueArTlE6kzLKputDg1sQEqKUK/GEdZMYw==",
+      "createdAt": 1789146245371,
+      "updatedAt": 1789146245375,
+      "rawNotification": {
+        "notification": {
+          "status": "GRANTED",
+          "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+          "consentDetail": {
+            "schemaVersion": "v3",
+            "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+            "createdAt": "2026-09-11T16:58:58.345Z",
+            "patient": {
+              "id": "pranay_2025@sbx"
+            },
+            "careContexts": [
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+              }
+            ],
+            "purpose": {
+              "text": "Self Requested",
+              "code": "PATRQT",
+              "refUri": "www.abdm.gov.in"
+            },
+            "hip": {
+              "id": "IN2410002480"
+            },
+            "consentManager": {
+              "id": "sbx"
+            },
+            "hiTypes": [
+              "Prescription",
+              "DiagnosticReport",
+              "OPConsultation",
+              "DischargeSummary",
+              "ImmunizationRecord",
+              "HealthDocumentRecord",
+              "WellnessRecord",
+              "Invoice"
+            ],
+            "permission": {
+              "accessMode": "VIEW",
+              "dateRange": {
+                "from": "1926-09-11T16:58:55.337Z",
+                "to": "2026-09-11T16:58:55.337Z"
+              },
+              "dataEraseAt": "2126-09-11T16:58:55.337Z",
+              "frequency": {
+                "unit": "DAY",
+                "value": 0,
+                "repeats": 2
+              }
+            }
+          },
+          "signature": "MWswgJavx2QWdDjCVfMC7SzzY8lY72nCo+BVBj3MabriP+SWRtSERnz2lmHHmV9oFYr7OJQrE8CK4tFBtN4abBWl+NOSWNHLOH9DgtwlPGFP3zsbV9SWSG0+bgIDLZdJZE8rv7vHEObLlmQJIJnpnb1Ba++4E8HU7C4K1rI7cbtagJ0DRv4NZrifu8Sm//uDIuWArAsfU+dgSFR+M6Ip/7CG2WD8Fg+NDpEBYAKdY67XEmJQXn4IzQpk1WEUgunLkBK/7YRFS18RFtTzdRv5SJ+qzVI+mY5ntd6hkE89S7pOmokaYG4G8ueArTlE6kzLKputDg1sQEqKUK/GEdZMYw==",
+          "grantAcknowledgement": false
+        },
+        "requestId": "9b2d5b61-893d-4699-b608-06e78633881e"
+      },
+      "status": "Active"
+    },
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789146245373,
+        "skippedFields": [
+          "transactionId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "curve25519",
+      "dhPublicKey": {
+        "expiry": "2026-09-21T17:04:28.750Z",
+        "parameters": "Ephemeral public key",
+        "keyValue": "BHiYfg8jcjBQ6l/xd6ulfh3aUQ8TeNjxuZGPb3EPknWYf3Kmf5iwlk7iV5LEBwKU4WjCKD2KEZha9MkqhnB5Bv8="
+      },
+      "nonce": "4D9dowj4OLlhZkDmzcOg2/+Ml8f0j48xmrRa/YL9CGM="
+    },
+    "hiRequestPayload": {
+      "transactionId": "e73e7d60-8328-469a-a741-fe23012c6b65",
+      "hiRequest": {
+        "consent": {
+          "id": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e"
+        },
+        "dateRange": {
+          "from": "1926-09-11T16:58:55.337Z",
+          "to": "2026-09-11T16:58:55.337Z"
+        },
+        "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+        "keyMaterial": {
+          "cryptoAlg": "ECDH",
+          "curve": "curve25519",
+          "dhPublicKey": {
+            "expiry": "2026-09-21T17:04:28.750Z",
+            "parameters": "Ephemeral public key",
+            "keyValue": "BHiYfg8jcjBQ6l/xd6ulfh3aUQ8TeNjxuZGPb3EPknWYf3Kmf5iwlk7iV5LEBwKU4WjCKD2KEZha9MkqhnB5Bv8="
+          },
+          "nonce": "4D9dowj4OLlhZkDmzcOg2/+Ml8f0j48xmrRa/YL9CGM="
+        }
+      },
+      "requestId": "9a26cec5-0118-4849-810c-3bb4a93b84ea"
+    },
+    "healthInformationNotifyPayload": {
+      "requestId": "335cf43e-17a2-4a80-b3e6-4ccd864fb631",
+      "timestamp": "2026-09-11T17:04:45.264Z",
+      "notification": {
+        "consentId": "50fc3bdd-4ac7-4f49-9f09-f022e336f00e",
+        "transactionId": "e73e7d60-8328-469a-a741-fe23012c6b65",
+        "doneAt": "2026-09-11T17:04:45.264Z",
+        "notifier": {
+          "type": "HIP",
+          "id": "IN2410002480"
+        },
+        "statusNotification": {
+          "sessionStatus": "FAILED",
+          "hipId": "IN2410002480",
+          "statusResponses": [
+            {
+              "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c",
+              "hiStatus": "ERRORED",
+              "description": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+            }
+          ]
+        }
+      }
+    },
+    "healthInformationNotifyStatusCode": 202
+  },
+  "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78": {
+    "transactionId": "73dc1fc6-3cd7-47bb-bd05-69c452f8a807",
+    "requestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78",
+    "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+    "consentRequestId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+    "healthInformationRequestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+    "gatewayRequestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+    "hiRequestId": "",
+    "patientId": "pranay_2025@sbx",
+    "patient": {
+      "id": "pranay_2025@sbx"
+    },
+    "abhaAddress": "pranay_2025@sbx",
+    "hipId": "IN2410002480",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [
+      {
+        "patientReference": "Pranay Anup Agrawal",
+        "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+      }
+    ],
+    "careContextReference": "",
+    "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+    "receiverPublicKey": "BCSOBTV6pzql3cLvVvtBOYb0OiLHEM7rYIepsSUQDYOPMvZk/vxIv9tFbEjD6nvgTdQDB6Uy8tyrhJDIIUm1f+0=",
+    "receiverNonce": "fpiNMPm3ApllCy5MHciNA16M+XxwKgJ5ErH7IoXa3ps=",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789146301359,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78",
+          "type": "Consent Notification",
+          "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789146326296,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [
+      {
+        "timestamp": 1789146301688,
+        "from": "Created",
+        "to": "CONSENT_GRANTED",
+        "metadata": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78",
+            "incomingRequestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146326299,
+        "from": "CONSENT_GRANTED",
+        "to": "HI Request Received",
+        "metadata": {
+          "callbackRequestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789146326306,
+        "from": "HI Request Received",
+        "to": "HI Request Received",
+        "metadata": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789146326483,
+        "from": "HI Request Received",
+        "to": "Acknowledged",
+        "metadata": {
+          "requestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789146327491,
+        "from": "Acknowledged",
+        "to": "Consent Received",
+        "metadata": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789146327611,
+        "from": "Consent Received",
+        "to": "Failed",
+        "metadata": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789146327810,
+        "from": "Failed",
+        "to": "Notify Sent",
+        "metadata": {
+          "requestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "currentState": "Notify Sent",
+    "previousState": "Failed",
+    "createdTimestamp": 1789146301135,
+    "updatedTimestamp": 1789146327815,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789146301135,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789146301432,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Consent Notification\" processed.",
+        "details": {
+          "callbackRequestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78",
+          "type": "Consent Notification",
+          "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+          "matchReason": "NoMatch"
+        }
+      },
+      {
+        "timestamp": 1789146301688,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Created\" to \"CONSENT_GRANTED\".",
+        "details": {
+          "reason": "Consent status transitioned to Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78",
+            "incomingRequestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146301701,
+        "eventType": "CONSENT_STATUS_UPDATED",
+        "message": "Consent status changed to \"Active\".",
+        "details": {
+          "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+          "from": "Requested",
+          "to": "Active",
+          "metadata": {
+            "source": "Gateway Notification Callback",
+            "requestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78",
+            "incomingRequestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78"
+          }
+        }
+      },
+      {
+        "timestamp": 1789146326296,
+        "eventType": "CALLBACK_RECEIVED",
+        "message": "Callback \"Health Information Request\" processed.",
+        "details": {
+          "callbackRequestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "type": "Health Information Request",
+          "consentId": "",
+          "matchReason": ""
+        }
+      },
+      {
+        "timestamp": 1789146326299,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"CONSENT_GRANTED\" to \"HI Request Received\".",
+        "details": {
+          "callbackRequestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "sourceCallback": "Health Information Request"
+        }
+      },
+      {
+        "timestamp": 1789146326306,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"HI Request Received\".",
+        "details": {
+          "reason": "Request verified and ready for manual push."
+        }
+      },
+      {
+        "timestamp": 1789146326483,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"HI Request Received\" to \"Acknowledged\".",
+        "details": {
+          "requestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "source": "Official HIP Health Information Response"
+        }
+      },
+      {
+        "timestamp": 1789146327491,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Acknowledged\" to \"Consent Received\".",
+        "details": {
+          "reason": "Consent verified, starting data transformation pipeline."
+        }
+      },
+      {
+        "timestamp": 1789146327611,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Consent Received\" to \"Failed\".",
+        "details": {
+          "reason": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+        }
+      },
+      {
+        "timestamp": 1789146327810,
+        "eventType": "STATE_TRANSITION",
+        "message": "State changed from \"Failed\" to \"Notify Sent\".",
+        "details": {
+          "requestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82",
+          "source": "Official HIP Data Flow Notification Request"
+        }
+      }
+    ],
+    "consentStatus": "GRANTED",
+    "permission": {
+      "accessMode": "VIEW",
+      "dateRange": {
+        "from": "1926-09-11T17:01:49.001Z",
+        "to": "2026-09-11T17:01:49.001Z"
+      },
+      "dataEraseAt": "2126-09-11T17:01:49.001Z",
+      "frequency": {
+        "unit": "DAY",
+        "value": 0,
+        "repeats": 2
+      }
+    },
+    "hiTypes": [
+      "Prescription",
+      "DiagnosticReport",
+      "OPConsultation",
+      "DischargeSummary",
+      "ImmunizationRecord",
+      "HealthDocumentRecord",
+      "WellnessRecord",
+      "Invoice"
+    ],
+    "consentDetail": {
+      "schemaVersion": "v3",
+      "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+      "createdAt": "2026-09-11T17:01:51.233Z",
+      "patient": {
+        "id": "pranay_2025@sbx"
+      },
+      "careContexts": [
+        {
+          "patientReference": "Pranay Anup Agrawal",
+          "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+        }
+      ],
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "consentManager": {
+        "id": "sbx"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T17:01:49.001Z",
+          "to": "2026-09-11T17:01:49.001Z"
+        },
+        "dataEraseAt": "2126-09-11T17:01:49.001Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      }
+    },
+    "consentReceivedAt": "2026-09-11T17:05:01.599Z",
+    "consentSignature": "a1pIaWTKntOvbaPBis6+vo5+4ngR02p5Dr88vVsxD0TOAoXVoGJSzbmhRscUG6KQ2+klRK1jB5Dvstwi7Xo6OsxbMtWX15xXkInY80lcbbD3u7xKWzhOrrkBFM4pmeJGsf3/J6d+XOIjcClLF78jyPZtKnGbiKXTQ/UsYN5b7JOT1ZzMdG3nku1n6kMlY5yBaqVW/G1LHYft9MiEIN93gwDbv4dyjckmulzRPDl10FJfxtvaR+NbIRrjfoMQEaPDLopdGyxZVbmhm1bZ+0S0UG1BZxaI+ypGdFLBPv2RuoAEu/BM2Oc59I0xPXxDEAFuUzN++zh9TJLypLd5B1xZsA==",
+    "consentNotifyPayload": {
+      "notification": {
+        "status": "GRANTED",
+        "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+        "consentDetail": {
+          "schemaVersion": "v3",
+          "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+          "createdAt": "2026-09-11T17:01:51.233Z",
+          "patient": {
+            "id": "pranay_2025@sbx"
+          },
+          "careContexts": [
+            {
+              "patientReference": "Pranay Anup Agrawal",
+              "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+            }
+          ],
+          "purpose": {
+            "text": "Self Requested",
+            "code": "PATRQT",
+            "refUri": "www.abdm.gov.in"
+          },
+          "hip": {
+            "id": "IN2410002480"
+          },
+          "consentManager": {
+            "id": "sbx"
+          },
+          "hiTypes": [
+            "Prescription",
+            "DiagnosticReport",
+            "OPConsultation",
+            "DischargeSummary",
+            "ImmunizationRecord",
+            "HealthDocumentRecord",
+            "WellnessRecord",
+            "Invoice"
+          ],
+          "permission": {
+            "accessMode": "VIEW",
+            "dateRange": {
+              "from": "1926-09-11T17:01:49.001Z",
+              "to": "2026-09-11T17:01:49.001Z"
+            },
+            "dataEraseAt": "2126-09-11T17:01:49.001Z",
+            "frequency": {
+              "unit": "DAY",
+              "value": 0,
+              "repeats": 2
+            }
+          }
+        },
+        "signature": "a1pIaWTKntOvbaPBis6+vo5+4ngR02p5Dr88vVsxD0TOAoXVoGJSzbmhRscUG6KQ2+klRK1jB5Dvstwi7Xo6OsxbMtWX15xXkInY80lcbbD3u7xKWzhOrrkBFM4pmeJGsf3/J6d+XOIjcClLF78jyPZtKnGbiKXTQ/UsYN5b7JOT1ZzMdG3nku1n6kMlY5yBaqVW/G1LHYft9MiEIN93gwDbv4dyjckmulzRPDl10FJfxtvaR+NbIRrjfoMQEaPDLopdGyxZVbmhm1bZ+0S0UG1BZxaI+ypGdFLBPv2RuoAEu/BM2Oc59I0xPXxDEAFuUzN++zh9TJLypLd5B1xZsA==",
+        "grantAcknowledgement": false
+      },
+      "requestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78"
+    },
+    "consentDetails": {
+      "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+      "consentRequestId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+      "consentArtifactId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+      "patientId": "pranay_2025@sbx",
+      "patient": {
+        "id": "pranay_2025@sbx"
+      },
+      "hip": {
+        "id": "IN2410002480"
+      },
+      "hiTypes": [
+        "Prescription",
+        "DiagnosticReport",
+        "OPConsultation",
+        "DischargeSummary",
+        "ImmunizationRecord",
+        "HealthDocumentRecord",
+        "WellnessRecord",
+        "Invoice"
+      ],
+      "permission": {
+        "accessMode": "VIEW",
+        "dateRange": {
+          "from": "1926-09-11T17:01:49.001Z",
+          "to": "2026-09-11T17:01:49.001Z"
+        },
+        "dataEraseAt": "2126-09-11T17:01:49.001Z",
+        "frequency": {
+          "unit": "DAY",
+          "value": 0,
+          "repeats": 2
+        }
+      },
+      "purpose": {
+        "text": "Self Requested",
+        "code": "PATRQT",
+        "refUri": "www.abdm.gov.in"
+      },
+      "dateRange": {
+        "from": "1926-09-11T17:01:49.001Z",
+        "to": "2026-09-11T17:01:49.001Z"
+      },
+      "expiry": 4944819709001,
+      "receivedTime": "2026-09-11T17:05:01.599Z",
+      "signature": "a1pIaWTKntOvbaPBis6+vo5+4ngR02p5Dr88vVsxD0TOAoXVoGJSzbmhRscUG6KQ2+klRK1jB5Dvstwi7Xo6OsxbMtWX15xXkInY80lcbbD3u7xKWzhOrrkBFM4pmeJGsf3/J6d+XOIjcClLF78jyPZtKnGbiKXTQ/UsYN5b7JOT1ZzMdG3nku1n6kMlY5yBaqVW/G1LHYft9MiEIN93gwDbv4dyjckmulzRPDl10FJfxtvaR+NbIRrjfoMQEaPDLopdGyxZVbmhm1bZ+0S0UG1BZxaI+ypGdFLBPv2RuoAEu/BM2Oc59I0xPXxDEAFuUzN++zh9TJLypLd5B1xZsA==",
+      "createdAt": 1789146301599,
+      "updatedAt": 1789146301667,
+      "rawNotification": {
+        "notification": {
+          "status": "GRANTED",
+          "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+          "consentDetail": {
+            "schemaVersion": "v3",
+            "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+            "createdAt": "2026-09-11T17:01:51.233Z",
+            "patient": {
+              "id": "pranay_2025@sbx"
+            },
+            "careContexts": [
+              {
+                "patientReference": "Pranay Anup Agrawal",
+                "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c"
+              }
+            ],
+            "purpose": {
+              "text": "Self Requested",
+              "code": "PATRQT",
+              "refUri": "www.abdm.gov.in"
+            },
+            "hip": {
+              "id": "IN2410002480"
+            },
+            "consentManager": {
+              "id": "sbx"
+            },
+            "hiTypes": [
+              "Prescription",
+              "DiagnosticReport",
+              "OPConsultation",
+              "DischargeSummary",
+              "ImmunizationRecord",
+              "HealthDocumentRecord",
+              "WellnessRecord",
+              "Invoice"
+            ],
+            "permission": {
+              "accessMode": "VIEW",
+              "dateRange": {
+                "from": "1926-09-11T17:01:49.001Z",
+                "to": "2026-09-11T17:01:49.001Z"
+              },
+              "dataEraseAt": "2126-09-11T17:01:49.001Z",
+              "frequency": {
+                "unit": "DAY",
+                "value": 0,
+                "repeats": 2
+              }
+            }
+          },
+          "signature": "a1pIaWTKntOvbaPBis6+vo5+4ngR02p5Dr88vVsxD0TOAoXVoGJSzbmhRscUG6KQ2+klRK1jB5Dvstwi7Xo6OsxbMtWX15xXkInY80lcbbD3u7xKWzhOrrkBFM4pmeJGsf3/J6d+XOIjcClLF78jyPZtKnGbiKXTQ/UsYN5b7JOT1ZzMdG3nku1n6kMlY5yBaqVW/G1LHYft9MiEIN93gwDbv4dyjckmulzRPDl10FJfxtvaR+NbIRrjfoMQEaPDLopdGyxZVbmhm1bZ+0S0UG1BZxaI+ypGdFLBPv2RuoAEu/BM2Oc59I0xPXxDEAFuUzN++zh9TJLypLd5B1xZsA==",
+          "grantAcknowledgement": false
+        },
+        "requestId": "c6eca839-4e9e-4daf-a5f5-ef77c0d08e78"
+      },
+      "status": "Active"
+    },
+    "identifierProtectionHistory": [
+      {
+        "timestamp": 1789146301646,
+        "skippedFields": [
+          "transactionId"
+        ],
+        "reason": "Ignored empty identifier update to preserve ABDM identifier propagation."
+      }
+    ],
+    "keyMaterial": {
+      "cryptoAlg": "ECDH",
+      "curve": "curve25519",
+      "dhPublicKey": {
+        "expiry": "2026-09-21T17:05:25.937Z",
+        "parameters": "Ephemeral public key",
+        "keyValue": "BCSOBTV6pzql3cLvVvtBOYb0OiLHEM7rYIepsSUQDYOPMvZk/vxIv9tFbEjD6nvgTdQDB6Uy8tyrhJDIIUm1f+0="
+      },
+      "nonce": "fpiNMPm3ApllCy5MHciNA16M+XxwKgJ5ErH7IoXa3ps="
+    },
+    "hiRequestPayload": {
+      "transactionId": "73dc1fc6-3cd7-47bb-bd05-69c452f8a807",
+      "hiRequest": {
+        "consent": {
+          "id": "1c6f0898-c57c-4cb9-83a9-2572cac35b09"
+        },
+        "dateRange": {
+          "from": "1926-09-11T17:01:49.001Z",
+          "to": "2026-09-11T17:01:49.001Z"
+        },
+        "dataPushUrl": "https://apissbx.abdm.gov.in/abha/api/v3/patient-hiu/app/v0.5/health-information/transfer",
+        "keyMaterial": {
+          "cryptoAlg": "ECDH",
+          "curve": "curve25519",
+          "dhPublicKey": {
+            "expiry": "2026-09-21T17:05:25.937Z",
+            "parameters": "Ephemeral public key",
+            "keyValue": "BCSOBTV6pzql3cLvVvtBOYb0OiLHEM7rYIepsSUQDYOPMvZk/vxIv9tFbEjD6nvgTdQDB6Uy8tyrhJDIIUm1f+0="
+          },
+          "nonce": "fpiNMPm3ApllCy5MHciNA16M+XxwKgJ5ErH7IoXa3ps="
+        }
+      },
+      "requestId": "ecd4bed0-877d-43e4-8a2a-c03618406a82"
+    },
+    "healthInformationNotifyPayload": {
+      "requestId": "a23ddd10-5002-475b-a8b5-bf7d7a7c5e0d",
+      "timestamp": "2026-09-11T17:05:27.612Z",
+      "notification": {
+        "consentId": "1c6f0898-c57c-4cb9-83a9-2572cac35b09",
+        "transactionId": "73dc1fc6-3cd7-47bb-bd05-69c452f8a807",
+        "doneAt": "2026-09-11T17:05:27.612Z",
+        "notifier": {
+          "type": "HIP",
+          "id": "IN2410002480"
+        },
+        "statusNotification": {
+          "sessionStatus": "FAILED",
+          "hipId": "IN2410002480",
+          "statusResponses": [
+            {
+              "careContextReference": "e94f2589-0027-4886-a5b4-d437765a030c",
+              "hiStatus": "ERRORED",
+              "description": "Data transfer failed: No matching FHIR bundles found for requested types: Prescription, DiagnosticReport, OPConsultation, DischargeSummary, ImmunizationRecord, HealthDocumentRecord, WellnessRecord, Invoice"
+            }
+          ]
+        }
+      }
+    },
+    "healthInformationNotifyStatusCode": 202
+  },
+  "tx-test-req-1789148395788": {
+    "transactionId": "tx-test-req-1789148395788",
+    "requestId": "test-req-1789148395788",
+    "consentId": "mock-consent-id",
+    "consentRequestId": "real-gateway-consent-req-id",
+    "healthInformationRequestId": "",
+    "gatewayRequestId": "",
+    "hiRequestId": "",
+    "patientId": "patient@sbx",
+    "patient": {},
+    "abhaAddress": "",
+    "hipId": "",
+    "linkToken": "",
+    "linkedAt": "",
+    "createdTime": "",
+    "careContexts": [],
+    "careContextReference": "",
+    "dataPushUrl": "",
+    "receiverPublicKey": "",
+    "receiverNonce": "",
+    "senderNonce": "",
+    "encryptionMetadata": {},
+    "callbackHistory": [
+      {
+        "timestamp": 1789148395810,
+        "eventType": "CONSENT_INIT_CALLBACK_RECEIVED",
+        "message": "Consent init callback bridged from M3",
+        "details": {
+          "callbackRequestId": "test-req-1789148395788",
+          "consentRequestId": "real-gateway-consent-req-id",
+          "payload": {
+            "timestamp": "2026-09-11T17:39:55.798Z",
+            "consentRequest": {
+              "id": "real-gateway-consent-req-id"
+            },
+            "resp": {
+              "requestId": "test-req-1789148395788"
+            }
+          }
+        }
+      }
+    ],
+    "retryHistory": [],
+    "statusHistory": [],
+    "currentState": "GatewayAcknowledged",
+    "previousState": "",
+    "createdTimestamp": 1789148395796,
+    "updatedTimestamp": 1789148395810,
+    "retryCount": 0,
+    "failureCount": 0,
+    "errorDetails": "",
+    "auditHistory": [
+      {
+        "timestamp": 1789148395796,
+        "eventType": "CREATED",
+        "message": "Transaction record initialized.",
+        "details": {}
+      },
+      {
+        "timestamp": 1789148395810,
+        "eventType": "CONSENT_INIT_CALLBACK_RECEIVED",
+        "message": "Consent init callback bridged from M3",
+        "details": {
+          "callbackRequestId": "test-req-1789148395788",
+          "consentRequestId": "real-gateway-consent-req-id",
+          "payload": {
+            "timestamp": "2026-09-11T17:39:55.798Z",
+            "consentRequest": {
+              "id": "real-gateway-consent-req-id"
+            },
+            "resp": {
+              "requestId": "test-req-1789148395788"
+            }
+          }
+        }
+      }
+    ]
   }
 }

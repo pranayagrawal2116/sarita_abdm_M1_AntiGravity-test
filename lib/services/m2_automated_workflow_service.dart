@@ -51,7 +51,7 @@ class M2AutomatedWorkflowService {
     final requestId = _generateRequestId();
     final now = DateTime.now().toUtc();
     final fromDate = now.subtract(const Duration(days: 365));
-    final toDate = now.add(const Duration(days: 1));
+    final toDate = now; // ABDM rejects future dates for dateRange.to
     final dataEraseAt = now.add(const Duration(days: 30));
 
     await ConsentManagerApiService.initConsentRequest({

@@ -50,6 +50,7 @@ router.post(
     "/api/v3/health-information/on-request",
     "/v3/health-information/on-request",
   ],
+  GatewayAuthMiddleware,
   M2CallbackController.onHealthInformationOnRequest);
 
 router.post(
@@ -64,16 +65,19 @@ router.post(
 // add the /hip/... user-initiated URLs here: they are owned by user_init.
 router.post(
   ["/api/v3/care-contexts/discover", "/v3/care-contexts/discover"],
+  GatewayAuthMiddleware,
   M2CallbackController.handleDiscover
 );
 
 router.post(
   ["/api/v3/links/link/init", "/v3/links/link/init"],
+  GatewayAuthMiddleware,
   M2CallbackController.handleLinkInit
 );
 
 router.post(
   ["/api/v3/links/link/confirm", "/v3/links/link/confirm"],
+  GatewayAuthMiddleware,
   M2CallbackController.handleLinkConfirm
 );
 

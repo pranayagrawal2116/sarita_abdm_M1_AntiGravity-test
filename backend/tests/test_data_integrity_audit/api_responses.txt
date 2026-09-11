@@ -1,0 +1,37 @@
+[OUTBOUND REQUEST] POST https://dev.abdm.gov.in/api/hiecm/data-flow/v3/health-information/notify
+{
+  "headers": {
+    "Content-Type": "application/json",
+    "REQUEST-ID": "c61927f3-57c7-4d68-9ea1-5d953b31926b",
+    "TIMESTAMP": "2026-09-11T16:39:52.230Z",
+    "X-CM-ID": "sbx",
+    "Authorization": "Bearer mock-token",
+    "X-HIP-ID": "IN2410002480"
+  },
+  "data": {
+    "requestId": "d8c85d9b-81e8-4756-af9b-736ae576873c",
+    "timestamp": "2026-09-11T16:39:52.230Z",
+    "notification": {
+      "consentId": "CONSENT-A",
+      "transactionId": "TX-A",
+      "doneAt": "2026-09-11T16:39:52.230Z",
+      "notifier": {
+        "type": "HIP",
+        "id": "IN2410002480"
+      },
+      "statusNotification": {
+        "sessionStatus": "FAILED",
+        "hipId": "IN2410002480",
+        "statusResponses": [
+          {
+            "careContextReference": "patientB@sbx_22_bundle.json",
+            "hiStatus": "ERRORED",
+            "description": "Data transfer failed: Consent validation rejected data transfer: Consent is not active. Current status: undefined"
+          }
+        ]
+      }
+    }
+  }
+}
+[RESPONSE] Status: undefined
+

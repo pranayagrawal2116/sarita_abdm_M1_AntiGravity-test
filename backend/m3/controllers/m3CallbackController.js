@@ -29,15 +29,49 @@ class M3CallbackController {
     
     // We get consentRequest.id which is the actual consentRequestId from ABDM
     if (consentRequest && consentRequest.id && resp) {
-      M3ConsentStore.updateConsentByRequestId(resp.requestId, {
+      let updated = M3ConsentStore.updateConsentByRequestId(resp.requestId, {
         status: "INITIATED",
         consentRequestId: consentRequest.id,
       });
+      
+      if (!updated) {
+        try {
+          const M2TransactionStore = require("../../m2/transactions/M2TransactionStore");
+          const tx = M2TransactionStore.getTransaction(resp.requestId);
+          if (tx) {
+            await M2TransactionStore.updateTransaction(tx.transactionId || tx.requestId, {
+              consentRequestId: consentRequest.id,
+              currentState: "GatewayAcknowledged"
+            });
+            await M2TransactionStore.appendAuditEvent(tx.transactionId || tx.requestId, "CONSENT_INIT_CALLBACK_RECEIVED", "Consent init callback bridged from M3", {
+              callbackRequestId: resp.requestId,
+              consentRequestId: consentRequest.id,
+              payload: req.body
+            });
+            Logger.info("M3Callback", "Bridged consent on-init to M2TransactionStore successfully.");
+          }
+        } catch (e) {
+          Logger.error("M3Callback", "Failed to bridge on-init to M2.", e);
+        }
+      }
     } else if (error && resp) {
-      M3ConsentStore.updateConsentByRequestId(resp.requestId, {
+      let updated = M3ConsentStore.updateConsentByRequestId(resp.requestId, {
         status: "FAILED",
         error: error.message
       });
+      
+      if (!updated) {
+        try {
+          const M2TransactionStore = require("../../m2/transactions/M2TransactionStore");
+          const tx = M2TransactionStore.getTransaction(resp.requestId);
+          if (tx) {
+            M2TransactionStore.updateTransaction(tx.transactionId || tx.requestId, {
+              currentState: "Failed",
+              error: error
+            });
+          }
+        } catch (e) {}
+      }
     }
     res.status(202).send();
   }
@@ -95,7 +129,30 @@ class M3CallbackController {
         });
           
         if (!updated) {
-            Logger.error("M3Callback", "consentRequestId not found. Discarding unrelated callback.");
+           // Fallback to M2TransactionStore for Automated Data Transfer requests
+           try {
+              const M2TransactionStore = require("../../m2/transactions/M2TransactionStore");
+              const tx = M2TransactionStore.getTransaction(notification.consentRequestId);
+              if (tx) {
+                 await M2TransactionStore.updateTransaction(tx.transactionId, {
+                    currentState: "Granted",
+                    consentArtifactId: (notification.consentArtefacts && notification.consentArtefacts.length > 0) ? notification.consentArtefacts[0].id : undefined,
+                    consentDetails: {
+                       ...tx.consentDetails,
+                       status: "GRANTED",
+                       consentArtefacts: notification.consentArtefacts
+                    }
+                 });
+                 await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_NOTIFIED", "Consent granted.", { consentArtefacts: notification.consentArtefacts });
+                 updated = true;
+              }
+           } catch(e) {
+              Logger.error("M3Callback", "Failed to bridge M2 transaction", { error: e.message });
+           }
+        }
+        
+        if (!updated) {
+            Logger.warn("M3Callback", "consentRequestId not found. Discarding unrelated callback.");
             return;
         }
           
@@ -115,7 +172,24 @@ class M3CallbackController {
             updatedAt: timestamp
           });
          if (!updated) {
-           Logger.warn("M3Callback", "consentRequestId not found for status update. Discarding unrelated callback.", { consentRequestId: notification.consentRequestId, status: notification.status });
+           try {
+              const M2TransactionStore = require("../../m2/transactions/M2TransactionStore");
+              const tx = M2TransactionStore.getTransaction(notification.consentRequestId);
+              if (tx) {
+                 await M2TransactionStore.updateTransaction(tx.transactionId, {
+                    currentState: notification.status === "DENIED" ? "Denied" : notification.status === "REVOKED" ? "Revoked" : "Expired",
+                    consentDetails: {
+                       ...tx.consentDetails,
+                       status: notification.status
+                    }
+                 });
+                 await M2TransactionStore.appendAuditEvent(tx.transactionId, "CONSENT_NOTIFIED", `Consent ${notification.status}.`, { status: notification.status });
+                 updated = true;
+              }
+           } catch(e) {}
+           if (!updated) {
+              Logger.warn("M3Callback", "consentRequestId not found for status update. Discarding unrelated callback.", { consentRequestId: notification.consentRequestId, status: notification.status });
+           }
          }
          
          if (notification.status === "EXPIRED" || notification.status === "REVOKED") {

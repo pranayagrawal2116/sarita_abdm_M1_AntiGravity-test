@@ -58,14 +58,17 @@ const GatewayAuthMiddleware = (req, res, next) => {
         }
 
         // Configuration
-        const expectedIssuer = process.env.ABDM_GATEWAY_JWT_ISSUER || "https://dev.ndhm.gov.in/auth/realms/central-registry";
-        const expectedAudience = process.env.ABDM_GATEWAY_JWT_AUDIENCE || "account";
+        const expectedIssuer = process.env.ABDM_GATEWAY_JWT_ISSUER || "https://dev.abdm.gov.in/auth/realms/central-registry";
+        const expectedAudience = process.env.ABDM_GATEWAY_JWT_AUDIENCE;
 
         const options = {
             algorithms: ["RS256"],
-            issuer: expectedIssuer,
-            audience: expectedAudience
+            issuer: expectedIssuer
         };
+
+        if (expectedAudience && expectedAudience.trim().length > 0) {
+            options.audience = expectedAudience.trim();
+        }
 
         jwt.verify(token, getSigningKey, options, (err, decoded) => {
             if (err) {

@@ -466,7 +466,11 @@ class M2CallbackManager {
     if (!tx || !callbackRequestId) return false;
     const auditHistory = Array.isArray(tx.auditHistory) ? tx.auditHistory : [];
     const callbackHistory = Array.isArray(tx.callbackHistory) ? tx.callbackHistory : [];
-    return [...auditHistory, ...callbackHistory].some(event => event.details?.callbackRequestId === callbackRequestId);
+    return [...auditHistory, ...callbackHistory].some(event => 
+      event.details?.callbackRequestId === callbackRequestId || 
+      event.requestId === callbackRequestId || 
+      event.details?.requestId === callbackRequestId
+    );
   }
 
   /**

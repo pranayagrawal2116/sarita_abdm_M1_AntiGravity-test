@@ -448,7 +448,12 @@ class M2ConsentController {
       status: tx.currentState,
       entriesCount: Array.isArray(tx.entries) ? tx.entries.length : 0,
       payload: tx,
-      source: "M2TransactionStore"
+      source: "M2TransactionStore",
+      notification: {
+        status: tx.consentDetails?.status || tx.currentState,
+        consentArtefacts: tx.consentDetails?.consentArtefacts || []
+      },
+      entries: tx.entries || []
     });
   }
 

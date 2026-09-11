@@ -16,7 +16,7 @@ router.post([
   "/v3/hiu/consent/request/on-status",
   "/v3/consent/requests/on-status",
   "/api/v3/consent/requests/on-status"
-], M3CallbackController.onConsentStatus);
+], GatewayAuthMiddleware, M3CallbackController.onConsentStatus);
 
 router.post([
   "/api/v3/hiu/consent/request/notify", 
@@ -47,8 +47,8 @@ router.post([
 ], GatewayAuthMiddleware, M3CallbackController.healthInfoTransfer);
 
 // Subscription Callbacks
-router.post(["/api/v3/hiu/hiecm/subscription-requests/on-init", "/api/v3/hiu/subscription-requests/on-init"], M3CallbackController.onSubscriptionInit);
-router.post(["/api/v3/hiu/subscription-requests/hiu/notify", "/api/v3/hiu/subscription-requests/notify"], M3CallbackController.subscriptionNotify);
-router.post(["/api/v3/hiu/care-context/on-notify", "/api/v3/hiu/subscription/notify"], M3CallbackController.subscriptionContextNotify);
+router.post(["/api/v3/hiu/hiecm/subscription-requests/on-init", "/api/v3/hiu/subscription-requests/on-init"], GatewayAuthMiddleware, M3CallbackController.onSubscriptionInit);
+router.post(["/api/v3/hiu/subscription-requests/hiu/notify", "/api/v3/hiu/subscription-requests/notify"], GatewayAuthMiddleware, M3CallbackController.subscriptionNotify);
+router.post(["/api/v3/hiu/care-context/on-notify", "/api/v3/hiu/subscription/notify"], GatewayAuthMiddleware, M3CallbackController.subscriptionContextNotify);
 
 module.exports = router;

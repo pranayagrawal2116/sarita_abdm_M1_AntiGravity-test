@@ -25,8 +25,9 @@ const hospitalConfig = require("../../config/hospitalConfig");
 const { firstText, extractTransactionIdFromLinkToken } = require("../helpers/identifierUtils");
 
 const VALID_CONSENT_TRANSITIONS = {
-  "Requested": ["Active", "Rejected", "Expired"],
+  "Requested": ["Active", "GRANTED", "Rejected", "Expired"],
   "Active": ["Expired", "Revoked", "Completed"],
+  "GRANTED": ["Expired", "Revoked", "Completed"],
   "Rejected": [],
   "Expired": [],
   "Revoked": [],
@@ -65,6 +66,7 @@ class M2ConsentManager {
   async createConsent(consentData) {
     Logger.info("M2ConsentManager", "Creating consent record.", { patientId: consentData?.patientId });
 
+    let tempId;
     try {
       // 1. Obtain gateway credentials through TokenManager ONLY
       const token = await M2TokenManager.getGatewayToken();
@@ -73,7 +75,7 @@ class M2ConsentManager {
       }
 
       // 2. Establish transaction record in Store
-      const tempId = consentData.transactionId || uuidv4();
+      tempId = consentData.transactionId || uuidv4();
       const tx = await M2TransactionStore.createTransaction({
         transactionId: tempId,
         requestId: consentData.requestId || uuidv4(),
@@ -135,12 +137,14 @@ class M2ConsentManager {
               system: "https://www.mciindia.org"
             }
           },
-          hiTypes: consentData.hiTypes && consentData.hiTypes.length > 0 ? consentData.hiTypes : ["OPCONSULTATION"],
+          hiTypes: consentData.hiTypes && consentData.hiTypes.length > 0 ? consentData.hiTypes : ["OPConsultation"],
           permission: {
             accessMode: "VIEW",
             dateRange: {
               from: consentData.dateRange?.from ? new Date(consentData.dateRange.from).toISOString() : new Date(Date.now() - 365*24*60*60*1000).toISOString(),
-              to: consentData.dateRange?.to ? new Date(consentData.dateRange.to).toISOString() : new Date().toISOString()
+              to: consentData.dateRange?.to 
+                ? (new Date(consentData.dateRange.to) > new Date() ? new Date().toISOString() : new Date(consentData.dateRange.to).toISOString())
+                : new Date().toISOString()
             },
             dataEraseAt: consentData.expiry ? new Date(consentData.expiry).toISOString() : new Date(Date.now() + 30*24*60*60*1000).toISOString(),
             frequency: {
@@ -173,7 +177,26 @@ class M2ConsentManager {
 
     } catch (err) {
       Logger.error("M2ConsentManager", "Failed to create consent.", err);
-      return { status: "error", error: "CREATION_FAILED", message: err.message };
+      let gatewayError = undefined;
+      if (err.response) {
+        gatewayError = err.response.data;
+        Logger.error("M2ConsentManager", "ABDM Gateway responded with error", gatewayError);
+      }
+      
+      // Prevent false positive consent statuses by marking transaction as failed
+      if (tempId) {
+        try {
+          await M2TransactionStore.updateTransaction(tempId, {
+            currentState: "Error",
+            consentDetails: { status: "Error", error: err.message }
+          });
+          await M2TransactionStore.appendAuditEvent(tempId, "CONSENT_GATEWAY_ERROR", "Consent initialization failed at Gateway.", { error: err.message });
+        } catch (e) {
+           Logger.error("M2ConsentManager", "Failed to mark transaction as error.", e);
+        }
+      }
+      
+      return { status: "error", error: "CREATION_FAILED", message: err.message, gatewayError };
     }
   }
 
@@ -410,7 +433,7 @@ class M2ConsentManager {
       return { isValid: false, reason: "Consent has expired." };
     }
 
-    if (consent.status !== "Active") {
+    if (consent.status !== "Active" && consent.status !== "GRANTED") {
       return { isValid: false, reason: `Consent is not active. Current status: ${consent.status}` };
     }
 

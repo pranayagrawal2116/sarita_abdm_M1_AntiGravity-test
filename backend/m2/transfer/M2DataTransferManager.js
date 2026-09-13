@@ -132,9 +132,7 @@ class M2DataTransferManager {
       const normalizedRequestedTypes = requestedTypes.map(r => this.normalizeHiType(r));
       const bundlePayloads = this.loadBundlePayloads(bundlesToSend);
       const currentTx = M2TransactionStore.getTransaction(transactionId) || {};
-      if (currentTx.unmatchedConsentContext) {
-        throw new Error("Automatic transfer blocked because the consent care context was not linked to a local record.");
-      }
+
       const allTxs = M2TransactionStore.listTransactions();
       const contextCandidates = [
         currentTx.consentDetails?.careContexts,
@@ -189,8 +187,20 @@ class M2DataTransferManager {
          return true;
       });
 
-      // Push all matched payloads
+      // Push all matched payloads, but if no explicit contexts were requested (manual push),
+      // only push the latest bundle for each HI Type to avoid sending duplicate historical records.
       let selectedPayloads = [...matchedPayloads];
+      if (requestedCareContexts.length === 0) {
+        const latestPerType = new Map();
+        for (const payload of selectedPayloads) {
+          const type = this.normalizeHiType(payload.meta?.hiType);
+          const existing = latestPerType.get(type);
+          if (!existing || new Date(payload.meta?.updatedAt || 0) > new Date(existing.meta?.updatedAt || 0)) {
+            latestPerType.set(type, payload);
+          }
+        }
+        selectedPayloads = Array.from(latestPerType.values());
+      }
 
       // Older automated-link registrations did not retain a document-to-care
       // context mapping. That compatibility fallback is never valid for User
@@ -817,25 +827,7 @@ class M2DataTransferManager {
       source: "Official HIP Health Information Response"
     });
 
-    if (currentTx.unmatchedConsentContext) {
-      await M2TransactionStore.updateTransaction(currentTx.transactionId, {
-        automaticTransferSuppressed: true,
-        automaticTransferSuppressedAt: new Date().toISOString(),
-        automaticTransferSuppressionReason: "Consent care context did not match a local HIP-link or User Init transaction."
-      });
-      Logger.warn("M2DataTransferManager", "Automatic transfer suppressed for unmatched consent context.", {
-        transactionId: currentTx.transactionId,
-        consentId,
-        careContexts: currentTx.careContexts || []
-      });
-      return {
-        success: true,
-        skipped: true,
-        reason: "UNMATCHED_CARE_CONTEXT",
-        requestId: gatewayRequestId,
-        hiResponse
-      };
-    }
+
 
     // Automatically trigger data push in the background to prevent HIU timeouts
     if (true) { // Enabled auto-push for M2 & M3
@@ -1043,6 +1035,10 @@ class M2DataTransferManager {
   async sendHealthInformationNotify(tx, { requestId, consentId, transactionId, status, hiStatus, description }) {
     if (!requestId) {
       throw new Error("Cannot send health information notify without original gateway requestId.");
+    }
+    if (String(consentId).startsWith("consent_") || String(transactionId).startsWith("tx_")) {
+      Logger.info("M2DataTransferManager", "Skipping Gateway Notify for mock/local transaction", { consentId, transactionId });
+      return { skipped: true, reason: "MOCK_TRANSACTION" };
     }
     const token = await M2TokenManager.getGatewayToken();
     const baseHeaders = getHeaders(token);

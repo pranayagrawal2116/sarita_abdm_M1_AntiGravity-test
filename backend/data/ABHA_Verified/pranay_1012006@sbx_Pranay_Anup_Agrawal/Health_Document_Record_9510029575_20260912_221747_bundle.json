@@ -1,0 +1,246 @@
+{
+  "resourceType": "Bundle",
+  "id": "bundle-20ebf153-a5e3-4da9-b3d5-4f8d23a72d77",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2026-09-12T22:19:40.923+05:30",
+    "profile": [
+      "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentBundle"
+    ]
+  },
+  "identifier": {
+    "system": "https://abdm.gov.in/fhir/r4/document",
+    "value": "b9a12ccd-ddd6-4b6d-ad9b-d3a9547e26bc"
+  },
+  "type": "document",
+  "timestamp": "2026-09-12T22:19:40.923+05:30",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:6343e098-7707-4d63-884d-2749f70a1357",
+      "resource": {
+        "resourceType": "Composition",
+        "id": "6343e098-7707-4d63-884d-2749f70a1357",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/HealthDocumentRecord"
+          ]
+        },
+        "status": "final",
+        "type": {
+          "text": "Health Document Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:e844decb-0f46-487c-96a6-52a672b32e0a",
+          "display": "Pranay Anup Agrawal"
+        },
+        "encounter": {
+          "reference": "urn:uuid:337dc400-234f-4509-92df-e99b23f559c2",
+          "display": "Ambulatory"
+        },
+        "date": "2026-09-12T22:19:40.923+05:30",
+        "author": [
+          {
+            "reference": "urn:uuid:6afeed3e-06af-4d79-9910-14eded3016a4",
+            "display": "Dr. Sarita"
+          }
+        ],
+        "title": "Health Document Record",
+        "custodian": {
+          "reference": "urn:uuid:fd23f94e-ef8c-429d-9124-1b1a7c998f8a",
+          "display": "Sarita Health Care"
+        },
+        "section": [
+          {
+            "title": "Record artifact",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://snomed.info/sct",
+                  "code": "419891008",
+                  "display": "Record artifact"
+                }
+              ]
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:291d1405-6683-4308-8aa4-f1359bd7e057",
+                "display": "DocumentReference"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e844decb-0f46-487c-96a6-52a672b32e0a",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "e844decb-0f46-487c-96a6-52a672b32e0a",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-12T22:19:40.923+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical record number"
+                }
+              ],
+              "text": "Medical record number"
+            },
+            "system": "https://healthid.ndhm.gov.in",
+            "value": "pranay_1012006@sbx"
+          }
+        ],
+        "name": [
+          {
+            "text": "Pranay Anup Agrawal"
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "9510029575",
+            "use": "home"
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2006-01-21"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6afeed3e-06af-4d79-9910-14eded3016a4",
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "6afeed3e-06af-4d79-9910-14eded3016a4",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "2026-09-12T22:19:40.923+05:30",
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ],
+              "text": "Medical License number"
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": ""
+          }
+        ],
+        "name": [
+          {
+            "text": "Dr. Sarita"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:fd23f94e-ef8c-429d-9124-1b1a7c998f8a",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "fd23f94e-ef8c-429d-9124-1b1a7c998f8a",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ],
+              "text": "Provider number"
+            },
+            "system": "https://facility.ndhm.gov.in",
+            "value": "IN2410002480"
+          }
+        ],
+        "name": "Sarita Health Care"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:337dc400-234f-4509-92df-e99b23f559c2",
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "337dc400-234f-4509-92df-e99b23f559c2",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/Encounter"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "https://abdm.gov.in/fhir/encounter",
+            "value": "0a3291ef-bf60-440d-9557-accbdac76252"
+          }
+        ],
+        "status": "arrived",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "AMB",
+          "display": "Ambulatory-Walkable Outpatient Encounter"
+        },
+        "subject": {
+          "reference": "urn:uuid:e844decb-0f46-487c-96a6-52a672b32e0a",
+          "display": "Pranay Anup Agrawal"
+        },
+        "period": {
+          "start": "2026-09-12T22:19:40.923+05:30"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:291d1405-6683-4308-8aa4-f1359bd7e057",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "id": "291d1405-6683-4308-8aa4-f1359bd7e057",
+        "meta": {
+          "profile": [
+            "https://nrces.in/ndhm/fhir/r4/StructureDefinition/DocumentReference"
+          ]
+        },
+        "status": "current",
+        "docStatus": "final",
+        "type": {
+          "text": "Health Document Record"
+        },
+        "subject": {
+          "reference": "urn:uuid:e844decb-0f46-487c-96a6-52a672b32e0a"
+        },
+        "date": "2026-09-12T16:49:40.923Z",
+        "content": [
+          {
+            "attachment": {
+              "contentType": "application/pdf",
+              "language": "en-IN",
+              "data": "JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyAvUGFnZXMgMiAwIFIgPj4gZW5kb2JqCjIgMCBvYmogPDwgL1R5cGUgL1BhZ2VzIC9LaWRzIFszIDAgUl0gL0NvdW50IDEgPj4gZW5kb2JqCjMgMCBvYmogPDwgL1R5cGUgL1BhZ2UgL1BhcmVudCAyIDAgUiAvTWVkaWFCb3ggWzAgMCA1OTUgODQyXSAvUmVzb3VyY2VzIDw8IC9Gb250IDw8IC9GMSA0IDAgUiA+PiA+PiAvQ29udGVudHMgNSAwIFIgPj4gZW5kb2JqCjQgMCBvYmogPDwgL1R5cGUgL0ZvbnQgL1N1YnR5cGUgL1R5cGUxIC9CYXNlRm9udCAvSGVsdmV0aWNhID4+IGVuZG9iago1IDAgb2JqIDw8IC9MZW5ndGggODU5ID4+IHN0cmVhbQpCVAovRjEgMTQgVGYKNzIgNzYwIFRkCihIZWFsdGhEb2N1bWVudFJlY29yZCkgVGoKMCAtMjQgVGQKL0YxIDEwIFRmCihQYXRpZW50IFVISUQ6IFNIQzI5MDgyNjAxKSBUagowIC0xNCBUZAooQUJIQSBOdW1iZXI6IDkxLTE3MjItMDQwMC0wODI5KSBUagowIC0xNCBUZAooQUJIQSBBZGRyZXNzOiBwcmFuYXlfMTAxMjAwNkBzYngpIFRqCjAgLTE0IFRkCihIZWFsdGggSW5mb3JtYXRpb24gUmVjb3JkKSBUagowIC0xNCBUZAooPT09PT09PT09PT09PT09PT09PT09PT09PSkgVGoKMCAtMTQgVGQKKFR5cGU6IEhlYWx0aCBEb2N1bWVudCBSZWNvcmQpIFRqCjAgLTE0IFRkCihTYXZlZCBBdDogMjAyNi0wOS0xMiAyMjoxNzo0NykgVGoKMCAtMTQgVGQKKCkgVGoKMCAtMTQgVGQKKC0tLSBQYXRpZW50IERldGFpbHMgLS0tKSBUagowIC0xNCBUZAooTmFtZTogUHJhbmF5IEFudXAgQWdyYXdhbCkgVGoKMCAtMTQgVGQKKEFCSEEgQWRkcmVzczogLSkgVGoKMCAtMTQgVGQKKEFCSEEgTnVtYmVyOiAtKSBUagowIC0xNCBUZAooTW9iaWxlOiA5NTEwMDI5NTc1KSBUagowIC0xNCBUZAooR2VuZGVyOiBNYWxlKSBUagowIC0xNCBUZAooRE9CIC8gWU9COiAyMS0wMS0yMDA2KSBUagowIC0xNCBUZAooVUhJRDogLSkgVGoKMCAtMTQgVGQKKCkgVGoKMCAtMTQgVGQKKC0tLSBSZWNvcmQgRGF0YSAtLS0pIFRqCjAgLTE0IFRkCigpIFRqCjAgLTE0IFRkCihQREZfQkFTRTY0OiBKVkJFUmkweExqWUtKYWZqOGZFS01pQXdJRzlpYWdvOFBBb3ZUV1YwWVdSaGRHRWdOQ0F3SUZJS0wxQmhaMlZNWVdKbGJITWdOU0F3SUZJS0wxQmhaMlZ6SURZZ01DQlNDaSkgVGoKMCAtMTQgVGQKKC0pIFRqCjAgLTE0IFRkCigpIFRqCjAgLTE0IFRkCkVUCmVuZHN0cmVhbSBlbmRvYmoKdHJhaWxlciA8PCAvUm9vdCAxIDAgUiA+PgolJUVPRg==",
+              "title": "Health_Document_Record_9510029575_20260912_221747",
+              "creation": "2026-09-12T16:49:40.923Z"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

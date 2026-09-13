@@ -43,13 +43,13 @@ const HI_TYPE_TO_FHIR_RESOURCE = {
 };
 
 const HI_TYPE_TO_RECORD_TYPE = {
-  DiagnosticReport: "Diagnostic Report",
+  DiagnosticReport: "DiagnosticReport",
   Prescription: "Prescription",
   OPConsultation: "OPConsultation",
-  DischargeSummary: "Discharge Summary",
-  ImmunizationRecord: "Immunization",
-  HealthDocumentRecord: "Health Document",
-  WellnessRecord: "Wellness",
+  DischargeSummary: "DischargeSummary",
+  ImmunizationRecord: "ImmunizationRecord",
+  HealthDocumentRecord: "HealthDocumentRecord",
+  WellnessRecord: "WellnessRecord",
 };
 
 // Normalise an ABDM HI type string to the canonical key used above.
@@ -752,7 +752,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
   if (businessData.pdfBase64 && !forceGeneratedPdf) {
     // Explicitly provided via PDF_BASE64 in the text file
     log("Using explicit PDF_BASE64 from text document for", { recordType });
-  } else if (recordType === "OP Consultation") {
+  } else if (recordType === "OPConsultation") {
     const { generateOPConsultationPDF } = require("./pdfGenerator");
     try {
       businessData.pdfBase64 = await generateOPConsultationPDF(businessData);
@@ -760,7 +760,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       console.error("Failed to generate OP Consultation PDF", e);
       businessData.pdfBase64 = Buffer.from(businessData.textContent || "Record").toString("base64");
     }
-  } else if (recordType === "Wellness") {
+  } else if (recordType === "WellnessRecord") {
     const { generateWellnessRecordPDF } = require("./pdfGenerator");
     try {
       businessData.pdfBase64 = await generateWellnessRecordPDF(businessData);
@@ -768,7 +768,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       console.error("Failed to generate Wellness PDF", e);
       businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
     }
-  } else if (recordType === "Diagnostic Report") {
+  } else if (recordType === "DiagnosticReport") {
     const { generateDiagnosticReportPDF } = require("./pdfGenerator");
     try {
       businessData.pdfBase64 = await generateDiagnosticReportPDF(businessData);
@@ -776,7 +776,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       console.error("Failed to generate Diagnostic Report PDF", e);
       businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
     }
-  } else if (recordType === "Immunization") {
+  } else if (recordType === "ImmunizationRecord") {
     const { generateImmunizationRecordPDF } = require("./pdfGenerator");
     try {
       businessData.pdfBase64 = await generateImmunizationRecordPDF(businessData);
@@ -784,7 +784,7 @@ const buildWithRecordBuilder = async ({ abhaId, folderName, file, canonicalHiTyp
       console.error("Failed to generate Immunization PDF", e);
       businessData.pdfBase64 = createPdfBase64(file.hiType, file.content || file.textContent || "Record", businessData);
     }
-  } else if (recordType === "Discharge Summary") {
+  } else if (recordType === "DischargeSummary") {
     const { generateDischargeSummaryPDF } = require("./pdfGenerator");
     try {
       businessData.pdfBase64 = await generateDischargeSummaryPDF(businessData);
@@ -825,22 +825,22 @@ const generatePrescriptionRecordBundle = async ({ abhaId, folderName, file, cano
 };
 
 const generateDiagnosticReportBundle = async (context) =>
-  buildWithRecordBuilder({ ...context, recordType: "Diagnostic Report" });
+  buildWithRecordBuilder({ ...context, recordType: "DiagnosticReport" });
 
 const generateOPConsultationBundle = async (context) =>
-  buildWithRecordBuilder({ ...context, recordType: "OP Consultation" });
+  buildWithRecordBuilder({ ...context, recordType: "OPConsultation" });
 
 const generateDischargeSummaryBundle = async (context) =>
-  buildWithRecordBuilder({ ...context, recordType: "Discharge Summary" });
+  buildWithRecordBuilder({ ...context, recordType: "DischargeSummary" });
 
 const generateImmunizationRecordBundle = async (context) =>
-  buildWithRecordBuilder({ ...context, recordType: "Immunization" });
+  buildWithRecordBuilder({ ...context, recordType: "ImmunizationRecord" });
 
 const generateHealthDocumentRecordBundle = async (context) =>
-  buildWithRecordBuilder({ ...context, recordType: "Health Document" });
+  buildWithRecordBuilder({ ...context, recordType: "HealthDocumentRecord" });
 
 const generateWellnessRecordBundle = async (context) =>
-  buildWithRecordBuilder({ ...context, recordType: "Wellness" });
+  buildWithRecordBuilder({ ...context, recordType: "WellnessRecord" });
 
 const generateInvoiceRecordBundle = async (context) =>
   buildWithRecordBuilder({ ...context, recordType: "Invoice" });

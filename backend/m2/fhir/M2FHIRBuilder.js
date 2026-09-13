@@ -62,13 +62,13 @@ class M2FHIRBuilder {
    * Registers default out-of-the-box builders.
    */
   _registerDefaultBuilders() {
-    this.builders.set("OP Consultation", OpConsultationBuilder);
+    this.builders.set("OPConsultation", OpConsultationBuilder);
     this.builders.set("Prescription", PrescriptionBuilder);
-    this.builders.set("Wellness", WellnessBuilder);
-    this.builders.set("Immunization", ImmunizationBuilder);
-    this.builders.set("Health Document", HealthDocumentBuilder);
-    this.builders.set("Discharge Summary", DischargeSummaryBuilder);
-    this.builders.set("Diagnostic Report", DiagnosticReportBuilder);
+    this.builders.set("WellnessRecord", WellnessBuilder);
+    this.builders.set("ImmunizationRecord", ImmunizationBuilder);
+    this.builders.set("HealthDocumentRecord", HealthDocumentBuilder);
+    this.builders.set("DischargeSummary", DischargeSummaryBuilder);
+    this.builders.set("DiagnosticReport", DiagnosticReportBuilder);
     this.builders.set("Invoice", InvoiceBuilder);
   }
 

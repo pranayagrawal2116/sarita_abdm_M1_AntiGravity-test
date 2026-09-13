@@ -90,6 +90,8 @@ class M2DataTransferController {
         const normalized = String(type || "").replace(/\s+/g, "").toLowerCase();
         if (["dischargesummary", "ipddischargesummary", "discharge"].includes(normalized)) return "dischargesummary";
         if (["healthdocument", "healthdocumentrecord", "healthrecord"].includes(normalized)) return "healthdocumentrecord";
+        if (["wellness", "wellnessrecord"].includes(normalized)) return "wellnessrecord";
+        if (["immunization", "immunizationrecord"].includes(normalized)) return "immunizationrecord";
         return normalized;
       };
       

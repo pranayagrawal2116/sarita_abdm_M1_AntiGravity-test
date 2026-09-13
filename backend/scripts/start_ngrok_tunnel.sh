@@ -52,7 +52,7 @@ fi
 : > "$LOG_FILE"
 
 echo "Starting ngrok on port ${PORT_VALUE} with domain ${CLEAN_DOMAIN}..."
-nohup "$NGROK_BIN" http --url="${PUBLIC_URL}" "${PORT_VALUE}" >"$LOG_FILE" 2>&1 &
+nohup "$NGROK_BIN" http --url="${PUBLIC_URL}" --inspect=false "${PORT_VALUE}" >"$LOG_FILE" 2>&1 &
 PID=$!
 echo "$PID" > "$PID_FILE"
 

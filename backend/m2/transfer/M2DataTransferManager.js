@@ -358,6 +358,11 @@ class M2DataTransferManager {
       
       const refreshedTx = M2TransactionStore.getTransaction(transactionId);
       const notifyConsentId = this.resolveConsentArtifactId(refreshedTx, consentId);
+      
+      // Deliberate delay to allow the HIU (mobile app backend) time to decrypt 
+      // and parse the data before we send the final completion notification
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       const notifyResult = await this.sendHealthInformationNotify(refreshedTx, {
         requestId: refreshedTx.gatewayRequestId || refreshedTx.requestId || requestDetails?.requestId || transactionId,
         consentId: notifyConsentId,

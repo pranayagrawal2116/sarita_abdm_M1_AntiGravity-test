@@ -113,13 +113,17 @@ class M2CallbackController {
       return res.status(400).json({ error: "Missing requestId or hiRequest." });
     }
 
-    try {
-      const result = await M2CallbackManager.receiveCallback(payload);
-      return res.status(result.status === "error" ? 400 : 200).json(result);
-    } catch (err) {
-      Logger.error("M2CallbackController", "Error processing health information request.", err);
-      return res.status(500).json({ error: err.message });
-    }
+    // Immediately acknowledge the gateway to prevent 2-minute timeout retry cycle
+    res.status(202).json({});
+
+    // Process asynchronously out of the main request loop
+    setImmediate(async () => {
+      try {
+        await M2CallbackManager.receiveCallback(payload);
+      } catch (err) {
+        Logger.error("M2CallbackController", "Error processing health information request.", err);
+      }
+    });
   }
 
   static async receive(req, res) {

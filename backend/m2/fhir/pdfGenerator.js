@@ -826,13 +826,20 @@ const generateDischargeSummaryPDF = (params) => {
         ]
       };
 
-      const recordedDate = formatDate(params.timestamp);
+      const now = new Date();
+      const dischargeDateStr = formatDate(now.toISOString());
+      
+      const istNow = new Date(now.getTime() + 5.5 * 60 * 60 * 1000);
+      const admissionIst = new Date(istNow.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const admissionDateStr = `${admissionIst.getUTCFullYear()}-${String(admissionIst.getUTCMonth() + 1).padStart(2, '0')}-${String(admissionIst.getUTCDate()).padStart(2, '0')} 13:47`;
 
       docDefinition.content.push(
         { text: `Status:   final`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
-        { text: `Admission Date:   ${recordedDate}`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
-        { text: `Discharge Date:   ${recordedDate}`, fontSize: 10, bold: true, margin: [0, 0, 0, 10] }
+        { text: `Admission Date:   ${admissionDateStr}`, fontSize: 10, bold: true, margin: [0, 0, 0, 2] },
+        { text: `Discharge Date:   ${dischargeDateStr}`, fontSize: 10, bold: true, margin: [0, 0, 0, 10] }
       );
+
+      const recordedDate = formatDate(params.timestamp);
 
       // Chief Complaints
       if (params.complaints && params.complaints.length > 0) {

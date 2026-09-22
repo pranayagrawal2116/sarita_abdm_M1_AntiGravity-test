@@ -34,9 +34,8 @@
 
   <!-- PDF.js for Syncfusion PDF Viewer -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
-  <script type="text/javascript">
-     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js";
-  </script>
+  <!-- Externalized initialization scripts to avoid CSP unsafe-inline -->
+  <script src="init.js"></script>
 </head>
 <body>
   <!--
@@ -47,15 +46,6 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for(let registration of registrations) {
-          registration.unregister();
-        }
-      });
-    }
-  </script>
   <script src="flutter_bootstrap.js?v=2" async></script>
 </body>
 </html>

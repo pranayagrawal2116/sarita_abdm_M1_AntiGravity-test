@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sarita_abdm/screens/start_screen.dart';
+import '../config/hospital_config.dart';
 import '../utils/api_config.dart';
+import '../utils/app_runtime_store.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -41,6 +43,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        if (body['token'] != null) {
+          AppRuntimeStore.setValue('admin_session', body['token']);
+        }
         if (!mounted) return;
         Navigator.of(context).pushReplacement(
           PageRouteBuilder<void>(

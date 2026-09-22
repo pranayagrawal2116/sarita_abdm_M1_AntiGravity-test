@@ -15,7 +15,11 @@ import 'package:sarita_abdm/widgets/scan_share_qr_dialog.dart';
 
 import '../utils/app_runtime_store.dart';
 import '../utils/registered_users_store.dart';
+import '../utils/api_config.dart';
 import '../m3/screens/hiu_module_screen.dart';
+import 'login_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -30,6 +34,7 @@ class _StartScreenState extends State<StartScreen> {
   final TextEditingController _searchCtrl = TextEditingController();
   List<Map<String, dynamic>> _scanShareQueue = const <Map<String, dynamic>>[];
   Timer? _scanSharePollTimer;
+  Timer? _heartbeatTimer;
   bool _scanShareLoading = false;
   bool _preparingScanShareQr = false;
   String? _scanShareError;
@@ -42,11 +47,41 @@ class _StartScreenState extends State<StartScreen> {
       const Duration(seconds: 5),
       (_) => _refreshScanShareQueue(silent: true),
     );
+    _heartbeatTimer = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => _sendHeartbeat(),
+    );
+  }
+
+  Future<void> _sendHeartbeat() async {
+    final token = AppRuntimeStore.values['admin_session'];
+    if (token == null) return;
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}/admin/heartbeat'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'ngrok-skip-browser-warning': 'true',
+        },
+      );
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        _heartbeatTimer?.cancel();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Session expired or logged in on another device.')),
+          );
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const LoginScreen()),
+          );
+        }
+      }
+    } catch (_) {}
   }
 
   @override
   void dispose() {
     _scanSharePollTimer?.cancel();
+    _heartbeatTimer?.cancel();
     _searchCtrl.dispose();
     super.dispose();
   }

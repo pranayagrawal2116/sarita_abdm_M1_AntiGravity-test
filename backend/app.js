@@ -330,7 +330,7 @@ app.get("/api/config/callbacks", (req, res) => {
 
 // Routes
 app.use("/api/Abha", require("./routes/abhaRoutes"));
-app.use("/api/admin", require("./routes/authRoutes"));
+app.use("/api/admin", require("./routes/authRoutes").router);
 app.use("/api/facilities", require("./routes/facilityProviderRoutes"));
 app.use("/api/scan-share", require("./routes/scanShareRoutes"));
 app.use("/api/hip/link", require("./routes/hipLinkingRoutes"));

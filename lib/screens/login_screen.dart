@@ -57,6 +57,11 @@ class _LoginScreenState extends State<LoginScreen> {
             },
           ),
         );
+      } else if (response.statusCode == 409) {
+        final body = jsonDecode(response.body);
+        setState(() {
+          _errorMessage = body['message'] ?? 'This account is already logged in on another device or browser. Please log out from the other session first.';
+        });
       } else {
         final body = jsonDecode(response.body);
         setState(() {
@@ -65,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Network error. Please try again.';
+        _errorMessage = 'Failed to connect to server. Please try again.';
       });
     } finally {
       if (mounted) {

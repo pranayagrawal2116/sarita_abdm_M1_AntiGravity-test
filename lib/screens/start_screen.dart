@@ -86,10 +86,42 @@ class _StartScreenState extends State<StartScreen> {
     super.dispose();
   }
 
+  Future<void> _handleLogout() async {
+    final token = AppRuntimeStore.values['admin_session'];
+    if (token != null) {
+      try {
+        await http.post(
+          Uri.parse('${ApiConfig.baseUrl}/admin/logout'),
+          headers: {
+            'Authorization': 'Bearer $token',
+            'ngrok-skip-browser-warning': 'true',
+          },
+        );
+      } catch (_) {}
+    }
+    _heartbeatTimer?.cancel();
+    AppRuntimeStore.setValue('admin_session', null);
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(HospitalConfig.appTitle)),
+      appBar: AppBar(
+        title: Text(HospitalConfig.appTitle),
+        actions: [
+          TextButton.icon(
+            onPressed: _handleLogout,
+            icon: const Icon(Icons.logout, color: Colors.white),
+            label: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
       body: ValueListenableBuilder<int>(
         valueListenable: AppRuntimeStore.revision,
         builder: (context, value, child) {
